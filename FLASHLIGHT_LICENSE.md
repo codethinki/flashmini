@@ -1,8 +1,8 @@
-Applies to all modifications additions and deletions done by me or contributors on this repository.
-All other code is subject to the [flashlight license](FLASHLIGHT_LICENSE.md) 
+This license applies to ALL code that is not explicitly marked 
 
 MIT License
-Copyright (c) Lukas Thomann
+
+Copyright (c) Meta Platforms, Inc. and affiliates.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
