@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 option(FL_BUILD_DISTRIBUTED
-  "Build distributed computation capabilities with Flashlight" ON)
+  "Build distributed computation capabilities with Flashlight" OFF)
 
 # Determine build option defaults
 if (APPLE OR NOT FL_BUILD_DISTRIBUTED)

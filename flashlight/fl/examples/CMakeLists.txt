@@ -8,10 +8,13 @@ if (NOT TARGET flashlight)
   find_package(flashlight CONFIG REQUIRED)
 endif ()
 
+find_package(fmt)
+
 function(build_example SRCFILE)
   get_filename_component(src_name ${SRCFILE} NAME_WE)
   set(target "${src_name}")
   add_executable(${target} ${SRCFILE})
+  target_link_libraries(${target} PRIVATE fmt::fmt)
   if (TARGET flashlight)
     target_link_libraries(${target} PRIVATE flashlight)
   else ()

@@ -1,0 +1,106 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "vcpkg",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "ninja",
+      "hidden": true,
+      "generator": "Ninja Multi-Config"
+    },
+    {
+      "name": "base",
+      "hidden": true,
+      "inherits": [
+        "ninja",
+        "vcpkg"
+      ]
+    },
+
+    {
+      "name": "msvc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_C_COMPILER": "cl.exe"
+      }
+    },
+    {
+      "name": "clang-cl",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang-cl.exe",
+        "CMAKE_C_COMPILER": "clang-cl.exe"
+      }
+    },
+    {
+      "name": "clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++.exe",
+        "CMAKE_C_COMPILER": "clang.exe"
+      }
+    },
+    {
+      "name": "cuda-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CUDA_COMPILER": "$env{CUDA_PATH}/bin/nvcc.exe",
+        "FL_USE_CUDNN": false,
+        "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler"
+      }
+    },
+    {
+      "name": "distributed",
+      "hidden": true,
+      "cacheVariables": {
+        "FL_BUILD_DISTRIBUTED": true
+      }
+    },
+    {
+      "name": "af-backend-base",
+      "hidden": true,
+      "cacheVariables": {
+        "FL_BUILD_ARRAYFIRE": true,
+        "FL_USE_ARRAYFIRE": true
+      }
+    },
+    {
+      "name": "af-cpu-backend",
+      "hidden": true,
+      "inherits": "af-backend-base"
+    },
+    {
+      "name": "af-cuda-backend",
+      "hidden": true,
+      "inherits": [
+        "af-backend-base",
+        "cuda-base"
+      ],
+      "cacheVariables": {
+        "FL_ARRAYFIRE_USE_CUDA": true
+      }
+    },
+    {
+      "name": "msvc_af_cuda",
+      "inherits": [
+        "base",
+        "msvc",
+        "af-cuda-backend"
+      ]
+    },
+    {
+      "name": "clang-cl_af_cuda",
+      "inherits": [
+        "base",
+        "clang-cl",
+        "af-cuda-backend"
+      ]
+    }
+  ]
+}

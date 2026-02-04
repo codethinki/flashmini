@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 option(FL_USE_CUDNN "Build with cuDNN support" OFF)
 
-find_package(CUDNN)
+if(FL_USE_CUDNN)
+  find_package(CUDNN)
+  message(STATUS "configuring with CUDNN enabled")
+endif()
 if (NOT CUDNN_FOUND AND FL_USE_CUDNN)
   message(FATAL_ERROR
     "cuDNN required to build cuDNN backend: cuDNN was not found")

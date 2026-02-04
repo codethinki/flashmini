@@ -34,7 +34,7 @@ Dim Shape::elements() const {
   if (dims_.empty()) {
     return kEmptyShapeNumberOfElements;
   }
-  return std::accumulate(dims_.begin(), dims_.end(), 1, std::multiplies<Dim>());
+  return std::accumulate(dims_.begin(), dims_.end(), static_cast<Dim>(1), std::multiplies<Dim>());
 }
 
 int Shape::ndim() const {

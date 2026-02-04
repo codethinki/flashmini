@@ -6,6 +6,7 @@
  */
 
 #include <array>
+#include <chrono>
 #include <inttypes.h>
 #include <stdexcept>
 #include <thread>

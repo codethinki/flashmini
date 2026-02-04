@@ -12,7 +12,7 @@ if(CCACHE_PROGRAM)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # The CUDA standard is still C++14 to enable interopability with
@@ -129,7 +129,6 @@ endif()
 
 # --------------------------- pkg/app ---------------------------
 include(${FL_ROOT_DIR}/pkg/CMakeLists.txt)
-include(${FL_ROOT_DIR}/app/CMakeLists.txt)
 
 # --------------------------- Cleanup ---------------------------
 setup_install_targets(INSTALL_TARGETS ${INSTALLABLE_TARGETS})

@@ -115,7 +115,7 @@ class FL_API Container : public Module {
       throw std::invalid_argument("can't add null Module to Container");
     }
     for (int i = 0; i < module->numParamTensors(); i++) {
-      childParamIdx_[params_.size()] = std::make_tuple(modules_.size(), i);
+      childParamIdx_[params_.size()] = std::make_tuple(static_cast<int>(modules_.size()), i);
       params_.push_back(module->param(i));
     }
     modules_.emplace_back(std::move(module));
