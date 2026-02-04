@@ -11,10 +11,6 @@
   #include "flashlight/fl/tensor/backend/af/ArrayFireBackend.h"
   #include "flashlight/fl/tensor/backend/af/ArrayFireTensor.h"
 #endif
-#if FL_USE_ONEDNN
-  #include "flashlight/fl/tensor/backend/onednn/OneDnnBackend.h"
-  #include "flashlight/fl/tensor/backend/onednn/OneDnnTensor.h"
-#endif
 #if FL_USE_TENSOR_STUB
   #include "flashlight/fl/tensor/backend/stub/StubBackend.h"
   #include "flashlight/fl/tensor/backend/stub/StubTensor.h"
@@ -33,10 +29,6 @@ using DefaultTensorType_t = fl::ArrayFireTensor;
 using DefaultTensorBackend_t = fl::ArrayFireBackend;
 #define FL_DEFAULT_BACKEND_COMPILE_FLAG FL_USE_ARRAYFIRE
 
-#elif FL_USE_ONEDNN
-using DefaultTensorType_t = fl::OneDnnTensor;
-using DefaultTensorBackend_t = fl::OneDnnBackend;
-#define FL_DEFAULT_BACKEND_COMPILE_FLAG FL_USE_ONEDNN
 
 #elif FL_USE_TENSOR_STUB
 using DefaultTensorType_t = fl::StubTensor;
