@@ -33,7 +33,7 @@ PrefetchDataset::PrefetchDataset(
     auto deviceId = fl::getDevice();
     threadPool_ = std::make_unique<ThreadPool>(
         numThreads_,
-        [deviceId](int /* threadId */) { fl::setDevice(deviceId); });
+        [deviceId](size_t /* threadId */) { fl::setDevice(deviceId); });
   }
 }
 

@@ -31,7 +31,7 @@ std::unordered_multimap<int, int> Container::getOrphanedParamsIdxMap() const {
       const auto& mod = modules_.at(midx);
       i += mod->params().size();
     } else {
-      orphanedParamsIdxMap.emplace(prevMidx, i);
+      orphanedParamsIdxMap.emplace(prevMidx, static_cast<int>(i));
       ++i;
     }
   }

@@ -70,7 +70,7 @@ TEST(SerializationTest, OptimizerSerialize) {
   }
 
   std::shared_ptr<FirstOrderOptimizer> opt;
-  opt = std::make_shared<AdamOptimizer>(parameters, 0.0001);
+  opt = std::make_shared<AdamOptimizer>(parameters, 0.0001f);
   opt->step();
 
   save(

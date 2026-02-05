@@ -97,7 +97,7 @@ Variable LayerNorm::forward(const Variable& _input) {
       epsilon_);
 
   if (!axesContinuous) {
-    std::vector<std::pair<int, int>> restoreDims;
+    std::vector<std::pair<size_t, Dim>> restoreDims;
     for (size_t i = 0; i < reorderDims.ndim(); ++i) {
       restoreDims.emplace_back(reorderDims[i], i);
     }
