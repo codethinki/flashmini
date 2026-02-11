@@ -1,0 +1,33 @@
+{
+  "version": 3,
+
+  "buildPresets": [
+    {
+        "name": "ci-base",
+        "hidden": true,
+        "configuration": "Release"
+    },
+    {
+        "name": "win_msvc_af_cpu_ci_build_test",
+        "configurePreset": "msvc_af_cpu",
+        "inherits": "ci-base"
+        
+    },
+    {
+        "name": "win_msvc_af_cuda_ci_build",
+        "configurePreset": "msvc_af_cuda",
+        "inherits": "ci-base"
+    },
+    {
+        "name": "linux_gcc_af_cpu_ci_build_test",
+        "configurePreset": "gcc_af_cpu",
+        "inherits": "ci-base"
+        
+    },
+    {
+        "name": "linux_gcc_af_cuda_ci_build",
+        "configurePreset": "gcc_af_cuda",
+        "inherits": "ci-base"
+    }
+  ]
+}
