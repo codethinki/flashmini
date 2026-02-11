@@ -16,9 +16,7 @@ compiles not:
 
 
 ### [Contributing](CONTRIBUTING.md)
-
-
-### [Code of Conduct](CODE_OF_CONDUCT.md)
+Please read the [todo list](TODO.md)
 
 
 ### Quirks
@@ -31,3 +29,5 @@ compiles not:
 - backends removed:
     - oneDNN
     - JIT
+
+### [Code of Conduct](CODE_OF_CONDUCT.md)
