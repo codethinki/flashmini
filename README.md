@@ -6,8 +6,6 @@
 
 compiles on:
 - msvc windows
-
-may compile on:
 - gcc linux
 
 does not compile on:
