@@ -32,6 +32,13 @@
       "generator": "Ninja Multi-Config"
     },
     {
+      "name" : "build-cache",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER_LAUNCHER": "BuildCache"
+      }
+    },
+    {
       "name": "base",
       "hidden": true,
       "inherits": [

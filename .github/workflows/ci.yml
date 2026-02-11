@@ -41,13 +41,15 @@ jobs:
 
       - name: Setup Linux Env
         uses: ./.github/actions/setup-linux
+        with:
+          compiler: ${{ matrix.compiler }}
 
       # Vcpkg cache
       - name: Cache vcpkg installed
         uses: actions/cache@v4
         with:
           path: |
-            out/build/base/vcpkg_installed
+            vcpkg_installed
           key: vcpkg-installed-linux-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-installed-linux-${{ matrix.compiler }}-
@@ -57,9 +59,7 @@ jobs:
         with:
           run: |
             cp ci/CMakeUserPresets.json CMakeUserPresets.json
-            cmake --preset ${{ matrix.compiler }}_af_cpu \
-              -DFL_BUILD_TESTS=ON \
-              -DFL_BUILD_STANDALONE=ON
+            cmake --preset ci_${{ matrix.compiler }}_af_cpu
 
       - name: Build
         uses: ./.github/actions/run-linux
@@ -69,7 +69,7 @@ jobs:
       - name: Test
         uses: ./.github/actions/run-linux
         with:
-          run: ctest --test-dir out/build/${{ matrix.compiler }}_af_cpu -C Release --output-on-failure
+          run: ctest --test-dir out/build/ci_${{ matrix.compiler }}_af_cpu -C Release --output-on-failure
 
       - name: Fix permissions
         if: always()
@@ -120,9 +120,7 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item ci/CMakeUserPresets.json CMakeUserPresets.json
-          cmake --preset msvc_af_cpu `
-            -DFL_BUILD_TESTS=ON `
-            -DFL_BUILD_STANDALONE=ON
+          cmake --preset ci_msvc_af_cpu
 
       - name: Build
         shell: pwsh
@@ -132,4 +130,4 @@ jobs:
       - name: Test
         shell: pwsh
         run: |
-          ctest --test-dir out/build/msvc_af_cpu -C Release --output-on-failure
+          ctest --test-dir out/build/ci_msvc_af_cpu -C Release --output-on-failure

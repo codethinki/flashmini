@@ -1,33 +1,71 @@
 {
-  "version": 3,
-
-  "buildPresets": [
-    {
-        "name": "ci-base",
-        "hidden": true,
-        "configuration": "Release"
-    },
-    {
-        "name": "win_msvc_af_cpu_ci_build_test",
-        "configurePreset": "msvc_af_cpu",
-        "inherits": "ci-base"
-        
-    },
-    {
-        "name": "win_msvc_af_cuda_ci_build",
-        "configurePreset": "msvc_af_cuda",
-        "inherits": "ci-base"
-    },
-    {
-        "name": "linux_gcc_af_cpu_ci_build_test",
-        "configurePreset": "gcc_af_cpu",
-        "inherits": "ci-base"
-        
-    },
-    {
-        "name": "linux_gcc_af_cuda_ci_build",
-        "configurePreset": "gcc_af_cuda",
-        "inherits": "ci-base"
-    }
-  ]
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "ci-config-base",
+            "hidden": true,
+            "inherits": [
+                "build-cache"
+            ],
+            "cacheVariables": {
+                "FL_BUILD_TESTS": "ON",
+                "FL_BUILD_STANDALONE": "ON"
+            }
+        },
+        {
+            "name": "ci_msvc_af_cpu",
+            "inherits": [
+                "ci-config-base",
+                "msvc_af_cpu"
+            ]
+        },
+        {
+            "name": "ci_msvc_af_cuda",
+            "inherits": [
+                "ci-config-base",
+                "msvc_af_cuda"
+            ]
+        },
+        {
+            "name": "ci_gcc_af_cpu",
+            "inherits": [
+                "ci-config-base",
+                "gcc_af_cpu"
+            ]
+        },
+        {
+            "name": "ci_gcc_af_cuda",
+            "inherits": [
+                "ci-config-base",
+                "gcc_af_cuda"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "ci-build-base",
+            "hidden": true,
+            "configuration": "Release"
+        },
+        {
+            "name": "win_msvc_af_cpu_ci_build_test",
+            "configurePreset": "ci_msvc_af_cpu",
+            "inherits": "ci-build-base"
+        },
+        {
+            "name": "win_msvc_af_cuda_ci_build",
+            "configurePreset": "ci_msvc_af_cuda",
+            "inherits": "ci-build-base"
+        },
+        {
+            "name": "linux_gcc_af_cpu_ci_build_test",
+            "configurePreset": "ci_gcc_af_cpu",
+            "inherits": "ci-build-base"
+        },
+        {
+            "name": "linux_gcc_af_cuda_ci_build",
+            "configurePreset": "ci_gcc_af_cuda",
+            "inherits": "ci-build-base"
+        }
+    ]
 }
