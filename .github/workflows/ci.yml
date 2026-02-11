@@ -31,12 +31,17 @@ jobs:
       matrix:
         compiler: [gcc]
     steps:
-      - name: Analyze Disk Usage
+      - name: Analyze Disk Usage (Detailed)
         run: |
           df -h
-          echo "--- Large Directories (Depth 2) ---"
-          sudo du -h --max-depth=2 --exclude=/proc --exclude=/sys --exclude=/dev /usr /opt /var | sort -rh | head -n 20
-      
+          echo "--- Top 10 Largest Directories in /usr/local ---"
+          sudo du -h --max-depth=2 /usr/local | sort -rh | head -n 10
+          echo "--- Top 10 Largest Directories in /opt ---"
+          sudo du -h --max-depth=2 /opt | sort -rh | head -n 10
+          echo "--- Top 10 Directories by File Count (Slow to Delete) ---"
+          # Find directories with most files (approximate check on top usage dirs)
+          sudo find /usr/local /opt -maxdepth 3 -type d -print0 | xargs -0 -I{} sh -c 'echo "$(find "{}" -maxdepth 1 | wc -l) {}"' | sort -rn | head -n 10
+
       # - name: Free Disk Space
       #   run: |
       #     sudo rm -rf /usr/share/dotnet
