@@ -77,12 +77,13 @@
       "name": "cuda-base",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CUDA_COMPILER": "$env{CUDA_PATH}/bin/nvcc",
+        "CMAKE_CUDA_COMPILER": "nvcc",
         "FL_USE_CUDNN": false,
 
         "CMAKE_CUDA_ARCHITECTURES": "native",
-        "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler"
+        "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler",
 
+        "VCPKG_MANIFEST_FEATURES": "cuda"
       }
     },
     {
@@ -113,7 +114,10 @@
       "inherits": [
         "cpu-base",
         "af-backend-base"
-      ]
+      ],
+      "cacheVariables": {
+        "FL_ARRAYFIRE_USE_CPU": true
+      }
     },
     {
       "name": "af-cuda-backend",
@@ -135,19 +139,27 @@
       ]
     },
     {
-      "name": "clang-cl_af_cuda",
-      "inherits": [
-        "base",
-        "clang-cl",
-        "af-cuda-backend"
-      ]
-    },
-    {
       "name": "gcc_af_cuda",
       "inherits": [
         "base",
         "gcc",
         "af-cuda-backend"
+      ]
+    },
+    {
+      "name": "msvc_af_cpu",
+      "inherits": [
+        "base",
+        "msvc",
+        "af-cpu-backend"
+      ]
+    },
+    {
+      "name": "gcc_af_cpu",
+      "inherits": [
+        "base",
+        "gcc",
+        "af-cpu-backend"
       ]
     }
   ]

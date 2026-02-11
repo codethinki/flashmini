@@ -48,16 +48,16 @@ std::string prettyStringMemorySizeUnits(size_t size) {
   while (size) {
     size_t shift = 0;
     const char* unit = "";
-    if (size >= (1L << 40)) { // >= 8TB
+    if (size >= (1ULL << 40)) { // >= 8TB
       shift = 40;
       unit = "TB";
-    } else if (size >= (1L << 30)) { // >= 8G B
+    } else if (size >= (1ULL << 30)) { // >= 8G B
       shift = 30;
       unit = "GB";
-    } else if (size >= (1L << 20)) { // >= 8M B
+    } else if (size >= (1ULL << 20)) { // >= 8M B
       shift = 20;
       unit = "MB";
-    } else if (size >= (1L << 10)) { // >= 8K B
+    } else if (size >= (1ULL << 10)) { // >= 8K B
       shift = 10;
       unit = "KB";
     }
