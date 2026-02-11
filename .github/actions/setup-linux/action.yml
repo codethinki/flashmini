@@ -1,0 +1,31 @@
+name: 'Setup Linux Environment'
+description: 'Restores caches for Linux runtime'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+    - name: Create BuildCache Directory
+      shell: bash
+      run: mkdir -p .buildcache
+
+    - name: Restore BuildCache directory
+      uses: actions/cache@v4
+      with:
+        path: .buildcache
+        key: buildcache-linux-${{ github.sha }}
+        restore-keys: |
+          buildcache-linux-
+
+    - name: Export GitHub Actions Cache Environment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');

@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  #
+  # Linux
+  #
+  linux-prepare:
+    name: Prepare Linux Container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-linux-container
+
+  linux-test:
+    name: Linux Test (${{ matrix.compiler }}-release)
+    needs: linux-prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [clang, gcc]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Linux Env
+        uses: ./.github/actions/setup-linux
+
+      # Vcpkg cache
+      - name: Cache vcpkg installed
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/build/base/vcpkg_installed
+          key: vcpkg-installed-linux-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-installed-linux-${{ matrix.compiler }}-
+
+      - name: Configure
+        uses: ./.github/actions/run-linux
+        with:
+          run: |
+            cmake --preset base \
+              -DCMAKE_CXX_COMPILER=${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }} \
+              -DCMAKE_C_COMPILER=${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }} \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DFL_BUILD_TESTS=ON \
+              -DFL_BUILD_STANDALONE=ON
+
+      - name: Build
+        uses: ./.github/actions/run-linux
+        with:
+          run: cmake --build --preset base
+
+      - name: Test
+        uses: ./.github/actions/run-linux
+        with:
+          run: ctest --preset base --output-on-failure
+
+      - name: Fix permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) out/build
+  
+  #
+  # Windows
+  #
+  windows-test:
+    name: Windows Test (${{ matrix.compiler }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [msvc] 
+        # clang on windows skipped for simplicity unless requested, cth had it.
+        # Keeping msvc only to save CI time/complexity initially.
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Install Core Dependencies (Legacy/Manual Integration)
+      # Using ArrayFire as standard backend config
+      - uses: ./.github/actions/install_core_deps
+        with:
+          backend: ArrayFire
+          distributed_backend: Stub
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: ".github/requirements.txt"
+
+      - name: Install CMake & Ninja
+        shell: pwsh
+        run: |
+          pip install --upgrade -r .github/requirements.txt
+
+      - name: Setup Windows Env
+        uses: ./.github/actions/setup-windows
+        with:
+          compiler: ${{ matrix.compiler }}
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake --preset base `
+            -DCMAKE_CXX_COMPILER=cl `
+            -DCMAKE_C_COMPILER=cl `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DFL_BUILD_TESTS=ON `
+            -DFL_BUILD_STANDALONE=ON `
+            -DFL_USE_ARRAYFIRE=ON
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build --preset base
+
+      - name: Test
+        shell: pwsh
+        run: |
+          ctest --preset base --output-on-failure

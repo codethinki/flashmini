@@ -1,0 +1,21 @@
+name: 'Run in Linux Container'
+description: 'Runs a script inside the flashmini-linux container'
+inputs:
+  run:
+    description: 'Command to run'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Docker Command
+      uses: addnab/docker-run-action@v3
+      with:
+        image: ghcr.io/${{ github.repository }}:linux-latest
+        options: >-
+            -v ${{ github.workspace }}:/work 
+            -w /work 
+            -e BUILDCACHE_DIR=/work/.buildcache
+            -e ACTIONS_CACHE_URL=${{ env.ACTIONS_CACHE_URL }}
+            -e ACTIONS_RUNTIME_TOKEN=${{ env.ACTIONS_RUNTIME_TOKEN }}
+        run: ${{ inputs.run }}

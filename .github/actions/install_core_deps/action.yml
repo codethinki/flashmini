@@ -31,14 +31,9 @@ runs:
       shell: bash -el {0}
     - name: "Install ArrayFire (Windows)"
       run: |
-        choco install --no-progress wget -y
-        cd $HOME
-        INSTALLER_NAME="ArrayFire-v3.8.1-CUDA-11.4.exe"
-        wget --quiet https://arrayfire.s3.amazonaws.com/3.8.1/$INSTALLER_NAME
-        7z.exe x $INSTALLER_NAME -o"C:\Program Files\ArrayFire" -y
-        rm $INSTALLER_NAME
+        winget install --id ArrayFire.ArrayFire -e --accept-package-agreements --accept-source-agreements
       if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
-      shell: bash -el {0}
+      shell: pwsh
     # oneDNN
     - name: Install oneDNN with micromamba
       uses: mamba-org/setup-micromamba@v1
