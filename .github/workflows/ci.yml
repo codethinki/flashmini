@@ -31,12 +31,18 @@ jobs:
       matrix:
         compiler: [gcc]
     steps:
-      - name: Free Disk Space
+      - name: Analyze Disk Usage
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+          echo "--- Large Directories (Depth 2) ---"
+          sudo du -h --max-depth=2 --exclude=/proc --exclude=/sys --exclude=/dev /usr /opt /var | sort -rh | head -n 20
+      
+      # - name: Free Disk Space
+      #   run: |
+      #     sudo rm -rf /usr/share/dotnet
+      #     sudo rm -rf /usr/local/lib/android
+      #     sudo rm -rf /opt/ghc
+      #     sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - uses: actions/checkout@v4
         with:
