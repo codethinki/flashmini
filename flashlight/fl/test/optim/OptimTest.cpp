@@ -91,7 +91,7 @@ TEST(SerializationTest, OptimizerSerialize) {
     ASSERT_TRUE(allClose(parameters[i].tensor(), parameters2[i].tensor()));
   }
 
-  opt = std::make_shared<NovogradOptimizer>(parameters, 0.01);
+  opt = std::make_shared<NovogradOptimizer>(parameters, 0.01f);
   opt->step();
 
   save(

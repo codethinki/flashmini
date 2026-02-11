@@ -1,7 +1,32 @@
 {
+  "name": "flashmini",
   "dependencies": [
-    "fmt",
     "cereal",
+    "fmt",
     "gtest"
-  ]
+  ],
+  "features": {
+    "cuda": {
+      "description": "Dependencies for gpu backend",
+      "dependencies": [
+        {
+          "name": "arrayfire",
+          "features": [
+            "cuda"
+          ]
+        }
+      ]
+    },
+    "cpu": {
+      "description": "Dependencies for cpu backend",
+      "dependencies": [
+        {
+          "name": "arrayfire",
+          "features": [
+            "cuda"
+          ]
+        }
+      ]
+    }
+  }
 }

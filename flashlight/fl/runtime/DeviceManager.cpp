@@ -26,6 +26,7 @@ int getActiveDeviceId(const fl::DeviceType type) {
       throw std::runtime_error("CUDA is unsupported");
     }
   }
+    throw std::runtime_error("unsupported device type");
 }
 
 } // namespace

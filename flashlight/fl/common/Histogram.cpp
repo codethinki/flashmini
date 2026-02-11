@@ -29,13 +29,13 @@ void shortFormatCount(std::stringstream& ss, size_t count) {
 
 void shortFormatMemory(std::stringstream& ss, size_t size) {
   constexpr size_t stringLen = 5;
-  if (size >= (1L << 43)) { // >= 8TB
+  if (size >= (1ULL << 43)) { // >= 8TB
     ss << std::setw(stringLen - 1) << (size >> 40) << "T";
-  } else if (size >= (1L << 33)) { // >= 8G B
+  } else if (size >= (1ULL << 33)) { // >= 8G B
     ss << std::setw(stringLen - 1) << (size >> 30) << "G";
-  } else if (size >= (1L << 23)) { // >= 8M B
+  } else if (size >= (1ULL << 23)) { // >= 8M B
     ss << std::setw(stringLen - 1) << (size >> 20) << "M";
-  } else if (size >= (1L << 13)) { // >= 8K B
+  } else if (size >= (1ULL << 13)) { // >= 8K B
     ss << std::setw(stringLen - 1) << (size >> 10) << "K";
   } else {
     ss << std::setw(stringLen) << size;

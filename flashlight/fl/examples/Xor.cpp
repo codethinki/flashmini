@@ -34,8 +34,8 @@ int main(int argc, const char** argv) {
 
   const int inputSize = 2;
   const int outputSize = 1;
-  const double lr = 0.01;
-  const double mu = 0.1;
+  const float lr = 0.01;
+  const float mu = 0.1;
   const int numSamples = 4;
 
   std::array<float, 8> hInput = {1, 1, 0, 0, 1, 0, 0, 1};

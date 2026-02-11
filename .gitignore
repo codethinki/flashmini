@@ -1,7 +1,9 @@
 # Build
-build
-release
-debug
+build/
+release/
+debug/
+out/
+vcpkg_installed/
 *.so
 
 # FB

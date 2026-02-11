@@ -5,7 +5,25 @@
       "name": "vcpkg",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "cmake/utils/toolchain.cmake"
+      }
+    },
+    {
+      "name": "wsl-settings",
+      "hidden": true,
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "copySources": true,
+          "copySourcesOptions": {
+            "exclusionList": [
+              ".vs",
+              ".git",
+              "out",
+              "build",
+              "vcpkg_installed"
+            ]
+          }
+        }
       }
     },
     {
@@ -17,42 +35,61 @@
       "name": "base",
       "hidden": true,
       "inherits": [
+        "wsl-settings",
         "ninja",
         "vcpkg"
-      ]
+      ],
+      "binaryDir": "${sourceDir}/out/build/${presetName}"
     },
-
     {
       "name": "msvc",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_C_COMPILER": "cl.exe"
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_C_COMPILER": "cl"
       }
     },
     {
       "name": "clang-cl",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang-cl.exe",
-        "CMAKE_C_COMPILER": "clang-cl.exe"
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_C_COMPILER": "clang-cl"
       }
     },
     {
       "name": "clang",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang++.exe",
-        "CMAKE_C_COMPILER": "clang.exe"
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_C_COMPILER": "clang"
+      }
+    },
+    {
+      "name": "gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_C_COMPILER": "gcc"
       }
     },
     {
       "name": "cuda-base",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CUDA_COMPILER": "$env{CUDA_PATH}/bin/nvcc.exe",
+        "CMAKE_CUDA_COMPILER": "$env{CUDA_PATH}/bin/nvcc",
         "FL_USE_CUDNN": false,
+
+        "CMAKE_CUDA_ARCHITECTURES": "native",
         "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler"
+
+      }
+    },
+    {
+      "name": "cpu-base",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "cpu"
       }
     },
     {
@@ -73,7 +110,10 @@
     {
       "name": "af-cpu-backend",
       "hidden": true,
-      "inherits": "af-backend-base"
+      "inherits": [
+        "cpu-base",
+        "af-backend-base"
+      ]
     },
     {
       "name": "af-cuda-backend",
@@ -99,6 +139,14 @@
       "inherits": [
         "base",
         "clang-cl",
+        "af-cuda-backend"
+      ]
+    },
+    {
+      "name": "gcc_af_cuda",
+      "inherits": [
+        "base",
+        "gcc",
         "af-cuda-backend"
       ]
     }

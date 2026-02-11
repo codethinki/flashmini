@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.0)
 
 project(flashlight LANGUAGES CXX C VERSION 0.4.0)
 
@@ -7,6 +7,7 @@ include(CMakeDependentOption)
 
 # ----------------------------- Setup -----------------------------
 find_program(CCACHE_PROGRAM ccache)
+
 if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
@@ -27,6 +28,7 @@ set(FL_INSTALL_INC_DIR "include" CACHE PATH "Install path for headers")
 set(FL_INSTALL_INC_DIR_HEADER_LOC ${FL_INSTALL_INC_DIR}/flashlight)
 set(FL_INSTALL_LIB_DIR "lib" CACHE PATH "Install path for libraries")
 set(FL_INSTALL_BIN_DIR "bin" CACHE PATH "Install path for binaries")
+
 # Other assets
 set(FL_INSTALL_ASSETS_BASE_DIR "share/flashlight")
 set(FL_INSTALL_CMAKE_DIR "${FL_INSTALL_ASSETS_BASE_DIR}/cmake" CACHE PATH "Install path for CMake files")
@@ -34,21 +36,24 @@ set(FL_INSTALL_EXAMPLES_DIR "${FL_INSTALL_ASSETS_BASE_DIR}/examples" CACHE PATH 
 set(FL_INSTALL_DOC_DIR "${FL_INSTALL_ASSETS_BASE_DIR}/doc" CACHE PATH "Install path for documentation")
 
 include(CheckCXXCompilerFlag)
+
 # All libraries should have their symbols exported so plugins can lazily
 # symbols from any of them
 check_cxx_compiler_flag("-rdynamic" COMPILER_SUPPORTS_RDYNAMIC)
+
 if(${COMPILER_SUPPORTS_RDYNAMIC})
   message(STATUS "-rdynamic supported.")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 else()
-  if (NOT WIN32) # Windows operates with explicit dll exports
+  if(NOT WIN32) # Windows operates with explicit dll exports
     message(WARNING
       "This compiler doesn't support dynamic symbol exports. "
       "Plugin functionality likely won't work.")
   endif()
 endif()
-if (WIN32 OR MSVC)
+
+if(WIN32 OR MSVC)
   set(FL_BUILD_PLUGIN ON)
 else()
   set(FL_BUILD_PLUGIN ${COMPILER_SUPPORTS_RDYNAMIC})
@@ -58,17 +63,17 @@ endif()
 add_library(flashlight)
 
 # We haven't [yet] polluted Flashlight with explicit dllexport annotations
-if (MSVC)
+if(MSVC)
   target_compile_options(flashlight PUBLIC $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:/bigobj>)
 endif()
-if (WIN32)
+
+if(WIN32)
   target_compile_definitions(flashlight PUBLIC _USE_MATH_DEFINES NOMINMAX)
 endif()
 
 include(InternalUtils)
 
 # ----------------------------- Configuration -----------------------------
-
 option(FL_BUILD_TESTS "Build tests" ON)
 option(FL_CODE_COVERAGE "Enable coverage reporting" OFF)
 option(FL_BUILD_EXAMPLES "Build examples" ON)
@@ -77,7 +82,7 @@ option(FL_BUILD_SCRIPTS "Build internal scripts for wav2letter++" OFF)
 option(FL_BUILD_RECIPES "Build recipes" ON)
 option(FL_BUILD_STANDALONE "Build standalone installation" ON)
 
-if (FL_BUILD_TESTS)
+if(FL_BUILD_TESTS)
   enable_testing()
   include(TestUtils)
 endif()
@@ -93,10 +98,10 @@ set(FL_BUILD_BINARY_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 # ]--- Backend Options
 # TODO: change these to FL_BACKEND_* to be consistent with preproc
-option(FL_USE_CUDA   "Build CUDA support for Flashlight backends" OFF)
-option(FL_USE_CPU    "Build CPU support for Flashlight backends"  OFF)
+option(FL_USE_CUDA "Build CUDA support for Flashlight backends" OFF)
+option(FL_USE_CPU "Build CPU support for Flashlight backends" OFF)
 option(FL_USE_OPENCL "Build OpenCL support for Flashlight backends" OFF)
-option(FL_USE_MKL    "Build MKL support for Flashlight backends" OFF)
+option(FL_USE_MKL "Build MKL support for Flashlight backends" OFF)
 
 # --------------------------- Core ---------------------------
 # Internal includes are implicitly defined as <flashlight...>
@@ -109,8 +114,10 @@ target_include_directories(
 set(FL_CORE_DIR "${FL_ROOT_DIR}/fl")
 include(${FL_CORE_DIR}/CMakeLists.txt)
 list(APPEND INSTALLABLE_TARGETS flashlight)
+
 # flashlight core components keep their relative paths with respect to project
 setup_install_headers(${FL_CORE_DIR} ${FL_INSTALL_INC_DIR_HEADER_LOC})
+
 # FL_USE_* variables are set in flashlight/fl/tensor/CMakeLists.txt based on
 # backend registration
 target_compile_definitions(flashlight
@@ -121,9 +128,9 @@ target_compile_definitions(flashlight
   FL_COMPILE_LIBRARY=$<BOOL:${BUILD_SHARED_LIBS}>
   PRIVATE
   FL_DLL
-  )
+)
 
-if (FL_CODE_COVERAGE)
+if(FL_CODE_COVERAGE)
   add_coverage_to_target(TARGET flashlight)
 endif()
 
