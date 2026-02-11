@@ -29,7 +29,7 @@ runs:
       run: |
         choco install --no-progress wget -y
         cd $HOME
-        wget --quiet https://arrayfire.gateway.scarf.sh/windows/3.10.0/ArrayFire.exe -O ArrayFire.exe
+        wget -nv https://arrayfire.gateway.scarf.sh/windows/3.10.0/ArrayFire.exe -O ArrayFire.exe
         7z.exe x ArrayFire.exe -o"C:\tools\ArrayFire" -y
         rm ArrayFire.exe
       shell: bash -el {0}
