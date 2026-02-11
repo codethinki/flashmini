@@ -16,6 +16,31 @@ runs:
   steps:
     # ]----- Backend dependencies
     # ArrayFire
+    - name: Cache ArrayFire (Windows)
+      id: cache-arrayfire-windows
+      uses: actions/cache@v4
+      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
+      with:
+        path: C:\tools\ArrayFire
+        key: arrayfire-windows-3.10.0
+    
+    - name: "Install ArrayFire (Windows)"
+      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire' && steps.cache-arrayfire-windows.outputs.cache-hit != 'true'
+      run: |
+        choco install --no-progress wget -y
+        cd $HOME
+        wget --quiet https://arrayfire.gateway.scarf.sh/windows/3.10.0/ArrayFire.exe -O ArrayFire.exe
+        7z.exe x ArrayFire.exe -o"C:\tools\ArrayFire" -y
+        rm ArrayFire.exe
+      shell: bash -el {0}
+
+    - name: Set ArrayFire Env (Windows)
+      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
+      run: |
+        echo "ArrayFire_DIR=C:\tools\ArrayFire" >> $GITHUB_ENV
+        echo "C:\tools\ArrayFire\lib" >> $GITHUB_PATH
+      shell: bash -el {0}
+    
     - name: "Install ArrayFire (Linux)"
       run: |
         sudo apt update
@@ -29,11 +54,6 @@ runs:
       run: brew install arrayfire
       if: runner.os == 'macOS' && inputs.backend == 'ArrayFire'
       shell: bash -el {0}
-    - name: "Install ArrayFire (Windows)"
-      run: |
-        winget install --id ArrayFire.ArrayFire -e --accept-package-agreements --accept-source-agreements
-      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
-      shell: pwsh
     # oneDNN
     - name: Install oneDNN with micromamba
       uses: mamba-org/setup-micromamba@v1

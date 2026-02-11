@@ -117,20 +117,17 @@ jobs:
       - name: Configure
         shell: pwsh
         run: |
-          cmake --preset base `
-            -DCMAKE_CXX_COMPILER=cl `
-            -DCMAKE_C_COMPILER=cl `
+          cmake --preset msvc_af_cpu `
             -DCMAKE_BUILD_TYPE=Release `
             -DFL_BUILD_TESTS=ON `
-            -DFL_BUILD_STANDALONE=ON `
-            -DFL_USE_ARRAYFIRE=ON
+            -DFL_BUILD_STANDALONE=ON
 
       - name: Build
         shell: pwsh
         run: |
-          cmake --build --preset base
+          cmake --build --preset msvc_af_cpu
 
       - name: Test
         shell: pwsh
         run: |
-          ctest --preset base --output-on-failure
+          ctest --preset msvc_af_cpu --output-on-failure

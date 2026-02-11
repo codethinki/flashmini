@@ -104,7 +104,6 @@
       "name": "af-backend-base",
       "hidden": true,
       "cacheVariables": {
-        "FL_BUILD_ARRAYFIRE": true,
         "FL_USE_ARRAYFIRE": true
       }
     },
