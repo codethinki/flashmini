@@ -122,7 +122,8 @@
         "af-backend-base"
       ],
       "cacheVariables": {
-        "FL_ARRAYFIRE_USE_CPU": true
+        "FL_ARRAYFIRE_USE_CPU": true,
+        "FL_USE_ONEDNN": true
       }
     },
     {
@@ -167,6 +168,61 @@
         "gcc",
         "af-cpu-backend"
       ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release-base",
+      "hidden": true,
+      "configuration": "Release"
+    },
+    {
+      "name": "debug-base",
+      "hidden": true,
+      "configuration": "Debug"
+    },
+    {
+      "name": "msvc_af_cuda_release",
+      "configurePreset": "msvc_af_cuda",
+      "inherits": "release-base"
+    },
+    {
+      "name": "gcc_af_cuda_release",
+      "configurePreset": "gcc_af_cuda",
+      "inherits": "release-base"
+    },
+    {
+      "name": "msvc_af_cpu_release",
+      "configurePreset": "msvc_af_cpu",
+      "inherits": "release-base"
+    },
+    {
+      "name": "gcc_af_cpu_release",
+      "configurePreset": "gcc_af_cpu",
+      "inherits": "debug-base"
+    },
+    {
+      "name": "msvc_af_cuda_debug",
+      "configurePreset": "msvc_af_cuda",
+      "inherits": "debug-base"
+    },
+    {
+      "name": "gcc_af_cuda_debug",
+      "configurePreset": "gcc_af_cuda",
+      "inherits": "debug-base"
+    },
+    {
+      "name": "msvc_af_cpu_debug",
+      "configurePreset": "msvc_af_cpu",
+      "inherits": "debug-base",
+      "environment": {
+        //"ONEDNN_VERBOSE" : "all"
+      }
+    },
+    {
+      "name": "gcc_af_cpu_debug",
+      "configurePreset": "gcc_af_cpu",
+      "inherits": "debug-base"
     }
   ]
 }
