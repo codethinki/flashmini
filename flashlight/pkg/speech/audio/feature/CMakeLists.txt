@@ -2,15 +2,20 @@ cmake_minimum_required(VERSION 3.16)
 
 # ----------------------------- Dependencies -----------------------------
 # BLAS
-find_package(MKL)
+find_package(MKL CONFIG REQUIRED)
 if (MKL_FOUND)
   set(FL_USE_MKL ON)
-  setup_install_find_module(${PROJECT_SOURCE_DIR}/cmake/FindMKL.cmake)
-  set(CBLAS_LIBRARIES ${MKL_LIBRARIES})
-  set(CBLAS_INCLUDE_DIR ${MKL_INCLUDE_DIR})
+  #setup_install_find_module(${PROJECT_SOURCE_DIR}/cmake/FindMKL.cmake)
+  #set(CBLAS_LIBRARIES ${MKL_LIBRARIES})
+  #set(CBLAS_INCLUDE_DIR ${MKL_INCLUDE_DIR})
   # TODO: remove me when we consolidate build options
+  
   target_compile_definitions(fl_pkg_speech PUBLIC FL_USE_MKL=$<BOOL:${FL_USE_MKL}>)
+  target_link_libraries(fl_pkg_speech PUBLIC MKL::MKL)
+
+
 else()
+# TODO remove all cblas support
   find_package(CBLAS REQUIRED)
   setup_install_find_module(${PROJECT_SOURCE_DIR}/cmake/FindCBLAS.cmake)
 endif()
@@ -29,11 +34,11 @@ endif()
 target_link_libraries(fl_pkg_speech PUBLIC $<BUILD_INTERFACE:FFTW3::fftw3>)
 
 # OpenMP
-if (NOT MKL_FOUND)
+#if (NOT MKL_FOUND)
   # NB: MKL provides iomp if enabled
-  find_package(OpenMP REQUIRED)
-  target_link_libraries(fl_pkg_speech PRIVATE OpenMP::OpenMP_CXX)
-endif()
+#  find_package(OpenMP REQUIRED)
+#  target_link_libraries(fl_pkg_speech PRIVATE OpenMP::OpenMP_CXX)
+#endif()
 
 # Threads
 find_package(Threads REQUIRED)
