@@ -38,7 +38,7 @@ TEST(DeviceManagerTest, getDeviceCount) {
     ASSERT_NO_THROW(manager.getDeviceCount(DeviceType::CUDA));
   } else {
     ASSERT_THROW(manager.getDeviceCount(DeviceType::CUDA),
-      std::invalid_argument);
+      std::runtime_error);
   }
 }
 
@@ -54,7 +54,7 @@ TEST(DeviceManagerTest, getDevicesOfType) {
       }
     } else {
       ASSERT_THROW(manager.getDeviceCount(DeviceType::CUDA),
-          std::invalid_argument);
+          std::runtime_error);
     }
   }
 }
@@ -72,7 +72,7 @@ TEST(DeviceManagerTest, getActiveDevice) {
     if (manager.isDeviceTypeAvailable(type)) {
       ASSERT_EQ(manager.getActiveDevice(type).type(), type);
     } else {
-      ASSERT_THROW(manager.getActiveDevice(type), std::invalid_argument);
+      ASSERT_THROW(manager.getActiveDevice(type), std::runtime_error);
     }
   }
 }
