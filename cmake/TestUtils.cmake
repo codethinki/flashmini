@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.21)
+include(fm_target_utilities)
 
 set(GTEST_IMPORTED_TARGETS "")
 
@@ -61,6 +62,7 @@ function(build_test)
     PUBLIC
     ${build_test_PREPROC}
     )
+
   if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(
       ${target}
@@ -70,4 +72,6 @@ function(build_test)
     )
   endif()
   gtest_add_tests(TARGET ${target})
+
+  fm_target_copy_dependencies(${target})
 endfunction(build_test)

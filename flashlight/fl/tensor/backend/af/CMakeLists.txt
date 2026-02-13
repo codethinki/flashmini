@@ -74,6 +74,22 @@ if (${FL_ARRAYFIRE_USE_CUDA})
   fl_set_backend_state(ENABLE CUDA)
 elseif(${FL_ARRAYFIRE_USE_CPU})
   target_link_libraries(flashlight PUBLIC ArrayFire::afcpu)
+  if(WIN32)
+    include(fm_target_utilities)
+    
+    set(AF_LIB_DIR "${ArrayFire_DIR}/../lib")
+
+    fm_glob(MKL_DLLS "${AF_LIB_DIR}/mkl_*.dll")
+    
+
+    fm_target_attach_dependency(
+        flashlight 
+        NOLINK 
+        ${MKL_DLLS}
+        "${AF_LIB_DIR}/libiomp5md.dll" 
+    )
+  endif()
+
   fl_set_backend_state(ENABLE CPU)
 elseif(${FL_ARRAYFIRE_USE_OPENCL})
   target_link_libraries(flashlight PUBLIC ArrayFire::afopencl)

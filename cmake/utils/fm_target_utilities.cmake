@@ -34,11 +34,24 @@ function(fm_glob OUT_VAR)
     set(SUB_PATHS ${ARG_UNPARSED_ARGUMENTS})
 
     set(GLOB_PATTERNS "")
-    foreach(SUB_PATH IN LISTS SUB_PATHS)
-        foreach(PATTERN IN LISTS ARG_PATTERNS)
-            list(APPEND GLOB_PATTERNS "${SUB_PATH}/${PATTERN}")
+    if(SUB_PATHS AND ARG_PATTERNS)
+        # Case 1: Both paths and patterns provided - generate cross-product
+        foreach(SUB_PATH IN LISTS SUB_PATHS)
+            foreach(PATTERN IN LISTS ARG_PATTERNS)
+                if(SUB_PATH)
+                    list(APPEND GLOB_PATTERNS "${SUB_PATH}/${PATTERN}")
+                else()
+                    list(APPEND GLOB_PATTERNS "${PATTERN}")
+                endif()
+            endforeach()
         endforeach()
-    endforeach()
+    elseif(SUB_PATHS)
+        # Case 2: Only sub_paths provided - treat them as full patterns
+        set(GLOB_PATTERNS ${SUB_PATHS})
+    elseif(ARG_PATTERNS)
+        # Case 3: Only patterns provided - treat them as full patterns
+        set(GLOB_PATTERNS ${ARG_PATTERNS})
+    endif()
 
     if(GLOB_PATTERNS)
         file(GLOB_RECURSE FOUND_FILES
@@ -406,5 +419,179 @@ function(fm_add_clang_format_target TARGET_NAME)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Formatting all source files with clang-format..."
         VERBATIM
+    )
+endfunction()
+
+function(_fm_ensure_stub_lib)
+    set(stub_target "fm_link_attachment_stub")
+    if(TARGET ${stub_target})
+        return()
+    endif()
+
+    # Define a predictable, flat output directory
+    set(stub_dir "${CMAKE_BINARY_DIR}/_fm_internal")
+    file(MAKE_DIRECTORY "${stub_dir}")
+
+    # Generate dummy source
+    set(stub_src "${stub_dir}/stub.c")
+    if(NOT EXISTS "${stub_src}")
+        file(WRITE "${stub_src}" "void fm_link_attachment_stub_symbol(void) {}\n")
+    endif()
+
+    # Create the real static library
+    add_library(${stub_target} STATIC "${stub_src}")
+        
+    # FORCE the output location to be flat.
+    set_target_properties(${stub_target} PROPERTIES 
+        ARCHIVE_OUTPUT_DIRECTORY "${stub_dir}"
+        OUTPUT_NAME "fm_link_attachment_stub"
+    )
+        
+    if(CMAKE_CONFIGURATION_TYPES)
+        foreach(config ${CMAKE_CONFIGURATION_TYPES})
+            string(TOUPPER "${config}" config_upper)
+            set_target_properties(${stub_target} PROPERTIES 
+                ARCHIVE_OUTPUT_DIRECTORY_${config_upper} "${stub_dir}"
+            )
+        endforeach()
+    endif()
+endfunction()
+
+#[[.rst:
+.. command:: fm_target_attach_dependency
+
+   .. code-block:: cmake
+
+      fm_target_attach_dependency(<target> <mode> <files...>)
+
+   Attaches external file dependencies (like DLLs) to a target by creating imported targets.
+   This allows CMake to track these dependencies.
+
+   :param target: The target to attach dependencies to.
+   :type target: string
+   :param mode: Attachment mode. Must be ``LINK`` or ``NOLINK``.
+                - ``LINK``: The file behaves like a linked library (implicit link).
+                - ``NOLINK``: The file is attached but not linked (e.g., runtime-only DLL).
+   :type mode: string
+   :param files: List of file paths to attach.
+   :type files: list of strings
+
+   :pre: ``target`` must exist.
+   :pre: ``mode`` must be ``LINK`` or ``NOLINK``.
+
+   .. note::
+      Creates internal targets named ``<target>_<mode>_attachment_<filename>`` for each file.
+      In ``NOLINK`` mode, a dummy stub library is linked to satisfy CMake's requirement 
+      for SHARED libraries on Windows, preventing LNK1107 errors.
+#]]
+function(fm_target_attach_dependency target mode)
+    fm_assert_target(${target})
+    fm_assert_true(
+        "${mode}" MATCHES "^(LINK|NOLINK)$"
+    )
+
+    _fm_ensure_stub_lib()
+    
+    set(stub_dir "${CMAKE_BINARY_DIR}/_fm_internal")
+    set(
+        stub_lib_path 
+        "${stub_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}fm_link_attachment_stub${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    )
+
+    foreach(file_path ${ARGN})
+        # Resolve full path immediately
+        get_filename_component(abs_path "${file_path}" ABSOLUTE)
+        get_filename_component(file_name "${file_path}" NAME)
+        
+        # Generate unique target name
+        string(MD5 path_hash "${abs_path}")
+        set(leaf_target_name "_${target}_${mode}_${path_hash}")
+
+        if(NOT TARGET ${leaf_target_name})
+            
+            # --- PLATFORM LOGIC ---
+            if(WIN32)
+                # Windows: Always SHARED IMPORTED.
+                add_library(${leaf_target_name} SHARED IMPORTED GLOBAL)
+                set_target_properties(${leaf_target_name} PROPERTIES 
+                    IMPORTED_LOCATION "${abs_path}"
+                )
+
+                if(mode STREQUAL "NOLINK")
+                    # NOLINK: Point IMPLIB to the dummy stub.
+                    set_target_properties(${leaf_target_name} PROPERTIES 
+                        IMPORTED_IMPLIB "${stub_lib_path}"
+                    )
+                    # Ensure stub is built before linking
+                    add_dependencies(${leaf_target_name} fm_stub_lib)
+                else()
+                    # LINK: Calculate the real import library path.
+                    get_filename_component(dir_name "${abs_path}" DIRECTORY)
+                    get_filename_component(name_we "${abs_path}" NAME_WE)
+                    
+                    # Construct path: dir / [prefix]filename[suffix]
+                    set(implib_path "${dir_name}/${CMAKE_IMPORT_LIBRARY_PREFIX}${name_we}${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+                    
+                    if(EXISTS "${implib_path}")
+                        set_target_properties(${leaf_target_name} PROPERTIES 
+                            IMPORTED_IMPLIB "${implib_path}"
+                        )
+                    else()
+                        message(WARNING "fm_target_attach_dependency: LINK mode for ${file_name}, but import lib not found at: ${implib_path}")
+                    endif()
+                endif()
+
+            else()
+                # Unix/macOS: 
+                # NOLINK -> MODULE (Loadable, not linked)
+                # LINK   -> SHARED (Linked)
+                if(mode STREQUAL "NOLINK")
+                    add_library(${leaf_target_name} MODULE IMPORTED GLOBAL)
+                else()
+                    add_library(${leaf_target_name} SHARED IMPORTED GLOBAL)
+                endif()
+                
+                set_target_properties(${leaf_target_name} PROPERTIES 
+                    IMPORTED_LOCATION "${abs_path}"
+                )
+            endif()
+
+        endif()
+
+        # Link the imported target to the main target
+        target_link_libraries(${target} PRIVATE ${leaf_target_name})
+    endforeach()
+endfunction()
+
+#[[.rst:
+.. command:: fm_target_copy_dependencies
+
+   .. code-block:: cmake
+
+      fm_target_copy_dependencies(<target>)
+
+   Adds a post-build step to copy runtime dependencies (DLLs) to the target's output directory.
+   Uses ``$<TARGET_RUNTIME_DLLS:...>`` generator expression.
+
+   :param target: The target to copy dependencies for.
+   :type target: string
+
+   :pre: ``target`` must exist.
+   :pre: ``target`` must be an ``EXECUTABLE`` or ``SHARED_LIBRARY``.
+   :post: Runtime dependencies are copied to ``$<TARGET_FILE_DIR:target>`` after build.
+#]]
+function(fm_target_copy_dependencies target)
+    fm_assert_target("${target}")
+
+    get_target_property(TGT_TYPE ${target} TYPE)
+    fm_assert_true("${TGT_TYPE}" MATCHES "^(EXECUTABLE|SHARED_LIBRARY)$"
+        REASON "fm_target_copy_dependencies: Target '${target}' is of type '${TGT_TYPE}'. This function only supports EXECUTABLES or SHARED_LIBRARIES."
+    )
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_RUNTIME_DLLS:${target}>
+        $<TARGET_FILE_DIR:${target}>
+        COMMAND_EXPAND_LISTS
+        COMMENT "Propagating runtime dependencies for ${target}..."
     )
 endfunction()
