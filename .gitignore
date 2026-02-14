@@ -4,6 +4,7 @@ release/
 debug/
 out/
 vcpkg_installed/
+Testing/
 *.so
 
 # FB
