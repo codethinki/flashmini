@@ -259,7 +259,6 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::batchnormBackward(
   );
   auto bwdPrim =
       std::make_shared<dnnl::batch_normalization_backward>(bwdPrimitiveDesc);
-
   // Execute
   std::vector<dnnl::primitive> networkBackwards;
   std::vector<std::unordered_map<int, dnnl::memory>> bwdArgs = {
@@ -267,11 +266,12 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::batchnormBackward(
        {DNNL_ARG_MEAN, payload->meanMemory},
        {DNNL_ARG_VARIANCE, payload->varMemory},
        {DNNL_ARG_SCALE, payload->weightsMemory},
-       {DNNL_ARG_SHIFT, payload->biasMemory},
+       //TODO dnnl_arg_shift was here, check if something can be optimized bc it's not needed
        {DNNL_ARG_DIFF_SRC, gradInputMem.getMemory()},
        {DNNL_ARG_DIFF_DST, gradOutputMem.getMemory()},
        {DNNL_ARG_DIFF_SCALE, gradWeightsMem.getMemory()},
        {DNNL_ARG_DIFF_SHIFT, gradBiasMem.getMemory()}}};
+
   networkBackwards.push_back(*bwdPrim);
   detail::executeNetwork(networkBackwards, bwdArgs);
 

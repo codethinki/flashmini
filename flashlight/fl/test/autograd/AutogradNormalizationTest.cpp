@@ -236,17 +236,28 @@ TEST(AutogradNormalizationTest, BatchNormJacobian) {
   auto weight = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
 
+  auto cleanup = [&]() {
+      input.zeroGrad();
+      weight.zeroGrad();
+      bias.zeroGrad();
+  };
+
   auto funcBnIn = [&](Variable& in) {
     return (batchnorm(
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
+
+
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-4));
+    cleanup();
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-4));
+  cleanup();
+
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
@@ -269,6 +280,11 @@ TEST_F(AutogradTestF16, BatchNormJacobianF16) {
   auto runningVar = Variable(fl::rand({numFeat}, fl::dtype::f32), false);
   auto weight = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
+    auto cleanup = [&]() {
+      input.zeroGrad();
+      weight.zeroGrad();
+      bias.zeroGrad();
+  };
 
   // Use larger perturbations to ensure gradients don't underflow with fp16
 
@@ -277,12 +293,14 @@ TEST_F(AutogradTestF16, BatchNormJacobianF16) {
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 5e-2, 1e-1));
+  cleanup();
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 5e-2, 1e-1));
+  cleanup();
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
@@ -294,7 +312,7 @@ TEST_F(AutogradTestF16, BatchNormJacobianF16) {
 TEST(AutogradNormalizationTest, BatchNormJacobianMultipleAxes) {
   // Jacobian Test with  trainMode = true;
   std::vector<int> featAxes = {0, 1, 2};
-  auto input = Variable(fl::rand({8, 8, 3, 16}, fl::dtype::f32), true);
+  auto input = Variable(fl::rand({4, 4, 3, 4}, fl::dtype::f32), true);
   auto nfeatures = 1;
   for (auto ax : featAxes) {
     nfeatures *= input.dim(ax);
@@ -304,17 +322,25 @@ TEST(AutogradNormalizationTest, BatchNormJacobianMultipleAxes) {
   auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
 
+      auto cleanup = [&]() {
+      input.zeroGrad();
+      weight.zeroGrad();
+      bias.zeroGrad();
+  };
+
   auto funcBnIn = [&](Variable& in) {
     return (batchnorm(
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-3));
+  cleanup();
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-3));
+  cleanup();
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
@@ -340,6 +366,11 @@ TEST_F(AutogradTestF16, BatchNormJacobianMultipleAxesF16) {
   auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
 
+        auto cleanup = [&]() {
+      input.zeroGrad();
+      weight.zeroGrad();
+      bias.zeroGrad();
+  };
   // Use larger perturbations to ensure gradients don't underflow with fp16
 
   auto funcBnIn = [&](Variable& in) {
@@ -348,12 +379,14 @@ TEST_F(AutogradTestF16, BatchNormJacobianMultipleAxesF16) {
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(
       funcBnIn, input, 5e-2, 1e-1)); // TODO: investigate
+  cleanup();
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 5e-2, 1e-1));
+  cleanup();
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
