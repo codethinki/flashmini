@@ -84,7 +84,13 @@ elseif(${FL_ARRAYFIRE_USE_CPU})
     
     set(AF_LIB_DIR "${ArrayFire_DIR}/../lib")
 
-    fm_glob(MKL_DLLS "${AF_LIB_DIR}/" "mkl_avx2.2.dll" "mkl_def.2.dll")
+    fm_glob(
+        MKL_DLLS 
+        "${AF_LIB_DIR}/"
+        "mkl_avx2.2.dll"
+        "mkl_def.2.dll"
+        "mkl_tbb_thread.2.dll"
+    )
 
 
     fm_target_attach_dependency(
