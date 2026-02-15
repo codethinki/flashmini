@@ -4,9 +4,6 @@
         {
             "name": "ci-config-base",
             "hidden": true,
-            "inherits": [
-                "build-cache"
-            ],
             "cacheVariables": {
                 "FL_BUILD_TESTS": "ON",
                 "FL_BUILD_STANDALONE": "ON"
