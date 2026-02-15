@@ -15,13 +15,8 @@ RUN pacman -Syu --noconfirm && \
     python-pip \
     vcpkg \
     wget \
-    cloc
-
-# Install buildcache
-RUN wget -nv https://github.com/lucasg/buildcache/releases/download/v0.28.4/buildcache-linux-x86_64.tar.gz && \
-    tar -xzf buildcache-linux-x86_64.tar.gz && \
-    mv buildcache/bin/buildcache /usr/local/bin/ && \
-    rm -rf buildcache*
+    cloc \
+    buildcache-git
 
 ENV VCPKG_ROOT=/opt/vcpkg
 
