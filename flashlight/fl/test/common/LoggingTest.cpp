@@ -135,7 +135,7 @@ TEST(LoggingDeathTest, FatalOnOff) {
   std::cerr.rdbuf(origStderrBuffer);
 
   Logging::setMaxLoggingLevel(fl::LogLevel::FATAL);
-  EXPECT_DEATH({ FL_LOG(fl::LogLevel::FATAL) << "log-fatal"; }, "");
+  EXPECT_DEATH_IF_SUPPORTED({ FL_LOG(fl::LogLevel::FATAL) << "log-fatal"; }, "");
 }
 
 } // namespace

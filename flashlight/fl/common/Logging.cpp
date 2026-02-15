@@ -87,13 +87,18 @@ void addContext(
     std::stringstream* outputStream) {
   // report only the last threadIdNumDigits of the thread ID for succinctness
   // and compatibility with glog.
-  constexpr size_t threadIdNumDigits = 5;
+  constexpr size_t maxThreadIdNumDigits = 5;
   std::stringstream ss;
   ss << std::this_thread::get_id();
-  const std::string threadId = ss.str();
-
+  
+  std::string threadId = ss.str();
+  if(threadId.size() > maxThreadIdNumDigits){
+   threadId = threadId.substr(threadId.size() - maxThreadIdNumDigits);
+  }
+    
+  
   (*outputStream) << dateTimeWithMicroSeconds() << ' '
-                  << threadId.substr(threadId.size() - threadIdNumDigits) << ' '
+                  << threadId << ' '
                   << getFileName(fullPath) << ':' << lineNumber << ' ';
 }
 
