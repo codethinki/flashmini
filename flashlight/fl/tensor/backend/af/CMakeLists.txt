@@ -75,9 +75,6 @@ if (${FL_ARRAYFIRE_USE_CUDA})
 elseif(${FL_ARRAYFIRE_USE_CPU})
   target_link_libraries(flashlight PUBLIC ArrayFire::afcpu)
 
-  find_package(MKL CONFIG REQUIRED)
-  target_link_libraries(flashlight PUBLIC MKL::MKL)
-
   # af forgets dependencies, on windows we have to copy them
   if(WIN32)
     include(fm_target_utilities)
@@ -87,11 +84,10 @@ elseif(${FL_ARRAYFIRE_USE_CPU})
     fm_glob(
         MKL_DLLS 
         "${AF_LIB_DIR}/"
-        "mkl_avx2.2.dll"
-        "mkl_def.2.dll"
-        "mkl_tbb_thread.2.dll"
+        PATTERNS
+        "mkl_*.dll"
+        "libiomp5md.dll"
     )
-
 
     fm_target_attach_dependency(
         flashlight 

@@ -13,7 +13,6 @@
     "cpu": {
       "description": "Dependencies for cpu backend",
       "dependencies": [
-        "intel-mkl",
         "onednn"
       ]
     }

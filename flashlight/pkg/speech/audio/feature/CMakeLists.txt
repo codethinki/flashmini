@@ -10,12 +10,12 @@ if (MKL_FOUND)
   #set(CBLAS_INCLUDE_DIR ${MKL_INCLUDE_DIR})
   # TODO: remove me when we consolidate build options
   
+  # TODO linking to MKL doesn't work with gcc bc of openmpi issues
   target_compile_definitions(fl_pkg_speech PUBLIC FL_USE_MKL=$<BOOL:${FL_USE_MKL}>)
   target_link_libraries(fl_pkg_speech PUBLIC MKL::MKL)
 
 
 else()
-# TODO remove all cblas support
   find_package(CBLAS REQUIRED)
   setup_install_find_module(${PROJECT_SOURCE_DIR}/cmake/FindCBLAS.cmake)
 endif()
