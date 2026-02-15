@@ -32,13 +32,6 @@
       "generator": "Ninja Multi-Config"
     },
     {
-      "name" : "build-cache",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER_LAUNCHER": "BuildCache"
-      }
-    },
-    {
       "name": "base",
       "hidden": true,
       "inherits": [
@@ -46,7 +39,10 @@
         "ninja",
         "vcpkg"
       ],
-      "binaryDir": "${sourceDir}/out/build/${presetName}"
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS" :  true
+      }
     },
     {
       "name": "msvc",
@@ -199,7 +195,7 @@
     {
       "name": "gcc_af_cpu_release",
       "configurePreset": "gcc_af_cpu",
-      "inherits": "debug-base"
+      "inherits": "release-base"
     },
     {
       "name": "msvc_af_cuda_debug",
@@ -214,10 +210,7 @@
     {
       "name": "msvc_af_cpu_debug",
       "configurePreset": "msvc_af_cpu",
-      "inherits": "debug-base",
-      "environment": {
-        //"ONEDNN_VERBOSE" : "all"
-      }
+      "inherits": "debug-base"
     },
     {
       "name": "gcc_af_cpu_debug",
