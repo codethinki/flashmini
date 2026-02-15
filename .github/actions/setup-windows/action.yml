@@ -10,14 +10,6 @@ runs:
   steps:
     - uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Restore BuildCache directory
-      uses: actions/cache@v4
-      with:
-        path: ~/.buildcache
-        key: buildcache-windows-${{ inputs.compiler }}-${{ github.sha }}
-        restore-keys: |
-          buildcache-windows-${{ inputs.compiler }}-
-
     - name: Setup Vcpkg Environment
       shell: pwsh
       run: |

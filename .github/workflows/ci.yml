@@ -44,6 +44,15 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
+      # BuildCache cache
+      - name: Cache BuildCache directory
+        uses: actions/cache@v4
+        with:
+          path: .buildcache
+          key: buildcache-linux-${{ matrix.compiler }}
+          restore-keys: |
+            buildcache-linux-${{ matrix.compiler }}-
+
       # Vcpkg cache
       - name: Cache vcpkg installed
         uses: actions/cache@v4
@@ -115,6 +124,15 @@ jobs:
         uses: ./.github/actions/setup-windows
         with:
           compiler: ${{ matrix.compiler }}
+
+      # BuildCache cache
+      - name: Cache BuildCache directory
+        uses: actions/cache@v4
+        with:
+          path: .buildcache
+          key: buildcache-windows-${{ matrix.compiler }}
+          restore-keys: |
+            buildcache-windows-${{ matrix.compiler }}-
 
       # Vcpkg cache
       - name: Cache vcpkg installed
