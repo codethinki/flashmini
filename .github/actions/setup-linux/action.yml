@@ -28,10 +28,3 @@ runs:
         key: buildcache-linux-${{ inputs.compiler }}-${{ github.sha }}
         restore-keys: |
           buildcache-linux-${{ inputs.compiler }}-
-
-    - name: Export GitHub Actions Cache Environment
-      uses: actions/github-script@v7
-      with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');

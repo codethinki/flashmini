@@ -116,6 +116,16 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
+      # Vcpkg cache
+      - name: Cache vcpkg installed
+        uses: actions/cache@v4
+        with:
+          path: |
+            vcpkg_installed
+          key: vcpkg-installed-windows-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-installed-windows-${{ matrix.compiler }}-
+
       - name: Configure
         shell: pwsh
         run: |

@@ -16,8 +16,6 @@ runs:
             -v ${{ github.workspace }}:/work 
             -w /work 
             -e BUILDCACHE_DIR=/work/.buildcache
-            -e ACTIONS_CACHE_URL=${{ env.ACTIONS_CACHE_URL }}
-            -e ACTIONS_RUNTIME_TOKEN=${{ env.ACTIONS_RUNTIME_TOKEN }}
-            -v ${{ env.VCPKG_INSTALLATION_ROOT }}:/vcpkg
+            -v ${{ env.VCPKG_INSTALLATION_ROOT || '/usr/local/share/vcpkg' }}:/vcpkg
             -e VCPKG_ROOT=/vcpkg
         run: ${{ inputs.run }}
