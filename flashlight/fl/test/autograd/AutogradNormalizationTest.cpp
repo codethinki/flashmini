@@ -236,34 +236,26 @@ TEST(AutogradNormalizationTest, BatchNormJacobian) {
   auto weight = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
 
-  auto cleanup = [&]() {
-      input.zeroGrad();
-      weight.zeroGrad();
-      bias.zeroGrad();
-  };
-
   auto funcBnIn = [&](Variable& in) {
     return (batchnorm(
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
 
 
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-4));
-    cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-4, {&weight, &bias}));
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-4));
-  cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-4, {&input, &bias}));
 
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
         input, weight, bs, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 1e-2, 1e-4));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 1e-2, 1e-4, {&input, &weight}));
 }
 
 TEST_F(AutogradTestF16, BatchNormJacobianF16) {
@@ -280,11 +272,6 @@ TEST_F(AutogradTestF16, BatchNormJacobianF16) {
   auto runningVar = Variable(fl::rand({numFeat}, fl::dtype::f32), false);
   auto weight = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({numFeat}, fl::dtype::f32), true);
-    auto cleanup = [&]() {
-      input.zeroGrad();
-      weight.zeroGrad();
-      bias.zeroGrad();
-  };
 
   // Use larger perturbations to ensure gradients don't underflow with fp16
 
@@ -292,21 +279,19 @@ TEST_F(AutogradTestF16, BatchNormJacobianF16) {
     return (batchnorm(
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 5e-2, 1e-1));
-  cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 5e-2, 1e-1, {&weight, &bias}));
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 5e-2, 1e-1));
-  cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 5e-2, 1e-1, {&input, &bias}));
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
         input, weight, bs, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 5e-2, 1e-1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 5e-2, 1e-1, {&input, &weight}));
 }
 
 TEST(AutogradNormalizationTest, BatchNormJacobianMultipleAxes) {
@@ -322,31 +307,23 @@ TEST(AutogradNormalizationTest, BatchNormJacobianMultipleAxes) {
   auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
 
-      auto cleanup = [&]() {
-      input.zeroGrad();
-      weight.zeroGrad();
-      bias.zeroGrad();
-  };
-
   auto funcBnIn = [&](Variable& in) {
     return (batchnorm(
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-3));
-  cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-3, {&weight, &bias}));
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-3));
-  cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-3, {&input, &bias}));
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
         input, weight, bs, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 1e-2, 1e-3));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 1e-2, 1e-3, {&input, &weight}));
 }
 
 TEST_F(AutogradTestF16, BatchNormJacobianMultipleAxesF16) {
@@ -366,11 +343,6 @@ TEST_F(AutogradTestF16, BatchNormJacobianMultipleAxesF16) {
   auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
   auto bias = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
 
-        auto cleanup = [&]() {
-      input.zeroGrad();
-      weight.zeroGrad();
-      bias.zeroGrad();
-  };
   // Use larger perturbations to ensure gradients don't underflow with fp16
 
   auto funcBnIn = [&](Variable& in) {
@@ -378,21 +350,19 @@ TEST_F(AutogradTestF16, BatchNormJacobianMultipleAxesF16) {
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
   ASSERT_TRUE(fl::detail::jacobianTestImpl(
-      funcBnIn, input, 5e-2, 1e-1)); // TODO: investigate
-  cleanup();
+      funcBnIn, input, 5e-2, 1e-1, {&weight, &bias})); // TODO: investigate
 
   auto funcBnWt = [&](Variable& wt) {
     return (batchnorm(
         input, wt, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 5e-2, 1e-1));
-  cleanup();
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 5e-2, 1e-1, {&input, &bias}));
 
   auto funcBnBs = [&](Variable& bs) {
     return (batchnorm(
         input, weight, bs, runningMean, runningVar, featAxes, true, 0.0, 1E-5));
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 5e-2, 1e-1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnBs, bias, 5e-2, 1e-1, {&input, &weight}));
 }
 
 TEST(AutogradNormalizationTest, LayerNormJacobian) {
@@ -412,7 +382,7 @@ TEST(AutogradNormalizationTest, LayerNormJacobian) {
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5);
   };
 
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLnIn, input, 1e-2, 1e-4));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLnIn, input, 1e-2, 1e-4, {&weight, &bias}));
 }
 
 TEST_F(AutogradTestF16, LayerNormJacobianF16) {
@@ -438,7 +408,7 @@ TEST_F(AutogradTestF16, LayerNormJacobianF16) {
         in, weight, bias, runningMean, runningVar, featAxes, true, 0.0, 1E-5);
   };
 
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLnIn, input, 1e-4, 1e-2));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLnIn, input, 1e-4, 1e-2, {&weight, &bias}));
 }
 
 int main(int argc, char** argv) {

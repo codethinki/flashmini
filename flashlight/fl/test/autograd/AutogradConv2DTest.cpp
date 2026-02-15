@@ -22,6 +22,7 @@ TEST(AutogradConv2DTest, Convolve) {
   auto in = Variable(fl::rand({10, 9, 8, 7}, fl::dtype::f32), true);
   auto wt = Variable(fl::rand({4, 3, 8, 6}, fl::dtype::f32), true);
   auto bs = Variable(fl::rand({1, 1, 6, 1}, fl::dtype::f32), true);
+
   int px = 2, py = 1;
   int sx = 1, sy = 1;
   int dx = 1, dy = 1;
@@ -40,7 +41,8 @@ TEST(AutogradConv2DTest, Convolve) {
         /* groups */ 1,
         benchmarks);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 0.06));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 0.06, 1E-4, {&wt}));
+
   auto funcConvWt = [&](Variable& weight) {
     return conv2d(
         in,
@@ -55,7 +57,8 @@ TEST(AutogradConv2DTest, Convolve) {
         /* groups */ 1,
         benchmarks);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 0.06));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 0.06, 1E-4, {&in}));
+
   auto funcConvBs = [&](Variable& bias) {
     return conv2d(
         in,
@@ -70,7 +73,7 @@ TEST(AutogradConv2DTest, Convolve) {
         /* groups */ 1,
         benchmarks);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvBs, bs, 0.03));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvBs, bs, 0.03, 1E-4, {&in, &wt}));
 }
 
 TEST_F(AutogradTestF16, ConvolveF16) {
@@ -83,6 +86,7 @@ TEST_F(AutogradTestF16, ConvolveF16) {
       Variable(fl::rand({3, 1, 2, 1}, fl::dtype::f16) * scaleFactor, true);
   auto wt = Variable(fl::rand({2, 1, 2, 1}, fl::dtype::f16), true);
   auto bs = Variable(fl::rand({1, 1, 1, 1}, fl::dtype::f16), true);
+
   int px = 1, py = 1;
   int sx = 1, sy = 1;
   int dx = 1, dy = 1;
@@ -101,7 +105,8 @@ TEST_F(AutogradTestF16, ConvolveF16) {
         /* groups */ 1,
         benchmarks);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 5e-1, 0.1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 5e-1, 0.1, {&wt, &bs}));
+
   auto funcConvWt = [&](Variable& weight) {
     return conv2d(
         in,
@@ -116,7 +121,8 @@ TEST_F(AutogradTestF16, ConvolveF16) {
         /* groups */ 1,
         benchmarks);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 5e-2, 0.1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 5e-2, 0.1, {&in, &bs}));
+
   auto funcConvBs = [&](Variable& bias) {
     return conv2d(
         in,
@@ -131,7 +137,7 @@ TEST_F(AutogradTestF16, ConvolveF16) {
         /* groups */ 1,
         benchmarks);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvBs, bs, 3e-2, 0.1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvBs, bs, 3e-2, 0.1, {&in, &wt}));
 }
 
 TEST(AutogradConv2DTest, ConvolveFilterGroups) {
@@ -150,15 +156,15 @@ TEST(AutogradConv2DTest, ConvolveFilterGroups) {
   auto funcConvIn = [&](Variable& input) {
     return conv2d(input, wt, bs, sx, sy, px, py, dx, dy, groups);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 0.06));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 0.06, 1E-4, {&wt, &bs}));
   auto funcConvWt = [&](Variable& weight) {
     return conv2d(in, weight, bs, sx, sy, px, py, dx, dy, groups);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 0.05));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 0.05, 1E-4, {&in, &bs}));
   auto foncConvBs = [&](Variable& bias) {
     return conv2d(in, wt, bias, sx, sy, px, py, dx, dy, groups);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(foncConvBs, bs, 0.02));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(foncConvBs, bs, 0.02, 1E-4, {&in, &wt}));
 }
 
 TEST(AutogradConv2DTest, ConvolveDilation) {
@@ -181,7 +187,7 @@ TEST(AutogradConv2DTest, ConvolveDilation) {
         dy,
         /* groups */ 1);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 0.06));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvIn, in, 0.06, 1E-4, {&wt, &bs}));
   auto funcConvWt = [&](Variable& weight) {
     return conv2d(
         in,
@@ -195,7 +201,7 @@ TEST(AutogradConv2DTest, ConvolveDilation) {
         dy,
         /* groups */ 1);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 0.05));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvWt, wt, 0.05, 1E-4, {&in, &bs}));
   auto funcConvBs = [&](Variable& bias) {
     return conv2d(
         in,
@@ -209,7 +215,7 @@ TEST(AutogradConv2DTest, ConvolveDilation) {
         dy,
         /* groups */ 1);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvBs, bs, 0.02));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConvBs, bs, 0.02, 1E-4, {&in, &wt}));
 }
 
 TEST(AutogradConv2DTest, WeightNormConv) {
@@ -233,7 +239,7 @@ TEST(AutogradConv2DTest, WeightNormConv) {
         /* dy */ 1,
         /* groups */ 1);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcWeightNormIn, in, 3E-1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcWeightNormIn, in, 3E-1, 1E-4, {&v, &g}));
 
   auto funcWeightNormV = [&](Variable& input) {
     auto w = input *
@@ -250,7 +256,7 @@ TEST(AutogradConv2DTest, WeightNormConv) {
         /* dy */ 1,
         /* groups */ 1);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcWeightNormV, v, 2E-1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcWeightNormV, v, 2E-1, 1E-4, {&g, &in}));
 
   auto funcWeightNormG = [&](Variable& input) {
     auto w = v *
@@ -267,7 +273,7 @@ TEST(AutogradConv2DTest, WeightNormConv) {
         /* dy */ 1,
         /* groups */ 1);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcWeightNormG, g, 2E-1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcWeightNormG, g, 2E-1, 1E-4, {&v, &in}));
 }
 
 int main(int argc, char** argv) {

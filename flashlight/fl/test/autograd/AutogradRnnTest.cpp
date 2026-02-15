@@ -64,7 +64,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 bidirectional,
                 0.0));
     };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRnnIn, in, expectedPrecision, perturbation));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRnnIn, in, expectedPrecision, perturbation, {&w}));
 
     auto funcRnnW = [&](Variable& weights) -> Variable {
         return std::get<0>(
@@ -78,7 +78,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 bidirectional,
                 0.0));
     };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRnnW, w, expectedPrecision, perturbation));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRnnW, w, expectedPrecision, perturbation, {&in}));
 
     // We get the correct gradient for hx
     auto hx = Variable(
@@ -98,7 +98,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 bidirectional,
                 0.0));
     };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRnnHx, hx, expectedPrecision, perturbation));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRnnHx, hx, expectedPrecision, perturbation, {&in, &w}));
 
     // We can compute the gradient w.r.t. hy
     auto funcRnnInDhy = [&](Variable& input) -> Variable {
@@ -114,7 +114,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 0.0));
     };
     ASSERT_TRUE(
-        fl::detail::jacobianTestImpl(funcRnnInDhy, in, expectedPrecision, perturbation));
+        fl::detail::jacobianTestImpl(funcRnnInDhy, in, expectedPrecision, perturbation, {&w}));
 
     if (mode == RnnMode::LSTM) {
         // We get the correct gradient for cx
@@ -136,7 +136,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 0.0));
         };
         ASSERT_TRUE(
-            fl::detail::jacobianTestImpl(funcRnnCx, cx, expectedPrecision, perturbation));
+            fl::detail::jacobianTestImpl(funcRnnCx, cx, expectedPrecision, perturbation, {&in, &w}));
 
         // We can compute the gradient w.r.t. cy
         auto funcRnnInDcy = [&](Variable& input) -> Variable {
@@ -152,7 +152,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 0.0));
         };
         ASSERT_TRUE(
-            fl::detail::jacobianTestImpl(funcRnnInDcy, in, expectedPrecision, perturbation));
+            fl::detail::jacobianTestImpl(funcRnnInDcy, in, expectedPrecision, perturbation, {&w}));
     }
 }
 

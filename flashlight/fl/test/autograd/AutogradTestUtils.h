@@ -34,7 +34,8 @@ inline bool jacobianTestImpl(
     const JacobianFunc& func,
     Variable& input,
     float precision = 1E-5,
-    float perturbation = 1E-4) {
+    float perturbation = 1E-4,
+    const std::vector<Variable*>& zeroGradientVariables = {}) {
     auto fwdJacobian =
         Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
 
@@ -60,6 +61,9 @@ inline bool jacobianTestImpl(
     for (int i = 0; i < dout.elements(); ++i) {
         dout.tensor().flat(i) = 1; // element in 1D view
         input.zeroGrad();
+        for (auto* var : zeroGradientVariables) {
+            var->zeroGrad();
+        }
         auto out = func(input);
         out.backward(dout);
 
