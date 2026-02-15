@@ -7,9 +7,10 @@
             "inherits": [
                 "build-cache"
             ],
-            "environment": {
-                "BUILDCACHE_DIR": "${sourceDir}/.buildcache"
-            },
+          "environment": {
+            "BUILDCACHE_DIR": "${sourceDir}/.buildcache",
+            "BUILDCACHE_MAX_CACHE_SIZE": "524288000"
+          },
             "cacheVariables": {
                 "FL_BUILD_TESTS": "ON",
                 "FL_BUILD_STANDALONE": "ON"

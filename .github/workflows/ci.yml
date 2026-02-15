@@ -44,21 +44,13 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
-      # BuildCache cache
-      - name: Cache BuildCache directory
-        uses: actions/cache@v4
-        with:
-          path: .buildcache
-          key: buildcache-linux-${{ matrix.compiler }}
-          restore-keys: |
-            buildcache-linux-${{ matrix.compiler }}-
 
       # Vcpkg cache
-      - name: Cache vcpkg installed
-        uses: actions/cache@v4
+      - name: Restore vcpkg cache
+        id: restore-vcpkg
+        uses: actions/cache/restore@v4
         with:
-          path: |
-            vcpkg_installed
+          path: vcpkg_installed
           key: vcpkg-installed-linux-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-installed-linux-${{ matrix.compiler }}-
@@ -69,11 +61,33 @@ jobs:
           run: |
             cp ci/CMakeUserPresets.json CMakeUserPresets.json
             cmake --preset ci_${{ matrix.compiler }}_af_cpu
+      
+      - name: Save vcpkg cache
+        if: steps.restore-vcpkg.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: vcpkg_installed
+          key: ${{ steps.restore-vcpkg.outputs.cache-primary-key }}
+      
+      - name: Restore BuildCache cache
+        id: restore-buildcache
+        uses: actions/cache/restore@v4
+        with:
+          path: .buildcache
+          key: buildcache-linux-${{ matrix.compiler }}-${{ github.run_id }}
+          restore-keys: |
+            buildcache-linux-${{ matrix.compiler }}-
 
       - name: Build
         uses: ./.github/actions/run-linux
         with:
           run: cmake --build --preset linux_${{ matrix.compiler }}_af_cpu_ci_build_test
+
+      - name: Save BuildCache cache
+        uses: actions/cache/save@v4
+        with:
+          path: .buildcache
+          key: ${{ steps.restore-buildcache.outputs.cache-primary-key }}
 
       - name: Test
         uses: ./.github/actions/run-linux
@@ -125,24 +139,39 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
+      # Vcpkg cache
+      - name: Restore vcpkg cache
+        id: restore-vcpkg-win
+        uses: actions/cache/restore@v4
+        with:
+          path: vcpkg_installed
+          key: vcpkg-installed-windows-${{ matrix.compiler }}-${{ hashFiles('vcpkg-configuration.json') }}
+          restore-keys: |
+            vcpkg-installed-windows-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
+            vcpkg-installed-windows-${{ matrix.compiler }}-
+
+      - name: Save vcpkg cache
+        if: steps.restore-vcpkg-win.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: vcpkg_installed
+          key: ${{ steps.restore-vcpkg-win.outputs.cache-primary-key }}
+
       # BuildCache cache
-      - name: Cache BuildCache directory
-        uses: actions/cache@v4
+      - name: Restore BuildCache cache
+        id: restore-buildcache-win
+        uses: actions/cache/restore@v4
         with:
           path: .buildcache
-          key: buildcache-windows-${{ matrix.compiler }}
+          key: buildcache-windows-${{ matrix.compiler }}-${{ github.run_id }}
           restore-keys: |
             buildcache-windows-${{ matrix.compiler }}-
 
-      # Vcpkg cache
-      - name: Cache vcpkg installed
-        uses: actions/cache@v4
+      - name: Save BuildCache cache
+        uses: actions/cache/save@v4
         with:
-          path: |
-            vcpkg_installed
-          key: vcpkg-installed-windows-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            vcpkg-installed-windows-${{ matrix.compiler }}-
+          path: .buildcache
+          key: ${{ steps.restore-buildcache-win.outputs.cache-primary-key }}
 
       - name: Configure
         shell: pwsh
