@@ -16,7 +16,8 @@ FileBlobDataset::FileBlobDataset(
     bool rw,
     bool truncate)
     : name_(name) {
-  mode_ = (rw ? std::ios_base::in | std::ios_base::out : std::ios_base::in);
+  mode_ = (rw ? std::ios_base::in | std::ios_base::out : std::ios_base::in) |
+      std::ios_base::binary;
   {
     std::ofstream fs(name_, (truncate ? mode_ | std::ios_base::trunc : mode_));
     if (!fs.is_open()) {
