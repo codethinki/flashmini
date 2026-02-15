@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Run Docker Command
-      uses: addnab/docker-run-action@v3
+      uses: maus007/docker-run-action-fork@v1
       with:
         image: ghcr.io/${{ github.repository }}:linux-latest
         options: >-
