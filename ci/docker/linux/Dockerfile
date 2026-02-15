@@ -9,8 +9,6 @@ RUN pacman -Syu --noconfirm && \
     openmpi \
     cuda \
     cudnn \
-    onednn \
-    intel-oneapi-mkl \
     python \
     python-pip \
     vcpkg \
