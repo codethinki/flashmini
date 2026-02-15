@@ -34,7 +34,7 @@ jobs:
       - name: Free Disk Space
         run: |
           sudo rm -rf /usr/local/lib/android
-      
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -44,8 +44,7 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
-
-      # Vcpkg cache
+      #configure
       - name: Restore vcpkg cache
         id: restore-vcpkg-linux
         uses: actions/cache/restore@v4
@@ -61,14 +60,8 @@ jobs:
           run: |
             cp ci/CMakeUserPresets.json CMakeUserPresets.json
             cmake --preset ci_${{ matrix.compiler }}_af_cpu
-      
-      - name: Save vcpkg cache
-        if: steps.restore-vcpkg-linux.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: vcpkg_installed
-          key: ${{ steps.restore-vcpkg-linux.outputs.cache-primary-key }}
-      
+
+      #build
       - name: Restore BuildCache cache
         id: restore-buildcache-linux
         uses: actions/cache/restore@v4
@@ -89,6 +82,13 @@ jobs:
           path: .buildcache
           key: ${{ steps.restore-buildcache-linux.outputs.cache-primary-key }}
 
+      - name: Save vcpkg cache
+        if: steps.restore-vcpkg-linux.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: vcpkg_installed
+          key: ${{ steps.restore-vcpkg-linux.outputs.cache-primary-key }}
+
       - name: Test
         uses: ./.github/actions/run-linux
         with:
@@ -97,7 +97,7 @@ jobs:
       - name: Fix permissions
         if: always()
         run: sudo chown -R $(id -u):$(id -g) out/build
-  
+
   #
   # Windows
   #
@@ -107,7 +107,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [msvc] 
+        compiler: [msvc]
         # clang on windows skipped for simplicity unless requested, cth had it.
         # Keeping msvc only to save CI time/complexity initially.
 
@@ -139,6 +139,7 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
+      #configure
       - name: Restore vcpkg cache
         id: restore-vcpkg-win
         uses: actions/cache/restore@v4
@@ -154,13 +155,7 @@ jobs:
           Copy-Item ci/CMakeUserPresets.json CMakeUserPresets.json
           cmake --preset ci_msvc_af_cpu
 
-      - name: Save vcpkg cache
-        if: steps.restore-vcpkg-win.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: vcpkg_installed
-          key: ${{ steps.restore-vcpkg-win.outputs.cache-primary-key }}
-
+        #build
       - name: Restore BuildCache cache
         id: restore-buildcache-win
         uses: actions/cache/restore@v4
@@ -181,6 +176,12 @@ jobs:
           path: .buildcache
           key: ${{ steps.restore-buildcache-win.outputs.cache-primary-key }}
 
+      - name: Save vcpkg cache
+        if: steps.restore-vcpkg-win.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: vcpkg_installed
+          key: ${{ steps.restore-vcpkg-win.outputs.cache-primary-key }}
       - name: Test
         shell: pwsh
         run: |
