@@ -74,20 +74,29 @@ if (${FL_ARRAYFIRE_USE_CUDA})
   fl_set_backend_state(ENABLE CUDA)
 elseif(${FL_ARRAYFIRE_USE_CPU})
   target_link_libraries(flashlight PUBLIC ArrayFire::afcpu)
+
+  find_package(MKL CONFIG REQUIRED)
+  target_link_libraries(flashlight PUBLIC MKL::MKL)
+
+  # af forgets dependencies, on windows we have to copy them
   if(WIN32)
     include(fm_target_utilities)
     
     set(AF_LIB_DIR "${ArrayFire_DIR}/../lib")
 
-    fm_glob(MKL_DLLS "${AF_LIB_DIR}/mkl_*.dll")
-    
+    fm_glob(MKL_DLLS "${AF_LIB_DIR}/" "mkl_avx2.2.dll" "mkl_def.2.dll")
+
 
     fm_target_attach_dependency(
         flashlight 
         NOLINK 
         ${MKL_DLLS}
-        "${AF_LIB_DIR}/libiomp5md.dll" 
     )
+  endif()
+  
+  if(LINUX)
+    find_package(OpenMP REQUIRED COMPONENTS CXX)
+    target_link_libraries(flashlight PUBLIC OpenMP::OpenMP_CXX)
   endif()
 
   fl_set_backend_state(ENABLE CPU)
