@@ -1,50 +1,65 @@
 {
     "version": 3,
-    "configurePresets": [
-        {
-            "name": "ci-config-base",
-            "hidden": true,
-            "environment": {
-              "BUILDCACHE_DIR": "${sourceDir}/.buildcache",
-              "BUILDCACHE_MAX_CACHE_SIZE": "524288000"
-            },
-          "cacheVariables": {
-            "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed",
+  "configurePresets": [
+    {
+      "name": "ci-vcpkg",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
+      }
+    },
+    {
+      "name": "ci-buildcache",
+      "hidden": true,
+      "environment": {
+        "BUILDCACHE_DIR": "${sourceDir}/.buildcache",
+        "BUILDCACHE_ACCURACY": "SLOPPY",
+        "BUILDCACHE_MAX_CACHE_SIZE": "524288000"
+      }
+    },
 
 
-            "FL_BUILD_TESTS": "ON",
-            "FL_BUILD_STANDALONE": "ON"
-          }
-        },
-        {
-            "name": "ci_msvc_af_cpu",
-            "inherits": [
-                "ci-config-base",
-                "msvc_af_cpu"
-            ]
-        },
-        {
-            "name": "ci_msvc_af_cuda",
-            "inherits": [
-                "ci-config-base",
-                "msvc_af_cuda"
-            ]
-        },
-        {
-            "name": "ci_gcc_af_cpu",
-            "inherits": [
-                "ci-config-base",
-                "gcc_af_cpu"
-            ]
-        },
-        {
-            "name": "ci_gcc_af_cuda",
-            "inherits": [
-                "ci-config-base",
-                "gcc_af_cuda"
-            ]
-        }
-    ],
+    {
+      "name": "ci-config-base",
+      "hidden": true,
+      "inherits": [
+        "ci-vcpkg",
+        "ci-buildcache"
+      ],
+      "cacheVariables": {
+        "FL_BUILD_TESTS": "ON",
+        "FL_BUILD_STANDALONE": "ON"
+      }
+    },
+    {
+      "name": "ci_msvc_af_cpu",
+      "inherits": [
+        "ci-config-base",
+        "msvc_af_cpu"
+      ]
+    },
+    {
+      "name": "ci_msvc_af_cuda",
+      "inherits": [
+        "ci-config-base",
+        "msvc_af_cuda"
+      ]
+    },
+    {
+      "name": "ci_gcc_af_cpu",
+      "inherits": [
+        "ci-config-base",
+        "gcc_af_cpu"
+      ]
+    },
+    {
+      "name": "ci_gcc_af_cuda",
+      "inherits": [
+        "ci-config-base",
+        "gcc_af_cuda"
+      ]
+    }
+  ],
     "buildPresets": [
         {
             "name": "ci-build-base",

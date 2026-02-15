@@ -9,6 +9,11 @@
       }
     },
     {
+      "name": "ninja",
+      "hidden": true,
+      "generator": "Ninja Multi-Config"
+    },
+    {
       "name": "wsl-settings",
       "hidden": true,
       "vendor": {
@@ -26,11 +31,7 @@
         }
       }
     },
-    {
-      "name": "ninja",
-      "hidden": true,
-      "generator": "Ninja Multi-Config"
-    },
+
     {
       "name": "base",
       "hidden": true,
@@ -41,7 +42,7 @@
       ],
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS" :  true
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
       }
     },
     {
@@ -82,10 +83,8 @@
       "cacheVariables": {
         "CMAKE_CUDA_COMPILER": "nvcc",
         "FL_USE_CUDNN": false,
-
         "CMAKE_CUDA_ARCHITECTURES": "native",
         "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler",
-
         "VCPKG_MANIFEST_FEATURES": "cuda"
       }
     },
