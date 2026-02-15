@@ -5,13 +5,16 @@
             "name": "ci-config-base",
             "hidden": true,
             "environment": {
-                "BUILDCACHE_DIR": "${sourceDir}/.buildcache",
-                "BUILDCACHE_MAX_CACHE_SIZE": "524288000"
+              "BUILDCACHE_DIR": "${sourceDir}/.buildcache",
+              "BUILDCACHE_MAX_CACHE_SIZE": "524288000"
             },
-            "cacheVariables": {
-                "FL_BUILD_TESTS": "ON",
-                "FL_BUILD_STANDALONE": "ON"
-            }
+          "cacheVariables": {
+            "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed",
+
+
+            "FL_BUILD_TESTS": "ON",
+            "FL_BUILD_STANDALONE": "ON"
+          }
         },
         {
             "name": "ci_msvc_af_cpu",
