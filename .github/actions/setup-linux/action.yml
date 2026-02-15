@@ -16,15 +16,3 @@ runs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ github.token }}
-
-    - name: Create BuildCache Directory
-      shell: bash
-      run: mkdir -p .buildcache
-
-    - name: Restore BuildCache directory
-      uses: actions/cache@v4
-      with:
-        path: .buildcache
-        key: buildcache-linux-${{ inputs.compiler }}-${{ github.sha }}
-        restore-keys: |
-          buildcache-linux-${{ inputs.compiler }}-

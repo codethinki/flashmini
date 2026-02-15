@@ -50,6 +50,7 @@ runs:
         sudo apt install arrayfire-cmake=3.8.1-2 arrayfire-headers=3.8.1-2 arrayfire-cpu3-mkl=3.8.1-2 arrayfire-cpu3-dev=3.8.1-2
       if: runner.os == 'Linux' && inputs.backend == 'ArrayFire'
       shell: bash -el {0}
+      
     - name: "Install ArrayFire (macOS)"
       run: brew install arrayfire
       if: runner.os == 'macOS' && inputs.backend == 'ArrayFire'

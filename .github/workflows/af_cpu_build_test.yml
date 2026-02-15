@@ -1,4 +1,4 @@
-name: CI
+name: AF CPU build & test
 
 on:
   push:
