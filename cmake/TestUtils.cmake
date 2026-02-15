@@ -73,5 +73,7 @@ function(build_test)
   endif()
   gtest_add_tests(TARGET ${target})
 
-  fm_target_copy_dependencies(${target})
+  if(WIN32)
+    fm_target_copy_dependencies(${target})
+  endif()
 endfunction(build_test)
