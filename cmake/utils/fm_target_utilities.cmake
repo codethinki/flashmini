@@ -587,11 +587,63 @@ function(fm_target_copy_dependencies target)
     fm_assert_true("${TGT_TYPE}" MATCHES "^(EXECUTABLE|SHARED_LIBRARY)$"
         REASON "fm_target_copy_dependencies: Target '${target}' is of type '${TGT_TYPE}'. This function only supports EXECUTABLES or SHARED_LIBRARIES."
     )
+    #add_custom_command(TARGET ${target} POST_BUILD
+    #    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    #    $<TARGET_RUNTIME_DLLS:${target}>
+    #    $<TARGET_FILE_DIR:${target}>
+    #    COMMAND_EXPAND_LISTS
+    #    COMMENT "Propagating runtime dependencies for ${target}..."
+    #)
+    set(RETRY_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${target}_copy_retry_$<CONFIG>.cmake")
+
+    # Generate the script. We use file(GENERATE) so generator expressions resolve correctly.
+    file(GENERATE OUTPUT "${RETRY_SCRIPT}" CONTENT "
+        cmake_minimum_required(VERSION 3.21)
+
+        set(DLLS \"$<TARGET_RUNTIME_DLLS:${target}>\")
+        set(DEST \"$<TARGET_FILE_DIR:${target}>\")
+
+        # Exit early if no DLLs to copy
+        if(NOT DLLS)
+            return()
+        endif()
+
+        # Retry Loop: Try up to 5 times
+        foreach(i RANGE 1 5)
+            # 1. Try to copy ALL files in one go (Fast).
+            #    'copy_if_different' is idempotent; if 49/50 files succeed, 
+            #    the next attempt only copies the 1 failed file.
+            execute_process(
+                COMMAND \${CMAKE_COMMAND} -E copy_if_different \${DLLS} \${DEST}
+                RESULT_VARIABLE CMD_RESULT
+                ERROR_VARIABLE CMD_ERR
+                OUTPUT_VARIABLE CMD_OUT
+            )
+
+            # 2. Check success
+            if(CMD_RESULT EQUAL 0)
+                return()
+            endif()
+
+            # 3. Handle failure
+            if(\${i} LESS 5)
+                # Print a warning but don't fail yet
+                message(STATUS \"[${target}] Copy failed (Attempt \${i}/5). Retrying in 1s...\")
+
+                # sleep
+                execute_process(COMMAND \${CMAKE_COMMAND} -E sleep 1)
+            else()
+                # Final attempt failed, print error and exit with failure code
+                message(STATUS \"\${CMD_OUT}\")
+                message(STATUS \"\${CMD_ERR}\")
+                message(FATAL_ERROR \"[${target}] Failed to copy dependencies after 5 attempts.\")
+            endif()
+        endforeach()
+    ")
+
+    # Add the post-build step to run the generated script
     add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_RUNTIME_DLLS:${target}>
-        $<TARGET_FILE_DIR:${target}>
-        COMMAND_EXPAND_LISTS
-        COMMENT "Propagating runtime dependencies for ${target}..."
+        COMMAND ${CMAKE_COMMAND} -P "${RETRY_SCRIPT}"
+        COMMENT "Propagating runtime dependencies for ${target} ..."
     )
 endfunction()
