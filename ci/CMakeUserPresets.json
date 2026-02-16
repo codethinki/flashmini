@@ -67,22 +67,22 @@
             "configuration": "Release"
         },
         {
-            "name": "_i_win_msvc_af_cpu",
+            "name": "ci_msvc_af_cpu",
             "configurePreset": "ci_msvc_af_cpu",
             "inherits": "ci-build-base"
         },
         {
-            "name": "ci_win_msvc_af_cuda",
+            "name": "ci_msvc_af_cuda",
             "configurePreset": "ci_msvc_af_cuda",
             "inherits": "ci-build-base"
         },
         {
-            "name": "ci_linux_gcc_af_cpu",
+            "name": "ci_gcc_af_cpu",
             "configurePreset": "ci_gcc_af_cpu",
             "inherits": "ci-build-base"
         },
         {
-            "name": "ci_linux_gcc_af_cuda",
+            "name": "ci_gcc_af_cuda",
             "configurePreset": "ci_gcc_af_cuda",
             "inherits": "ci-build-base"
         }
