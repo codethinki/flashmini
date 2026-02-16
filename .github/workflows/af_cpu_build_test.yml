@@ -50,8 +50,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: vcpkg_installed
-          key: vcpkg-installed-linux-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-linux-${{ matrix.compiler }}-cpu-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
+            vcpkg-linux-${{ matrix.compiler }}-cpu-
             vcpkg-installed-linux-${{ matrix.compiler }}-
 
       - name: Configure
@@ -67,8 +68,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .buildcache
-          key: buildcache-linux-${{ matrix.compiler }}-${{ github.run_id }}
+          key: buildcache-linux-${{ matrix.compiler }}-cpu-${{ github.run_id }}
           restore-keys: |
+            buildcache-linux-${{ matrix.compiler }}-cpu-
             buildcache-linux-${{ matrix.compiler }}-
 
       - name: Build
@@ -145,8 +147,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: vcpkg_installed
-          key: vcpkg-installed-windows-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-windows-${{ matrix.compiler }}-cpu-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
+            vcpkg-windows-${{ matrix.compiler }}-cpu-
             vcpkg-installed-windows-${{ matrix.compiler }}-
 
       - name: Configure
@@ -161,8 +164,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .buildcache
-          key: buildcache-windows-${{ matrix.compiler }}-${{ github.run_id }}
+          key: buildcache-windows-${{ matrix.compiler }}-cpu-${{ github.run_id }}
           restore-keys: |
+            buildcache-windows-${{ matrix.compiler }}-cpu-
             buildcache-windows-${{ matrix.compiler }}-
 
       - name: Build
