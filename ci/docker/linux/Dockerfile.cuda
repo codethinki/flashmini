@@ -19,7 +19,8 @@ RUN pacman -Syu --noconfirm && \
 ENV VCPKG_ROOT=/opt/vcpkg
 
 #symlink for cuda stubs
-RUN ln -s /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so.1
+RUN ln -sf /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /usr/lib/libcuda.so.1 && \
+    ln -sf /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /usr/lib/libcuda.so
 
 
 # Install ArrayFire from script
