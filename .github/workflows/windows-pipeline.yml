@@ -50,8 +50,7 @@ jobs:
       - name: Build
         uses: ./.github/actions/core-build
         with:
-          cache_key_prefix: windows-${{ inputs.name }}
-          # Dynamic presets based on inputs
+          cache_key_prefix: windows-${{ inputs.backend }}-${{ inputs.compiler }}
           configure_preset: ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
           build_preset: win_${{ inputs.compiler }}_af_${{ inputs.backend }}_ci
 

@@ -27,7 +27,7 @@ jobs:
       - name: Build & Push
         uses: ./.github/actions/build-linux-container
         with:
-          dockerfile: Docker.${{ inputs.backend }}
+          dockerfile: ci/docker/linux/Docker.${{ inputs.backend }}
           tag: linux-${{ inputs.backend }}
 
   build:
