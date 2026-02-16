@@ -18,11 +18,16 @@ RUN pacman -Syu --noconfirm && \
 
 ENV VCPKG_ROOT=/opt/vcpkg
 
+#symlink for cuda stubs
+RUN ln -s /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so.1
+
+
 # Install ArrayFire from script
 RUN wget -nv https://arrayfire.s3.amazonaws.com/3.10.0/ArrayFire-v3.10.0_Linux_x86_64.sh -O af_installer.sh && \
     chmod +x af_installer.sh && \
     ./af_installer.sh --include-subdir --prefix=/opt --skip-license --yes && \
     rm af_installer.sh
+
 ENV ArrayFire_DIR=/opt/arrayfire
 ENV CUDA_HOME=/opt/cuda
 ENV PATH=/opt/cuda/bin:$PATH

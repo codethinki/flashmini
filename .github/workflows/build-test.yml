@@ -108,9 +108,9 @@ jobs:
           - name: msvc-cpu
             backend: cpu
             run_tests: true
-          # - name: msvc-cuda
-          #   backend: cuda
-          #   run_tests: false
+          - name: msvc-cuda
+            backend: cuda
+            run_tests: false
 
     steps:
       - uses: actions/checkout@v4
