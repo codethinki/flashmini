@@ -42,17 +42,16 @@ runs:
         create-args: >-
           cuda-toolkit=12.3.0
         cache-environment: true
-        # initializes 'nvcc' in the path for subsequent steps
-        init-shell: bash 
-   
-    - name: Set CUDA_ROOT
+        init-shell: powershell 
+
+    - name: Set CUDA Environment Variables
       if: inputs.backend == 'cuda'
-      shell: bash
+      shell: powershell
       run: |
-        echo "CUDAToolkit_ROOT=$CONDA_PREFIX" >> $GITHUB_ENV
-        echo "CUDA_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
-        echo "$CONDA_PREFIX/bin" >> $GITHUB_PATH
-        echo "$CONDA_PREFIX/Library/bin" >> $GITHUB_PATH
+        "CUDAToolkit_ROOT=$env:CONDA_PREFIX" >> $env:GITHUB_ENV
+        "CUDA_PATH=$env:CONDA_PREFIX" >> $env:GITHUB_ENV
+        "$env:CONDA_PREFIX\Library\bin" >> $env:GITHUB_PATH
+        "$env:CONDA_PREFIX\bin" >> $env:GITHUB_PATH
 
     - name: Cache ArrayFire
       id: cache-arrayfire-windows
