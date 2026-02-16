@@ -51,9 +51,9 @@ jobs:
       - name: Build
         uses: ./.github/actions/core-build
         with:
-          cache_key_prefix: linux-${{ inputs.compiler }}-${{ inputs.backend }}
-          configure_preset: ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
-          build_preset: linux_${{ inputs.compiler }}_af_${{ inputs.backend }}_ci
+          cache_prefix: linux
+          compiler: ${{ inputs.compiler }}
+          backend: ${{ inputs.backend }}
 
       - name: Test
         if: inputs.run_tests

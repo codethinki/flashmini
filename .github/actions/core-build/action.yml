@@ -1,14 +1,14 @@
 name: 'Core Build'
 description: 'Handles Caching, Configuration, and Compilation'
 inputs:
-  configure_preset:
-    description: 'CMake preset used for configuration'
+  cache_prefix:
+    description: 'Cache Prefix e.g. OS'
     required: true
-  build_preset:
-    description: 'CMake preset used for building'
+  compiler:
+    description: 'Compiler'
     required: true
-  cache_key_prefix:
-    description: 'Unique string to separate caches (e.g. linux-gcc-cpu)'
+  backend:
+    description: 'Backend'
     required: true
 
 runs:
@@ -20,16 +20,16 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: vcpkg_installed
-        key: vcpkg-${{ inputs.cache_key_prefix }}-${{ hashFiles('vcpkg.json') }}
-        restore-keys: vcpkg-${{ inputs.cache_key_prefix }}-
-
+        key: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-
 
     # --- 2. Configure ---
     - name: Configure CMake
       shell: bash
       run: |
         [ -f ci/CMakeUserPresets.json ] && cp ci/CMakeUserPresets.json CMakeUserPresets.json
-        cmake --preset ${{ inputs.configure_preset }}
+        # Preset: ci_gcc_af_cpu
+        cmake --preset ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
 
     # --- 3. Save Vcpkg ---
     - name: Save vcpkg cache
@@ -45,13 +45,13 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: .buildcache
-        key: buildcache-${{ inputs.cache_key_prefix }}-${{ github.run_id }}
-        restore-keys: buildcache-${{ inputs.cache_key_prefix }}-
+        key: buildcache-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ github.run_id }}
+        restore-keys: buildcache-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-
 
     # --- 5. Build ---
     - name: Build
       shell: bash
-      run: cmake --build --preset ${{ inputs.build_preset }}
+      run: cmake --build --preset ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
 
     # --- 6. Save BuildCache ---
     - name: Save BuildCache
