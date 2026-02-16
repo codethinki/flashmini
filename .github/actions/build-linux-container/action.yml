@@ -1,5 +1,12 @@
 name: 'Build Linux Container'
 description: 'Builds and pushes the Linux Docker image'
+inputs:
+  dockerfile:
+    description: 'Path to the Dockerfile'
+    required: true
+  tag:
+    description: 'Tag suffix for the image (e.g., linux-cpu)'
+    required: true
 
 runs:
   using: "composite"
@@ -17,10 +24,10 @@ runs:
     - name: Build Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ci/docker/linux
+        context: .
+        file: ${{ inputs.dockerfile }}
         push: true
-        load: false
-        tags: |
-          ghcr.io/${{ github.repository }}:linux-latest
-        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:linux-cache
-        cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:linux-cache,mode=max
+        tags: ghcr.io/${{ github.repository }}:${{ inputs.tag }}
+        # Cache based on the specific tag (cpu vs cuda)
+        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ inputs.tag }}-cache
+        cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:${{ inputs.tag }}-cache,mode=max

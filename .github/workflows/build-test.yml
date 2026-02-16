@@ -1,0 +1,146 @@
+name: Build & Test
+
+on:
+  push:
+    branches: ["master", "_master/add_ci"]
+  pull_request:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # ----------------------------------------------------------------
+  # 1. Prepare Linux Containers
+  # ----------------------------------------------------------------
+  linux-prepare:
+    name: Build Container (${{ matrix.tag }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - tag: linux-cpu
+            file: ci/docker/linux/Dockerfile.cpu
+          - tag: linux-cuda
+            file: ci/docker/linux/Dockerfile.cuda
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Uses the restored action below
+      - name: Build & Push
+        uses: ./.github/actions/build-linux-container
+        with:
+          dockerfile: ${{ matrix.file }}
+          tag: ${{ matrix.tag }}
+
+  # ----------------------------------------------------------------
+  # 2. Linux Build & Test
+  # ----------------------------------------------------------------
+  linux:
+    name: Linux (${{ matrix.config.name }})
+    needs: linux-prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: gcc-cpu
+            docker_tag: linux-cpu
+            compiler: gcc
+            backend: cpu
+            run_tests: true
+          - name: gcc-cuda
+            docker_tag: linux-cuda
+            compiler: gcc
+            backend: cuda
+            run_tests: false
+
+    # Dynamic Container Selection
+    container:
+      image: ghcr.io/${{ github.repository }}:${{ matrix.config.docker_tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build
+        uses: ./.github/actions/core-build
+        with:
+          cache_key_prefix: linux-${{ matrix.config.name }}
+          configure_preset: ci_${{ matrix.config.compiler }}_af_${{ matrix.config.backend }}
+          build_preset: linux_${{ matrix.config.compiler }}_af_${{ matrix.config.backend }}_ci
+
+      - name: Test
+        if: matrix.config.run_tests
+        uses: ./.github/actions/core-test
+        with:
+          test_dir: out/build/ci_${{ matrix.config.compiler }}_af_${{ matrix.config.backend }}
+      
+      - name: Fix permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) out/build
+
+  # ----------------------------------------------------------------
+  # 3. Windows Build & Test
+  # ----------------------------------------------------------------
+  windows:
+    name: Windows (${{ matrix.config.name }})
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash # Forces Git Bash
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: msvc-cpu
+            backend: cpu
+            run_tests: true
+          # - name: msvc-cuda
+          #   backend: cuda
+          #   run_tests: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/install_core_deps
+        with:
+          backend: ArrayFire
+      
+      - name: Install CUDA (Windows)
+        if: matrix.config.backend == 'cuda'
+        uses: Jimver/cuda-toolkit@v0.2.14
+        with:
+          cuda: '12.3.0'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install CMake & Ninja
+        run: pip install --upgrade cmake ninja
+      
+      - uses: ./.github/actions/setup-windows
+        with:
+          compiler: msvc
+
+      - name: Build
+        uses: ./.github/actions/core-build
+        with:
+          cache_key_prefix: windows-${{ matrix.config.name }}
+          configure_preset: ci_msvc_af_${{ matrix.config.backend }}
+          build_preset: win_msvc_af_${{ matrix.config.backend }}_ci
+
+      - name: Test
+        if: matrix.config.run_tests
+        uses: ./.github/actions/core-test
+        with:
+          test_dir: out/build/ci_msvc_af_${{ matrix.config.backend }}

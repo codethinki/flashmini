@@ -587,13 +587,14 @@ function(fm_target_copy_dependencies target)
     fm_assert_true("${TGT_TYPE}" MATCHES "^(EXECUTABLE|SHARED_LIBRARY)$"
         REASON "fm_target_copy_dependencies: Target '${target}' is of type '${TGT_TYPE}'. This function only supports EXECUTABLES or SHARED_LIBRARIES."
     )
-    #add_custom_command(TARGET ${target} POST_BUILD
-    #    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    #    $<TARGET_RUNTIME_DLLS:${target}>
-    #    $<TARGET_FILE_DIR:${target}>
-    #    COMMAND_EXPAND_LISTS
-    #    COMMENT "Propagating runtime dependencies for ${target}..."
-    #)
+
+    get_target_property(_registered ${target} _FM_COPY_DEPS_REGISTERED)
+    if(_registered)
+        message(WARNING "fm_target_copy_dependencies(${target}) called multiple times!")
+        return()
+    endif()
+    set_property(TARGET ${target} PROPERTY _FM_COPY_DEPS_REGISTERED TRUE)
+
     set(RETRY_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${target}_copy_retry_$<CONFIG>.cmake")
 
     # Generate the script. We use file(GENERATE) so generator expressions resolve correctly.

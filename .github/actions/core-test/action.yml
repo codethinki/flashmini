@@ -1,0 +1,13 @@
+name: 'Core Test'
+description: 'Runs CTest in the specified directory'
+inputs:
+  test_dir:
+    description: 'Directory containing the CTestTestfile.cmake (usually build dir)'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Test
+      shell: bash
+      run: ctest --test-dir ${{ inputs.test_dir }} -C Release --output-on-failure
