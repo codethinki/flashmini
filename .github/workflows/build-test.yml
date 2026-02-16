@@ -1,60 +1,40 @@
 name: Build & Test
 
 on:
-  push:
-    branches: ["master", "_master/add_ci"]
-  pull_request:
-    branches: ["master"]
+  push: { branches: ["master", "_master/add_ci"] }
+  pull_request: { branches: ["master"] }
   workflow_dispatch:
 
-permissions:
-  contents: read
-  packages: write
+permissions: { contents: read, packages: write }
 
 jobs:
-  # ----------------------------------------------------------------
-  # Linux Build & Test
-  # ----------------------------------------------------------------
   linux:
+    name: Linux (${{ matrix.compiler }}, ${{ matrix.backend }})
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: gcc-cpu
-            compiler: gcc
-            backend: cpu
-            run_tests: true
-          - name: gcc-cuda
-            compiler: gcc
-            backend: cuda
-            run_tests: false
+        compiler: [gcc]
+        backend: [cpu, cuda]
     
     uses: ./.github/workflows/linux-pipeline.yml
     with:
       compiler: ${{ matrix.compiler }}
       backend: ${{ matrix.backend }}
-      run_tests: ${{ matrix.run_tests }}
+      # run_tests is true only if backend is cpu
+      run_tests: ${{ matrix.backend == 'cpu' }}
     secrets: inherit
 
-  # ----------------------------------------------------------------
-  # Windows Build & Test
-  # ----------------------------------------------------------------
   windows:
-    name: Windows (${{ matrix.name }})
+    name: Windows (${{ matrix.compiler }}, ${{ matrix.backend }})
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: msvc-cpu
-            backend: cpu
-            run_tests: true
-          - name: msvc-cuda
-            backend: cuda
-            run_tests: false
+        compiler: [msvc]
+        backend: [cpu, cuda]
 
     uses: ./.github/workflows/windows-pipeline.yml
     with:
-      compiler: msvc
+      compiler: ${{ matrix.compiler }}
       backend: ${{ matrix.backend }}
-      run_tests: ${{ matrix.run_tests }}
+      run_tests: ${{ matrix.backend == 'cpu' }}
     secrets: inherit
