@@ -49,9 +49,10 @@ runs:
       if: inputs.backend == 'cuda'
       shell: bash
       run: |
-        echo "CUDA_ROOT=$CONDA_PREFIX" >> $GITHUB_ENV
+        echo "CUDAToolkit_ROOT=$CONDA_PREFIX" >> $GITHUB_ENV
+        echo "CUDA_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
         echo "$CONDA_PREFIX/bin" >> $GITHUB_PATH
-        echo "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "$CONDA_PREFIX/Library/bin" >> $GITHUB_PATH
 
     - name: Cache ArrayFire
       id: cache-arrayfire-windows
