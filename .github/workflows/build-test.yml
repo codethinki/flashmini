@@ -117,7 +117,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: ./.github/actions/install_core_deps
+      - uses: ./.github/actions/install-core-deps
         with:
           backend: ArrayFire
       
