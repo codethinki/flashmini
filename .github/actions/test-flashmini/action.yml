@@ -1,4 +1,4 @@
-name: 'Core Test'
+name: 'Test flashmini'
 description: 'Runs CTest in the specified directory'
 inputs:
   test_dir:

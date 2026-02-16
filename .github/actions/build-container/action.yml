@@ -1,4 +1,4 @@
-name: 'Build Linux Container'
+name: 'Build Container'
 description: 'Builds and pushes the Linux Docker image'
 inputs:
   dockerfile:
