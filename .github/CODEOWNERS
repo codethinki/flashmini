@@ -1,4 +1,6 @@
 .github/actions/ @codethinki
 .github/workflows/ @codethinki
+ci/docker/ @codethinki
+
 LICENSE @codethinki
 .clang-format @codethinki
