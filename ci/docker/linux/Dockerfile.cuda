@@ -24,4 +24,6 @@ RUN wget -nv https://arrayfire.s3.amazonaws.com/3.10.0/ArrayFire-v3.10.0_Linux_x
     ./af_installer.sh --include-subdir --prefix=/opt --skip-license --yes && \
     rm af_installer.sh
 ENV ArrayFire_DIR=/opt/arrayfire
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/arrayfire/lib64
+ENV CUDA_HOME=/opt/cuda
+ENV PATH=/opt/cuda/bin:$PATH
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cuda/lib64:/opt/arrayfire/lib64
