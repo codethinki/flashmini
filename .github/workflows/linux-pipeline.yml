@@ -30,7 +30,7 @@ jobs:
           tag: linux-${{ inputs.backend }}
 
   build:
-    name: Linux (${{ inputs.backend }}-${{ inputs.compiler }})
+    name: Linux (${{ inputs.compiler }}-${{ inputs.backend }})
     needs: prepare
     runs-on: ubuntu-latest
     container:

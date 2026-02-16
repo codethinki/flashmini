@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    name: Windows (${{ inputs.backend }}-${{ inputs.compiler }})
+    name: Windows (${{ inputs.compiler }}-${{ inputs.backend }})
     runs-on: windows-latest
     defaults:
       run:
