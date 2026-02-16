@@ -30,11 +30,22 @@ jobs:
         with:
           backend: ArrayFire
       
-      - name: Install CUDA (Windows)
+      - name: Install CUDA 12.3.0 (Micromamba)
         if: inputs.backend == 'cuda'
-        uses: Jimver/cuda-toolkit@v0.2.14
+        uses: mamba-org/setup-micromamba@v1
         with:
-          cuda: '12.3.0'
+          environment-name: cuda-env
+          # 'nvidia' channel contains the full official toolkit with nvcc.
+          # We use 'cuda-toolkit' specifically to get the compiler + tools.
+          condarc: |
+            channels:
+              - nvidia
+              - conda-forge
+          create-args: >-
+            cuda-toolkit=12.3.0
+          cache-environment: true
+          # initializes 'nvcc' in the path for subsequent steps
+          init-shell: powershell 
 
       - uses: actions/setup-python@v5
         with:
