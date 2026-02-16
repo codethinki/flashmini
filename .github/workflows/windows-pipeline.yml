@@ -25,41 +25,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      - uses: ./.github/actions/install-core-deps
-        with:
-          backend: ArrayFire
-      
-      - name: Install CUDA (micromamba)
-        if: inputs.backend == 'cuda'
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-name: cuda-env
-          # 'nvidia' channel contains the full official toolkit with nvcc.
-          # We use 'cuda-toolkit' specifically to get the compiler + tools.
-          condarc: |
-            channels:
-              - nvidia
-              - conda-forge
-          create-args: >-
-            cuda-toolkit=12.3.0
-          cache-environment: true
-          # initializes 'nvcc' in the path for subsequent steps
-          init-shell: bash 
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      
-      - name: Install CMake & Ninja
-        run: pip install --upgrade cmake ninja
       
       - uses: ./.github/actions/setup-windows
         with:
           compiler: ${{ inputs.compiler }}
+          backend: ${{ inputs.backend }}
 
       - name: Build
-        uses: ./.github/actions/core-build
+        uses: ./.github/actions/build-flashmini
         with:
           cache_prefix: windows
           compiler: ${{ inputs.compiler }}
@@ -67,6 +40,6 @@ jobs:
 
       - name: Test
         if: inputs.run_tests
-        uses: ./.github/actions/core-test
+        uses: ./.github/actions/test-flashmini
         with:
           test_dir: out/build/ci_${{ inputs.compiler }}_af_${{ inputs.backend }}

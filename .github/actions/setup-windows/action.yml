@@ -4,6 +4,9 @@ inputs:
   compiler:
     description: 'compiler to CMakeUserPresets.json'
     required: true
+  backend: 
+    description: "backend to compile for"
+    required: true
 
 runs:
   using: "composite"
@@ -26,3 +29,57 @@ runs:
         Invoke-WebRequest -Uri "https://gitlab.com/bits-n-bites/buildcache/-/releases/v0.31.7/downloads/buildcache-windows.zip" -OutFile "buildcache.zip"
         Expand-Archive buildcache.zip -DestinationPath c:\buildcache
         echo "c:\buildcache\buildcache\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Install CUDA (micromamba)
+      if: inputs.backend == 'cuda'
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-name: cuda-env
+        condarc: |
+          channels:
+            - nvidia
+            - conda-forge
+        create-args: >-
+          cuda-toolkit=12.3.0
+        cache-environment: true
+        # initializes 'nvcc' in the path for subsequent steps
+        init-shell: bash 
+   
+    - name: Set CUDA_HOME
+      if: inputs.backend == 'cuda'
+      shell: bash
+      run: |
+        echo "CUDA_HOME=$CONDA_PREFIX" >> $GITHUB_ENV
+        echo "$CONDA_PREFIX/bin" >> $GITHUB_PATH
+        echo "LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Cache ArrayFire
+      id: cache-arrayfire-windows
+      uses: actions/cache@v4
+      with:
+        path: C:\tools\ArrayFire
+        key: arrayfire-windows-3.10.0
+    
+    - name: "Install ArrayFire"
+      if: steps.cache-arrayfire-windows.outputs.cache-hit != 'true'
+      run: |
+        choco install --no-progress wget -y
+        cd $HOME
+        wget -nv https://arrayfire.gateway.scarf.sh/windows/3.10.0/ArrayFire.exe -O ArrayFire.exe
+        7z.exe x ArrayFire.exe -o"C:\tools\ArrayFire" -y
+        rm ArrayFire.exe
+      shell: bash -el {0}
+
+    - name: Set ArrayFire Env
+      run: |
+        echo "ArrayFire_DIR=C:\tools\ArrayFire" >> $GITHUB_ENV
+        echo "C:\tools\ArrayFire\lib" >> $GITHUB_PATH
+      shell: bash -el {0}
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+    
+    - name: Install CMake & Ninja
+      run: pip install --upgrade cmake ninja
+      shell: powershell

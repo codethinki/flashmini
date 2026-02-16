@@ -5,7 +5,7 @@ inputs:
     description: 'Path to the Dockerfile'
     required: true
   tag:
-    description: 'Tag suffix for the image (e.g., linux-cpu)'
+    description: 'Tag suffix for the image'
     required: true
 
 runs:
@@ -28,6 +28,5 @@ runs:
         file: ${{ inputs.dockerfile }}
         push: true
         tags: ghcr.io/${{ github.repository }}:${{ inputs.tag }}
-        # Cache based on the specific tag (cpu vs cuda)
         cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ inputs.tag }}-cache
         cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:${{ inputs.tag }}-cache,mode=max

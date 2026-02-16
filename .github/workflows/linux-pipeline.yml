@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build & Push
-        uses: ./.github/actions/build-linux-container
+        uses: ./.github/actions/build-container
         with:
           dockerfile: ci/docker/linux/Dockerfile.${{ inputs.backend }}
           tag: linux-${{ inputs.backend }}
@@ -49,7 +49,7 @@ jobs:
           submodules: recursive
 
       - name: Build
-        uses: ./.github/actions/core-build
+        uses: ./.github/actions/build-flashmini
         with:
           cache_prefix: linux
           compiler: ${{ inputs.compiler }}
@@ -57,7 +57,7 @@ jobs:
 
       - name: Test
         if: inputs.run_tests
-        uses: ./.github/actions/core-test
+        uses: ./.github/actions/test-flashmini
         with:
           test_dir: out/build/ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
       
