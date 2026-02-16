@@ -29,7 +29,6 @@ jobs:
             backend: cuda
             run_tests: false
     
-    # call linux pipeline
     uses: ./.github/workflows/linux-pipeline.yml
     with:
       compiler: ${{ matrix.compiler }}
@@ -38,14 +37,10 @@ jobs:
     secrets: inherit
 
   # ----------------------------------------------------------------
-  # 3. Build & Test
+  # Windows Build & Test
   # ----------------------------------------------------------------
   windows:
     name: Windows (${{ matrix.name }})
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: bash # Forces Git Bash
     strategy:
       fail-fast: false
       matrix:
