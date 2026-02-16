@@ -57,18 +57,16 @@ jobs:
             backend: cuda
             run_tests: false
 
-    # Dynamic Container Selection
     container:
       image: ghcr.io/${{ github.repository }}:${{ matrix.config.docker_tag }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ github.token }}
       options: >-
-        --user 1001
-        -v ${{ env.VCPKG_INSTALLATION_ROOT || '/usr/local/share/vcpkg' }}:/vcpkg
+        -v /usr/local/share/vcpkg:/vcpkg
         -e VCPKG_ROOT=/vcpkg
+      # Map env vars inside the container so steps can see them
       env:
-        VCPKG_INSTALLATION_ROOT: ${{ env.VCPKG_INSTALLATION_ROOT || '/usr/local/share/vcpkg' }}
         VCPKG_ROOT: /vcpkg
 
     steps:
@@ -89,6 +87,7 @@ jobs:
         with:
           test_dir: out/build/ci_${{ matrix.config.compiler }}_af_${{ matrix.config.backend }}
       
+      # Permission fix
       - name: Fix permissions
         if: always()
         run: sudo chown -R $(id -u):$(id -g) out/build
