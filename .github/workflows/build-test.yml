@@ -63,7 +63,13 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ github.token }}
-      options: --user 1001
+      options: >-
+        --user 1001
+        -v ${{ env.VCPKG_INSTALLATION_ROOT || '/usr/local/share/vcpkg' }}:/vcpkg
+        -e VCPKG_ROOT=/vcpkg
+      env:
+        VCPKG_INSTALLATION_ROOT: ${{ env.VCPKG_INSTALLATION_ROOT || '/usr/local/share/vcpkg' }}
+        VCPKG_ROOT: /vcpkg
 
     steps:
       - uses: actions/checkout@v4
