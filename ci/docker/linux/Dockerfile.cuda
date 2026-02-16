@@ -20,7 +20,7 @@ ENV VCPKG_ROOT=/opt/vcpkg
 
 #symlink for cuda stubs
 RUN ln -s /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so.1
-RUN sudo ln -s /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so.1
+RUN ln -s /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /opt/cuda/targets/x86_64-linux/lib/stubs/libcuda.so.1
 
 
 # Install ArrayFire from script

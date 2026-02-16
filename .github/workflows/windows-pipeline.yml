@@ -30,7 +30,7 @@ jobs:
         with:
           backend: ArrayFire
       
-      - name: Install CUDA 12.3.0 (Micromamba)
+      - name: Install CUDA (micromamba)
         if: inputs.backend == 'cuda'
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -45,7 +45,7 @@ jobs:
             cuda-toolkit=12.3.0
           cache-environment: true
           # initializes 'nvcc' in the path for subsequent steps
-          init-shell: powershell 
+          init-shell: bash 
 
       - uses: actions/setup-python@v5
         with:
