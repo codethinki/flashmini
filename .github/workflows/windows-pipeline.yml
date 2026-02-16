@@ -1,0 +1,62 @@
+name: Windows Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      compiler:
+        required: true
+        type: string
+      backend:
+        required: true
+        type: string
+      run_tests:
+        required: true
+        type: boolean
+
+jobs:
+  build:
+    name: Windows (${{ inputs.backend }}-${{ inputs.compiler }})
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash # Forces Git Bash for consistency with Linux scripts
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/install-core-deps
+        with:
+          backend: ArrayFire
+      
+      - name: Install CUDA (Windows)
+        if: inputs.backend == 'cuda'
+        uses: Jimver/cuda-toolkit@v0.2.14
+        with:
+          cuda: '12.3.0'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      
+      - name: Install CMake & Ninja
+        run: pip install --upgrade cmake ninja
+      
+      - uses: ./.github/actions/setup-windows
+        with:
+          compiler: ${{ inputs.compiler }}
+
+      - name: Build
+        uses: ./.github/actions/core-build
+        with:
+          cache_key_prefix: windows-${{ inputs.name }}
+          # Dynamic presets based on inputs
+          configure_preset: ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
+          build_preset: win_${{ inputs.compiler }}_af_${{ inputs.backend }}_ci
+
+      - name: Test
+        if: inputs.run_tests
+        uses: ./.github/actions/core-test
+        with:
+          test_dir: out/build/ci_${{ inputs.compiler }}_af_${{ inputs.backend }}

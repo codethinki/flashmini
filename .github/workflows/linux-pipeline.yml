@@ -1,0 +1,67 @@
+name: Linux Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      # Build & Test Inputs
+      compiler:
+        required: true
+        type: string
+      backend:
+        required: true
+        type: string
+      run_tests:
+        required: true
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prepare:
+    name: Build Container (${{ inputs.backend }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & Push
+        uses: ./.github/actions/build-linux-container
+        with:
+          dockerfile: Docker.${{ inputs.backend }}
+          tag: linux-${{ inputs.backend }}
+
+  build:
+    name: Linux (${{ inputs.backend }}-${{ inputs.compiler }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}:linux-${{ inputs.backend }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: >-
+        -v /usr/local/share/vcpkg:/vcpkg
+        -e VCPKG_ROOT=/vcpkg
+      env:
+        VCPKG_ROOT: /vcpkg
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build
+        uses: ./.github/actions/core-build
+        with:
+          cache_key_prefix: linux-${{ inputs.name }}
+          configure_preset: ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
+          build_preset: linux_${{ inputs.compiler }}_af_${{ inputs.backend }}_ci
+
+      - name: Test
+        if: inputs.run_tests
+        uses: ./.github/actions/core-test
+        with:
+          test_dir: out/build/ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
+      
+      - name: Fix permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) out/build
