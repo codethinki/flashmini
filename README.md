@@ -8,10 +8,10 @@ compiles on:
 - msvc windows
 - gcc linux
 
-does not compile on:
+does not compile on (yet):
 - clang, clang-cl (non standard behavior in forward decls, gotta fix that first)
 
-compiles not:
+compiles not (yet):
 - FL_USE_CUDNN bc of old api
 
 
