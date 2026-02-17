@@ -40,11 +40,11 @@ runs:
 
     # --- Setup ORAS (Only if local missed) ---
     - name: Set up ORAS
-      if: steps.local-cache.outputs.cache-hit != 'true'
+      if: steps.local-cache.outputs.cache-matched-key == ''
       uses: oras-project/setup-oras@v1
 
     - name: Log in to GHCR
-      if: steps.local-cache.outputs.cache-hit != 'true'
+      if: steps.local-cache.outputs.cache-matched-key == ''
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
@@ -54,7 +54,7 @@ runs:
     # --- Global GHCR cache ---
     - name: Restore global cache
       id: global-cache
-      if: steps.local-cache.outputs.cache-hit != 'true'
+      if: steps.local-cache.outputs.cache-matched-key == ''
       shell: bash
       env:
         REPO: ghcr.io/${{ github.repository }}
