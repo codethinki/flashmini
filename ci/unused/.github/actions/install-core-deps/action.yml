@@ -16,6 +16,31 @@ runs:
   steps:
     # ]----- Backend dependencies
     # ArrayFire
+    - name: Cache ArrayFire (Windows)
+      id: cache-arrayfire-windows
+      uses: actions/cache@v4
+      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
+      with:
+        path: C:\tools\ArrayFire
+        key: arrayfire-windows-3.10.0
+    
+    - name: "Install ArrayFire (Windows)"
+      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire' && steps.cache-arrayfire-windows.outputs.cache-hit != 'true'
+      run: |
+        choco install --no-progress wget -y
+        cd $HOME
+        wget -nv https://arrayfire.gateway.scarf.sh/windows/3.10.0/ArrayFire.exe -O ArrayFire.exe
+        7z.exe x ArrayFire.exe -o"C:\tools\ArrayFire" -y
+        rm ArrayFire.exe
+      shell: bash -el {0}
+
+    - name: Set ArrayFire Env (Windows)
+      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
+      run: |
+        echo "ArrayFire_DIR=C:\tools\ArrayFire" >> $GITHUB_ENV
+        echo "C:\tools\ArrayFire\lib" >> $GITHUB_PATH
+      shell: bash -el {0}
+    
     - name: "Install ArrayFire (Linux)"
       run: |
         sudo apt update
@@ -25,19 +50,10 @@ runs:
         sudo apt install arrayfire-cmake=3.8.1-2 arrayfire-headers=3.8.1-2 arrayfire-cpu3-mkl=3.8.1-2 arrayfire-cpu3-dev=3.8.1-2
       if: runner.os == 'Linux' && inputs.backend == 'ArrayFire'
       shell: bash -el {0}
+      
     - name: "Install ArrayFire (macOS)"
       run: brew install arrayfire
       if: runner.os == 'macOS' && inputs.backend == 'ArrayFire'
-      shell: bash -el {0}
-    - name: "Install ArrayFire (Windows)"
-      run: |
-        choco install --no-progress wget -y
-        cd $HOME
-        INSTALLER_NAME="ArrayFire-v3.8.1-CUDA-11.4.exe"
-        wget --quiet https://arrayfire.s3.amazonaws.com/3.8.1/$INSTALLER_NAME
-        7z.exe x $INSTALLER_NAME -o"C:\Program Files\ArrayFire" -y
-        rm $INSTALLER_NAME
-      if: runner.os == 'Windows' && inputs.backend == 'ArrayFire'
       shell: bash -el {0}
     # oneDNN
     - name: Install oneDNN with micromamba

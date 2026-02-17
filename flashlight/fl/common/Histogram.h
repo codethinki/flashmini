@@ -49,7 +49,7 @@ template <typename T>
 struct HistogramBucket {
   T startInclusive = 0; //! left boundary of the bucket.
   T endExclusive = 0; //! right boundary of the bucket.
-  size_t count = 0; //! Number of elements in this bucket.88
+  size_t count = 0; //! Number of elements in this bucket.
 
   std::string prettyString(
       double countPerTick, // ratio of count/bar_length
@@ -146,8 +146,8 @@ HistogramStats<T> FixedBucketSizeHistogram(
   stats.mean = simpleMovingAverage;
 
   // Calculate bucket size
-  long range = stats.max - stats.min;
-  double bucketWidth = range / nBuckets;
+  double range = stats.max - stats.min;
+  auto bucketWidth = range / nBuckets;
   if (range == 0 || bucketWidth == 0) {
     stats.buckets[0].count = stats.numValues;
     stats.maxNumValuesPerBucket = stats.numValues;
@@ -157,11 +157,11 @@ HistogramStats<T> FixedBucketSizeHistogram(
   // Calculate count per bucket
   stats.maxNumValuesPerBucket = 0;
   for (auto itr = begin; itr != end; ++itr) {
-    if (*itr < clipMinValueInclusive || *itr > clipMaxValueExclusive) {
+    if (*itr < clipMinValueInclusive || *itr >= clipMaxValueExclusive) {
       continue;
     }
     double index =
-        std::round(static_cast<double>(*itr - stats.min) / bucketWidth);
+        std::floor(static_cast<double>(*itr - stats.min) / bucketWidth);
     size_t intIndex = std::min(static_cast<size_t>(index), nBuckets - 1);
 
     HistogramBucket<T>& bucket = stats.buckets[intIndex];

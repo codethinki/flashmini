@@ -198,12 +198,12 @@ TEST(AutogradTest, Concatenate) {
   auto funcConcatenateT1 = [x2, x3, x4](Variable& in) {
     return concatenate({in, x2, x3, x4}, 2);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT1, x1));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT1, x1, 1E-5, 1E-4, {&x2, &x3, &x4}));
 
   auto funcConcatenateT2 = [x1, x2, x4](Variable& in) {
     return concatenate({x1, x2, in, x4}, 2);
   };
-  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT2, x3));
+  ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT2, x3, 1E-5, 1E-4, {&x1, &x2, &x4}));
 }
 
 TEST(AutogradTest, Split) {

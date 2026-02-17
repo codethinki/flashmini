@@ -126,11 +126,11 @@ TEST(AutogradBinaryOpsTest, Linear) {
     auto wt = Variable(fl::rand({6, 3}, fl::dtype::f64) * 2 - 1, true);
     auto bs = Variable(fl::rand({6}, fl::dtype::f64) * 2 - 1, true);
     auto funcLinIn = [&](Variable& input) { return linear(input, wt, bs); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinIn, in, 1E-8));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinIn, in, 1E-8, 1E-4, {&wt, &bs}));
     auto funcLinWt = [&](Variable& weight) { return linear(in, weight, bs); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinWt, wt, 1E-8));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinWt, wt, 1E-8, 1E-4, {&in, &bs}));
     auto funcLinBs = [&](Variable& bias) { return linear(in, wt, bias); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinBs, bs, 1E-8));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinBs, bs, 1E-8, 1E-4, {&in, &wt}));
   }
 }
 
@@ -146,11 +146,11 @@ TEST_F(AutogradTestF16, LinearF16) {
     auto wt = Variable(fl::rand({2, 2}, fl::dtype::f16) * scale, true);
     auto bs = Variable(fl::rand({2}, fl::dtype::f16) * scale, true);
     auto funcLinIn = [&](Variable& input) { return linear(input, wt, bs); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinIn, in, 5E-2, 5E-1));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinIn, in, 5E-2, 5E-1, {&wt, &bs}));
     auto funcLinWt = [&](Variable& weight) { return linear(in, weight, bs); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinWt, wt, 5E-2, 5E-1));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinWt, wt, 5E-2, 5E-1, {&in, &bs}));
     auto funcLinBs = [&](Variable& bias) { return linear(in, wt, bias); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinBs, bs, 5E-2, 5E-1));
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcLinBs, bs, 5E-2, 5E-1, {&in, &wt}));
   }
 }
 

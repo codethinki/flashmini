@@ -475,8 +475,11 @@ void assertScalarBehavior(fl::dtype type) {
         << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
   }
 
-  auto a = fl::rand({5, 6}, type);
-  ASSERT_TRUE(allClose(fl::full({1}, a.scalar<ScalarArgType>(), type), a(0, 0)))
+
+  ScalarArgType val = static_cast<ScalarArgType>(rand());
+  auto a = fl::full({5, 6}, val, type);
+  
+  ASSERT_TRUE(allClose(fl::full({1}, a.template scalar<ScalarArgType>(), type), a(0, 0)))
       << "dtype: " << type
       << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
 }

@@ -23,6 +23,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
+# no modules in this library
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 # Default directories for installation
 set(FL_INSTALL_INC_DIR "include" CACHE PATH "Install path for headers")
 set(FL_INSTALL_INC_DIR_HEADER_LOC ${FL_INSTALL_INC_DIR}/flashlight)

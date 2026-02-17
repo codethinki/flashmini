@@ -1,0 +1,45 @@
+name: Windows Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      compiler:
+        required: true
+        type: string
+      backend:
+        required: true
+        type: string
+      run_tests:
+        required: true
+        type: boolean
+
+jobs:
+  build:
+    name: Windows (${{ inputs.compiler }}-${{ inputs.backend }})
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash # Forces Git Bash for consistency with Linux scripts
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - uses: ./.github/actions/setup-windows
+        with:
+          compiler: ${{ inputs.compiler }}
+          backend: ${{ inputs.backend }}
+
+      - name: Build
+        uses: ./.github/actions/build-flashmini
+        with:
+          cache_prefix: windows
+          compiler: ${{ inputs.compiler }}
+          backend: ${{ inputs.backend }}
+
+      - name: Test
+        if: inputs.run_tests
+        uses: ./.github/actions/test-flashmini
+        with:
+          test_dir: out/build/ci_${{ inputs.compiler }}_af_${{ inputs.backend }}

@@ -1,0 +1,62 @@
+name: 'Build flashmini'
+description: 'Handles Caching, Configuration, and Compilation'
+inputs:
+  cache_prefix:
+    description: 'Cache Prefix e.g. OS'
+    required: true
+  compiler:
+    description: 'Compiler'
+    required: true
+  backend:
+    description: 'Backend'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # --- 1. Restore Vcpkg ---
+    - name: Restore vcpkg cache
+      id: restore-vcpkg
+      uses: actions/cache/restore@v4
+      with:
+        path: vcpkg_installed
+        key: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-
+
+    # --- 2. Configure ---
+    - name: Configure CMake
+      shell: bash
+      run: |
+        [ -f ci/CMakeUserPresets.json ] && cp ci/CMakeUserPresets.json CMakeUserPresets.json
+        # Preset: ci_gcc_af_cpu
+        cmake --preset ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
+
+    # --- 3. Save Vcpkg ---
+    - name: Save vcpkg cache
+      if: steps.restore-vcpkg.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: vcpkg_installed
+        key: ${{ steps.restore-vcpkg.outputs.cache-primary-key }}
+
+    # --- 4. Restore BuildCache ---
+    - name: Restore BuildCache
+      id: restore-buildcache
+      uses: actions/cache/restore@v4
+      with:
+        path: .buildcache
+        key: buildcache-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ github.run_id }}
+        restore-keys: buildcache-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-
+
+    # --- 5. Build ---
+    - name: Build
+      shell: bash
+      run: cmake --build --preset ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
+
+    # --- 6. Save BuildCache ---
+    - name: Save BuildCache
+      if: always() && steps.restore-buildcache.outputs.cache-primary-key != ''
+      uses: actions/cache/save@v4
+      with:
+        path: .buildcache
+        key: ${{ steps.restore-buildcache.outputs.cache-primary-key }}

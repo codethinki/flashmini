@@ -23,8 +23,9 @@ TEST(TensorReductionTest, countNonzero) {
     a(idx / 10, idx % 10) = 0;
   }
 
-  ASSERT_TRUE(
-      allClose(fl::fromScalar(a.elements() - idxs.size()), fl::countNonzero(a)));
+  ASSERT_TRUE(allClose(
+      fl::fromScalar(a.elements() - idxs.size(), a.type()),
+      fl::countNonzero(a)));
 
   std::vector<unsigned> sizes(a.shape().dim(0));
   for (unsigned i = 0; i < a.shape().dim(0); ++i) {
@@ -44,7 +45,7 @@ TEST(TensorReductionTest, countNonzero) {
       fl::Tensor::fromVector<unsigned>({2}, {4, 1}),
       fl::countNonzero(b, {0, 1})));
   ASSERT_TRUE(
-      allClose(fl::fromScalar(b.elements() - 3), fl::countNonzero(b, {0, 1, 2})));
+      allClose(fl::fromScalar(b.elements() - 3, b.type()), fl::countNonzero(b, {0, 1, 2})));
 }
 
 TEST(TensorReductionTest, amin) {

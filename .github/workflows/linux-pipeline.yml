@@ -1,0 +1,66 @@
+name: Linux Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      compiler:
+        required: true
+        type: string
+      backend:
+        required: true
+        type: string
+      run_tests:
+        required: true
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prepare:
+    name: Build Container (${{ inputs.backend }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & Push
+        uses: ./.github/actions/build-container
+        with:
+          dockerfile: ci/docker/linux/Dockerfile.${{ inputs.backend }}
+          tag: linux-${{ inputs.backend }}
+
+  build:
+    name: Linux (${{ inputs.compiler }}-${{ inputs.backend }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}:linux-${{ inputs.backend }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: >-
+        -v /usr/local/share/vcpkg:/vcpkg
+        -e VCPKG_ROOT=/vcpkg
+      env:
+        VCPKG_ROOT: /vcpkg
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build
+        uses: ./.github/actions/build-flashmini
+        with:
+          cache_prefix: linux
+          compiler: ${{ inputs.compiler }}
+          backend: ${{ inputs.backend }}
+
+      - name: Test
+        if: inputs.run_tests
+        uses: ./.github/actions/test-flashmini
+        with:
+          test_dir: out/build/ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
+      
+      - name: Fix permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) out/build

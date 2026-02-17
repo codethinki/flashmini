@@ -19,6 +19,9 @@ message(STATUS "appended (${FM_CMAKE_LIBRARY_DIR}/../) cmake/ to cmake module pa
 include(fm_assertions)
 include(fm_tool_utilities)
 
+#enable BuildCache
+fm_enable_build_cache(OPTIONAL)
+
 #delegate to vcpkg
 
 fm_assert_program(vcpkg REASON "fm needs vcpkg" HINTS "$ENV{VCPKG_ROOT}")

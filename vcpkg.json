@@ -12,7 +12,9 @@
     },
     "cpu": {
       "description": "Dependencies for cpu backend",
-      "dependencies": []
+      "dependencies": [
+        "onednn"
+      ]
     }
   }
 }

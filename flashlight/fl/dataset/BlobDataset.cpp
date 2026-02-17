@@ -159,7 +159,7 @@ std::vector<uint8_t> BlobDataset::readRawArray(
     buffer.resize(fl::getTypeSize(e.type) * e.dims.elements());
     readData(
         e.offset,
-        (char*)buffer.data(),
+        reinterpret_cast<char*>(buffer.data()),
         fl::getTypeSize(e.type) * e.dims.elements());
   }
   return buffer;

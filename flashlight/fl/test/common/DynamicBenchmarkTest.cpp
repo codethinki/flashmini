@@ -77,7 +77,7 @@ TEST_F(DynamicBenchmark, OptionsStateTimed) {
 
 TEST_F(DynamicBenchmark, DynamicBenchmarkSimple) {
   size_t maxCount = 5;
-  std::vector<int> sleepTimes = {4, 2, 6};
+  std::vector<int> sleepTimes = {30, 16, 40}; //min 16ms (win)
 
   auto options =
       std::make_shared<fl::DynamicBenchmarkOptions<int>>(sleepTimes, maxCount);
@@ -90,12 +90,12 @@ TEST_F(DynamicBenchmark, DynamicBenchmarkSimple) {
   }
   ASSERT_TRUE(options->timingsComplete());
   // sleeping for fewer miliseconds is faster
-  ASSERT_EQ(options->currentOption(), 2);
+  ASSERT_EQ(options->currentOption(), sleepTimes[1]);
 }
 
 TEST_F(DynamicBenchmark, DynamicBenchmarkDisjointLambdas) {
   size_t maxCount = 5;
-  std::vector<int> sleepTimes = {4, 2, 6};
+  std::vector<int> sleepTimes = {30, 16, 40};
 
   auto options =
       std::make_shared<fl::DynamicBenchmarkOptions<int>>(sleepTimes, maxCount);
@@ -120,7 +120,7 @@ TEST_F(DynamicBenchmark, DynamicBenchmarkDisjointLambdas) {
   }
   ASSERT_TRUE(options->timingsComplete());
   // option 2 is still fastest disregarding intermediate time
-  ASSERT_EQ(options->currentOption(), 2);
+  ASSERT_EQ(options->currentOption(), sleepTimes[1]);
 }
 
 TEST_F(DynamicBenchmark, DynamicBenchmarkMatmul) {
