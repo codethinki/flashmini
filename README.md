@@ -27,7 +27,7 @@ Please read the [todo list](TODO.md)
 
 ### Functional changes from Flashlight
 - backends removed:
-    - oneDNN
+    - oneDNN (only standalone version)
     - JIT
 
 ### [Code of Conduct](CODE_OF_CONDUCT.md)
