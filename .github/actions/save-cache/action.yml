@@ -1,0 +1,57 @@
+name: 'Save Cache'
+description: 'Saves to GitHub Cache (Always) and GHCR (Only on master)'
+inputs:
+  path:
+    description: 'File path to save'
+    required: true
+  key:
+    description: 'Key used in the restore step'
+    required: true
+  global-tag:
+    description: 'OCI Tag for GHCR'
+    required: true
+  gh-token:
+    description: 'GitHub Token for GHCR auth'
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: "composite"
+  steps:
+    # --- Local github cache ---
+    - name: Save Local Cache
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}
+
+    # --- Setup for Global (Only on master) ---
+    - name: Set up ORAS
+      if: github.ref == 'refs/heads/master'
+      uses: oras-project/setup-oras@v1
+
+    - name: Log in to GHCR
+      if: github.ref == 'refs/heads/master'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.gh-token }}
+
+    # --- Global GHCR cache (master only) ---
+    - name: Save Global Cache
+      if: github.ref == 'refs/heads/master'
+      shell: bash
+      env:
+        REPO: ghcr.io/${{ github.repository }}
+        TAG: master-${{ inputs.global-tag }}
+        TARGET_PATH: ${{ inputs.path }}
+      run: |
+        if [ -d "$TARGET_PATH" ]; then
+          echo "Compressing for Global Cache..."
+          tar -czf cache-archive.tar.gz "$TARGET_PATH"
+          
+          echo "Pushing to GHCR..."
+          oras push "$REPO/cache:$TAG" cache-archive.tar.gz
+          rm cache-archive.tar.gz
+        fi

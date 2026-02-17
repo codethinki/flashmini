@@ -1,0 +1,72 @@
+name: 'Restore Cache'
+description: 'Restores from GitHub Cache or GHCR'
+inputs:
+  path:
+    description: 'File path to restore'
+    required: true
+  key:
+    description: 'Primary key for GitHub Cache'
+    required: true
+  restore-keys:
+    description: 'Fallback keys for GitHub Cache'
+    required: false
+  global-tag:
+    description: 'OCI Tag for GHCR'
+    required: true
+  gh-token:
+    description: 'GitHub Token for GHCR auth'
+    required: true
+    default: ${{ github.token }}
+
+outputs:
+  cache-hit:
+    description: 'true if cache was found in either github or GHCR'
+    value: ${{ steps.local-cache.outputs.cache-hit == 'true' || steps.global-cache.outputs.hit == 'true' }}
+  primary-key:
+    description: 'The key used for saving later'
+    value: ${{ steps.local-cache.outputs.cache-primary-key }}
+
+runs:
+  using: "composite"
+  steps:
+    # --- Local GitHub cache ---
+    - name: Restore local cache
+      id: local-cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}
+        restore-keys: ${{ inputs.restore-keys }}
+
+    # --- Setup ORAS (Only if local missed) ---
+    - name: Set up ORAS
+      if: steps.local-cache.outputs.cache-matched-key == ''
+      uses: oras-project/setup-oras@v1
+
+    - name: Log in to GHCR
+      if: steps.local-cache.outputs.cache-matched-key == ''
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.gh-token }}
+
+    # --- Global GHCR cache ---
+    - name: Restore global cache
+      id: global-cache
+      if: steps.local-cache.outputs.cache-matched-key == ''
+      shell: bash
+      env:
+        REPO: ghcr.io/${{ github.repository }}
+        TAG: master-${{ inputs.global-tag }}
+        TARGET_PATH: ${{ inputs.path }}
+      run: |
+        echo "Local miss. Pulling from GHCR: $TAG"
+        if oras pull "$REPO/cache:$TAG"; then
+          echo "hit=true" >> $GITHUB_OUTPUT
+          tar -xzf cache-archive.tar.gz
+          rm cache-archive.tar.gz
+        else
+          echo "hit=false" >> $GITHUB_OUTPUT
+          echo "Global cache miss."
+        fi
