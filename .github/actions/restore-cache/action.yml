@@ -64,7 +64,6 @@ runs:
         echo "Local miss. Pulling from GHCR: $TAG"
         if oras pull "$REPO/cache:$TAG"; then
           echo "hit=true" >> $GITHUB_OUTPUT
-          # GHCR stores a tarball, we must extract it
           tar -xzf cache-archive.tar.gz
           rm cache-archive.tar.gz
         else

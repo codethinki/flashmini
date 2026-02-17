@@ -8,7 +8,7 @@ inputs:
     description: 'Key used in the restore step'
     required: true
   global-tag:
-    description: 'OCI Tag for GHCR (e.g. vcpkg-linux-gcc-latest)'
+    description: 'OCI Tag for GHCR'
     required: true
   gh-token:
     description: 'GitHub Token for GHCR auth'
@@ -24,6 +24,19 @@ runs:
       with:
         path: ${{ inputs.path }}
         key: ${{ inputs.key }}
+
+    # --- Setup for Global (Only on master) ---
+    - name: Set up ORAS
+      if: github.ref == 'refs/heads/master'
+      uses: oras-project/setup-oras@v1
+
+    - name: Log in to GHCR
+      if: github.ref == 'refs/heads/master'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.gh-token }}
 
     # --- Global GHCR cache (master only) ---
     - name: Save Global Cache

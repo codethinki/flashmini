@@ -13,6 +13,10 @@ on:
         required: true
         type: boolean
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     name: Windows (${{ inputs.compiler }}-${{ inputs.backend }})
