@@ -17,7 +17,7 @@ runs:
     # --- 1. Restore Vcpkg ---
     - name: Restore Vcpkg
       id: vcpkg
-      uses: ./.github/actions/tiered-cache-restore
+      uses: ./.github/actions/restore-cache
       with:
         path: vcpkg_installed
         key: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ hashFiles('vcpkg.json') }}
@@ -35,7 +35,7 @@ runs:
     # --- 3. Save Vcpkg ---
     - name: Save Vcpkg
       if: steps.vcpkg.outputs.cache-hit != 'true'
-      uses: ./.github/actions/tiered-cache-save
+      uses: ./.github/actions/save-cache
       with:
         path: vcpkg_installed
         key: ${{ steps.vcpkg.outputs.primary-key }}
@@ -45,7 +45,7 @@ runs:
     # --- 4. Restore BuildCache ---
     - name: Restore BuildCache
       id: buildcache
-      uses: ./.github/actions/tiered-cache-restore
+      uses: ./.github/actions/restore-cache
       with:
         path: .buildcache
         key: buildcache-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ github.run_id }}
@@ -62,7 +62,7 @@ runs:
     # --- 6. Save BuildCache ---
     - name: Save BuildCache
       if: always()
-      uses: ./.github/actions/tiered-cache-save
+      uses: ./.github/actions/save-cache
       with:
         path: .buildcache
         key: ${{ steps.buildcache.outputs.primary-key }}
