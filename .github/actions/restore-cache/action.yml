@@ -59,7 +59,7 @@ runs:
       shell: bash
       env:
         REPO: ghcr.io/${{ github.repository }}
-        TAG: test-${{ inputs.global-tag }}
+        TAG: master-${{ inputs.global-tag }}
         TARGET_PATH: ${{ inputs.path }}
       run: |
         echo "Local miss. Pulling from GHCR: $TAG"

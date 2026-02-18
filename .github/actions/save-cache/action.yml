@@ -27,12 +27,12 @@ runs:
 
     # --- Setup for Global (Only on master) ---
     - name: Set up ORAS
-      # if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       uses: oras-project/setup-oras@v1
 
     # --- Login ---
     - name: Login to GHCR (Native ORAS)
-      # if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       shell: bash
       run: |
         echo "${{ inputs.gh-token }}" | oras login ghcr.io \
@@ -41,7 +41,7 @@ runs:
 
     # --- Global GHCR cache (master only) ---
     - name: Save Global Cache
-      #if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       shell: bash
       env:
         REPO: ghcr.io/${{ github.repository }}
