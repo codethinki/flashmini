@@ -14,7 +14,8 @@ RUN pacman -Syu --noconfirm && \
     vcpkg \
     wget \
     cloc \
-    buildcache-git
+    buildcache-git \
+    oras
 
 ENV VCPKG_ROOT=/opt/vcpkg
 
