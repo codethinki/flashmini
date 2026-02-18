@@ -32,7 +32,7 @@ runs:
 
     # --- Login ---
     - name: Login to GHCR (Native ORAS)
-      if: github.ref == 'refs/heads/master'
+      # if: github.ref == 'refs/heads/master'
       shell: bash
       run: |
         echo "${{ inputs.gh-token }}" | oras login ghcr.io \
