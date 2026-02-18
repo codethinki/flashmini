@@ -41,7 +41,7 @@ runs:
 
     # --- Global GHCR cache (master only) ---
     - name: Save Global Cache
-      if: github.ref == 'refs/heads/master'
+      #if: github.ref == 'refs/heads/master'
       shell: bash
       env:
         REPO: ghcr.io/${{ github.repository }}
