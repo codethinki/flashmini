@@ -13,7 +13,7 @@ RUN pacman -Syu --noconfirm && \
     wget \
     cloc \
     buildcache-git \
-    oras
+    docker
 
 ENV VCPKG_ROOT=/opt/vcpkg
 
