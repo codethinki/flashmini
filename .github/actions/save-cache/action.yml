@@ -27,7 +27,7 @@ runs:
 
     # --- Setup for Global (Only on master) ---
     - name: Set up ORAS
-      if: github.ref == 'refs/heads/master'
+      # if: github.ref == 'refs/heads/master'
       uses: oras-project/setup-oras@v1
 
     # --- Login ---
