@@ -31,13 +31,13 @@ runs:
       uses: oras-project/setup-oras@v1
 
     # --- Login ---
-    - name: Log in to GHCR
+    - name: Login to GHCR (Native ORAS)
       if: github.ref == 'refs/heads/master'
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ inputs.gh-token }}
+      shell: bash
+      run: |
+        echo "${{ inputs.gh-token }}" | oras login ghcr.io \
+          --username "${{ github.actor }}" \
+          --password-stdin
 
     # --- Global GHCR cache (master only) ---
     - name: Save Global Cache

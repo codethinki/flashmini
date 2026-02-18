@@ -14,8 +14,7 @@ RUN pacman -Syu --noconfirm && \
     vcpkg \
     wget \
     cloc \
-    buildcache-git \
-    docker
+    buildcache-git
 
 ENV VCPKG_ROOT=/opt/vcpkg
 
