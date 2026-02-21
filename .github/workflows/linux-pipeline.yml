@@ -21,20 +21,23 @@ jobs:
   prepare:
     name: Build Container (${{ inputs.backend }})
     runs-on: ubuntu-latest
+    outputs:
+      container-image-adress: ${{ steps.build.outputs.container-image-adress }}
     steps:
       - uses: actions/checkout@v4
-      - name: Build & Push
+      - id: build
+        name: Build & Push
         uses: ./.github/actions/build-container
         with:
           dockerfile: ci/docker/linux/Dockerfile.${{ inputs.backend }}
-          tag: linux-${{ inputs.backend }}
+          tag: linux-${{ inputs.backend }}-container
 
   build:
     name: Linux (${{ inputs.compiler }}-${{ inputs.backend }})
     needs: prepare
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/${{ github.repository }}:linux-${{ inputs.backend }}
+      image: ${{ needs.prepare.outputs.container-image-adress }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ github.token }}
