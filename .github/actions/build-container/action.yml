@@ -26,7 +26,7 @@ runs:
       id: set-image
       shell: bash
       run: |
-        image="ghcr.io/${{ github.repository }}/{{inputs.image-subdir}}:${{ inputs.tag }}"
+        image="ghcr.io/${{ github.repository }}/${{ inputs.image-subdir }}:${{ inputs.tag }}"
         echo "image=$image" >> $GITHUB_OUTPUT
         echo "cache_image=${image}-cache" >> $GITHUB_OUTPUT
 
