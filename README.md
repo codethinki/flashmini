@@ -3,10 +3,12 @@
 
 
 ### State
+[![Build & Test](https://github.com/codethinki/flashmini/actions/workflows/build-test.yml/badge.svg)](https://github.com/codethinki/flashmini/actions/workflows/build-test.yml)\
+Badge indicates:
+- Build with gcc (linux) and msvc (windows) with both cpu & cuda backend
+- Testing: gcc & msvc on cpu backend
 
-compiles on:
-- msvc windows
-- gcc linux
+The Tests should also run on cuda there is just no CI for it (github free runner limitation)
 
 does not compile on (yet):
 - clang, clang-cl (non standard behavior in forward decls, gotta fix that first)
