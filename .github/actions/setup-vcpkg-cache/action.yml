@@ -1,0 +1,21 @@
+name: 'Vcpkg Cache'
+description: 'sets up vcpkg to use NuGet for caching'
+inputs:
+  gh-token:
+    description: 'GitHub Token for GHCR auth'
+    required: true
+    default: ${{ github.token }}
+
+
+runs:
+  using: "composite"
+  steps: 
+    - name: setup nuget source
+      shell: bash
+      run: |
+        dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+          --name "GitHub" \
+          --username "${{ github.repository_owner }}" \
+          --password "${{ inputs.gh-token }}" \
+          --store-password-in-clear-text
+  
