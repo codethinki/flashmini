@@ -3,6 +3,21 @@ name: Clang Format
 on: [push, pull_request]
 
 permissions: { contents: read }
+
+# ---------------------------------------------------------
+# CONFIG
+# ---------------------------------------------------------
+env:
+  CLANG_FORMAT_VERSION: "21.1.0"
+  CHECK_PATH: "flashlight"
+  FILE_EXTENSIONS: "c|cpp|h|hpp|cu"
+
+
+
+
+# ---------------------------------------------------------
+# JOB
+# ---------------------------------------------------------
 jobs:
   formatting-check:
     name: Format check
@@ -10,8 +25,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Install clang-format
+      # Installs the exact version specified in the env block
+      run: pipx install clang-format==${{ env.CLANG_FORMAT_VERSION }}
+      
     - name: Run clang-format style check
-      uses: jidicula/clang-format-action@v4.2.0
-      with:
-        clang-format-version: '19'
-        check-path: 'flashlight'
+      run: |
+        find ${{ env.CHECK_PATH }} \
+          -type f \
+          -regextype posix-extended \
+          -regex ".*\.(${{ env.FILE_EXTENSIONS }})$" \
+          | xargs -r clang-format --style=file --dry-run --Werror
