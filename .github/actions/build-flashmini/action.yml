@@ -14,34 +14,18 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # --- 1. Restore Vcpkg ---
-    - name: Restore Vcpkg
-      id: vcpkg
-      uses: ./.github/actions/restore-cache
-      with:
-        path: vcpkg_installed
-        key: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}-${{ hashFiles('vcpkg.json') }}
-        global-tag: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}
-        gh-token: ${{ github.token }}
-
-    # --- 2. Configure ---
+    # --- 1. setup vcpkg cache ---
+    - name: setup vcpkg
+      uses: ./.github/actions/setup-vcpkg-cache
+      
+    # --- 2. configure ---
     - name: Configure CMake
       shell: bash
       run: |
         [ -f ci/CMakeUserPresets.json ] && cp ci/CMakeUserPresets.json CMakeUserPresets.json
         cmake --preset ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
 
-    # --- 3. Save Vcpkg ---
-    - name: Save Vcpkg
-      if: steps.vcpkg.outputs.cache-hit != 'true'
-      uses: ./.github/actions/save-cache
-      with:
-        path: vcpkg_installed
-        key: ${{ steps.vcpkg.outputs.primary-key }}
-        global-tag: vcpkg-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}
-        gh-token: ${{ github.token }}
-
-    # --- 4. Restore BuildCache ---
+    # --- 4. restore BuildCache ---
     - name: Restore BuildCache
       id: buildcache
       uses: ./.github/actions/restore-cache
@@ -52,12 +36,12 @@ runs:
         global-tag: buildcache-${{ inputs.cache_prefix }}-${{ inputs.compiler }}-${{ inputs.backend }}
         gh-token: ${{ github.token }}
 
-    # --- 5. Build ---
+    # --- 5. build ---
     - name: Build
       shell: bash
       run: cmake --build --preset ci_${{ inputs.compiler }}_af_${{ inputs.backend }}
 
-    # --- 6. Save BuildCache ---
+    # --- 6. save BuildCache ---
     - name: Save BuildCache
       if: always()
       uses: ./.github/actions/save-cache
