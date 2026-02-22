@@ -1,6 +1,8 @@
 name: Clang Format
 
-on: [push, pull_request]
+on:
+  push: { branches: ["master", "_master/add_ci"] }
+  pull_request: { branches: ["master"] }
 
 permissions: { contents: read }
 
