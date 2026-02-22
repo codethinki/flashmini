@@ -11,7 +11,7 @@ env:
   CLANG_FORMAT_VERSION: "21.1.0"
   CHECK_PATH: "flashlight"
   FILE_EXTENSIONS: "c|cpp|h|hpp|cu"
-
+  FILES_PER_THREAD: "40"
 
 
 
@@ -26,7 +26,6 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Install clang-format
-      # Installs the exact version specified in the env block
       run: pipx install clang-format==${{ env.CLANG_FORMAT_VERSION }}
       
     - name: Run clang-format style check
@@ -35,4 +34,4 @@ jobs:
           -type f \
           -regextype posix-extended \
           -regex ".*\.(${{ env.FILE_EXTENSIONS }})$" \
-          | xargs -r clang-format --style=file --dry-run --Werror
+          | xargs -r -P $(nproc) -n ${{ env.FILES_PER_THREAD }} clang-format --style=file --dry-run --Werror
