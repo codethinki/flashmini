@@ -145,5 +145,5 @@ setup_install_targets(INSTALL_TARGETS ${INSTALLABLE_TARGETS})
 
 # --------------------------- Other ------------------------------
 include(fm_target_utilities)
-fm_glob_cpp(FM_CPP)
-fm_add_clang_format_target(clang-format)
+fm_glob_cpp(FM_CPP "flashlight/*")
+fm_add_clang_format_target(clang-format ${FM_CPP})

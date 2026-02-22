@@ -37,6 +37,7 @@ BraceWrapping:
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
 BreakBeforeBraces: Custom
+BreakBeforeTemplateCloser: true
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon
 BreakInheritanceList: BeforeComma
@@ -89,6 +90,7 @@ TabWidth: 4
 UseTab: Never
 PenaltyBreakBeforeFirstCallParameter: 0
 PenaltyBreakTemplateDeclaration: 0
-PenaltyReturnTypeOnItsOwnLine: 10
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyBreakScopeResolution: 1000
 ...
 
