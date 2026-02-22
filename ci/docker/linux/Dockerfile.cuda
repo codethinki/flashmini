@@ -14,6 +14,7 @@ RUN pacman -Syu --noconfirm && \
     vcpkg \
     wget \
     cloc \
+    mono \
     dotnet-sdk-bin \ 
     buildcache-git
 
