@@ -10,7 +10,7 @@ runs:
   using: "composite"
   steps: 
     # --- WINDOWS: (dotnet nuget) ---
-    - name: setup nuget source (Windows)
+    - name: setup vcpkg nuget source
       if: runner.os == 'Windows'
       shell: bash
       run: |
@@ -21,15 +21,15 @@ runs:
           --store-password-in-clear-text
 
     # --- other: (mono + nuget.exe) ---
-    - name: setup nuget source for vcpkg (Linux/macOS)
+    - name: setup vcpkg nuget source
       if: runner.os != 'Windows'
       shell: bash
       run: |
-        # 1. Ensure vcpkg has downloaded nuget.exe, then grab its exact path
-        vcpkg fetch nuget > /dev/null
-        NUGET_PATH=$(vcpkg fetch nuget | tail -n 1)
+        # download nuget.exe
+        wget -qO nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+        NUGET_PATH="$(pwd)/nuget.exe"
         
-        # 2. Add the GitHub Packages source using nuget.exe
+        # add source
         mono "$NUGET_PATH" sources add \
           -Name "GitHub" \
           -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
@@ -37,6 +37,6 @@ runs:
           -Password "${{ inputs.gh-token }}" \
           -StorePasswordInClearText
         
-        # 3. Set the API key (vcpkg requires this to push/upload compiled binaries)
+        # set API key for push
         mono "$NUGET_PATH" setapikey "${{ inputs.gh-token }}" \
           -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
