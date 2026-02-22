@@ -13,7 +13,6 @@ RUN pacman -Syu --noconfirm && \
     wget \
     cloc \
     mono \
-    dotnet-sdk-bin \ 
     buildcache-git
 
 ENV VCPKG_ROOT=/opt/vcpkg

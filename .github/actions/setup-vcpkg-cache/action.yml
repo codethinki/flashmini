@@ -6,11 +6,12 @@ inputs:
     required: true
     default: ${{ github.token }}
 
-
 runs:
   using: "composite"
   steps: 
-    - name: setup nuget source
+    # --- WINDOWS: (dotnet nuget) ---
+    - name: setup nuget source (Windows)
+      if: runner.os == 'Windows'
       shell: bash
       run: |
         dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
@@ -18,4 +19,24 @@ runs:
           --username "${{ github.repository_owner }}" \
           --password "${{ inputs.gh-token }}" \
           --store-password-in-clear-text
-  
+
+    # --- other: (mono + nuget.exe) ---
+    - name: setup nuget source for vcpkg (Linux/macOS)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        # 1. Ensure vcpkg has downloaded nuget.exe, then grab its exact path
+        vcpkg fetch nuget > /dev/null
+        NUGET_PATH=$(vcpkg fetch nuget | tail -n 1)
+        
+        # 2. Add the GitHub Packages source using nuget.exe
+        mono "$NUGET_PATH" sources add \
+          -Name "GitHub" \
+          -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+          -UserName "${{ github.repository_owner }}" \
+          -Password "${{ inputs.gh-token }}" \
+          -StorePasswordInClearText
+        
+        # 3. Set the API key (vcpkg requires this to push/upload compiled binaries)
+        mono "$NUGET_PATH" setapikey "${{ inputs.gh-token }}" \
+          -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
