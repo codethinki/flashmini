@@ -122,10 +122,10 @@ endfunction()
 
       fm_find_uncrustify([OPTIONAL])
 
-   Locates a required clang-format executable and exports its path to the parent scope.
-   If OPTIONAL is specified, does not error if clang-format is not found.
+   Locates a required uncrustify executable and exports its path to the parent scope.
+   If OPTIONAL is specified, does not error if uncrustify is not found.
 
-   :post: UNCRUSTIFY_EXECUTABLE is set in PARENT_SCOPE with the full path to clang-format, or configuration terminates with FATAL_ERROR if not found and not OPTIONAL
+   :post: UNCRUSTIFY_EXECUTABLE is set in PARENT_SCOPE with the full path to uncrustify, or configuration terminates with FATAL_ERROR if not found and not OPTIONAL
 
    .. seealso::
       Use ``fm_add_uncrustify_target()`` from fm_target_utilities to create a format target.
@@ -135,9 +135,9 @@ function(fm_find_uncrustify)
    cmake_parse_arguments(PARSE_ARGV 0 ARG "OPTIONAL" "" "")
 
    if(ARG_OPTIONAL)
-      fm_find_program(UNCRUSTIFY_EXECUTABLE clang-format OPTIONAL)
+      fm_find_program(UNCRUSTIFY_EXECUTABLE uncrustify OPTIONAL)
    else()
-      fm_find_program(UNCRUSTIFY_EXECUTABLE clang-format)
+      fm_find_program(UNCRUSTIFY_EXECUTABLE uncrustify)
    endif()
    
    set(UNCRUSTIFY_EXECUTABLE ${UNCRUSTIFY_EXECUTABLE} PARENT_SCOPE)
