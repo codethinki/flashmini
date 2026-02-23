@@ -29,8 +29,7 @@ Tensor span(const Shape& inDims, const int index) {
     return fl::iota(dims);
 }
 
-Shape calcStrides(const Shape& dims) {
-    return {1, dims[0], dims[0] * dims[1], dims[0] * dims[1] * dims[2]};
+Shape calcStrides(const Shape& dims) { return {1, dims[0], dims[0] * dims[1], dims[0] * dims[1] * dims[2]};
 };
 
 Shape calcOutDims(const std::vector<Tensor>& coords) {
@@ -299,9 +298,7 @@ SetCriterion::LossDict SetCriterion::lossLabels(
     return {{"lossCe", lossCe.astype(predLogits.type())}};
 }
 
-std::unordered_map<std::string, float> SetCriterion::getWeightDict() {
-    return weightDict_;
-}
+std::unordered_map<std::string, float> SetCriterion::getWeightDict() { return weightDict_; }
 
 std::pair<Tensor, Tensor> SetCriterion::getTgtPermutationIdx(
     const std::vector<std::pair<Tensor, Tensor>>& indices

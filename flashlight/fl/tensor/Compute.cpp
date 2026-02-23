@@ -39,9 +39,7 @@ namespace {
 
 } // namespace
 
-void sync() {
-    DeviceManager::getInstance().getActiveDevice(fl::kDefaultDeviceType).sync();
-}
+void sync() { DeviceManager::getInstance().getActiveDevice(fl::kDefaultDeviceType).sync(); }
 
 void sync(const int deviceId) {
     DeviceManager::getInstance()
@@ -84,9 +82,7 @@ void relativeSync(const std::vector<Tensor>& waits, const Stream& waitOn) {
         stream->relativeSync(waitOn);
 }
 
-void eval(Tensor& tensor) {
-    tensor.backend().eval(tensor);
-}
+void eval(Tensor& tensor) { tensor.backend().eval(tensor); }
 
 int getDevice() {
     return DeviceManager::getInstance()
@@ -100,9 +96,7 @@ void setDevice(const int deviceId) {
     .setActive();
 }
 
-int getDeviceCount() {
-    return DeviceManager::getInstance().getDeviceCount(fl::kDefaultDeviceType);
-}
+int getDeviceCount() { return DeviceManager::getInstance().getDeviceCount(fl::kDefaultDeviceType); }
 
 namespace detail {
 
@@ -110,13 +104,9 @@ namespace detail {
         const char* msg,
         const int deviceId,
         std::ostream* ostream /* = &std::cout */
-    ) {
-        defaultTensorBackend().getMemMgrInfo(msg, deviceId, ostream);
-    }
+    ) { defaultTensorBackend().getMemMgrInfo(msg, deviceId, ostream); }
 
-    void setMemMgrLogStream(std::ostream* stream) {
-        defaultTensorBackend().setMemMgrLogStream(stream);
-    }
+    void setMemMgrLogStream(std::ostream* stream) { defaultTensorBackend().setMemMgrLogStream(stream); }
 
     void setMemMgrLoggingEnabled(const bool enabled) {
         defaultTensorBackend().setMemMgrLoggingEnabled(enabled);

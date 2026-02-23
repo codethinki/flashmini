@@ -54,8 +54,7 @@ Tensor allreduceGet(fl::CountMeter& mtr) {
     return Tensor::fromVector(mtrVal);
 }
 
-Tensor allreduceGet(fl::TimeMeter& mtr) {
-    return fl::full({1}, mtr.value(), fl::dtype::f64);
+Tensor allreduceGet(fl::TimeMeter& mtr) { return fl::full({1}, mtr.value(), fl::dtype::f64);
 }
 
 Tensor allreduceGet(fl::TopKMeter& mtr) {

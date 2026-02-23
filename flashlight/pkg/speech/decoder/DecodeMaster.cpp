@@ -26,12 +26,8 @@ constexpr size_t kDMWordPredIdx = 3;
 
 using namespace fl;
 
-Tensor removeNegative(const fl::Tensor& arr) {
-    return arr(arr >= 0);
-}
-Tensor removePad(const Tensor& arr, int32_t padIdx) {
-    return arr(arr != padIdx);
-}
+Tensor removeNegative(const fl::Tensor& arr) { return arr(arr >= 0); }
+Tensor removePad(const Tensor& arr, int32_t padIdx) { return arr(arr != padIdx); }
 } // namespace
 
 // TODO threading?

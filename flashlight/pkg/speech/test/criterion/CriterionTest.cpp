@@ -193,8 +193,8 @@ TEST(CriterionTest, CTCCompareTensorflow) {
         input1.end(),
         input1.begin(),
         [](float p) -> float {
-        return log(p);
-    }
+            return log(p);
+        }
     );
     std::array<float, N1* T1> gradExpected1 = {
         -0.366234, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553,
@@ -231,8 +231,8 @@ TEST(CriterionTest, CTCCompareTensorflow) {
         input2.end(),
         input2.begin(),
         [](float p) -> float {
-        return log(p);
-    }
+            return log(p);
+        }
     );
     std::array<float, N2* T2> gradExpected2 = {
         -0.69824, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508,
@@ -491,8 +491,8 @@ TEST(CriterionTest, FCCCost) {
         input1.end(),
         input1.begin(),
         [](float p) -> float {
-        return log(p);
-    }
+            return log(p);
+        }
     );
     std::array<int, 2> dummyTarget1 = {0, 0};
     const int N1 = 2, L1 = 2, T1 = 3, B1 = 2;
@@ -618,8 +618,8 @@ TEST(CriterionTest, ASGCost) {
         input1.end(),
         input1.begin(),
         [](float p) -> float {
-        return log(p);
-    }
+            return log(p);
+        }
     );
     std::array<int, (B1* L1)> target1 = {0, 1, 0, 1};
     std::array<float, (N1* N1)> trans1 = {};

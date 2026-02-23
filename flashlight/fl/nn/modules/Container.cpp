@@ -108,9 +108,7 @@ Variable Sequential::forward(const Variable& input) {
     return output.front();
 }
 
-Variable Sequential::operator()(const Variable& input) {
-    return this->forward(input);
-}
+Variable Sequential::operator()(const Variable& input) { return this->forward(input); }
 
 std::string Sequential::prettyString() const {
     std::ostringstream ss;

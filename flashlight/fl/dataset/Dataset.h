@@ -72,13 +72,9 @@ public:
     // Setup iterators
     using iterator = detail::DatasetIterator<Dataset, std::vector<Tensor>>;
 
-    iterator begin() {
-        return iterator(this);
-    }
+    iterator begin() { return iterator(this); }
 
-    iterator end() {
-        return iterator();
-    }
+    iterator end() { return iterator(); }
 
 protected:
     void checkIndexBounds(int64_t idx) const {

@@ -39,8 +39,8 @@ Variable::Variable(
             inputs.begin(),
             inputs.end(),
             [](const Variable& input) {
-            return input.isCalcGrad();
-        }
+                return input.isCalcGrad();
+            }
         )
     ) {
         sharedGrad_->calcGrad = true;
@@ -172,9 +172,7 @@ void Variable::eval() const {
     fl::eval(tensor());
 }
 
-void Variable::zeroGrad() {
-    sharedGrad_->grad.reset();
-}
+void Variable::zeroGrad() { sharedGrad_->grad.reset(); }
 
 void Variable::setCalcGrad(bool calcGrad) {
     sharedGrad_->calcGrad = calcGrad;
@@ -221,13 +219,9 @@ void Variable::addGrad(const Variable& childGrad) {
     }
 }
 
-void Variable::registerGradHook(const GradHook& hook) {
-    sharedGrad_->onGradAvailable = hook;
-}
+void Variable::registerGradHook(const GradHook& hook) { sharedGrad_->onGradAvailable = hook; }
 
-void Variable::clearGradHook() {
-    sharedGrad_->onGradAvailable = nullptr;
-}
+void Variable::clearGradHook() { sharedGrad_->onGradAvailable = nullptr; }
 
 void Variable::applyGradHook() {
     if(sharedGrad_->onGradAvailable) {

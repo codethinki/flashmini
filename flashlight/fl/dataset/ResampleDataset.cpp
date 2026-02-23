@@ -55,9 +55,7 @@ ResampleDataset::ResampleDataset(
     dataset,
     makePermutationFromFn(n == -1 ? dataset->size() : n, fn)) {}
 
-void ResampleDataset::resample(std::vector<int64_t> resamplevec) {
-    resampleVec_ = std::move(resamplevec);
-}
+void ResampleDataset::resample(std::vector<int64_t> resamplevec) { resampleVec_ = std::move(resamplevec); }
 
 std::vector<Tensor> ResampleDataset::get(const int64_t idx) const {
     checkIndexBounds(idx);

@@ -209,8 +209,6 @@ int64_t CocoDataset::size() const {
     return batched_->size();
 }
 
-CocoData CocoDataset::get(const uint64_t idx) {
-    return batched_->get(idx);
-}
+CocoData CocoDataset::get(const uint64_t idx) { return batched_->get(idx); }
 
 } // namespace fl

@@ -44,17 +44,13 @@ MemoryManagerAdapter::~MemoryManagerAdapter() {
     }
 }
 
-void MemoryManagerAdapter::setLogStream(std::ostream* logStream) {
-    logStream_ = logStream;
-}
+void MemoryManagerAdapter::setLogStream(std::ostream* logStream) { logStream_ = logStream; }
 
 std::ostream* MemoryManagerAdapter::getLogStream() const {
     return logStream_;
 }
 
-void MemoryManagerAdapter::setLoggingEnabled(bool log) {
-    loggingEnabled_ = log;
-}
+void MemoryManagerAdapter::setLoggingEnabled(bool log) { loggingEnabled_ = log; }
 
 void MemoryManagerAdapter::setLogFlushInterval(size_t interval) {
     if(interval < 1)

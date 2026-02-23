@@ -116,17 +116,11 @@ CachingMemoryManager::CachingMemoryManager(
 
 void CachingMemoryManager::initialize() {}
 
-void CachingMemoryManager::setRecyclingSizeLimit(size_t limit) {
-    recyclingSizeLimit_ = limit;
-}
+void CachingMemoryManager::setRecyclingSizeLimit(size_t limit) { recyclingSizeLimit_ = limit; }
 
-void CachingMemoryManager::setSplitSizeLimit(size_t limit) {
-    splitSizeLimit_ = limit;
-}
+void CachingMemoryManager::setSplitSizeLimit(size_t limit) { splitSizeLimit_ = limit; }
 
-void CachingMemoryManager::shutdown() {
-    signalMemoryCleanup();
-}
+void CachingMemoryManager::shutdown() { signalMemoryCleanup(); }
 
 void CachingMemoryManager::addMemoryManagement(int device) {
     if(deviceMemInfos_.find(device) != deviceMemInfos_.end())
@@ -409,9 +403,7 @@ void CachingMemoryManager::userLock(const void* ptr) {
         it->second->userLock_ = true;
 }
 
-void CachingMemoryManager::userUnlock(const void* ptr) {
-    this->unlock(const_cast<void*>(ptr), true);
-}
+void CachingMemoryManager::userUnlock(const void* ptr) { this->unlock(const_cast<void*>(ptr), true); }
 
 bool CachingMemoryManager::isUserLocked(const void* ptr) {
     if(!ptr)

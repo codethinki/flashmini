@@ -168,9 +168,7 @@ std::pair<Variable, Variable> TransformerCriterion::vectorizedDecoder(
 Tensor TransformerCriterion::viterbiPath(
     const Tensor& input,
     const Tensor& inputSizes /* = Tensor() */
-) {
-    return viterbiPathBase(input, inputSizes, false).first;
-}
+) { return viterbiPathBase(input, inputSizes, false).first; }
 
 std::pair<Tensor, Variable> TransformerCriterion::viterbiPathBase(
     const Tensor& input,

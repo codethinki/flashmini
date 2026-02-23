@@ -29,7 +29,6 @@ using DefaultTensorType_t = fl::ArrayFireTensor;
 using DefaultTensorBackend_t = fl::ArrayFireBackend;
 #define FL_DEFAULT_BACKEND_COMPILE_FLAG FL_USE_ARRAYFIRE
 
-
 #elif FL_USE_TENSOR_STUB
 using DefaultTensorType_t = fl::StubTensor;
 using DefaultTensorBackend_t = fl::StubBackend;

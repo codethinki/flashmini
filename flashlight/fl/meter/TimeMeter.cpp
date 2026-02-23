@@ -53,9 +53,7 @@ void TimeMeter::resume() {
     isStopped_ = false;
 }
 
-void TimeMeter::incUnit(int64_t num) {
-    curN_ += num;
-}
+void TimeMeter::incUnit(int64_t num) { curN_ += num; }
 
 void TimeMeter::stopAndIncUnit(int64_t num) {
     stop();

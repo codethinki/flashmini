@@ -50,13 +50,9 @@ Variable FrozenBatchNorm::forward(const Variable& input) {
     return (input * fl::tileAs(scale, input)) + fl::tileAs(bias, input);
 }
 
-void FrozenBatchNorm::setRunningMean(const fl::Variable& x) {
-    runningMean_ = x;
-}
+void FrozenBatchNorm::setRunningMean(const fl::Variable& x) { runningMean_ = x; }
 
-void FrozenBatchNorm::setRunningVar(const fl::Variable& x) {
-    runningVar_ = x;
-}
+void FrozenBatchNorm::setRunningVar(const fl::Variable& x) { runningVar_ = x; }
 
 void FrozenBatchNorm::train() {
     for(auto& param : params_)

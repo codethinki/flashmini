@@ -161,9 +161,7 @@ public:
     }
 
     template<typename T>
-    T& get() {
-        return std::get<T>(index_);
-    }
+    T& get() { return std::get<T>(index_); }
 
     IndexVariant getVariant() const {
         return index_;

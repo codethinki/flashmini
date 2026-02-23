@@ -17,7 +17,6 @@ using fl::Stream;
 using fl::StreamType;
 using fl::ArrayFireCPUStream;
 
-
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     fl::init();

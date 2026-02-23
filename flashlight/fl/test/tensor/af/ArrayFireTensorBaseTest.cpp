@@ -164,9 +164,9 @@ TEST(ArrayFireTensorBaseTest, withTensorType) {
     Tensor t;
     fl::withTensorType<ArrayFireTensor>(
         [&t]() {
-        t = fl::full({5, 5}, 6.);
-        t += 1;
-    }
+            t = fl::full({5, 5}, 6.);
+            t += 1;
+        }
     );
     ASSERT_TRUE(allClose(t, fl::full({5, 5}, 7.)));
 }

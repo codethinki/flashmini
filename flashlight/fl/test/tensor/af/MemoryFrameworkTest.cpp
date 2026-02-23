@@ -191,15 +191,15 @@ public:
         ON_CALL(*this, initialize()).WillByDefault(
             Invoke(
                 [this]() {
-                real_->initialize();
-            }
+                    real_->initialize();
+                }
             )
         );
         ON_CALL(*this, shutdown()).WillByDefault(
             Invoke(
                 [this]() {
-                real_->shutdown();
-            }
+                    real_->shutdown();
+                }
             )
         );
         ON_CALL(*this, alloc(_, _, _, _))
@@ -210,45 +210,45 @@ public:
                     const unsigned ndims,
                     dim_t* dims,
                     const unsigned elSize) {
-                return real_->alloc(userLock, ndims, dims, elSize);
-            }
+                    return real_->alloc(userLock, ndims, dims, elSize);
+                }
             )
         );
         ON_CALL(*this, allocated(_)).WillByDefault(
             Invoke(
                 [this](void* ptr) {
-                return real_->allocated(ptr);
-            }
+                    return real_->allocated(ptr);
+                }
             )
         );
         ON_CALL(*this, unlock(_, _))
         .WillByDefault(
             Invoke(
                 [this](void* ptr, bool userLock) {
-                real_->unlock(ptr, userLock);
-            }
+                    real_->unlock(ptr, userLock);
+                }
             )
         );
         ON_CALL(*this, signalMemoryCleanup()).WillByDefault(
             Invoke(
                 [this]() {
-                real_->signalMemoryCleanup();
-            }
+                    real_->signalMemoryCleanup();
+                }
             )
         );
         ON_CALL(*this, printInfo(_, _, _))
         .WillByDefault(
             Invoke(
                 [this](const char* msg, const int device, std::ostream* ostream) {
-                real_->printInfo(msg, device, ostream);
-            }
+                    real_->printInfo(msg, device, ostream);
+                }
             )
         );
         ON_CALL(*this, userLock(_)).WillByDefault(
             Invoke(
                 [this](const void* cPtr) {
-                real_->userLock(cPtr);
-            }
+                    real_->userLock(cPtr);
+                }
             )
         );
         ON_CALL(*this, userUnlock(_))
@@ -263,16 +263,16 @@ public:
         ON_CALL(*this, getMemoryPressure()).WillByDefault(
             Invoke(
                 [this]() {
-                return real_->getMemoryPressure();
-            }
+                    return real_->getMemoryPressure();
+                }
             )
         );
         ON_CALL(*this, jitTreeExceedsMemoryPressure(_))
         .WillByDefault(
             Invoke(
                 [this](size_t bytes) {
-                return real_->jitTreeExceedsMemoryPressure(bytes);
-            }
+                    return real_->jitTreeExceedsMemoryPressure(bytes);
+                }
             )
         );
     }

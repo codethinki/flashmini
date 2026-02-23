@@ -40,9 +40,7 @@ const {
     return maxSize;
 }
 
-void MemoryBlobDataset::flushData() {
-    std::lock_guard<std::mutex> lock(writeMutex_);
-}
+void MemoryBlobDataset::flushData() { std::lock_guard<std::mutex> lock(writeMutex_); }
 
 bool MemoryBlobDataset::isEmptyData() const {
     return data_.empty();

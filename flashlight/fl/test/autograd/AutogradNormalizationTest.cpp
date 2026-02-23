@@ -267,7 +267,6 @@ TEST(AutogradNormalizationTest, BatchNormJacobian) {
             );
         };
 
-
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnIn, input, 1e-2, 1e-4, {&weight, &bias}));
 
     auto funcBnWt = [&](Variable& wt) {
@@ -284,7 +283,6 @@ TEST(AutogradNormalizationTest, BatchNormJacobian) {
             );
         };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcBnWt, weight, 1e-2, 1e-4, {&input, &bias}));
-
 
     auto funcBnBs = [&](Variable& bs) {
             return batchnorm(

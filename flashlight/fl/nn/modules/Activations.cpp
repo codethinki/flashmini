@@ -15,9 +15,7 @@ namespace fl {
 
 Sigmoid::Sigmoid() = default;
 
-Variable Sigmoid::forward(const Variable& input) {
-    return sigmoid(input);
-}
+Variable Sigmoid::forward(const Variable& input) { return sigmoid(input); }
 
 std::unique_ptr<Module> Sigmoid::clone() const {
     return std::make_unique<Sigmoid>(*this);
@@ -29,9 +27,7 @@ std::string Sigmoid::prettyString() const {
 
 Log::Log() = default;
 
-Variable Log::forward(const Variable& input) {
-    return log(input);
-}
+Variable Log::forward(const Variable& input) { return log(input); }
 
 std::unique_ptr<Module> Log::clone() const {
     return std::make_unique<Log>(*this);
@@ -43,9 +39,7 @@ std::string Log::prettyString() const {
 
 Tanh::Tanh() = default;
 
-Variable Tanh::forward(const Variable& input) {
-    return tanh(input);
-}
+Variable Tanh::forward(const Variable& input) { return tanh(input); }
 
 std::unique_ptr<Module> Tanh::clone() const {
     return std::make_unique<Tanh>(*this);
@@ -57,9 +51,7 @@ std::string Tanh::prettyString() const {
 
 HardTanh::HardTanh() = default;
 
-Variable HardTanh::forward(const Variable& input) {
-    return clamp(input, -1.0, 1.0);
-}
+Variable HardTanh::forward(const Variable& input) { return clamp(input, -1.0, 1.0); }
 
 std::unique_ptr<Module> HardTanh::clone() const {
     return std::make_unique<HardTanh>(*this);
@@ -71,9 +63,7 @@ std::string HardTanh::prettyString() const {
 
 ReLU::ReLU() = default;
 
-Variable ReLU::forward(const Variable& input) {
-    return max(input, 0.0);
-}
+Variable ReLU::forward(const Variable& input) { return max(input, 0.0); }
 
 std::unique_ptr<Module> ReLU::clone() const {
     return std::make_unique<ReLU>(*this);
@@ -85,9 +75,7 @@ std::string ReLU::prettyString() const {
 
 ReLU6::ReLU6() = default;
 
-Variable ReLU6::forward(const Variable& input) {
-    return clamp(input, 0.0, 6.0);
-}
+Variable ReLU6::forward(const Variable& input) { return clamp(input, 0.0, 6.0); }
 
 std::unique_ptr<Module> ReLU6::clone() const {
     return std::make_unique<ReLU6>(*this);
@@ -99,9 +87,7 @@ std::string ReLU6::prettyString() const {
 
 LeakyReLU::LeakyReLU(double slope) : mSlope_(slope) {}
 
-Variable LeakyReLU::forward(const Variable& input) {
-    return max(input, mSlope_ * input);
-}
+Variable LeakyReLU::forward(const Variable& input) { return max(input, mSlope_ * input); }
 
 std::unique_ptr<Module> LeakyReLU::clone() const {
     return std::make_unique<LeakyReLU>(*this);
@@ -163,9 +149,7 @@ std::string ThresholdReLU::prettyString() const {
 
 GatedLinearUnit::GatedLinearUnit(int dim) : dim_(dim) {}
 
-Variable GatedLinearUnit::forward(const Variable& input) {
-    return gatedlinearunit(input, dim_);
-}
+Variable GatedLinearUnit::forward(const Variable& input) { return gatedlinearunit(input, dim_); }
 
 std::unique_ptr<Module> GatedLinearUnit::clone() const {
     return std::make_unique<GatedLinearUnit>(*this);
@@ -177,9 +161,7 @@ std::string GatedLinearUnit::prettyString() const {
 
 LogSoftmax::LogSoftmax(int dim /* = 0 */) : dim_(dim) {}
 
-Variable LogSoftmax::forward(const Variable& input) {
-    return logSoftmax(input, dim_);
-}
+Variable LogSoftmax::forward(const Variable& input) { return logSoftmax(input, dim_); }
 
 std::unique_ptr<Module> LogSoftmax::clone() const {
     return std::make_unique<LogSoftmax>(*this);
@@ -191,9 +173,7 @@ std::string LogSoftmax::prettyString() const {
 
 Swish::Swish(double beta /* = 1.0 */) : beta_(beta) {}
 
-Variable Swish::forward(const Variable& input) {
-    return swish(input, beta_);
-}
+Variable Swish::forward(const Variable& input) { return swish(input, beta_); }
 
 std::unique_ptr<Module> Swish::clone() const {
     return std::make_unique<Swish>(*this);

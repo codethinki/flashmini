@@ -57,9 +57,7 @@ public:
     }
 
     /** Set the learning rate. */
-    void setLr(double lr) {
-        lr_ = lr;
-    }
+    void setLr(double lr) { lr_ = lr; }
 
     /** Zero the gradients for all the parameters being optimized. Typically
      * this will be called after every call to step().

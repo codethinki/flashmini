@@ -158,13 +158,9 @@ namespace pkg {
                 setUseSequentialDecoder();
             }
 
-            void setGumbelTemperature(double temperature) {
-                gumbelTemperature_ = temperature;
-            }
+            void setGumbelTemperature(double temperature) { gumbelTemperature_ = temperature; }
 
-            void setLabelSmooth(double labelSmooth) {
-                labelSmooth_ = labelSmooth;
-            }
+            void setLabelSmooth(double labelSmooth) { labelSmooth_ = labelSmooth; }
 
         private:
             int eos_;

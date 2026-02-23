@@ -27,9 +27,7 @@ namespace fl {
 
 Tensor::Tensor(std::unique_ptr<TensorAdapterBase> adapter) : impl_(std::move(adapter)) {}
 
-std::unique_ptr<TensorAdapterBase> Tensor::releaseAdapter() {
-    return std::move(impl_);
-}
+std::unique_ptr<TensorAdapterBase> Tensor::releaseAdapter() { return std::move(impl_); }
 
 Tensor::~Tensor() = default;
 
@@ -259,9 +257,7 @@ const Stream& Tensor::stream() const {
     return impl_->stream();
 }
 
-void Tensor::setContext(void* context) {
-    impl_->setContext(context);
-}
+void Tensor::setContext(void* context) { impl_->setContext(context); }
 
 void* Tensor::getContext() const {
     return impl_->getContext();
@@ -365,9 +361,7 @@ FL_CREATE_FUN_LITERAL_TYPE(const short&);
 FL_CREATE_FUN_LITERAL_TYPE(const unsigned short&);
 #undef FL_CREATE_FUN_LITERAL_TYPE
 
-Tensor identity(const Dim dim, const dtype type) {
-    return defaultTensorBackend().identity(dim, type);
-}
+Tensor identity(const Dim dim, const dtype type) { return defaultTensorBackend().identity(dim, type); }
 
 #define FL_ARANGE_FUN_DEF(TYPE)                                                              \
         template<> FL_API Tensor arange(TYPE start, TYPE end, TYPE step, const dtype type) { \
@@ -394,17 +388,13 @@ Tensor iota(const Shape& dims, const Shape& tileDims, const dtype type) {
 
 /************************ Shaping and Indexing *************************/
 
-Tensor reshape(const Tensor& tensor, const Shape& shape) {
-    return tensor.backend().reshape(tensor, shape);
-}
+Tensor reshape(const Tensor& tensor, const Shape& shape) { return tensor.backend().reshape(tensor, shape); }
 
 Tensor transpose(const Tensor& tensor, const Shape& axes /* = {} */) {
     return tensor.backend().transpose(tensor, axes);
 }
 
-Tensor tile(const Tensor& tensor, const Shape& shape) {
-    return tensor.backend().tile(tensor, shape);
-}
+Tensor tile(const Tensor& tensor, const Shape& shape) { return tensor.backend().tile(tensor, shape); }
 
 Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis) {
     if(tensors.empty())
@@ -417,8 +407,8 @@ Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis) {
             tensors.begin(),
             tensors.end(),
             [b](const Tensor& t) {
-            return t.backendType() == b;
-        }
+                return t.backendType() == b;
+            }
         );
     if(!matches)
         throw std::invalid_argument(
@@ -428,82 +418,46 @@ Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis) {
     return tensors.front().backend().concatenate(tensors, axis);
 }
 
-Tensor nonzero(const Tensor& tensor) {
-    return tensor.backend().nonzero(tensor);
-}
+Tensor nonzero(const Tensor& tensor) { return tensor.backend().nonzero(tensor); }
 
 Tensor pad(
     const Tensor& input,
     const std::vector<std::pair<int, int>>& padWidths,
     const PadType type
-) {
-    return input.backend().pad(input, padWidths, type);
-}
+) { return input.backend().pad(input, padWidths, type); }
 
 /************************** Unary Operators ***************************/
-Tensor exp(const Tensor& tensor) {
-    return tensor.backend().exp(tensor);
-}
+Tensor exp(const Tensor& tensor) { return tensor.backend().exp(tensor); }
 
-Tensor log(const Tensor& tensor) {
-    return tensor.backend().log(tensor);
-}
+Tensor log(const Tensor& tensor) { return tensor.backend().log(tensor); }
 
-Tensor negative(const Tensor& tensor) {
-    return tensor.backend().negative(tensor);
-}
+Tensor negative(const Tensor& tensor) { return tensor.backend().negative(tensor); }
 
-Tensor logicalNot(const Tensor& tensor) {
-    return tensor.backend().logicalNot(tensor);
-}
+Tensor logicalNot(const Tensor& tensor) { return tensor.backend().logicalNot(tensor); }
 
-Tensor log1p(const Tensor& tensor) {
-    return tensor.backend().log1p(tensor);
-}
+Tensor log1p(const Tensor& tensor) { return tensor.backend().log1p(tensor); }
 
-Tensor sin(const Tensor& tensor) {
-    return tensor.backend().sin(tensor);
-}
+Tensor sin(const Tensor& tensor) { return tensor.backend().sin(tensor); }
 
-Tensor cos(const Tensor& tensor) {
-    return tensor.backend().cos(tensor);
-}
+Tensor cos(const Tensor& tensor) { return tensor.backend().cos(tensor); }
 
-Tensor sqrt(const Tensor& tensor) {
-    return tensor.backend().sqrt(tensor);
-}
+Tensor sqrt(const Tensor& tensor) { return tensor.backend().sqrt(tensor); }
 
-Tensor tanh(const Tensor& tensor) {
-    return tensor.backend().tanh(tensor);
-}
+Tensor tanh(const Tensor& tensor) { return tensor.backend().tanh(tensor); }
 
-Tensor floor(const Tensor& tensor) {
-    return tensor.backend().floor(tensor);
-}
+Tensor floor(const Tensor& tensor) { return tensor.backend().floor(tensor); }
 
-Tensor ceil(const Tensor& tensor) {
-    return tensor.backend().ceil(tensor);
-}
+Tensor ceil(const Tensor& tensor) { return tensor.backend().ceil(tensor); }
 
-Tensor rint(const Tensor& tensor) {
-    return tensor.backend().rint(tensor);
-}
+Tensor rint(const Tensor& tensor) { return tensor.backend().rint(tensor); }
 
-Tensor absolute(const Tensor& tensor) {
-    return tensor.backend().absolute(tensor);
-}
+Tensor absolute(const Tensor& tensor) { return tensor.backend().absolute(tensor); }
 
-Tensor sigmoid(const Tensor& tensor) {
-    return tensor.backend().sigmoid(tensor);
-}
+Tensor sigmoid(const Tensor& tensor) { return tensor.backend().sigmoid(tensor); }
 
-Tensor erf(const Tensor& tensor) {
-    return tensor.backend().erf(tensor);
-}
+Tensor erf(const Tensor& tensor) { return tensor.backend().erf(tensor); }
 
-Tensor flip(const Tensor& tensor, const unsigned dim) {
-    return tensor.backend().flip(tensor, dim);
-}
+Tensor flip(const Tensor& tensor, const unsigned dim) { return tensor.backend().flip(tensor, dim); }
 
 Tensor clip(const Tensor& tensor, const Tensor& low, const Tensor& high) {
     FL_TENSOR_BACKENDS_MATCH_CHECK(tensor, low, high);
@@ -528,25 +482,15 @@ Tensor roll(const Tensor& tensor, const int shift, const unsigned axis) {
     return tensor.backend().roll(tensor, shift, axis);
 }
 
-Tensor isnan(const Tensor& tensor) {
-    return tensor.backend().isnan(tensor);
-}
+Tensor isnan(const Tensor& tensor) { return tensor.backend().isnan(tensor); }
 
-Tensor isinf(const Tensor& tensor) {
-    return tensor.backend().isinf(tensor);
-}
+Tensor isinf(const Tensor& tensor) { return tensor.backend().isinf(tensor); }
 
-Tensor sign(const Tensor& tensor) {
-    return tensor.backend().sign(tensor);
-}
+Tensor sign(const Tensor& tensor) { return tensor.backend().sign(tensor); }
 
-Tensor tril(const Tensor& tensor) {
-    return tensor.backend().tril(tensor);
-}
+Tensor tril(const Tensor& tensor) { return tensor.backend().tril(tensor); }
 
-Tensor triu(const Tensor& tensor) {
-    return tensor.backend().triu(tensor);
-}
+Tensor triu(const Tensor& tensor) { return tensor.backend().triu(tensor); }
 
 Tensor where(const Tensor& condition, const Tensor& x, const Tensor& y) {
     FL_TENSOR_BACKENDS_MATCH_CHECK(condition, x, y);
@@ -585,9 +529,7 @@ void sort(
     const Tensor& input,
     const Dim axis,
     const SortMode sortMode /* = SortMode::Descending */
-) {
-    return values.backend().sort(values, indices, input, axis, sortMode);
-}
+) { return values.backend().sort(values, indices, input, axis, sortMode); }
 
 Tensor argsort(const Tensor& input, const Dim axis, const SortMode sortMode) {
     return input.backend().argsort(input, axis, sortMode);
@@ -666,34 +608,22 @@ Tensor maximum(const Tensor& lhs, const Tensor& rhs) {
     return lhs.backend().maximum(lhs, rhs);
 }
 
-Tensor minimum(const Tensor& lhs, const double& rhs) {
-    return lhs.backend().minimum(lhs, rhs);
-}
+Tensor minimum(const Tensor& lhs, const double& rhs) { return lhs.backend().minimum(lhs, rhs); }
 
-Tensor minimum(const double& lhs, const Tensor& rhs) {
-    return rhs.backend().minimum(lhs, rhs);
-}
+Tensor minimum(const double& lhs, const Tensor& rhs) { return rhs.backend().minimum(lhs, rhs); }
 
-Tensor maximum(const Tensor& lhs, const double& rhs) {
-    return lhs.backend().maximum(lhs, rhs);
-}
+Tensor maximum(const Tensor& lhs, const double& rhs) { return lhs.backend().maximum(lhs, rhs); }
 
-Tensor maximum(const double& lhs, const Tensor& rhs) {
-    return rhs.backend().maximum(lhs, rhs);
-}
+Tensor maximum(const double& lhs, const Tensor& rhs) { return rhs.backend().maximum(lhs, rhs); }
 
 Tensor power(const Tensor& lhs, const Tensor& rhs) {
     FL_TENSOR_BACKENDS_MATCH_CHECK(lhs, rhs);
     return lhs.backend().power(lhs, rhs);
 }
 
-Tensor power(const Tensor& lhs, const double& rhs) {
-    return lhs.backend().power(lhs, rhs);
-}
+Tensor power(const Tensor& lhs, const double& rhs) { return lhs.backend().power(lhs, rhs); }
 
-Tensor power(const double& lhs, const Tensor& rhs) {
-    return rhs.backend().power(lhs, rhs);
-}
+Tensor power(const double& lhs, const Tensor& rhs) { return rhs.backend().power(lhs, rhs); }
 
 /******************************* BLAS ********************************/
 Tensor matmul(
@@ -712,17 +642,13 @@ Tensor amin(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().amin(input, axes, keepDims);
-}
+) { return input.backend().amin(input, axes, keepDims); }
 
 Tensor amax(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().amax(input, axes, keepDims);
-}
+) { return input.backend().amax(input, axes, keepDims); }
 
 void min(
     Tensor& values,
@@ -750,95 +676,71 @@ Tensor sum(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().sum(input, axes, keepDims);
-}
+) { return input.backend().sum(input, axes, keepDims); }
 
-Tensor cumsum(const Tensor& input, const unsigned axis) {
-    return input.backend().cumsum(input, axis);
-}
+Tensor cumsum(const Tensor& input, const unsigned axis) { return input.backend().cumsum(input, axis); }
 
 Tensor argmax(
     const Tensor& input,
     const unsigned axis,
     const bool keepDims /* = false */
-) {
-    return input.backend().argmax(input, axis, keepDims);
-}
+) { return input.backend().argmax(input, axis, keepDims); }
 
 Tensor argmin(
     const Tensor& input,
     const unsigned axis,
     const bool keepDims /* = false */
-) {
-    return input.backend().argmin(input, axis, keepDims);
-}
+) { return input.backend().argmin(input, axis, keepDims); }
 
 Tensor mean(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().mean(input, axes, keepDims);
-}
+) { return input.backend().mean(input, axes, keepDims); }
 
 Tensor median(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().median(input, axes, keepDims);
-}
+) { return input.backend().median(input, axes, keepDims); }
 
 Tensor var(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool bias,
     const bool keepDims /* = false */
-) {
-    return input.backend().var(input, axes, bias, keepDims);
-}
+) { return input.backend().var(input, axes, bias, keepDims); }
 
 Tensor std(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().std(input, axes, keepDims);
-}
+) { return input.backend().std(input, axes, keepDims); }
 
 Tensor norm(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     double p /* = 2 */,
     const bool keepDims /* = false */
-) {
-    return input.backend().norm(input, axes, p, keepDims);
-}
+) { return input.backend().norm(input, axes, p, keepDims); }
 
 Tensor countNonzero(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().countNonzero(input, axes, keepDims);
-}
+) { return input.backend().countNonzero(input, axes, keepDims); }
 
 Tensor any(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().any(input, axes, keepDims);
-}
+) { return input.backend().any(input, axes, keepDims); }
 
 Tensor all(
     const Tensor& input,
     const std::vector<int>& axes /* = {} */,
     const bool keepDims /* = false */
-) {
-    return input.backend().all(input, axes, keepDims);
-}
+) { return input.backend().all(input, axes, keepDims); }
 
 /************************** Utilities ***************************/
 
@@ -847,9 +749,7 @@ std::ostream& operator<<(std::ostream& ostr, const Tensor& t) {
     return ostr;
 }
 
-void print(const Tensor& tensor) {
-    tensor.backend().print(tensor);
-}
+void print(const Tensor& tensor) { tensor.backend().print(tensor); }
 
 bool allClose(
     const fl::Tensor& a,
@@ -890,17 +790,11 @@ std::ostream& operator<<(std::ostream& os, const TensorBackendType type) {
 
 namespace detail {
 
-    std::unique_ptr<TensorAdapterBase> releaseAdapter(Tensor&& t) {
-        return t.releaseAdapter();
-    }
+    std::unique_ptr<TensorAdapterBase> releaseAdapter(Tensor&& t) { return t.releaseAdapter(); }
 
-    std::unique_ptr<TensorAdapterBase> releaseAdapterUnsafe(Tensor& t) {
-        return t.releaseAdapter();
-    }
+    std::unique_ptr<TensorAdapterBase> releaseAdapterUnsafe(Tensor& t) { return t.releaseAdapter(); }
 
-    bool areTensorTypesEqual(const Tensor& a, const Tensor& b) {
-        return a.type() == b.type();
-    }
+    bool areTensorTypesEqual(const Tensor& a, const Tensor& b) { return a.type() == b.type(); }
 
 } // namespace detail
 

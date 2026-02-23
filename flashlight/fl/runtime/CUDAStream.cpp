@@ -97,9 +97,7 @@ const CUDADevice& CUDAStream::device() const {
     return device_;
 }
 
-CUDADevice& CUDAStream::device() {
-    return device_;
-}
+CUDADevice& CUDAStream::device() { return device_; }
 
 void CUDAStream::sync() const {
     FL_CUDA_CHECK(cudaStreamSynchronize(this->nativeStream_));

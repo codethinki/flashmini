@@ -23,9 +23,7 @@ namespace fl {
  * @return a Tensor containing the ArrayFire array
  */
 template<typename Impl, typename... T>
-Tensor toTensor(T&&... t) {
-    return Tensor(std::make_unique<Impl>(std::forward<T>(t)...));
-}
+Tensor toTensor(T&&... t) { return Tensor(std::make_unique<Impl>(std::forward<T>(t)...)); }
 
 /**
  * The implementation interface for Flashlight Tensor backends.

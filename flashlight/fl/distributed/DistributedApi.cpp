@@ -12,13 +12,9 @@
 
 namespace fl {
 
-FL_API bool isDistributedInit() {
-    return detail::DistributedInfo::getInstance().isInitialized_;
-}
+FL_API bool isDistributedInit() { return detail::DistributedInfo::getInstance().isInitialized_; }
 
-FL_API DistributedBackend distributedBackend() {
-    return detail::DistributedInfo::getInstance().backend_;
-}
+FL_API DistributedBackend distributedBackend() { return detail::DistributedInfo::getInstance().backend_; }
 
 FL_API void allReduce(Variable& var, double scale /* = 1.0 */, bool async /* = false */) {
     if(getWorldSize() > 1)

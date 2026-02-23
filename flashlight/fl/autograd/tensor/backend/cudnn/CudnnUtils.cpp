@@ -417,13 +417,9 @@ ConvDescriptor::~ConvDescriptor() {
     CUDNN_CHECK_ERR(cudnnDestroyConvolutionDescriptor(descriptor));
 }
 
-cudnnHandle_t getCudnnHandle() {
-    return getActiveDeviceHandle().cudnnHandle;
-}
+cudnnHandle_t getCudnnHandle() { return getActiveDeviceHandle().cudnnHandle; }
 
-const CUDAStream& getCudnnStream() {
-    return *getActiveDeviceHandle().stream;
-}
+const CUDAStream& getCudnnStream() { return *getActiveDeviceHandle().stream; }
 
 const void* kOne(const fl::dtype t) {
     switch(t) {

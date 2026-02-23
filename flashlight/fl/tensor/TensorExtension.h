@@ -109,9 +109,7 @@ bool registerTensorExtension(TensorBackendType backendType) {
 template<typename T>
 class TensorExtension : public TensorExtensionBase {
 public:
-    static TensorExtensionType getExtensionType() {
-        return T::extensionType;
-    }
+    static TensorExtensionType getExtensionType() { return T::extensionType; }
 };
 
 template<typename T>

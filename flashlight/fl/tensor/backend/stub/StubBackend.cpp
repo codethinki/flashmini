@@ -71,17 +71,11 @@ void StubBackend::setMemMgrFlushInterval(const size_t /* interval */) {
 
 /* -------------------------- Rand Functions -------------------------- */
 
-void StubBackend::setSeed(const int /* seed */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+void StubBackend::setSeed(const int /* seed */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::randn(const Shape& /* shape */, dtype /* type */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::randn(const Shape& /* shape */, dtype /* type */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::rand(const Shape& /* shape */, dtype /* type */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::rand(const Shape& /* shape */, dtype /* type */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 /* --------------------------- Tensor Operators --------------------------- */
 
@@ -116,40 +110,30 @@ FL_STUB_BACKEND_CREATE_FUN_LITERAL_DEF(const bool&);
 FL_STUB_BACKEND_CREATE_FUN_LITERAL_DEF(const short&);
 FL_STUB_BACKEND_CREATE_FUN_LITERAL_DEF(const unsigned short&);
 
-Tensor StubBackend::identity(const Dim /* dim */, const dtype /* type */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::identity(const Dim /* dim */, const dtype /* type */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::arange(
     const Shape& /* shape */,
     const Dim /* seqDim */,
     const dtype /* type */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::iota(
     const Shape& /* dims */,
     const Shape& /* tileDims */,
     const dtype /* type */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 /************************ Shaping and Indexing *************************/
 Tensor StubBackend::reshape(
     const Tensor& /* tensor */,
     const Shape& /* shape */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::transpose(
     const Tensor& /* tensor */,
     const Shape& /* axes */ /* = {} */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::tile(const Tensor& /* tensor */, const Shape& /* shape */) {
     FL_STUB_BACKEND_UNIMPLEMENTED;
@@ -158,83 +142,47 @@ Tensor StubBackend::tile(const Tensor& /* tensor */, const Shape& /* shape */) {
 Tensor StubBackend::concatenate(
     const std::vector<Tensor>& /* tensors */,
     const unsigned /* axis */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::nonzero(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::nonzero(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::pad(
     const Tensor& /* input */,
     const std::vector<std::pair<int, int>>& /* padWidths */,
     const PadType /* type */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 /************************** Unary Operators ***************************/
 
-Tensor StubBackend::exp(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::exp(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::log(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::log(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::negative(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::negative(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::logicalNot(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::logicalNot(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::log1p(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::log1p(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::sin(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::sin(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::cos(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::cos(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::sqrt(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::sqrt(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::tanh(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::tanh(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::floor(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::floor(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::ceil(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::ceil(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::rint(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::rint(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::absolute(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::absolute(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::sigmoid(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::sigmoid(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::erf(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::erf(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::flip(const Tensor& /* tensor */, const unsigned /* dim */) {
     FL_STUB_BACKEND_UNIMPLEMENTED;
@@ -244,45 +192,29 @@ Tensor StubBackend::clip(
     const Tensor& /* tensor */,
     const Tensor& /* low */,
     const Tensor& /* high */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::roll(
     const Tensor& /* tensor */,
     const int /* shift */,
     const unsigned /* axis */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::isnan(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::isnan(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::isinf(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::isinf(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::sign(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::sign(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::tril(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::tril(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-Tensor StubBackend::triu(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::triu(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::where(
     const Tensor& /* condition */,
     const Tensor& /* x */,
     const Tensor& /* y */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 void StubBackend::topk(
     Tensor& /* values */,
@@ -291,17 +223,13 @@ void StubBackend::topk(
     const unsigned /* k */,
     const Dim /* axis */,
     const SortMode /* sortMode */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::sort(
     const Tensor& /* input */,
     const Dim /* axis */,
     const SortMode /* sortMode */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 void StubBackend::sort(
     Tensor& /* values */,
@@ -309,17 +237,13 @@ void StubBackend::sort(
     const Tensor& /* input */,
     const Dim /* axis */,
     const SortMode /* sortMode */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::argsort(
     const Tensor& /* input */,
     const Dim /* axis */,
     const SortMode /* sortMode */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 /************************** Binary Operators ***************************/
 #define FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, TYPE)                          \
@@ -396,9 +320,7 @@ Tensor StubBackend::maximum(const Tensor& /* lhs */, const Tensor& /* rhs */) {
     FL_STUB_BACKEND_UNIMPLEMENTED;
 }
 
-Tensor StubBackend::power(const Tensor& /* lhs */, const Tensor& /* rhs */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+Tensor StubBackend::power(const Tensor& /* lhs */, const Tensor& /* rhs */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 /************************** BLAS ***************************/
 
@@ -407,9 +329,7 @@ Tensor StubBackend::matmul(
     const Tensor& /* rhs */,
     MatrixProperty /* lhsProp */,
     MatrixProperty /* rhsProp */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 /************************** Reductions ***************************/
 
@@ -417,17 +337,13 @@ Tensor StubBackend::amin(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::amax(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 void StubBackend::min(
     Tensor& /* values */,
@@ -435,9 +351,7 @@ void StubBackend::min(
     const Tensor& /* input */,
     const unsigned /* axis */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 void StubBackend::max(
     Tensor& /* values */,
@@ -445,109 +359,81 @@ void StubBackend::max(
     const Tensor& /* input */,
     const unsigned /* axis */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::sum(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::cumsum(
     const Tensor& /* input */,
     const unsigned /* axis */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::argmax(
     const Tensor& /* input */,
     const unsigned /* axis */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::argmin(
     const Tensor& /* input */,
     const unsigned /* axis */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::mean(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::median(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::var(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* bias */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::std(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::norm(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     double /* p */ /* = 2 */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::countNonzero(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::any(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 Tensor StubBackend::all(
     const Tensor& /* input */,
     const std::vector<int>& /* axes */,
     const bool /* keepDims */
-) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
-void StubBackend::print(const Tensor& /* tensor */) {
-    FL_STUB_BACKEND_UNIMPLEMENTED;
-}
+void StubBackend::print(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 
 } // namespace fl

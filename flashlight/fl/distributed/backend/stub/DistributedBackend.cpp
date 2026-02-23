@@ -54,11 +54,7 @@ void syncDistributed() {
     );
 }
 
-int getWorldRank() {
-    return 0;
-}
+int getWorldRank() { return 0; }
 
-int getWorldSize() {
-    return 1;
-}
+int getWorldSize() { return 1; }
 } // namespace fl

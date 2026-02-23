@@ -53,13 +53,9 @@ namespace pkg {
 
             using iterator = detail::DatasetIterator<CocoDataset, CocoData>;
 
-            iterator begin() {
-                return iterator(this);
-            }
+            iterator begin() { return iterator(this); }
 
-            iterator end() {
-                return iterator();
-            }
+            iterator end() { return iterator(); }
 
             int64_t size() const;
 

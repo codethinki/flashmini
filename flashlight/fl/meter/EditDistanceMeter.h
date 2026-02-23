@@ -70,9 +70,7 @@ public:
     );
 
     /** Updates all the counters with an `ErrorState`. */
-    void add(const ErrorState& es, const int64_t n) {
-        add(n, es.ndel, es.nins, es.nsub);
-    }
+    void add(const ErrorState& es, const int64_t n) { add(n, es.ndel, es.nins, es.nsub); }
 
     /** Returns a vector of five values:
      * - `error rate`: \f$ \frac{(ndel + nins + nsub)}{n} \times 100.0 \f$

@@ -276,12 +276,12 @@ TEST(DatasetTest, FileBlobDataset) {
         blob.setHostTransform(
             0,
             [](void* ptr, fl::Shape size, fl::dtype /* type */) {
-            float* ptrFl = (float*) ptr;
-            for(int64_t i = 0; i < size.elements(); i++)
-                ptrFl[i] += 1;
-            return Tensor::fromBuffer(size, ptrFl, MemoryLocation::Host);
-        }
-            );
+                float* ptrFl = (float*) ptr;
+                for(int64_t i = 0; i < size.elements(); i++)
+                    ptrFl[i] += 1;
+                return Tensor::fromBuffer(size, ptrFl, MemoryLocation::Host);
+            }
+        );
         check(blob);
         for(auto& vec : data)
             if(!vec.empty())
@@ -314,10 +314,10 @@ TEST(DatasetTest, FileBlobDataset) {
             auto device = fl::getDevice();
             workers.emplace_back(
                 [i, blob, nperworker, device, &thdata]() {
-                fl::setDevice(device);
-                for(int j = 0; j < nperworker; j++)
-                    thdata[i * nperworker + j] = blob->get(i * nperworker + j);
-            }
+                    fl::setDevice(device);
+                    for(int j = 0; j < nperworker; j++)
+                        thdata[i * nperworker + j] = blob->get(i * nperworker + j);
+                }
             );
         }
         for(int i = 0; i < nworker; i++)
@@ -355,10 +355,10 @@ TEST(DatasetTest, FileBlobDataset) {
             for(int i = 0; i < nworker; i++)
                 workers.emplace_back(
                     [i, blob, nperworker, device, &data]() {
-                    fl::setDevice(device);
-                    for(int j = 0; j < nperworker; j++)
-                        blob->add(data[i * nperworker + j]);
-                }
+                        fl::setDevice(device);
+                        for(int j = 0; j < nperworker; j++)
+                            blob->add(data[i * nperworker + j]);
+                    }
                 );
             for(int i = 0; i < nworker; i++)
                 workers[i].join();
@@ -453,12 +453,12 @@ TEST(DatasetTest, MemoryBlobDataset) {
         blob.setHostTransform(
             0,
             [](void* ptr, fl::Shape size, fl::dtype /* type */) {
-            float* ptrFl = (float*) ptr;
-            for(int64_t i = 0; i < size.elements(); i++)
-                ptrFl[i] += 1;
-            return Tensor::fromBuffer(size, ptrFl, MemoryLocation::Host);
-        }
-            );
+                float* ptrFl = (float*) ptr;
+                for(int64_t i = 0; i < size.elements(); i++)
+                    ptrFl[i] += 1;
+                return Tensor::fromBuffer(size, ptrFl, MemoryLocation::Host);
+            }
+        );
         check(blob);
     }
 
@@ -472,10 +472,10 @@ TEST(DatasetTest, MemoryBlobDataset) {
             auto device = fl::getDevice();
             workers.emplace_back(
                 [i, &blob, nperworker, device, &thdata]() {
-                fl::setDevice(device);
-                for(int j = 0; j < nperworker; j++)
-                    thdata[i * nperworker + j] = blob.get(i * nperworker + j);
-            }
+                    fl::setDevice(device);
+                    for(int j = 0; j < nperworker; j++)
+                        thdata[i * nperworker + j] = blob.get(i * nperworker + j);
+                }
             );
         }
         for(int i = 0; i < nworker; i++)
@@ -509,10 +509,10 @@ TEST(DatasetTest, MemoryBlobDataset) {
             for(int i = 0; i < nworker; i++)
                 workers.emplace_back(
                     [i, &wblob, nperworker, device, &data]() {
-                    fl::setDevice(device);
-                    for(int j = 0; j < nperworker; j++)
-                        wblob.add(data[i * nperworker + j]);
-                }
+                        fl::setDevice(device);
+                        for(int j = 0; j < nperworker; j++)
+                            wblob.add(data[i * nperworker + j]);
+                    }
                 );
             for(int i = 0; i < nworker; i++)
                 workers[i].join();

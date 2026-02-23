@@ -22,9 +22,7 @@
 
 namespace fl {
 
-bool f16Supported() {
-    return defaultTensorBackend().isDataTypeSupported(fl::dtype::f16);
-}
+bool f16Supported() { return defaultTensorBackend().isDataTypeSupported(fl::dtype::f16); }
 
 size_t divRoundUp(size_t numerator, size_t denominator) {
     if(!numerator)

@@ -246,8 +246,10 @@ Tensor generalizedBoxIou(const Tensor& bboxes1, const Tensor& bboxes2) {
     return iou - (area - uni) / area;
 }
 
-Variable l1Loss(const Variable& input, const Variable& target) {
-    return flatten(fl::sum(fl::abs(input - target), {0}), 0, 1);
+Variable l1Loss(
+    const Variable& input,
+    const Variable& target
+) { return flatten(fl::sum(fl::abs(input - target), {0}), 0, 1);
 }
 
 } // namespace fl

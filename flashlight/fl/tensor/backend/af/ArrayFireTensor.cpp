@@ -126,9 +126,7 @@ af::array::array_proxy ArrayFireTensor::IndexedArrayComponent::get(
     }
 }
 
-af::array& ArrayFireTensor::ArrayComponent::get(const ArrayFireTensor& inst) {
-    return *(inst.arrayHandle_);
-}
+af::array& ArrayFireTensor::ArrayComponent::get(const ArrayFireTensor& inst) { return *(inst.arrayHandle_); }
 
 const af::array& ArrayFireTensor::getHandle() const {
     return const_cast<ArrayFireTensor*>(this)->getHandle();
@@ -197,17 +195,11 @@ const Shape& ArrayFireTensor::shape() {
     return shape_;
 }
 
-fl::dtype ArrayFireTensor::type() {
-    return detail::afToFlType(getHandle().type());
-}
+fl::dtype ArrayFireTensor::type() { return detail::afToFlType(getHandle().type()); }
 
-bool ArrayFireTensor::isSparse() {
-    return getHandle().issparse();
-}
+bool ArrayFireTensor::isSparse() { return getHandle().issparse(); }
 
-af::dtype ArrayFireTensor::afHandleType() {
-    return arrayHandle_->type();
-}
+af::dtype ArrayFireTensor::afHandleType() { return arrayHandle_->type(); }
 
 Location ArrayFireTensor::location() {
     switch(af::getBackendId(getHandle())) {
@@ -223,21 +215,13 @@ Location ArrayFireTensor::location() {
     }
 }
 
-void ArrayFireTensor::scalar(void* out) {
-    AF_CHECK(af_get_scalar(out, getHandle().get()));
-}
+void ArrayFireTensor::scalar(void* out) { AF_CHECK(af_get_scalar(out, getHandle().get())); }
 
-void ArrayFireTensor::device(void** out) {
-    AF_CHECK(af_get_device_ptr(out, getHandle().get()));
-}
+void ArrayFireTensor::device(void** out) { AF_CHECK(af_get_device_ptr(out, getHandle().get())); }
 
-void ArrayFireTensor::host(void* out) {
-    AF_CHECK(af_get_data_ptr(out, getHandle().get()));
-}
+void ArrayFireTensor::host(void* out) { AF_CHECK(af_get_data_ptr(out, getHandle().get())); }
 
-void ArrayFireTensor::unlock() {
-    AF_CHECK(af_unlock_array(getHandle().get()));
-}
+void ArrayFireTensor::unlock() { AF_CHECK(af_unlock_array(getHandle().get())); }
 
 bool ArrayFireTensor::isLocked() {
     bool res;
@@ -250,13 +234,9 @@ bool ArrayFireTensor::isLocked() {
     return res;
 }
 
-bool ArrayFireTensor::isContiguous() {
-    return af::isLinear(getHandle());
-}
+bool ArrayFireTensor::isContiguous() { return af::isLinear(getHandle()); }
 
-Shape ArrayFireTensor::strides() {
-    return detail::afToFlDims(af::getStrides(getHandle()), numDims());
-}
+Shape ArrayFireTensor::strides() { return detail::afToFlDims(af::getStrides(getHandle()), numDims()); }
 
 const Stream& ArrayFireTensor::stream() const {
     // TODO indexing is unlikely to change the stream associated with a tensor.
@@ -502,14 +482,14 @@ af::array ArrayFireTensor::adjustInPlaceOperandDims(const Tensor& operand) {
     return doModdims ? af::moddims(operandArr, newDims) : operandArr;
 }
 
-#define ASSIGN_OP_TENSOR(FUN, AF_OP)                                     \
-        void ArrayFireTensor::FUN(const Tensor& tensor) {                \
-            std::visit(                                                  \
-    [&tensor, this](auto&& arr) {                                        \
-            arr.get(*this) AF_OP this->adjustInPlaceOperandDims(tensor); \
-        },                                                               \
-    handle_                                                              \
-            );                                                           \
+#define ASSIGN_OP_TENSOR(FUN, AF_OP)                                 \
+        void ArrayFireTensor::FUN(const Tensor& tensor) {            \
+            std::visit(                                              \
+    [&tensor, this](auto&& arr) {                                    \
+        arr.get(*this) AF_OP this->adjustInPlaceOperandDims(tensor); \
+    },                                                               \
+    handle_                                                          \
+            );                                                       \
         }
 
 #define ASSIGN_OP(FUN, AF_OP)        \

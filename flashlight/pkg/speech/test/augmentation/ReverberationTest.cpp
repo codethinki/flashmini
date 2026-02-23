@@ -104,8 +104,8 @@ TEST(ReverbEcho, SinWaveReverb) {
         noise.end(),
         noise.begin(),
         [norm](float x) -> float {
-        return x / norm;
-    }
+            return x / norm;
+        }
     );
 
     // To reduce test flakiness, we trim the edges of the noise and compare only

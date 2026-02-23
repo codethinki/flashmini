@@ -54,9 +54,7 @@ namespace detail {
 
 // 1 argument, general case.
     template<typename Archive, typename Arg>
-    void applyArchive(Archive& ar, const uint32_t version, Arg&& arg) {
-        ar(std::forward<Arg>(arg));
-    }
+    void applyArchive(Archive& ar, const uint32_t version, Arg&& arg) { ar(std::forward<Arg>(arg)); }
 
 // 1 argument, version-restricted.
     template<typename Archive, typename T>
@@ -109,13 +107,16 @@ namespace detail {
 } // namespace detail
 
 template<typename T>
-detail::Versioned<T> versioned(T&& t, uint32_t minVersion, uint32_t maxVersion) {
-    return detail::Versioned<T>{std::forward<T>(t), minVersion, maxVersion};
+detail::Versioned<T> versioned(
+    T&& t,
+    uint32_t minVersion,
+    uint32_t maxVersion
+) { return detail::Versioned<T>{std::forward<T>(t), minVersion, maxVersion};
 }
 
 template<typename S, typename T>
-detail::SerializeAs<S, T> serializeAs(T&& t) {
-    return detail::SerializeAs<S, T>{std::forward<T>(t), nullptr, nullptr};
+detail::SerializeAs<S,
+    T> serializeAs(T&& t) { return detail::SerializeAs<S, T>{std::forward<T>(t), nullptr, nullptr};
 }
 
 template<typename S, typename T, typename SaveConvFn, typename LoadConvFn>

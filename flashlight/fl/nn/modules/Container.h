@@ -100,9 +100,7 @@ public:
      * @param module the module to add.
      */
     template<typename T>
-    void add(std::unique_ptr<T> module) {
-        add(std::shared_ptr<T>(std::move(module)));
-    }
+    void add(std::unique_ptr<T> module) { add(std::shared_ptr<T>(std::move(module))); }
 
     /**
      * Adds a module to `modules_`, and adds parameters to the container's

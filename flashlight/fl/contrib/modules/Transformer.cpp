@@ -209,13 +209,9 @@ std::vector<Variable> Transformer::forward(const std::vector<Variable>& input) {
     }
 }
 
-void Transformer::setDropout(float value) {
-    pDropout_ = value;
-}
+void Transformer::setDropout(float value) { pDropout_ = value; }
 
-void Transformer::setLayerDropout(float value) {
-    pLayerdrop_ = value;
-}
+void Transformer::setLayerDropout(float value) { pLayerdrop_ = value; }
 
 std::unique_ptr<Module> Transformer::clone() const {
     return std::make_unique<Transformer>(*this);

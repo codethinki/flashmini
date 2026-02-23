@@ -69,9 +69,7 @@ size_t getTypeSize(dtype type) {
     }
 }
 
-const std::string& dtypeToString(dtype type) {
-    return kTypeToString.at(type);
-}
+const std::string& dtypeToString(dtype type) { return kTypeToString.at(type); }
 
 fl::dtype stringToDtype(const std::string& string) {
     if(kStringToType.find(string) != kStringToType.end())

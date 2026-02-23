@@ -12,7 +12,6 @@
 
 #include <gflags/gflags.h>
 
-
 namespace fl {
 namespace pkg {
     namespace speech {

@@ -31,9 +31,7 @@ std::unordered_map<int, const std::unique_ptr<Device>> createCUDADevices() {
 
 namespace detail {
 
-    void check(cudaError_t err, const char* file, int line) {
-        check(err, "", file, line);
-    }
+    void check(cudaError_t err, const char* file, int line) { check(err, "", file, line); }
 
     void check(cudaError_t err, const char* prefix, const char* file, int line) {
         if(err != cudaSuccess) {

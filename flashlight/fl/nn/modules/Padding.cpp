@@ -14,9 +14,7 @@ namespace fl {
 Padding::Padding(std::vector<std::pair<int, int>> padding, double val) : m_pad(std::move(padding)),
                                                                          m_val(val) {}
 
-Variable Padding::forward(const Variable& input) {
-    return padding(input, m_pad, m_val);
-}
+Variable Padding::forward(const Variable& input) { return padding(input, m_pad, m_val); }
 
 std::unique_ptr<Module> Padding::clone() const {
     return std::make_unique<Padding>(*this);

@@ -17,9 +17,7 @@ Transform::Transform(
 ) : func_(func),
     name_(name) {}
 
-Variable Transform::forward(const Variable& input) {
-    return func_(input);
-}
+Variable Transform::forward(const Variable& input) { return func_(input); }
 
 std::unique_ptr<Module> Transform::clone() const {
     return std::make_unique<Transform>(*this);

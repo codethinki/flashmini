@@ -24,8 +24,6 @@ std::vector<int64_t> CountMeter::value() const {
     return counts_;
 }
 
-void CountMeter::reset() {
-    std::fill(counts_.begin(), counts_.end(), 0);
-}
+void CountMeter::reset() { std::fill(counts_.begin(), counts_.end(), 0); }
 
 } // namespace fl

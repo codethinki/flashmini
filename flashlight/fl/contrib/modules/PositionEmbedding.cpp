@@ -59,9 +59,7 @@ std::vector<Variable> PositionEmbedding::forward(
 
 std::vector<Variable> PositionEmbedding::operator()(
     const std::vector<Variable>& input
-) {
-    return forward(input);
-}
+) { return forward(input); }
 
 std::unique_ptr<Module> PositionEmbedding::clone() const {
     return std::make_unique<PositionEmbedding>(*this);

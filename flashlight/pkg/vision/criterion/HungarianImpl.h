@@ -23,7 +23,6 @@ namespace lib {
  */
         void hungarian(float* costs, int* rowIdxs, int* colIdxs, int M, int N);
 
-
 /*
  * Same as above except it will output an M X N assignment matrix where
  * assignments[m][n] == 1 means m and n are assigned.

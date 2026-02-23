@@ -74,9 +74,7 @@ namespace pkg {
                 const Variable& prevAttn,
                 const Variable& logAttnWeight,
                 const Variable& xEncodedSizes
-            ) {
-                return forwardBase(state, xEncoded, prevAttn, logAttnWeight, xEncodedSizes);
-            }
+            ) { return forwardBase(state, xEncoded, prevAttn, logAttnWeight, xEncodedSizes); }
 
         protected:
             /**

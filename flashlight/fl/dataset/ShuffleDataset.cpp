@@ -34,8 +34,6 @@ void ShuffleDataset::resample() {
         );
 }
 
-void ShuffleDataset::setSeed(int seed) {
-    rng_.seed(seed);
-}
+void ShuffleDataset::setSeed(int seed) { rng_.seed(seed); }
 
 } // namespace fl

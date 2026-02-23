@@ -13,13 +13,9 @@
 
 namespace fl {
 
-OptimLevel OptimMode::getOptimLevel() {
-    return optimLevel_;
-}
+OptimLevel OptimMode::getOptimLevel() { return optimLevel_; }
 
-void OptimMode::setOptimLevel(OptimLevel level) {
-    optimLevel_ = level;
-}
+void OptimMode::setOptimLevel(OptimLevel level) { optimLevel_ = level; }
 
 OptimMode& OptimMode::get() {
     static OptimMode optimMode;

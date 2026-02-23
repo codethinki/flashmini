@@ -363,9 +363,7 @@ namespace detail {
     }
     namespace {
 
-        ncclComm_t& NcclContext::getComm() {
-            return comm_;
-        }
+        ncclComm_t& NcclContext::getComm() { return comm_; }
 
         int NcclContext::getWorldSize() const {
             return worldSize_;

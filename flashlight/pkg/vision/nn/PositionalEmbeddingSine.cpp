@@ -117,8 +117,6 @@ std::vector<Variable> PositionalEmbeddingSine::forward(
 
 std::vector<Variable> PositionalEmbeddingSine::operator()(
     const std::vector<Variable>& input
-) {
-    return forward(input);
-}
+) { return forward(input); }
 
 } // namespace fl

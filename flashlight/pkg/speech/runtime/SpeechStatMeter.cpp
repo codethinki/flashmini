@@ -13,9 +13,7 @@ SpeechStatMeter::SpeechStatMeter() {
     reset();
 }
 
-void SpeechStatMeter::reset() {
-    stats_.reset();
-}
+void SpeechStatMeter::reset() { stats_.reset(); }
 
 void SpeechStatMeter::add(const Tensor& inputSizes, const Tensor& targetSizes) {
     int64_t curInputSz = fl::sum(inputSizes).asScalar<int64_t>();

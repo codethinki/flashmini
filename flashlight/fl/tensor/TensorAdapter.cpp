@@ -15,7 +15,6 @@
 #include "flashlight/fl/tensor/TensorBackend.h"
 #include "flashlight/fl/tensor/TensorBase.h"
 
-
 namespace fl::detail {
 
 DefaultTensorType& DefaultTensorType::getInstance() {

@@ -22,9 +22,7 @@ int RandomNumberGenerator::randInt(int minVal, int maxVal) {
     return randomEngine_() % (maxVal - minVal + 1) + minVal;
 }
 
-float RandomNumberGenerator::random() {
-    return uniformDist_(randomEngine_);
-}
+float RandomNumberGenerator::random() { return uniformDist_(randomEngine_); }
 
 float RandomNumberGenerator::uniform(float minVal, float maxVal) {
     return minVal + (maxVal - minVal) * uniformDist_(randomEngine_);

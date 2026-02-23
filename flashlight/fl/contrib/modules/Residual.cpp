@@ -57,8 +57,7 @@ void Residual::processShortcut(
     int fromLayer,
     int toLayer,
     int projectionIndex
-) {
-    shortcut_[toLayer - 1].insert({fromLayer, projectionIndex});
+) { shortcut_[toLayer - 1].insert({fromLayer, projectionIndex});
 }
 
 void Residual::addShortcut(int fromLayer, int toLayer) {

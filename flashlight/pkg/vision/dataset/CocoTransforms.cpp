@@ -17,9 +17,7 @@
 
 namespace {
 
-int randomInt(int min, int max) {
-    return std::rand() % (max - min + 1) + min;
-}
+int randomInt(int min, int max) { return std::rand() % (max - min + 1) + min; }
 } // namespace
 
 namespace fl::pkg::vision {
@@ -198,14 +196,14 @@ TransformAllFunction Normalize(
                    boxes,
                    in[ClassesIdx]};
                return outputs;
-    };
+           };
 }
 
 TransformAllFunction randomSelect(std::vector<TransformAllFunction> fns) {
     return [fns](const std::vector<Tensor>& in) {
                TransformAllFunction randomFunc = fns[std::rand() % fns.size()];
                return randomFunc(in);
-    };
+           };
 };
 
 TransformAllFunction randomSizeCrop(int minSize, int maxSize) {
@@ -218,7 +216,7 @@ TransformAllFunction randomSizeCrop(int minSize, int maxSize) {
                const int x = std::rand() % (w - tw + 1);
                const int y = std::rand() % (h - th + 1);
                return crop(in, x, y, tw, th);
-    };
+           };
 };
 
 TransformAllFunction randomResize(std::vector<int> sizes, int maxsize) {
@@ -240,7 +238,7 @@ TransformAllFunction randomHorizontalFlip(float p) {
                    return hflip(in);
                else
                    return in;
-    };
+           };
 }
 
 TransformAllFunction compose(std::vector<TransformAllFunction> fns) {
@@ -249,7 +247,7 @@ TransformAllFunction compose(std::vector<TransformAllFunction> fns) {
                for(const auto& fn : fns)
                    out = fn(out);
                return out;
-    };
+           };
 }
 
 } // namespace fl

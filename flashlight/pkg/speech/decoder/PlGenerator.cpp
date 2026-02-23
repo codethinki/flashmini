@@ -269,9 +269,7 @@ std::shared_ptr<fl::Dataset> PlGenerator::createTrainSet(
     );
 }
 
-void PlGenerator::setModelWER(const float& wer) {
-    currentModelWER_ = wer;
-}
+void PlGenerator::setModelWER(const float& wer) { currentModelWER_ = wer; }
 
 int PlGenerator::findLastPlEpoch(int curEpoch) const {
     int lastPlEpoch = -1;

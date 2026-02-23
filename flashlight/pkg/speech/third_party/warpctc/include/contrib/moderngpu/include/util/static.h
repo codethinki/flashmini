@@ -66,7 +66,6 @@
 
 namespace mgpu {
 
-
 typedef unsigned char byte;
 
 typedef unsigned int uint;
@@ -159,7 +158,6 @@ template<int X>
 struct sAbs {
     enum {value = (X >= 0) ? X : -X};
 };
-
 
 // Finds the number of powers of 2 in the prime factorization of X.
 template<int X, int LSB = 1 & X>

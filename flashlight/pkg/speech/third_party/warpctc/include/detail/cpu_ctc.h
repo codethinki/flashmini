@@ -12,7 +12,6 @@
 
 #include "ctc_helper.h"
 
-
 template<typename ProbT>
 class CpuCTC {
 public:
@@ -49,7 +48,6 @@ public:
         const int* const label_lengths,
         const int* const input_lengths
     );
-
 
     ctcStatus_t score_forward(
         const ProbT* const activations,
@@ -569,7 +567,6 @@ ctcStatus_t CpuCTC<ProbT>::score_forward(
         CpuCTC_metadata ctcm(L, S, T, mb, alphabet_size_, workspace_,
             bytes_used + mb * per_minibatch_bytes, blank_label_,
             flat_labels + std::accumulate(label_lengths, label_lengths + mb, 0));
-
 
         if(L + ctcm.repeats > T)
             costs[mb] = ProbT(0);

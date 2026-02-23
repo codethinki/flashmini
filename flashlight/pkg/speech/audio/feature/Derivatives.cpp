@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <stdexcept>
 
-
 namespace fl::lib::audio {
 
 Derivatives::Derivatives(int deltawindow, int accwindow) : deltaWindow_(deltawindow),

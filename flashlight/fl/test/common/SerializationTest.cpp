@@ -223,8 +223,7 @@ struct WeirdTransform {
 };
 
 template<typename T>
-WeirdTransform<T> weirdTransform(T&& t) {
-    return WeirdTransform<T>{std::forward<T>(t)};
+WeirdTransform<T> weirdTransform(T&& t) { return WeirdTransform<T>{std::forward<T>(t)};
 }
 
 struct SerializeViaTemporary {

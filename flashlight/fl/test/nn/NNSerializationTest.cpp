@@ -27,9 +27,7 @@ class ContainerTestClass : public Sequential {
 public:
     ContainerTestClass() = default;
 
-    void addParam(const Variable& param) {
-        params_.push_back(param);
-    }
+    void addParam(const Variable& param) { params_.push_back(param); }
 
 private:
     FL_SAVE_LOAD_WITH_BASE(Sequential)

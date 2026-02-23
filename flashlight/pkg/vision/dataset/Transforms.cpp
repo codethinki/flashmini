@@ -55,12 +55,21 @@ Tensor resizeSmallest(const Tensor& in, const int resize) {
     return fl::resize(in, {tw, th}, InterpolationMode::Bilinear);
 }
 
-Tensor resize(const Tensor& in, const int resize) {
-    return fl::resize(in, {resize, resize}, InterpolationMode::Bilinear);
+Tensor resize(const Tensor& in, const int resize) { return fl::resize(
+    in,
+    {resize, resize},
+    InterpolationMode::Bilinear
+);
 }
 
 Tensor crop(const Tensor& in, const int x, const int y, const int w, const int h) {
-    return in(fl::range(x, x + w), fl::range(y, y + h));
+    return in(
+        fl::range(x, x + w),
+        fl::range(
+            y,
+            y + h
+        )
+    );
 }
 
 Tensor centerCrop(const Tensor& in, const int size) {
@@ -75,20 +84,32 @@ Tensor rotate(const Tensor& input, const float theta, const Tensor& fillImg) {
     return fl::rotate(input, theta, fillImg);
 }
 
-Tensor skewX(const Tensor& input, const float theta, const Tensor& fillImg) {
-    return fl::shear(input, {theta, 0}, {}, fillImg);
+Tensor skewX(
+    const Tensor& input,
+    const float theta,
+    const Tensor& fillImg
+) { return fl::shear(input, {theta, 0}, {}, fillImg);
 }
 
-Tensor skewY(const Tensor& input, const float theta, const Tensor& fillImg) {
-    return fl::shear(input, {0, theta}, {}, fillImg);
+Tensor skewY(
+    const Tensor& input,
+    const float theta,
+    const Tensor& fillImg
+) { return fl::shear(input, {0, theta}, {}, fillImg);
 }
 
-Tensor translateX(const Tensor& input, const int shift, const Tensor& fillImg) {
-    return fl::translate(input, {shift, 0}, {}, fillImg);
+Tensor translateX(
+    const Tensor& input,
+    const int shift,
+    const Tensor& fillImg
+) { return fl::translate(input, {shift, 0}, {}, fillImg);
 }
 
-Tensor translateY(const Tensor& input, const int shift, const Tensor& fillImg) {
-    return fl::translate(input, {0, shift}, {}, fillImg);
+Tensor translateY(
+    const Tensor& input,
+    const int shift,
+    const Tensor& fillImg
+) { return fl::translate(input, {0, shift}, {}, fillImg);
 }
 
 Tensor colorEnhance(const Tensor& input, const float enhance) {
@@ -115,13 +136,9 @@ Tensor contrastEnhance(const Tensor& input, const float enhance) {
     return meanPic + enhance * (input - meanPic);
 }
 
-Tensor brightnessEnhance(const Tensor& input, const float enhance) {
-    return input * enhance;
-}
+Tensor brightnessEnhance(const Tensor& input, const float enhance) { return input * enhance; }
 
-Tensor invert(const Tensor& input) {
-    return 255. - input;
-}
+Tensor invert(const Tensor& input) { return 255. - input; }
 
 Tensor solarize(const Tensor& input, const float threshold) {
     auto mask = (input < threshold);
@@ -269,8 +286,9 @@ std::pair<Tensor, Tensor> cutmixBatch(
     return {inputMixed, targetOneHotMixed};
 }
 
-ImageTransform resizeTransform(const uint64_t resize) {
-    return [resize](const Tensor& in) { return resizeSmallest(in, resize); };
+ImageTransform resizeTransform(const uint64_t resize) { return [resize](const Tensor& in) {
+               return resizeSmallest(in, resize);
+           };
 }
 
 ImageTransform compose(std::vector<ImageTransform> transformfns) {
@@ -279,11 +297,12 @@ ImageTransform compose(std::vector<ImageTransform> transformfns) {
                for(const auto& fn : transformfns)
                    out = fn(out);
                return out;
-    };
+           };
 }
 
-ImageTransform centerCropTransform(const int size) {
-    return [size](const Tensor& in) { return centerCrop(in, size); };
+ImageTransform centerCropTransform(const int size) { return [size](const Tensor& in) {
+               return centerCrop(in, size);
+           };
 };
 
 ImageTransform randomHorizontalFlipTransform(const float p) {
@@ -295,7 +314,7 @@ ImageTransform randomHorizontalFlipTransform(const float p) {
                    out = out(fl::range(w - 1, 1, -1));
                }
                return out;
-    };
+           };
 };
 
 ImageTransform randomResizeCropTransform(
@@ -326,7 +345,7 @@ ImageTransform randomResizeCropTransform(
                    }
                }
                return centerCrop(resizeSmallest(in, size), size);
-    };
+           };
 }
 
 ImageTransform randomResizeTransform(const int low, const int high) {
@@ -335,7 +354,7 @@ ImageTransform randomResizeTransform(const int low, const int high) {
                    static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
                const int resize = low + (high - low) * scale;
                return resizeSmallest(in, resize);
-    };
+           };
 };
 
 ImageTransform randomCropTransform(const int tw, const int th) {
@@ -350,7 +369,7 @@ ImageTransform randomCropTransform(const int tw, const int th) {
                const int x = std::rand() % (w - tw + 1);
                const int y = std::rand() % (h - th + 1);
                return crop(in, x, y, tw, th);
-    };
+           };
 };
 
 ImageTransform normalizeImage(
@@ -364,7 +383,7 @@ ImageTransform normalizeImage(
                out = out - mean;
                out = out / std;
                return out;
-    };
+           };
 };
 
 ImageTransform randomEraseTransform(
@@ -403,7 +422,7 @@ ImageTransform randomEraseTransform(
                    break;
                }
                return out;
-    };
+           };
 };
 
 ImageTransform randomAugmentationDeitTransform(
@@ -500,7 +519,7 @@ ImageTransform randomAugmentationDeitTransform(
                    res = fl::clip(res, 0., 255.).astype(res.type());
                }
                return res;
-    };
+           };
 }
 
 } // namespace fl

@@ -76,9 +76,7 @@ const std::vector<Dim>& Shape::get() const {
     return dims_;
 }
 
-std::vector<Dim>& Shape::get() {
-    return dims_;
-};
+std::vector<Dim>& Shape::get() { return dims_; };
 
 std::string Shape::toString() const {
     std::stringstream ss;

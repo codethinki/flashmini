@@ -20,9 +20,7 @@ public:
 
 protected:
     template<typename T>
-    T getSymbol(const std::string& symbol) {
-        return (T) getRawSymbol(symbol);
-    }
+    T getSymbol(const std::string& symbol) { return (T) getRawSymbol(symbol); }
 
 private:
     void* getRawSymbol(const std::string& symbol);

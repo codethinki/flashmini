@@ -23,7 +23,7 @@ static std::function<int(void)> makeSucceedsAfterIters(int iters) {
                    return 42;
                else
                    throw std::runtime_error("bleh");
-    };
+           };
 }
 
 static std::function<int(void)> makeSucceedsAfterMs(double ms) {
@@ -37,7 +37,7 @@ static std::function<int(void)> makeSucceedsAfterMs(double ms) {
                    return 42;
                else
                    throw std::runtime_error("bleh");
-    };
+           };
 }
 
 template<class Fn>
@@ -50,8 +50,8 @@ std::future<typename std::invoke_result<Fn>::type> retryAsync(
     return std::async(
         std::launch::async,
         [ = ]() {
-        return retryWithBackoff(initial, factor, iters, f);
-    }
+            return retryWithBackoff(initial, factor, iters, f);
+        }
     );
 }
 

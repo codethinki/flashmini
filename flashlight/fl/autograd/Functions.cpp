@@ -107,9 +107,7 @@ namespace detail {
         );
     }
 
-    bool areVariableTypesEqual(const Variable& a, const Variable& b) {
-        return a.type() == b.type();
-    }
+    bool areVariableTypesEqual(const Variable& a, const Variable& b) { return a.type() == b.type(); }
 
 } // namespace detail
 
@@ -133,9 +131,7 @@ Variable operator+(const Variable& lhs, const double& rhsVal) {
     return Variable(result, {lhs.withoutData()}, gradFunc);
 }
 
-Variable operator+(const double& lhsVal, const Variable& rhs) {
-    return rhs + lhsVal;
-}
+Variable operator+(const double& lhsVal, const Variable& rhs) { return rhs + lhsVal; }
 
 Variable operator-(const Variable& lhs, const Variable& rhs) {
     FL_VARIABLE_DTYPES_MATCH_CHECK(lhs, rhs);
@@ -197,9 +193,7 @@ Variable operator*(const Variable& lhs, const double& rhsVal) {
     return Variable(result, {lhs.withoutData()}, gradFunc);
 }
 
-Variable operator*(const double& lhsVal, const Variable& rhs) {
-    return rhs * lhsVal;
-}
+Variable operator*(const double& lhsVal, const Variable& rhs) { return rhs * lhsVal; }
 
 Variable operator/(const Variable& lhs, const Variable& rhs) {
     FL_VARIABLE_DTYPES_MATCH_CHECK(lhs, rhs);
@@ -352,9 +346,7 @@ Variable max(const Variable& lhs, const double& rhsVal) {
     return Variable(result, {lhs}, gradFunc);
 }
 
-Variable max(const double& lhsVal, const Variable& rhs) {
-    return max(rhs, lhsVal);
-}
+Variable max(const double& lhsVal, const Variable& rhs) { return max(rhs, lhsVal); }
 
 Variable min(const Variable& lhs, const Variable& rhs) {
     FL_VARIABLE_DTYPES_MATCH_CHECK(lhs, rhs);
@@ -384,9 +376,7 @@ Variable min(const Variable& lhs, const double& rhsVal) {
     return Variable(result, {lhs}, gradFunc);
 }
 
-Variable min(const double& lhsVal, const Variable& rhs) {
-    return min(rhs, lhsVal);
-}
+Variable min(const double& lhsVal, const Variable& rhs) { return min(rhs, lhsVal); }
 
 Variable negate(const Variable& input) {
     auto result = (0.0 - input.tensor()).astype(input.type());
@@ -522,9 +512,7 @@ Variable sigmoid(const Variable& input) {
     return Variable(result, {input.withoutData()}, gradFunc);
 }
 
-Variable swish(const Variable& input, double beta) {
-    return input * sigmoid(beta * input);
-}
+Variable swish(const Variable& input, double beta) { return input * sigmoid(beta * input); }
 
 Variable erf(const Variable& input) {
     auto result = fl::erf(FL_ADJUST_INPUT_TYPE(input.tensor()));
@@ -578,9 +566,7 @@ Variable tileAs(const Variable& input, const Shape& rdims) {
     return Variable(result, {input.withoutData()}, gradFunc);
 }
 
-Variable tileAs(const Variable& input, const Variable& reference) {
-    return tileAs(input, reference.shape());
-}
+Variable tileAs(const Variable& input, const Variable& reference) { return tileAs(input, reference.shape()); }
 
 Variable sumAs(const Variable& input, const Shape& rdims) {
     auto result = detail::sumAs(FL_ADJUST_INPUT_TYPE(input.tensor()), rdims);
@@ -592,9 +578,7 @@ Variable sumAs(const Variable& input, const Shape& rdims) {
     return Variable(result, {input.withoutData()}, gradFunc);
 }
 
-Variable sumAs(const Variable& input, const Variable& reference) {
-    return sumAs(input, reference.shape());
-}
+Variable sumAs(const Variable& input, const Variable& reference) { return sumAs(input, reference.shape()); }
 
 Variable concatenate(const std::vector<Variable>& concatInputs, int dim) {
     if(concatInputs.empty())
@@ -1854,9 +1838,7 @@ Variable dropout(const Variable& input, double p) {
         return input;
 }
 
-Variable relu(const Variable& input) {
-    return max(input, 0.0);
-}
+Variable relu(const Variable& input) { return max(input, 0.0); }
 
 Variable gelu(const Variable& in) {
     auto input = FL_ADJUST_INPUT_TYPE(in);

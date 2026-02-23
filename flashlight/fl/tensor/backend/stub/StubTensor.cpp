@@ -36,13 +36,9 @@ std::unique_ptr<TensorAdapterBase> StubTensor::clone() const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
 }
 
-Tensor StubTensor::copy() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Tensor StubTensor::copy() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-Tensor StubTensor::shallowCopy() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Tensor StubTensor::shallowCopy() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
 TensorBackendType StubTensor::backendType() const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
@@ -52,61 +48,35 @@ TensorBackend& StubTensor::backend() const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
 }
 
-const Shape& StubTensor::shape() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+const Shape& StubTensor::shape() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-fl::dtype StubTensor::type() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+fl::dtype StubTensor::type() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-bool StubTensor::isSparse() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+bool StubTensor::isSparse() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-Location StubTensor::location() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Location StubTensor::location() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-void StubTensor::scalar(void* /* out */) {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+void StubTensor::scalar(void* /* out */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-void StubTensor::device(void** /* out */) {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+void StubTensor::device(void** /* out */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-void StubTensor::host(void* /* out */) {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+void StubTensor::host(void* /* out */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-void StubTensor::unlock() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+void StubTensor::unlock() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-bool StubTensor::isLocked() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+bool StubTensor::isLocked() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-bool StubTensor::isContiguous() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+bool StubTensor::isContiguous() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-Shape StubTensor::strides() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Shape StubTensor::strides() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
 const Stream& StubTensor::stream() const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
 }
 
-Tensor StubTensor::astype(const dtype /* type */) {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Tensor StubTensor::astype(const dtype /* type */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-Tensor StubTensor::index(const std::vector<Index>& /* indices */) {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Tensor StubTensor::index(const std::vector<Index>& /* indices */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
 Tensor StubTensor::flatten() const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
@@ -116,9 +86,7 @@ Tensor StubTensor::flat(const Index& /* idx */) const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
 }
 
-Tensor StubTensor::asContiguousTensor() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+Tensor StubTensor::asContiguousTensor() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
 void StubTensor::setContext(void* /* context */) {
     // Used to store arbitrary data on a Tensor - can be a noop.
@@ -130,13 +98,9 @@ void* StubTensor::getContext() {
     FL_STUB_TENSOR_UNIMPLEMENTED;
 }
 
-std::string StubTensor::toString() {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+std::string StubTensor::toString() { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
-std::ostream& StubTensor::operator<<(std::ostream& /* ostr */) {
-    FL_STUB_TENSOR_UNIMPLEMENTED;
-}
+std::ostream& StubTensor::operator<<(std::ostream& /* ostr */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
 /******************** Assignment Operators ********************/
 #define FL_STUB_TENSOR_ASSIGN_OP_TYPE(OP, TYPE)        \

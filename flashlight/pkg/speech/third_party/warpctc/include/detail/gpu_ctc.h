@@ -84,7 +84,6 @@ private:
         bool compute_betas_and_grad
     );
 
-
     int out_dim_; // Number of characters plus blank
     int minibatch_;
 
@@ -123,12 +122,10 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
             + gpu_bytes_used);
     gpu_bytes_used += minibatch_ * sizeof(ProbT);
 
-
     nll_backward_ =
         reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace_)
             + gpu_bytes_used);
     gpu_bytes_used += minibatch_ * sizeof(ProbT);
-
 
     repeats_ =
         reinterpret_cast<int*>(static_cast<char*>(gpu_workspace_)
@@ -139,7 +136,6 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
         reinterpret_cast<int*>(static_cast<char*>(gpu_workspace_)
             + gpu_bytes_used);
     gpu_bytes_used += minibatch_ * sizeof(int);
-
 
     // This is the max of all S and T for all valid examples in the minibatch.
     // A valid example is one for which L + repeats <= T
@@ -199,7 +195,6 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
         );
         if(cuda_status != cudaSuccess)
             return CTC_STATUS_MEMOPS_FAILED;
-
 
         cuda_status = cudaMemcpyAsync(
             &(label_offsets_[start_idx]),
@@ -271,7 +266,6 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
             + gpu_bytes_used);
     gpu_bytes_used += (S_ * T_) * minibatch_ * sizeof(ProbT);
 
-
     denoms_ =
         reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace_)
             + gpu_bytes_used);
@@ -307,7 +301,6 @@ ctcStatus_t GpuCTC<ProbT>::launch_alpha_beta_kernels(
             repeats_, labels_without_blanks_, label_offsets_,
             labels_with_blanks_, alphas_, nll_forward_,
             stride, out_dim_, S_, T_, blank_label_);
-
 
     if(compute_beta) {
         compute_betas_and_grad_kernel<ProbT, NT, VT><< < grid_size, NT, 0, stream_ >>

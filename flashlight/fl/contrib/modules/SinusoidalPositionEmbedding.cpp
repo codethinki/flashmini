@@ -91,9 +91,7 @@ std::vector<Variable> SinusoidalPositionEmbedding::forward(
 
 std::vector<Variable> SinusoidalPositionEmbedding::operator()(
     const std::vector<Variable>& input
-) {
-    return forward(input);
-}
+) { return forward(input); }
 
 std::unique_ptr<Module> SinusoidalPositionEmbedding::clone() const {
     return std::make_unique<SinusoidalPositionEmbedding>(*this);

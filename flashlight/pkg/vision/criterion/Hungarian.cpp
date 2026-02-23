@@ -82,8 +82,8 @@ std::pair<Tensor, Tensor> HungarianMatcher::matchBatch(
             predBoxes,
             targetBoxes,
             [](const Tensor& x, const Tensor& y) {
-            return fl::sum(fl::abs(x - y), {0}, /* keepDims = */ true);
-        }
+                return fl::sum(fl::abs(x - y), {0}, /* keepDims = */ true);
+            }
         );
     costBbox = flatten(costBbox, 0, 1);
 

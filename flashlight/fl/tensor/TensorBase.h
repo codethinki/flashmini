@@ -258,9 +258,7 @@ public:
         fl::dtype t,
         const uint8_t* ptr,
         Location memoryLocation
-    ) {
-        return Tensor(s, t, ptr, memoryLocation);
-    }
+    ) { return Tensor(s, t, ptr, memoryLocation); }
 
     /**
      * Deep-copies the tensor, including underlying data.
@@ -844,9 +842,7 @@ FL_API Tensor pad(
  * @return a tensor with elements negated.
  */
 FL_API Tensor negative(const Tensor& tensor);
-inline Tensor operator-(const Tensor& tensor) {
-    return negative(tensor);
-}
+inline Tensor operator-(const Tensor& tensor) { return negative(tensor); }
 
 /**
  * Performs element-wise logical-not on the elements of a tensor
@@ -855,9 +851,7 @@ inline Tensor operator-(const Tensor& tensor) {
  * @return a tensor with element-wise logical not of the input
  */
 FL_API Tensor logicalNot(const Tensor& tensor);
-inline Tensor operator!(const Tensor& tensor) {
-    return logicalNot(tensor);
-}
+inline Tensor operator!(const Tensor& tensor) { return logicalNot(tensor); }
 
 /**
  * Compute the element-wise exponential of a tensor
@@ -948,9 +942,7 @@ FL_API Tensor rint(const Tensor& tensor);
 FL_API Tensor absolute(const Tensor& tensor);
 
 // \copydoc absolute
-inline Tensor abs(const Tensor& tensor) {
-    return absolute(tensor);
-}
+inline Tensor abs(const Tensor& tensor) { return absolute(tensor); }
 
 /**
  * Returns the element-wise sigmoid the input:
@@ -1769,9 +1761,7 @@ namespace detail {
         const Tensor& a,
         const Tensor& b,
         const Args&... args
-    ) {
-        return areTensorTypesEqual(a, b) && areTensorTypesEqual(a, args...);
-    }
+    ) { return areTensorTypesEqual(a, b) && areTensorTypesEqual(a, args...); }
 
 } // namespace detail
 

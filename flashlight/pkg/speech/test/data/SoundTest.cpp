@@ -60,8 +60,8 @@ TEST(SoundTest, Mono) {
         data.end(),
         data.begin(),
         [](double d) -> double {
-        return d * (1 << 15);
-    }
+            return d * (1 << 15);
+        }
     );
 
     // Short
@@ -77,8 +77,8 @@ TEST(SoundTest, Mono) {
         data.end(),
         data.begin(),
         [](double d) -> double {
-        return d * (1 << 16);
-    }
+            return d * (1 << 16);
+        }
     );
     // Int
     auto vecInt = loadSound<int>(audiopath);

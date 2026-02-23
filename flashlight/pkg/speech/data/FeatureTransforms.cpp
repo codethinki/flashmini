@@ -120,7 +120,7 @@ fl::Dataset::DataTransformFunction inputFeatures(
                    output.data(),
                    MemoryLocation::Host
                );
-    };
+           };
 }
 
 // target
@@ -166,7 +166,7 @@ fl::Dataset::DataTransformFunction targetFeatures(
                    // support empty target
                    return Tensor(fl::dtype::s32);
                return Tensor::fromVector(tgtVec);
-    };
+           };
 }
 
 fl::Dataset::DataTransformFunction wordFeatures(const Dictionary& wrdDict) {
@@ -179,6 +179,6 @@ fl::Dataset::DataTransformFunction wordFeatures(const Dictionary& wrdDict) {
                    // support empty target
                    return Tensor(fl::dtype::s32);
                return Tensor::fromVector(wrdVec);
-    };
+           };
 }
 } // namespace fl

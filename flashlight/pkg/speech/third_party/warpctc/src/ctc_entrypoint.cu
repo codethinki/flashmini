@@ -9,12 +9,9 @@
 #include "detail/gpu_ctc.h"
 #endif
 
-
 extern "C" {
 
-int get_warpctc_version() {
-    return 2;
-}
+int get_warpctc_version() { return 2; }
 
 const char* ctcGetStatusString(ctcStatus_t status) {
     switch(status) {
@@ -35,7 +32,6 @@ const char* ctcGetStatusString(ctcStatus_t status) {
     }
 
 }
-
 
 ctcStatus_t compute_ctc_loss(
     const float* const activations,
@@ -61,7 +57,7 @@ ctcStatus_t compute_ctc_loss(
         return CTC_STATUS_INVALID_VALUE;
 
     if(options.loc == CTC_CPU) {
-        CpuCTC < float > ctc(
+        CpuCTC<float> ctc(
             alphabet_size,
             minibatch,
             workspace,
@@ -88,7 +84,7 @@ ctcStatus_t compute_ctc_loss(
             );
     } else if(options.loc == CTC_GPU) {
 #ifdef __CUDACC__
-        GpuCTC < float > ctc(
+        GpuCTC<float> ctc(
             alphabet_size,
             minibatch,
             workspace,
@@ -121,7 +117,6 @@ ctcStatus_t compute_ctc_loss(
     } else
         return CTC_STATUS_INVALID_VALUE;
 }
-
 
 ctcStatus_t get_workspace_size(
     const int* const label_lengths,

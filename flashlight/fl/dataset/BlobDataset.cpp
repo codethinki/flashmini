@@ -18,17 +18,13 @@ const int64_t magicNumber = 0x31626f6c423a6c66;
 
 BlobDatasetEntryBuffer::BlobDatasetEntryBuffer() = default;
 
-void BlobDatasetEntryBuffer::clear() {
-    data_.clear();
-}
+void BlobDatasetEntryBuffer::clear() { data_.clear(); }
 
 int64_t BlobDatasetEntryBuffer::size() const {
     return data_.size() / nFieldPerEntry_;
 }
 
-void BlobDatasetEntryBuffer::resize(int64_t size) {
-    data_.resize(size * nFieldPerEntry_);
-}
+void BlobDatasetEntryBuffer::resize(int64_t size) { data_.resize(size * nFieldPerEntry_); }
 
 BlobDatasetEntry BlobDatasetEntryBuffer::get(const int64_t idx) const {
     BlobDatasetEntry e;
@@ -54,9 +50,7 @@ void BlobDatasetEntryBuffer::add(const BlobDatasetEntry& e) {
     data_.push_back(e.offset);
 }
 
-char* BlobDatasetEntryBuffer::data() {
-    return (char*) data_.data();
-}
+char* BlobDatasetEntryBuffer::data() { return (char*) data_.data(); }
 
 int64_t BlobDatasetEntryBuffer::bytes() const {
     return data_.size() * sizeof(int64_t);
@@ -233,16 +227,12 @@ void BlobDataset::readIndex() {
     readData(offset, entries_.data(), entries_.bytes());
 }
 
-void BlobDataset::flush() {
-    flushData();
-}
+void BlobDataset::flush() { flushData(); }
 
 void BlobDataset::setHostTransform(
     int field,
     std::function<Tensor(void*, fl::Shape, fl::dtype)> func
-) {
-    hostTransforms_[field] = func;
-}
+) { hostTransforms_[field] = func; }
 
 std::vector<BlobDatasetEntry> BlobDataset::getEntries(const int64_t idx) const {
     std::vector<BlobDatasetEntry> entries;

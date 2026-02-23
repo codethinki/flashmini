@@ -43,9 +43,7 @@ double TopKMeter::value() const {
     return (static_cast<double>(correct_) / n_) * 100.0f;
 }
 
-std::pair<int32_t, int32_t> TopKMeter::getStats() {
-    return std::make_pair(correct_, n_);
-}
+std::pair<int32_t, int32_t> TopKMeter::getStats() { return std::make_pair(correct_, n_); }
 
 void TopKMeter::set(int32_t correct, int32_t n) {
     n_ = n;

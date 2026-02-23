@@ -158,9 +158,7 @@ public:
     // Overrides DEFAULT_MAX_FL_LOGGING_LEVEL value.
     static void setMaxLoggingLevel(LogLevel maxLoggingLevel);
 
-    static bool ifLog(LogLevel level) {
-        return maxLoggingLevel_ >= level;
-    }
+    static bool ifLog(LogLevel level) { return maxLoggingLevel_ >= level; }
 
 private:
     static LogLevel maxLoggingLevel_;
@@ -185,9 +183,7 @@ public:
     // Overrides DEFAULT_MAX_VERBOSE_FL_LOGGING_LEVEL value.
     static void setMaxLoggingLevel(int maxLoggingLevel);
 
-    static bool ifLog(int level) {
-        return maxLoggingLevel_ >= level;
-    }
+    static bool ifLog(int level) { return maxLoggingLevel_ >= level; }
 
 private:
     static int maxLoggingLevel_;
@@ -215,9 +211,7 @@ FL_API Logging && operator<<(Logging && log, bool b);
 
 // Catch all designed mostly for <iomanip> stuff.
 template<typename T>
-Logging && operator<<(Logging&& log, const T& t) {
-    return log.print(t);
-}
+Logging && operator<<(Logging&& log, const T& t) { return log.print(t); }
 
 FL_API VerboseLogging && operator<<(VerboseLogging && log, const std::string& s);
 FL_API VerboseLogging && operator<<(VerboseLogging && log, const char* s);
@@ -234,8 +228,6 @@ FL_API VerboseLogging && operator<<(VerboseLogging && log, bool b);
 
 // Catch all designed mostly for <iomanip> stuff.
 template<typename T>
-VerboseLogging && operator<<(VerboseLogging&& log, const T& t) {
-    return log.print(t);
-}
+VerboseLogging && operator<<(VerboseLogging&& log, const T& t) { return log.print(t); }
 
 } // namespace fl

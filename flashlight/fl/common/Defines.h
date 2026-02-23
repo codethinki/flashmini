@@ -30,7 +30,6 @@
 #define FL_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #endif // defined(_WIN32) || defined(_MSC_VER)
 
-
 namespace fl {
 
 /**

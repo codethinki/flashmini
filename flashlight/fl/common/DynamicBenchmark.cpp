@@ -40,12 +40,8 @@ void DynamicBenchmark::stop(bool incrementCount) {
     options_->accumulateTimeToCurrentOption(elapsedTime, incrementCount);
 }
 
-void DynamicBenchmark::setBenchmarkMode(bool mode) {
-    benchmarkMode_ = mode;
-}
+void DynamicBenchmark::setBenchmarkMode(bool mode) { benchmarkMode_ = mode; }
 
-bool DynamicBenchmark::getBenchmarkMode() {
-    return benchmarkMode_;
-}
+bool DynamicBenchmark::getBenchmarkMode() { return benchmarkMode_; }
 
 } // namespace fl

@@ -9,9 +9,7 @@
 
 namespace fl {
 
-X64Device& SynchronousStream::device() {
-    return device_;
-}
+X64Device& SynchronousStream::device() { return device_; }
 
 const X64Device& SynchronousStream::device() const {
     return device_;

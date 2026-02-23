@@ -63,9 +63,7 @@ int Module::numParamTensors() const {
     return static_cast<int>(params_.size());
 }
 
-std::vector<Variable> Module::operator()(const std::vector<Variable>& input) {
-    return this->forward(input);
-}
+std::vector<Variable> Module::operator()(const std::vector<Variable>& input) { return this->forward(input); }
 
 UnaryModule::UnaryModule() = default;
 
@@ -79,9 +77,7 @@ std::vector<Variable> UnaryModule::forward(
     return {forward(inputs[0])};
 }
 
-Variable UnaryModule::operator()(const Variable& input) {
-    return this->forward(input);
-}
+Variable UnaryModule::operator()(const Variable& input) { return this->forward(input); }
 
 BinaryModule::BinaryModule() = default;
 
@@ -98,8 +94,6 @@ std::vector<Variable> BinaryModule::forward(
 Variable BinaryModule::operator()(
     const Variable& input1,
     const Variable& input2
-) {
-    return this->forward(input1, input2);
-}
+) { return this->forward(input1, input2); }
 
 } // namespace fl

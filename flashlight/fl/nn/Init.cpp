@@ -107,17 +107,11 @@ namespace detail {
 
 } // namespace detail
 
-Variable input(const Tensor& arr) {
-    return Variable(arr, false);
-}
+Variable input(const Tensor& arr) { return Variable(arr, false); }
 
-Variable noGrad(const Tensor& arr) {
-    return Variable(arr, false);
-}
+Variable noGrad(const Tensor& arr) { return Variable(arr, false); }
 
-Variable param(const Tensor& arr) {
-    return Variable(arr, true);
-}
+Variable param(const Tensor& arr) { return Variable(arr, true); }
 
 Variable constant(
     double val,
@@ -125,8 +119,7 @@ Variable constant(
     int inputSize,
     fl::dtype type,
     bool calcGrad
-) {
-    return constant(val, Shape({outputSize, inputSize}), type, calcGrad);
+) { return constant(val, Shape({outputSize, inputSize}), type, calcGrad);
 }
 
 Variable constant(double val, const Shape& dims, fl::dtype type, bool calcGrad) {
@@ -155,8 +148,7 @@ Variable uniform(
     double max,
     fl::dtype type,
     bool calcGrad
-) {
-    return uniform(Shape({outputSize, inputSize}), min, max, type, calcGrad);
+) { return uniform(Shape({outputSize, inputSize}), min, max, type, calcGrad);
 }
 
 Variable uniform(
@@ -165,9 +157,7 @@ Variable uniform(
     double max,
     fl::dtype type,
     bool calcGrad
-) {
-    return Variable(detail::uniform(dims, min, max, type), calcGrad);
-}
+) { return Variable(detail::uniform(dims, min, max, type), calcGrad); }
 
 Variable normal(
     int outputSize,
@@ -176,8 +166,7 @@ Variable normal(
     double mean,
     fl::dtype type,
     bool calcGrad
-) {
-    return normal(Shape({outputSize, inputSize}), stdv, mean, type, calcGrad);
+) { return normal(Shape({outputSize, inputSize}), stdv, mean, type, calcGrad);
 }
 
 Variable normal(
@@ -186,27 +175,21 @@ Variable normal(
     double mean,
     fl::dtype type,
     bool calcGrad
-) {
-    return Variable(detail::normal(dims, stdv, mean, type), calcGrad);
-}
+) { return Variable(detail::normal(dims, stdv, mean, type), calcGrad); }
 
 Variable kaimingUniform(
     const Shape& shape,
     int fanIn,
     fl::dtype type /* = fl::dtype::f32 */,
     bool calcGrad /* = true */
-) {
-    return Variable(detail::kaimingUniform(shape, fanIn, type), calcGrad);
-}
+) { return Variable(detail::kaimingUniform(shape, fanIn, type), calcGrad); }
 
 Variable kaimingNormal(
     const Shape& shape,
     int fanIn,
     fl::dtype type /* = fl::dtype::f32 */,
     bool calcGrad /* = true */
-) {
-    return Variable(detail::kaimingNormal(shape, fanIn, type), calcGrad);
-}
+) { return Variable(detail::kaimingNormal(shape, fanIn, type), calcGrad); }
 
 Variable glorotUniform(
     const Shape& shape,
@@ -214,9 +197,7 @@ Variable glorotUniform(
     int fanOut,
     fl::dtype type /* = fl::dtype::f32 */,
     bool calcGrad /* = true */
-) {
-    return Variable(detail::glorotUniform(shape, fanIn, fanOut, type), calcGrad);
-}
+) { return Variable(detail::glorotUniform(shape, fanIn, fanOut, type), calcGrad); }
 
 Variable glorotNormal(
     const Shape& shape,
@@ -224,9 +205,7 @@ Variable glorotNormal(
     int fanOut,
     fl::dtype type /* = fl::dtype::f32 */,
     bool calcGrad /* = true */
-) {
-    return Variable(detail::glorotNormal(shape, fanIn, fanOut, type), calcGrad);
-}
+) { return Variable(detail::glorotNormal(shape, fanIn, fanOut, type), calcGrad); }
 
 Variable truncNormal(
     const Shape& shape,

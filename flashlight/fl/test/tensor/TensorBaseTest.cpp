@@ -512,7 +512,6 @@ void assertScalarBehavior(fl::dtype type) {
         << "dtype: " << type
         << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
 
-
     ScalarArgType val = static_cast<ScalarArgType>(rand());
     auto a = fl::full({5, 6}, val, type);
 

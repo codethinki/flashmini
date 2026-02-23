@@ -14,9 +14,7 @@ template<typename T>
 HOSTDEVICE
 T neg_inf() { return -T(INFINITY); }
 
-inline int div_up(int x, int y) {
-    return (x + y - 1) / y;
-}
+inline int div_up(int x, int y) { return (x + y - 1) / y; }
 
 template<typename Arg, typename Res = Arg>
 struct maximum {

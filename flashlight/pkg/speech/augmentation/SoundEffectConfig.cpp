@@ -16,7 +16,6 @@
 #include <cereal/types/vector.hpp>
 #include <glog/logging.h>
 
-
 using namespace ::fl::pkg::speech::sfx;
 
 namespace cereal {

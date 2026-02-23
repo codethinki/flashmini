@@ -96,7 +96,6 @@ namespace {
         if(threadId.size() > maxThreadIdNumDigits)
             threadId = threadId.substr(threadId.size() - maxThreadIdNumDigits);
 
-
         (*outputStream) << dateTimeWithMicroSeconds() << ' '
         << threadId << ' '
         << getFileName(fullPath) << ':' << lineNumber << ' ';
@@ -151,61 +150,33 @@ void Logging::setMaxLoggingLevel(LogLevel maxLoggingLevel) {
     }
 }
 
-Logging&& operator<<(Logging&& log, const std::string& s) {
-    return std::move(log.print(s));
-}
+Logging&& operator<<(Logging&& log, const std::string& s) { return std::move(log.print(s)); }
 
-Logging&& operator<<(Logging&& log, const char* s) {
-    return std::move(log.print(s));
-}
+Logging&& operator<<(Logging&& log, const char* s) { return std::move(log.print(s)); }
 
-Logging&& operator<<(Logging&& log, const void* s) {
-    return std::move(log.print(s));
-}
+Logging&& operator<<(Logging&& log, const void* s) { return std::move(log.print(s)); }
 
-Logging&& operator<<(Logging&& log, char c) {
-    return std::move(log.print(c));
-}
+Logging&& operator<<(Logging&& log, char c) { return std::move(log.print(c)); }
 
-Logging&& operator<<(Logging&& log, unsigned char u) {
-    return std::move(log.print(u));
-}
+Logging&& operator<<(Logging&& log, unsigned char u) { return std::move(log.print(u)); }
 
-Logging&& operator<<(Logging&& log, int i) {
-    return std::move(log.print(i));
-}
+Logging&& operator<<(Logging&& log, int i) { return std::move(log.print(i)); }
 
-Logging&& operator<<(Logging&& log, unsigned int u) {
-    return std::move(log.print(u));
-}
+Logging&& operator<<(Logging&& log, unsigned int u) { return std::move(log.print(u)); }
 
-Logging&& operator<<(Logging&& log, long l) {
-    return std::move(log.print(l));
-}
+Logging&& operator<<(Logging&& log, long l) { return std::move(log.print(l)); }
 
-Logging&& operator<<(Logging&& log, long long l) {
-    return std::move(log.print(l));
-}
+Logging&& operator<<(Logging&& log, long long l) { return std::move(log.print(l)); }
 
-Logging&& operator<<(Logging&& log, unsigned long u) {
-    return std::move(log.print(u));
-}
+Logging&& operator<<(Logging&& log, unsigned long u) { return std::move(log.print(u)); }
 
-Logging&& operator<<(Logging&& log, unsigned long long u) {
-    return std::move(log.print(u));
-}
+Logging&& operator<<(Logging&& log, unsigned long long u) { return std::move(log.print(u)); }
 
-Logging&& operator<<(Logging&& log, float f) {
-    return std::move(log.print(f));
-}
+Logging&& operator<<(Logging&& log, float f) { return std::move(log.print(f)); }
 
-Logging&& operator<<(Logging&& log, double d) {
-    return std::move(log.print(d));
-}
+Logging&& operator<<(Logging&& log, double d) { return std::move(log.print(d)); }
 
-Logging&& operator<<(Logging&& log, bool b) {
-    return std::move(log.print(b));
-}
+Logging&& operator<<(Logging&& log, bool b) { return std::move(log.print(b)); }
 
 VerboseLogging::VerboseLogging(int level, const char* fullPath, int lineNumber) : level_(level) {
     if(level_ <= VerboseLogging::maxLoggingLevel_) {
@@ -231,53 +202,29 @@ void VerboseLogging::setMaxLoggingLevel(int maxLoggingLevel) {
     }
 }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, const std::string& s) {
-    return std::move(log.print(s));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, const std::string& s) { return std::move(log.print(s)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, const char* s) {
-    return std::move(log.print(s));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, const char* s) { return std::move(log.print(s)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, const void* s) {
-    return std::move(log.print(s));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, const void* s) { return std::move(log.print(s)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, char c) {
-    return std::move(log.print(c));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, char c) { return std::move(log.print(c)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, unsigned char u) {
-    return std::move(log.print(u));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, unsigned char u) { return std::move(log.print(u)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, int i) {
-    return std::move(log.print(i));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, int i) { return std::move(log.print(i)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, unsigned int u) {
-    return std::move(log.print(u));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, unsigned int u) { return std::move(log.print(u)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, long l) {
-    return std::move(log.print(l));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, long l) { return std::move(log.print(l)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, unsigned long u) {
-    return std::move(log.print(u));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, unsigned long u) { return std::move(log.print(u)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, float f) {
-    return std::move(log.print(f));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, float f) { return std::move(log.print(f)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, double d) {
-    return std::move(log.print(d));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, double d) { return std::move(log.print(d)); }
 
-VerboseLogging&& operator<<(VerboseLogging&& log, bool b) {
-    return std::move(log.print(b));
-}
+VerboseLogging&& operator<<(VerboseLogging&& log, bool b) { return std::move(log.print(b)); }
 
 constexpr std::array<fl::LogLevel, 5> flLogLevelValues = {
     fl::LogLevel::INFO,

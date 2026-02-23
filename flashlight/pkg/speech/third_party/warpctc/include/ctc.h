@@ -105,7 +105,6 @@ ctcStatus_t compute_ctc_loss(
     ctcOptions options
 );
 
-
 /** For a given set of labels and minibatch size return the required workspace
  *  size.  This will need to be allocated in the same memory space as your
  *  probabilities.

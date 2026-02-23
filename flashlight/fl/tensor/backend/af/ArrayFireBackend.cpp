@@ -133,9 +133,7 @@ TensorBackendType ArrayFireBackend::backendType() const {
 
 /* -------------------------- Compute Functions -------------------------- */
 
-void ArrayFireBackend::eval(const Tensor& tensor) {
-    af::eval(toArray(tensor));
-}
+void ArrayFireBackend::eval(const Tensor& tensor) { af::eval(toArray(tensor)); }
 
 const Stream& ArrayFireBackend::getStreamOfArray(
     const af::array& arr
@@ -205,9 +203,7 @@ void ArrayFireBackend::setMemMgrFlushInterval(const size_t interval) {
 
 /* -------------------------- Rand Functions -------------------------- */
 
-void ArrayFireBackend::setSeed(const int seed) {
-    af::setSeed(seed);
-}
+void ArrayFireBackend::setSeed(const int seed) { af::setSeed(seed); }
 
 Tensor ArrayFireBackend::randn(const Shape& shape, dtype type) {
     return toTensor<ArrayFireTensor>(
@@ -399,7 +395,5 @@ Tensor ArrayFireBackend::argsort(
     return toTensor<ArrayFireTensor>(std::move(indices), input.ndim());
 }
 
-void ArrayFireBackend::print(const Tensor& tensor) {
-    af::print("ArrayFireTensor", toArray(tensor));
-}
+void ArrayFireBackend::print(const Tensor& tensor) { af::print("ArrayFireTensor", toArray(tensor)); }
 } // namespace fl

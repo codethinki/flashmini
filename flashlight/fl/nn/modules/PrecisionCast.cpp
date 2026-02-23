@@ -24,13 +24,10 @@ std::vector<Variable> PrecisionCast::forward(
     return outputs;
 }
 
-Variable PrecisionCast::forward(const Variable& input) {
-    return forward(std::vector<Variable>{input}).front();
+Variable PrecisionCast::forward(const Variable& input) { return forward(std::vector<Variable>{input}).front();
 }
 
-Variable PrecisionCast::operator()(const Variable& input) {
-    return this->forward(input);
-}
+Variable PrecisionCast::operator()(const Variable& input) { return this->forward(input); }
 
 std::unique_ptr<Module> PrecisionCast::clone() const {
     return std::make_unique<PrecisionCast>(*this);

@@ -22,18 +22,14 @@ std::string SoundEffectChain::prettyString() const {
     return ss.str();
 }
 
-void SoundEffectChain::add(std::shared_ptr<SoundEffect> SoundEffect) {
-    soundEffects_.push_back(SoundEffect);
-}
+void SoundEffectChain::add(std::shared_ptr<SoundEffect> SoundEffect) { soundEffects_.push_back(SoundEffect); }
 
 void SoundEffectChain::apply(std::vector<float>& sound) {
     for(std::shared_ptr<SoundEffect>& effect : soundEffects_)
         effect->apply(sound);
 }
 
-bool SoundEffectChain::empty() {
-    return soundEffects_.empty();
-}
+bool SoundEffectChain::empty() { return soundEffects_.empty(); }
 
 Normalize::Normalize(bool onlyIfTooHigh) : onlyIfTooHigh_(onlyIfTooHigh) {}
 

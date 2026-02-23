@@ -98,13 +98,10 @@ std::vector<Variable> RNN::forward(const std::vector<Variable>& inputs) {
     return output;
 }
 
-Variable RNN::forward(const Variable& input) {
-    return forward(std::vector<Variable>{input}).front();
+Variable RNN::forward(const Variable& input) { return forward(std::vector<Variable>{input}).front();
 }
 
-Variable RNN::operator()(const Variable& input) {
-    return forward(input);
-}
+Variable RNN::operator()(const Variable& input) { return forward(input); }
 
 std::tuple<Variable, Variable> RNN::forward(
     const Variable& input,
@@ -117,9 +114,7 @@ std::tuple<Variable, Variable> RNN::forward(
 std::tuple<Variable, Variable> RNN::operator()(
     const Variable& input,
     const Variable& hidden_state
-) {
-    return forward(input, hidden_state);
-}
+) { return forward(input, hidden_state); }
 
 std::tuple<Variable, Variable, Variable> RNN::forward(
     const Variable& input,
@@ -134,9 +129,7 @@ std::tuple<Variable, Variable, Variable> RNN::operator()(
     const Variable& input,
     const Variable& hidden_state,
     const Variable& cell_state
-) {
-    return forward(input, hidden_state, cell_state);
-}
+) { return forward(input, hidden_state, cell_state); }
 
 std::unique_ptr<Module> RNN::clone() const {
     return std::make_unique<RNN>(*this);

@@ -45,9 +45,7 @@ namespace fl {
 
 namespace detail {
 
-    std::shared_ptr<gloo::mpi::Context> globalContext() {
-        return glooContext_;
-    }
+    std::shared_ptr<gloo::mpi::Context> globalContext() { return glooContext_; }
 
     template<typename T>
     inline void allreduceGloo(T* ptr, size_t s) {

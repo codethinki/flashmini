@@ -46,7 +46,6 @@ TEST(CUDAStreamTest, createUnmanaged) {
     }
 }
 
-
 TEST(CUDAStreamTest, unmanagedWrapper) {
     auto& manager = DeviceManager::getInstance();
     int numCudaDevices = 0;

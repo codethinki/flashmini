@@ -129,9 +129,7 @@ struct DynamicBenchmarkOptions : DynamicBenchmarkOptionsBase {
      *
      * @return T the current option.
      */
-    T currentOption() {
-        return updateState();
-    }
+    T currentOption() { return updateState(); }
 
     /**
      * @return whether or not this options' timings are complete.

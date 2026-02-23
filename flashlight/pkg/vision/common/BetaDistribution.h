@@ -75,9 +75,7 @@ namespace lib {
         }
 
         template<typename URNG>
-        result_type operator()(URNG& engine) {
-            return generate(engine, a_gamma, b_gamma);
-        }
+        result_type operator()(URNG& engine) { return generate(engine, a_gamma, b_gamma); }
 
         template<typename URNG>
         result_type operator()(URNG& engine, const param_type& param) {

@@ -16,9 +16,7 @@ std::string deviceTypeToString(const DeviceType type) {
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const DeviceType& type) {
-    return os << deviceTypeToString(type);
-}
+std::ostream& operator<<(std::ostream& os, const DeviceType& type) { return os << deviceTypeToString(type); }
 
 const std::unordered_set<DeviceType>& getDeviceTypes() {
     static std::unordered_set<DeviceType> types = {

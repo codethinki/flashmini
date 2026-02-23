@@ -82,9 +82,7 @@ namespace pkg {
 // when building sound effects without libsox.
             class SoxWrapper {
             public:
-                static SoxWrapper* instance(size_t sampleRate = 16000) {
-                    return nullptr;
-                }
+                static SoxWrapper* instance(size_t sampleRate = 16000) { return nullptr; }
                 void applyAndFreeEffect(std::vector<float>& signal, sox_effect_t* effect)
                 const {}
             };

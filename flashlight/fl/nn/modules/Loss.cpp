@@ -66,16 +66,14 @@ std::string MeanAbsoluteError::prettyString() const {
 Variable BinaryCrossEntropy::forward(
     const Variable& inputs,
     const Variable& targets
-) {
-    return mean(flat(binaryCrossEntropy(inputs, targets)), {0});
+) { return mean(flat(binaryCrossEntropy(inputs, targets)), {0});
 }
 
 Variable BinaryCrossEntropy::forward(
     const Variable& inputs,
     const Variable& targets,
     const Variable& weights
-) {
-    return mean(flat(weights * binaryCrossEntropy(inputs, targets)), {0});
+) { return mean(flat(weights * binaryCrossEntropy(inputs, targets)), {0});
 }
 
 std::unique_ptr<Module> BinaryCrossEntropy::clone() const {
@@ -89,9 +87,7 @@ std::string BinaryCrossEntropy::prettyString() const {
 Variable CategoricalCrossEntropy::forward(
     const Variable& inputs,
     const Variable& targets
-) {
-    return categoricalCrossEntropy(inputs, targets, reduction_, ignoreIndex_);
-}
+) { return categoricalCrossEntropy(inputs, targets, reduction_, ignoreIndex_); }
 
 std::unique_ptr<Module> CategoricalCrossEntropy::clone() const {
     return std::make_unique<CategoricalCrossEntropy>(*this);

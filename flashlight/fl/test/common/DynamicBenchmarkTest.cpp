@@ -141,11 +141,11 @@ TEST_F(DynamicBenchmark, DynamicBenchmarkMatmul) {
             ->currentOption();
         dynamicBench->audit(
             [size]() {
-            auto a = fl::rand({size, size});
-            auto b = fl::rand({size, size});
-            auto c = fl::matmul(a, b);
-            fl::eval(c);
-        }
+                auto a = fl::rand({size, size});
+                auto b = fl::rand({size, size});
+                auto c = fl::matmul(a, b);
+                fl::eval(c);
+            }
         );
     }
     auto ops = dynamicBench->getOptions<fl::DynamicBenchmarkOptions<int>>();

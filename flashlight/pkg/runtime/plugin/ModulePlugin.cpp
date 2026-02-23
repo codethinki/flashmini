@@ -16,8 +16,6 @@ ModulePlugin::ModulePlugin(const std::string& name) : fl::Plugin(name) {
 std::shared_ptr<fl::Module> ModulePlugin::arch(
     int64_t nFeatures,
     int64_t nClasses
-) {
-    return std::shared_ptr<fl::Module>(arch_(nFeatures, nClasses));
-}
+) { return std::shared_ptr<fl::Module>(arch_(nFeatures, nClasses)); }
 
 } // namespace fl

@@ -10,9 +10,7 @@
 namespace fl {
 namespace detail {
 
-    bool areBackendsEqual(const Tensor& a, const Tensor& b) {
-        return a.backendType() == b.backendType();
-    }
+    bool areBackendsEqual(const Tensor& a, const Tensor& b) { return a.backendType() == b.backendType(); }
 
 } // namespace detail
 
@@ -63,17 +61,13 @@ Tensor TensorBackend::where(
     const Tensor& condition,
     const Tensor& x,
     const double& y
-) {
-    return where(condition, x, full(condition.shape(), y, x.type()));
-}
+) { return where(condition, x, full(condition.shape(), y, x.type())); }
 
 Tensor TensorBackend::where(
     const Tensor& condition,
     const double& x,
     const Tensor& y
-) {
-    return where(condition, full(condition.shape(), x, y.type()), y);
-}
+) { return where(condition, full(condition.shape(), x, y.type()), y); }
 
 Tensor TensorBackend::minimum(const Tensor& lhs, const double& rhs) {
     return minimum(lhs, full(lhs.shape(), rhs, dtype_traits<double>::ctype));

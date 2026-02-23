@@ -32,9 +32,7 @@ DnnlStream::DnnlStream(dnnl::engine engine) {
 #endif
 }
 
-dnnl::stream& DnnlStream::getStream() {
-    return stream_;
-}
+dnnl::stream& DnnlStream::getStream() { return stream_; }
 
 DnnlStream& DnnlStream::getInstance() {
     static DnnlStream instance(DnnlEngine::getInstance().getEngine());
@@ -52,9 +50,7 @@ DnnlEngine::DnnlEngine() {
 #endif
 }
 
-dnnl::engine& DnnlEngine::getEngine() {
-    return engine_;
-}
+dnnl::engine& DnnlEngine::getEngine() { return engine_; }
 
 DnnlEngine& DnnlEngine::getInstance() {
     static DnnlEngine instance;
@@ -65,9 +61,7 @@ dnnl::memory::dims convertToDnnlDims(const std::vector<Dim>& shape) {
     return dnnl::memory::dims(shape.begin(), shape.end());
 }
 
-dnnl::memory::dims convertShapeToDnnlDims(const Shape& shape) {
-    return convertToDnnlDims(shape.get());
-}
+dnnl::memory::dims convertShapeToDnnlDims(const Shape& shape) { return convertToDnnlDims(shape.get()); }
 
 DnnlMemoryWrapper::DnnlMemoryWrapper(
     const Tensor& tensor,

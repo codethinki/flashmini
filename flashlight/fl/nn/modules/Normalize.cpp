@@ -20,9 +20,7 @@ Normalize::Normalize(
     eps_(eps),
     value_(value) {}
 
-Variable Normalize::forward(const Variable& input) {
-    return value_ * normalize(input, axes_, p_, eps_);
-}
+Variable Normalize::forward(const Variable& input) { return value_ * normalize(input, axes_, p_, eps_); }
 
 std::unique_ptr<Module> Normalize::clone() const {
     return std::make_unique<Normalize>(*this);

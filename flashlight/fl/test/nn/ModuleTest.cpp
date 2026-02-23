@@ -49,9 +49,7 @@ public:
         return std::make_unique<ContainerTestClass>(*this);
     }
 
-    void addParam(const Variable& param) {
-        params_.push_back(param);
-    }
+    void addParam(const Variable& param) { params_.push_back(param); }
 };
 
 class ModuleTestF16 : public ::testing::Test {

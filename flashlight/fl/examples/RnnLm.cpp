@@ -43,13 +43,9 @@ class Preprocessor {
 public:
     explicit Preprocessor(std::string dataset_path);
 
-    int to_int(std::string word) {
-        return word_to_int[word];
-    }
+    int to_int(std::string word) { return word_to_int[word]; }
 
-    int vocab_size() {
-        return word_to_int.size();
-    }
+    int vocab_size() { return word_to_int.size(); }
 
     static const std::string eos;
 
@@ -159,9 +155,7 @@ public:
     }
 
     std::tuple<Variable, Variable, Variable>
-    operator()(const Variable& input, const Variable& h, const Variable& c) {
-        return forward(input, h, c);
-    }
+    operator()(const Variable& input, const Variable& h, const Variable& c) { return forward(input, h, c); }
 
     std::string prettyString() const override {
         return "RnnLm";

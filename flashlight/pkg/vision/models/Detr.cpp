@@ -13,9 +13,7 @@
 
 namespace {
 
-double calculateGain(double negativeSlope) {
-    return std::sqrt(2.0 / (1 + std::pow(negativeSlope, 2)));
-}
+double calculateGain(double negativeSlope) { return std::sqrt(2.0 / (1 + std::pow(negativeSlope, 2))); }
 
 std::shared_ptr<fl::Linear> makeLinear(int inDim, int outDim) {
     int fanIn = inDim;
@@ -102,8 +100,7 @@ std::vector<Variable> Detr::forward(const std::vector<Variable>& input) {
     return forwardTransformer({feature, input[1]});
 }
 
-Variable Detr::forwardBackbone(const Variable& input) {
-    return backbone_->forward({input})[1];
+Variable Detr::forwardBackbone(const Variable& input) { return backbone_->forward({input})[1];
 }
 
 std::vector<Variable> Detr::forwardTransformer(
@@ -157,8 +154,6 @@ std::vector<fl::Variable> Detr::paramsWithoutBackbone() {
     return results;
 }
 
-std::vector<fl::Variable> Detr::backboneParams() {
-    return backbone_->params();
-}
+std::vector<fl::Variable> Detr::backboneParams() { return backbone_->params(); }
 
 } // namespace fl

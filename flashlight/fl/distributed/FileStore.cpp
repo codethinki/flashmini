@@ -100,12 +100,8 @@ void FileStore::wait(const std::string& key) {
     }
 }
 
-fs::path FileStore::tmpPath(const std::string& name) {
-    return basePath_ / fs::path("." + encodeName(name));
-}
+fs::path FileStore::tmpPath(const std::string& name) { return basePath_ / fs::path("." + encodeName(name)); }
 
-fs::path FileStore::objectPath(const std::string& name) {
-    return basePath_ / fs::path(encodeName(name));
-}
+fs::path FileStore::objectPath(const std::string& name) { return basePath_ / fs::path(encodeName(name)); }
 
 } // namespace fl

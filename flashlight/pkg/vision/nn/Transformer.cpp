@@ -9,7 +9,6 @@
 
 #include <cmath>
 
-
 using namespace fl;
 
 namespace {

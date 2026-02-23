@@ -43,9 +43,7 @@ void Embedding::initialize() {
     params_ = {embeddings};
 }
 
-Variable Embedding::forward(const Variable& input) {
-    return embedding(input, params_[0]);
-}
+Variable Embedding::forward(const Variable& input) { return embedding(input, params_[0]); }
 
 std::unique_ptr<Module> Embedding::clone() const {
     return std::make_unique<Embedding>(*this);

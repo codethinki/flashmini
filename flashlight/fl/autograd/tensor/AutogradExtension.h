@@ -50,9 +50,7 @@ public:
     static constexpr TensorExtensionType extensionType =
         TensorExtensionType::Autograd;
 
-    virtual std::shared_ptr<fl::DynamicBenchmark> createBenchmarkOptions() {
-        return nullptr;
-    }
+    virtual std::shared_ptr<fl::DynamicBenchmark> createBenchmarkOptions() { return nullptr; }
 
     /**************************** Forward ****************************/
     virtual Tensor conv2d(

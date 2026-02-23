@@ -95,13 +95,9 @@ DefaultMemoryManager::DefaultMemoryManager(
         this->maxBuffers = std::max(1, std::stoi(std::string(c)));
 }
 
-void DefaultMemoryManager::initialize() {
-    this->setMaxMemorySize();
-}
+void DefaultMemoryManager::initialize() { this->setMaxMemorySize(); }
 
-void DefaultMemoryManager::shutdown() {
-    signalMemoryCleanup();
-}
+void DefaultMemoryManager::shutdown() { signalMemoryCleanup(); }
 
 void DefaultMemoryManager::addMemoryManagement(int device) {
     // If there is a memory manager allocated for this device id, we might
@@ -350,9 +346,7 @@ void DefaultMemoryManager::userLock(const void* ptr) {
     }
 }
 
-void DefaultMemoryManager::userUnlock(const void* ptr) {
-    this->unlock(const_cast<void*>(ptr), true);
-}
+void DefaultMemoryManager::userUnlock(const void* ptr) { this->unlock(const_cast<void*>(ptr), true); }
 
 bool DefaultMemoryManager::isUserLocked(const void* ptr) {
     MemoryInfo& current = this->getCurrentMemoryInfo();
@@ -379,9 +373,7 @@ size_t DefaultMemoryManager::getMaxBytes() {
     return this->getCurrentMemoryInfo().maxBytes;
 }
 
-unsigned DefaultMemoryManager::getMaxBuffers() {
-    return this->maxBuffers;
-}
+unsigned DefaultMemoryManager::getMaxBuffers() { return this->maxBuffers; }
 
 bool DefaultMemoryManager::checkMemoryLimit() {
     const MemoryInfo& current = this->getCurrentMemoryInfo();

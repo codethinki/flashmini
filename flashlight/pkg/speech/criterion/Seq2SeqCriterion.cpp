@@ -304,9 +304,7 @@ std::pair<Variable, Variable> Seq2SeqCriterion::decoder(
 Tensor Seq2SeqCriterion::viterbiPath(
     const Tensor& input,
     const Tensor& inputSizes /* = Tensor() */
-) {
-    return viterbiPathBase(input, inputSizes, false).first;
-}
+) { return viterbiPathBase(input, inputSizes, false).first; }
 
 std::pair<Tensor, Variable> Seq2SeqCriterion::viterbiPathBase(
     const Tensor& input,
