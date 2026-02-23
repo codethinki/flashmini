@@ -30,7 +30,7 @@ class Tensor;
  */
 
 /// Enum for various tensor backends.
-enum class TensorBackendType { Stub, Tracer, ArrayFire };
+enum class TensorBackendType {Stub, Tracer, ArrayFire};
 
 // See TensorAdapter.h
 class TensorAdapterBase;
@@ -45,19 +45,19 @@ struct Index;
 class Stream;
 
 /// Location of memory or tensors.
-enum class Location { Host, Device };
+enum class Location {Host, Device};
 /// Alias to make it semantically clearer when referring to buffer location
 using MemoryLocation = Location;
 
 /// Tensor storage types.
-enum class StorageType { Dense = 0, CSR = 1, CSC = 2, COO = 3 };
+enum class StorageType {Dense = 0, CSR = 1, CSC = 2, COO = 3};
 
 /* @} */
 
 namespace detail {
 
-FL_API std::unique_ptr<TensorAdapterBase> releaseAdapter(Tensor&& t);
-FL_API std::unique_ptr<TensorAdapterBase> releaseAdapterUnsafe(Tensor& t);
+    FL_API std::unique_ptr<TensorAdapterBase> releaseAdapter(Tensor&& t);
+    FL_API std::unique_ptr<TensorAdapterBase> releaseAdapterUnsafe(Tensor& t);
 
 } // namespace detail
 
@@ -76,571 +76,578 @@ FL_API std::unique_ptr<TensorAdapterBase> releaseAdapterUnsafe(Tensor& t);
  * \warning This API may break and is not yet stable.
  */
 class FL_API Tensor {
-  // The tensor adapter for the tensor
-  std::unique_ptr<TensorAdapterBase> impl_;
+    // The tensor adapter for the tensor
+    std::unique_ptr<TensorAdapterBase> impl_;
 
-  /*
-   * Construct a tensor with a given shape and using an existing buffer.
-   *
-   * This constructor is a void* specialization to facilitate interface
-   * compliance with TensorAdapter and is intentionally private.
-   */
-  Tensor(
-      const Shape& shape,
-      fl::dtype type,
-      const void* ptr,
-      MemoryLocation memoryLocation);
+    /*
+     * Construct a tensor with a given shape and using an existing buffer.
+     *
+     * This constructor is a void* specialization to facilitate interface
+     * compliance with TensorAdapter and is intentionally private.
+     */
+    Tensor(
+        const Shape& shape,
+        fl::dtype type,
+        const void* ptr,
+        MemoryLocation memoryLocation
+    );
 
-  /**
-   * Shallow-copies the tensor, returning a tensor that points to the same
-   * underlying data.
-   *
-   * For internal use only. Tensor implementations should define when and where
-   * deep copies happen based on their dataflow graph abstractions.
-   *
-   * \todo slated for removal. Rely on copy-on-write and fix bad refcount
-   * issues.
-   */
-  Tensor shallowCopy() const;
-  // shallowCopy() above is used in DevicePtr given that it doesn't mutate
-  // tensors in place with tensor operations, and only pulls out memory.
-  friend class DevicePtr;
-  // also used in tensor abstractions that wrap and call tensor ops:
-  friend class TracerTensorBase;
+    /**
+     * Shallow-copies the tensor, returning a tensor that points to the same
+     * underlying data.
+     *
+     * For internal use only. Tensor implementations should define when and where
+     * deep copies happen based on their dataflow graph abstractions.
+     *
+     * \todo slated for removal. Rely on copy-on-write and fix bad refcount
+     * issues.
+     */
+    Tensor shallowCopy() const;
+    // shallowCopy() above is used in DevicePtr given that it doesn't mutate
+    // tensors in place with tensor operations, and only pulls out memory.
+    friend class DevicePtr;
+    // also used in tensor abstractions that wrap and call tensor ops:
+    friend class TracerTensorBase;
 
-  /**
-   * Release and transfer ownership of the tensor's underlying
-   * TensorAdapterBase.
-   *
-   * NB: After unlocking the adapter, the resulting Tensor should
-   * *probably* be destroyed, as it has no adapter and thus can't perform any
-   * operations.
-   */
+    /**
+     * Release and transfer ownership of the tensor's underlying
+     * TensorAdapterBase.
+     *
+     * NB: After unlocking the adapter, the resulting Tensor should
+     * *probably* be destroyed, as it has no adapter and thus can't perform any
+     * operations.
+     */
 
-  std::unique_ptr<TensorAdapterBase> releaseAdapter();
-  friend std::unique_ptr<TensorAdapterBase> detail::releaseAdapter(Tensor&& t);
-  friend std::unique_ptr<TensorAdapterBase> detail::releaseAdapterUnsafe(
-      Tensor& t);
+    std::unique_ptr<TensorAdapterBase> releaseAdapter();
+    friend std::unique_ptr<TensorAdapterBase> detail::releaseAdapter(Tensor&& t);
+    friend std::unique_ptr<TensorAdapterBase> detail::releaseAdapterUnsafe(
+        Tensor& t
+    );
 
- public:
-  explicit Tensor(std::unique_ptr<TensorAdapterBase> adapter);
-  virtual ~Tensor();
+public:
+    explicit Tensor(std::unique_ptr<TensorAdapterBase> adapter);
+    virtual ~Tensor();
 
-  /**
-   * Copy constructor - calls the implementation-defined copy constructor for
-   * the TensorAdapter.
-   */
-  Tensor(const Tensor& tensor);
+    /**
+     * Copy constructor - calls the implementation-defined copy constructor for
+     * the TensorAdapter.
+     */
+    Tensor(const Tensor& tensor);
 
-  /**
-   * Move constructor - moves the pointer to the TensorAdapter - performs no
-   * other operations.
-   */
-  Tensor(Tensor&& tensor) noexcept;
+    /**
+     * Move constructor - moves the pointer to the TensorAdapter - performs no
+     * other operations.
+     */
+    Tensor(Tensor&& tensor) noexcept;
 
-  /**
-   * Construct an empty tensor with the default tensor backend's tensor adapter.
-   */
-  Tensor();
+    /**
+     * Construct an empty tensor with the default tensor backend's tensor adapter.
+     */
+    Tensor();
 
-  /**
-   * Construct a tensor of a given shape (and optionally type) without
-   * populating its data.
-   *
-   * @param[in] shape the shape of the tensor
-   * @param[in] type (optional) the type of the tensor
-   */
-  explicit Tensor(const Shape& shape, fl::dtype type = fl::dtype::f32);
+    /**
+     * Construct a tensor of a given shape (and optionally type) without
+     * populating its data.
+     *
+     * @param[in] shape the shape of the tensor
+     * @param[in] type (optional) the type of the tensor
+     */
+    explicit Tensor(const Shape& shape, fl::dtype type = fl::dtype::f32);
 
-  /**
-   * Construct an empty tensor of a given type.
-   *
-   * @param[in] type (optional) the type of the tensor
-   */
-  explicit Tensor(fl::dtype type);
+    /**
+     * Construct an empty tensor of a given type.
+     *
+     * @param[in] type (optional) the type of the tensor
+     */
+    explicit Tensor(fl::dtype type);
 
-  /**
-   * Construct a sparse tensor.
-   *
-   * @param[in] nRows the number of rows of the tensor
-   * @param[in] nCols the number of columns of the tensor
-   * @param[in] values the values associated with the tensor
-   * @param[in] rowIdx the row indices of the sparse array
-   * @param[in] colIdx the the column indices of the sparse array
-   * @param[in] storageType the storage type of the underlying tensor
-   *
-   * \todo Expand this API with getters as needed.
-   */
-  Tensor(
-      const Dim nRows,
-      const Dim nCols,
-      const Tensor& values,
-      const Tensor& rowIdx,
-      const Tensor& colIdx,
-      StorageType storageType);
+    /**
+     * Construct a sparse tensor.
+     *
+     * @param[in] nRows the number of rows of the tensor
+     * @param[in] nCols the number of columns of the tensor
+     * @param[in] values the values associated with the tensor
+     * @param[in] rowIdx the row indices of the sparse array
+     * @param[in] colIdx the the column indices of the sparse array
+     * @param[in] storageType the storage type of the underlying tensor
+     *
+     * \todo Expand this API with getters as needed.
+     */
+    Tensor(
+        const Dim nRows,
+        const Dim nCols,
+        const Tensor& values,
+        const Tensor& rowIdx,
+        const Tensor& colIdx,
+        StorageType storageType
+    );
 
-  /**
-   * Create a tensor from a vector of values.
-   *
-   * @param[in] s the shape of the resulting tensor.
-   * @param[in] v values with which to populate the tensor.
-   * @return a tensor with values and shape as given.
-   */
-  template <typename T>
-  static Tensor fromVector(Shape s, std::vector<T> v) {
-    return Tensor(s, fl::dtype_traits<T>::fl_type, v.data(), Location::Host);
-  }
-
-  template <typename T, std::size_t S>
-  static Tensor fromArray(Shape s, std::array<T, S> a) {
-    return Tensor(s, fl::dtype_traits<T>::fl_type, a.data(), Location::Host);
-  }
-
-  template <typename T>
-  static Tensor fromVector(Shape s, std::vector<T> v, dtype type) {
-    return Tensor(s, type, v.data(), Location::Host);
-  }
-
-  template <typename T, std::size_t S>
-  static Tensor fromArray(Shape s, std::array<T, S> a, dtype type) {
-    return Tensor(s, type, a.data(), Location::Host);
-  }
-
-  template <typename T>
-  static Tensor fromVector(std::vector<T> v) {
-    return Tensor(
-        {static_cast<long long>(v.size())},
-        fl::dtype_traits<T>::fl_type,
-        v.data(),
-        Location::Host);
-  }
-
-  template <typename T, std::size_t S>
-  static Tensor fromArray(std::array<T, S> a) {
-    return Tensor(
-        {static_cast<long long>(a.size())},
-        fl::dtype_traits<T>::fl_type,
-        a.data(),
-        Location::Host);
-  }
-
-  /**
-   * Create a tensor from an existing buffer.
-   *
-   * @param[in] s the shape of the resulting tensor.
-   * @param[in] ptr the buffer containing the data
-   * @param[in] memoryLocation the location in memory where the input buffer
-   * with which to create the tensor resides.
-   * @return a tensor with values and shape as given.
-   */
-  template <typename T>
-  static Tensor fromBuffer(Shape s, const T* ptr, Location memoryLocation) {
-    return Tensor(s, fl::dtype_traits<T>::fl_type, ptr, memoryLocation);
-  }
-
-  /**
-   * Create a tensor from an existing byte buffer given a type.
-   *
-   * @param[in] s the shape of the resulting tensor.
-   * @param[in] t the type of the underlying tensor
-   * @param[in] ptr the buffer of bytes containing the data
-   * @param[in] memoryLocation the location in memory where the input buffer
-   * with which to create the tensor resides.
-   * @return a tensor with values and shape as given.
-   */
-  static Tensor fromBuffer(
-      Shape s,
-      fl::dtype t,
-      const uint8_t* ptr,
-      Location memoryLocation) {
-    return Tensor(s, t, ptr, memoryLocation);
-  }
-
-  /**
-   * Deep-copies the tensor, including underlying data.
-   */
-  Tensor copy() const;
-
-  /**
-   * Get the shape of a tensor.
-   *
-   * @return the shape of the tensor
-   */
-  const Shape& shape() const;
-
-  /**
-   * Get a tensor's location, host or some device.
-   *
-   * @return the tensor's location
-   */
-  Location location() const;
-
-  /**
-   * Get the number of elements in the tensor.
-   *
-   * @return the size of the tensor in elements.
-   */
-  size_t elements() const;
-
-  /**
-   * Get the size of a given dimension of a tensor in the number of arguments.
-   * Throws if the given dimension is larger than the number of tensor
-   * dimensions.
-   *
-   * @return the number of elements at the given dimension
-   */
-  Dim dim(const size_t dim) const;
-
-  /**
-   * Get the number of directions of the tensor.
-   *
-   * @return the number of dimensions
-   */
-  int ndim() const;
-
-  /**
-   * Returns true if the tensor has zero elements, else false.
-   *
-   * @return true if the tensor is empty
-   */
-  bool isEmpty() const;
-
-  /**
-   * Returns true if the tensor has an associated underlying adapter.
-   *
-   * @return true if the tensor has a valid adapter
-   */
-  bool hasAdapter() const;
-
-  /**
-   * Get the tensor size in bytes.
-   *
-   * @return the size of the tensor in bytes.
-   */
-  size_t bytes() const;
-
-  /**
-   * Get the data type of tensor.
-   *
-   * @return the dtype of the tensor
-   */
-  dtype type() const;
-
-  /**
-   * Returns whether or not the tensor is sparse.
-   *
-   * @return true if the tensor is a sparse tensor, else false
-   */
-  bool isSparse() const;
-
-  /**
-   * Get this tensor's strides - the number of elements/coefficients to step
-   * when moving along each dimension when traversing the tensor.
-   *
-   * @return a Shape containing strides in each dimension.
-   */
-  Shape strides() const;
-
-  /**
-   * Get the stream which contains(ed) the computation required to realize an
-   * up-to-date value for this tensor. For instance, `device()` may not yield a
-   * pointer to the up-to-date value -- to use this pointer, `Stream::sync` or
-   * `Stream::relativeSync` is required.
-   *
-   * @return an immutable reference to the stream that contains(ed) the
-   * computations which create this tensor.
-   */
-  virtual const Stream& stream() const;
-
-  /**
-   * Returns a tensor with elements cast as a particular type
-   *
-   * @param[in] type the type to which to cast the tensor
-   * @return a tensor with element-wise cast to the new type
-   */
-  Tensor astype(const dtype type) const;
-
-  /**
-   * Index into a tensor using a vector of fl::Index references.
-   *
-   * @param[in] indices a vector of fl::Index references with which to index.
-   * @return an indexed tensor
-   */
-  Tensor operator()(const std::vector<Index>& indices) const;
-
-  /**
-   * Index into a tensor using a variable number of fl::Index.
-   *
-   * @param[in] args fl::Index instances to use
-   * @return an indexed tensor
-   */
-  template <typename... Ts>
-  Tensor operator()(const Ts&... args) const {
-    // TODO: add this back if acceptable with C++ 17 ABIs and a nvcc
-    // static_assert(
-    //     std::conjunction<std::is_constructible<Index, Ts>...>::value,
-    //     "Tensor index operator can only take Index-compatible types - "
-    //     "fl::range, fl::Tensor, fl::span, and integer types.");
-    std::vector<Index> indices{{args...}};
-    return this->operator()(indices);
-  }
-
-  /**
-   * Returns a representation of the tensor in 1 dimension.
-   *
-   * @return a 1D version of this tensor 1D-indexed with the given index.
-   */
-  Tensor flatten() const;
-
-  /**
-   * Returns a tensor indexed from this tensor but indexed as a 1D/flattened
-   * tensor.
-   *
-   * @return an indexed, 1D version of this tensor.
-   */
-  Tensor flat(const Index& idx) const;
-
-  /**
-   * Return a copy (depending on copy-on-write behavior of the underlying
-   * implementation) of this tensor that is contigous in memory.
-   *
-   * @return an identical tensor that is contiguous in memory
-   */
-  Tensor asContiguousTensor() const;
-
-  /**
-   * Gets the backend enum from the underlying TensorAdapter.
-   *
-   * @return the backend in question
-   */
-  TensorBackendType backendType() const;
-
-  /**
-   * Gets the underlying tensor adapter implementation.
-   *
-   * @return the tensor adapter.
-   */
-  template <typename T>
-  T& getAdapter() const {
-    return *static_cast<T*>(impl_.get());
-  }
-
-  /**
-   * Return the TensorBackend associated with this tensor.
-   *
-   * @return a TensorBackend.
-   */
-  TensorBackend& backend() const;
-
-  /**
-   * Return a scalar of a specified type for the tensor. If the tensor has more
-   * than one element, returns the first element as a scalar.
-   *
-   * Throws an exception if the specified type does not match the dtype trait of
-   * the underlying tensor. To implicitly cast the scalar regardless of the
-   * underlying Tensor's dtype, use `asScalar`.
-   *
-   * @return a scalar of the first element in the tensor.
-   */
-  template <typename T>
-  T scalar() const;
-
-  /**
-   * Return a scalar of the specified type of the tensor. If the specified type
-   * does not match the tensor's underlying dtype, the scalar value is
-   * implicitly cast.
-   *
-   * @return a scalar of the first element in the tensor cast to the specified
-   * type.
-   */
-  template <typename T>
-  T asScalar() const {
-    // Implicitly cast to the requested return type
-    switch (type()) {
-      case dtype::f16:
-        return astype(dtype::f32).scalar<float>();
-      case dtype::f32:
-        return scalar<float>();
-      case dtype::f64:
-        return scalar<double>();
-      case dtype::s32:
-        return scalar<int>();
-      case dtype::u32:
-        return scalar<unsigned int>();
-      case dtype::b8:
-        return scalar<char>();
-      case dtype::u8:
-        return scalar<unsigned char>();
-      case dtype::s64:
-        return scalar<long long>();
-      case dtype::u64:
-        return scalar<unsigned long long>();
-      case dtype::s16:
-        return scalar<short>();
-      case dtype::u16:
-        return scalar<unsigned short>();
-      default:
-        throw std::invalid_argument(
-            "Tensor::asScaler - no castable type exists.");
+    /**
+     * Create a tensor from a vector of values.
+     *
+     * @param[in] s the shape of the resulting tensor.
+     * @param[in] v values with which to populate the tensor.
+     * @return a tensor with values and shape as given.
+     */
+    template<typename T>
+    static Tensor fromVector(Shape s, std::vector<T> v) {
+        return Tensor(s, fl::dtype_traits<T>::fl_type, v.data(), Location::Host);
     }
-  }
 
-  /**
-   * Return a pointer to the tensor's underlying data per a certain type. This
-   * pointer exists on the computation device.
-   *
-   * \note The memory allocated here will not be freed until Tensor:unlock() is
-   * called.
-   *
-   * @return the requested pointer on the device.
-   */
-  template <typename T>
-  T* device() const;
-
-  /**
-   * Populate a pointer value with the address of a Tensor's underlying buffer
-   * on the computation device.
-   *
-   * \note The memory allocated here will not be freed until Tensor:unlock() is
-   * called.
-   *
-   * @param[in] ptr the pointer to populate with the Tensor's buffer location on
-   * device.
-   */
-  template <typename T>
-  void device(T** ptr) const;
-
-  /**
-   * Returns a pointer to the tensor's underlying data, but on the host. If the
-   * tensor is located on a device, makes a copy of device memory and returns a
-   * buffer on the host containing the relevant memory.
-   *
-   * @return the requested pointer on the host.
-   */
-  template <typename T>
-  T* host() const;
-
-  /**
-   * Populates an existing buffer with the tensor's underlying data, but on the
-   * host. If the tensor is located on a device, makes a copy of device memory
-   * and returns a buffer on the host containing the relevant memory.
-   *
-   * @param[in] ptr a pointer to the region of memory to populate with tensor
-   * values
-   */
-  template <typename T>
-  void host(T* ptr) const;
-
-  /**
-   * Returns a vector on the host contaning a flat representation of the tensor.
-   * The resulting vector is a copy of the underlying tensor memory, even if on
-   * the host.
-   *
-   * @return a vector in host memory containing
-   */
-  template <typename T>
-  std::vector<T> toHostVector() const {
-    if (isEmpty()) {
-      return std::vector<T>();
+    template<typename T, std::size_t S>
+    static Tensor fromArray(Shape s, std::array<T, S> a) {
+        return Tensor(s, fl::dtype_traits<T>::fl_type, a.data(), Location::Host);
     }
-    std::vector<T> vec(this->elements());
-    host(vec.data());
-    return vec;
-  }
 
-  /**
-   * Unlocks any device memory associated with the tensor that was acquired with
-   * Tensor::device(), making it eligible to be freed.
-   */
-  void unlock() const;
+    template<typename T>
+    static Tensor fromVector(Shape s, std::vector<T> v, dtype type) {
+        return Tensor(s, type, v.data(), Location::Host);
+    }
 
-  /**
-   * Returns true if the tensor has been memory-locked per a call to
-   * Tensor::device<T>(). After unlocking via Tensor::unlock(), the tensor is no
-   * longer locked.
-   *
-   * @return true if the tensor is locked and a device pointer is active.
-   */
-  bool isLocked() const;
+    template<typename T, std::size_t S>
+    static Tensor fromArray(Shape s, std::array<T, S> a, dtype type) {
+        return Tensor(s, type, a.data(), Location::Host);
+    }
 
-  /**
-   * Returns if the Tensor is contiguous in its memory-based representation.
-   *
-   * @return a bool denoting Tensor contiguousness
-   */
-  bool isContiguous() const;
+    template<typename T>
+    static Tensor fromVector(std::vector<T> v) {
+        return Tensor(
+            {static_cast<long long>(v.size())},
+            fl::dtype_traits<T>::fl_type,
+            v.data(),
+            Location::Host
+        );
+    }
 
-  /**
-   * Stores arbitrary data on a tensor. For internal use/benchmarking only. This
-   * may be a no-op for some backends.
-   *
-   * @param[in] data a pointer to arbitrary data to pass to a tensor impl.
-   */
-  void setContext(void* data);
+    template<typename T, std::size_t S>
+    static Tensor fromArray(std::array<T, S> a) {
+        return Tensor(
+            {static_cast<long long>(a.size())},
+            fl::dtype_traits<T>::fl_type,
+            a.data(),
+            Location::Host
+        );
+    }
 
-  /**
-   * Gets arbitrary data stored on a tensor. For internal use/benchmarking only.
-   * This may be a no-op for some backends.
-   *
-   * @return a pointer to some implementation-defined data, else nullptr if a
-   * no-op.
-   */
-  void* getContext() const;
+    /**
+     * Create a tensor from an existing buffer.
+     *
+     * @param[in] s the shape of the resulting tensor.
+     * @param[in] ptr the buffer containing the data
+     * @param[in] memoryLocation the location in memory where the input buffer
+     * with which to create the tensor resides.
+     * @return a tensor with values and shape as given.
+     */
+    template<typename T>
+    static Tensor fromBuffer(Shape s, const T* ptr, Location memoryLocation) {
+        return Tensor(s, fl::dtype_traits<T>::fl_type, ptr, memoryLocation);
+    }
 
-  /**
-   * Returns a string representation of a Tensor.
-   *
-   * \note This is backend-dependent. See Flashlight's serialization utilities
-   * for ways to serialize Tensors that are portable across Tensor backends.
-   *
-   * @return a string representation of the Tensor.
-   */
-  std::string toString() const;
+    /**
+     * Create a tensor from an existing byte buffer given a type.
+     *
+     * @param[in] s the shape of the resulting tensor.
+     * @param[in] t the type of the underlying tensor
+     * @param[in] ptr the buffer of bytes containing the data
+     * @param[in] memoryLocation the location in memory where the input buffer
+     * with which to create the tensor resides.
+     * @return a tensor with values and shape as given.
+     */
+    static Tensor fromBuffer(
+        Shape s,
+        fl::dtype t,
+        const uint8_t* ptr,
+        Location memoryLocation
+    ) {
+        return Tensor(s, t, ptr, memoryLocation);
+    }
 
-  /**
-   * Write a string representation of a tensor to an output stream.
-   */
-  std::ostream& operator<<(std::ostream& ostr) const;
+    /**
+     * Deep-copies the tensor, including underlying data.
+     */
+    Tensor copy() const;
 
-  /******************** Assignment Operators ********************/
-#define ASSIGN_TENSOR_OP(OP) Tensor& OP(const Tensor& val);
-#define ASSIGN_SCALAR_OP(OP)             \
-  Tensor& OP(const double& val);         \
-  Tensor& OP(const float& val);          \
-  Tensor& OP(const int& val);            \
-  Tensor& OP(const unsigned& val);       \
-  Tensor& OP(const bool& val);           \
-  Tensor& OP(const char& val);           \
-  Tensor& OP(const unsigned char& val);  \
-  Tensor& OP(const short& val);          \
-  Tensor& OP(const unsigned short& val); \
-  Tensor& OP(const long& val);           \
-  Tensor& OP(const unsigned long& val);  \
-  Tensor& OP(const long long& val);      \
-  Tensor& OP(const unsigned long long& val);
-#define ASSIGN_OP(OP)   \
-  ASSIGN_TENSOR_OP(OP); \
-  ASSIGN_SCALAR_OP(OP);
+    /**
+     * Get the shape of a tensor.
+     *
+     * @return the shape of the tensor
+     */
+    const Shape& shape() const;
 
-  ASSIGN_SCALAR_OP(operator=);
-  ASSIGN_OP(operator+=);
-  ASSIGN_OP(operator-=);
-  ASSIGN_OP(operator*=);
-  ASSIGN_OP(operator/=);
+    /**
+     * Get a tensor's location, host or some device.
+     *
+     * @return the tensor's location
+     */
+    Location location() const;
+
+    /**
+     * Get the number of elements in the tensor.
+     *
+     * @return the size of the tensor in elements.
+     */
+    size_t elements() const;
+
+    /**
+     * Get the size of a given dimension of a tensor in the number of arguments.
+     * Throws if the given dimension is larger than the number of tensor
+     * dimensions.
+     *
+     * @return the number of elements at the given dimension
+     */
+    Dim dim(const size_t dim) const;
+
+    /**
+     * Get the number of directions of the tensor.
+     *
+     * @return the number of dimensions
+     */
+    int ndim() const;
+
+    /**
+     * Returns true if the tensor has zero elements, else false.
+     *
+     * @return true if the tensor is empty
+     */
+    bool isEmpty() const;
+
+    /**
+     * Returns true if the tensor has an associated underlying adapter.
+     *
+     * @return true if the tensor has a valid adapter
+     */
+    bool hasAdapter() const;
+
+    /**
+     * Get the tensor size in bytes.
+     *
+     * @return the size of the tensor in bytes.
+     */
+    size_t bytes() const;
+
+    /**
+     * Get the data type of tensor.
+     *
+     * @return the dtype of the tensor
+     */
+    dtype type() const;
+
+    /**
+     * Returns whether or not the tensor is sparse.
+     *
+     * @return true if the tensor is a sparse tensor, else false
+     */
+    bool isSparse() const;
+
+    /**
+     * Get this tensor's strides - the number of elements/coefficients to step
+     * when moving along each dimension when traversing the tensor.
+     *
+     * @return a Shape containing strides in each dimension.
+     */
+    Shape strides() const;
+
+    /**
+     * Get the stream which contains(ed) the computation required to realize an
+     * up-to-date value for this tensor. For instance, `device()` may not yield a
+     * pointer to the up-to-date value -- to use this pointer, `Stream::sync` or
+     * `Stream::relativeSync` is required.
+     *
+     * @return an immutable reference to the stream that contains(ed) the
+     * computations which create this tensor.
+     */
+    virtual const Stream& stream() const;
+
+    /**
+     * Returns a tensor with elements cast as a particular type
+     *
+     * @param[in] type the type to which to cast the tensor
+     * @return a tensor with element-wise cast to the new type
+     */
+    Tensor astype(const dtype type) const;
+
+    /**
+     * Index into a tensor using a vector of fl::Index references.
+     *
+     * @param[in] indices a vector of fl::Index references with which to index.
+     * @return an indexed tensor
+     */
+    Tensor operator()(const std::vector<Index>& indices) const;
+
+    /**
+     * Index into a tensor using a variable number of fl::Index.
+     *
+     * @param[in] args fl::Index instances to use
+     * @return an indexed tensor
+     */
+    template<typename... Ts>
+    Tensor operator()(const Ts&... args) const {
+        // TODO: add this back if acceptable with C++ 17 ABIs and a nvcc
+        // static_assert(
+        // std::conjunction<std::is_constructible<Index, Ts>...>::value,
+        // "Tensor index operator can only take Index-compatible types - "
+        // "fl::range, fl::Tensor, fl::span, and integer types.");
+        std::vector<Index> indices{{args...}};
+        return this->operator()(indices);
+    }
+
+    /**
+     * Returns a representation of the tensor in 1 dimension.
+     *
+     * @return a 1D version of this tensor 1D-indexed with the given index.
+     */
+    Tensor flatten() const;
+
+    /**
+     * Returns a tensor indexed from this tensor but indexed as a 1D/flattened
+     * tensor.
+     *
+     * @return an indexed, 1D version of this tensor.
+     */
+    Tensor flat(const Index& idx) const;
+
+    /**
+     * Return a copy (depending on copy-on-write behavior of the underlying
+     * implementation) of this tensor that is contigous in memory.
+     *
+     * @return an identical tensor that is contiguous in memory
+     */
+    Tensor asContiguousTensor() const;
+
+    /**
+     * Gets the backend enum from the underlying TensorAdapter.
+     *
+     * @return the backend in question
+     */
+    TensorBackendType backendType() const;
+
+    /**
+     * Gets the underlying tensor adapter implementation.
+     *
+     * @return the tensor adapter.
+     */
+    template<typename T>
+    T& getAdapter() const {
+        return *static_cast<T*>(impl_.get());
+    }
+
+    /**
+     * Return the TensorBackend associated with this tensor.
+     *
+     * @return a TensorBackend.
+     */
+    TensorBackend& backend() const;
+
+    /**
+     * Return a scalar of a specified type for the tensor. If the tensor has more
+     * than one element, returns the first element as a scalar.
+     *
+     * Throws an exception if the specified type does not match the dtype trait of
+     * the underlying tensor. To implicitly cast the scalar regardless of the
+     * underlying Tensor's dtype, use `asScalar`.
+     *
+     * @return a scalar of the first element in the tensor.
+     */
+    template<typename T>
+    T scalar() const;
+
+    /**
+     * Return a scalar of the specified type of the tensor. If the specified type
+     * does not match the tensor's underlying dtype, the scalar value is
+     * implicitly cast.
+     *
+     * @return a scalar of the first element in the tensor cast to the specified
+     * type.
+     */
+    template<typename T>
+    T asScalar() const {
+        // Implicitly cast to the requested return type
+        switch(type()) {
+            case dtype::f16:
+                return astype(dtype::f32).scalar<float>();
+            case dtype::f32:
+                return scalar<float>();
+            case dtype::f64:
+                return scalar<double>();
+            case dtype::s32:
+                return scalar<int>();
+            case dtype::u32:
+                return scalar<unsigned int>();
+            case dtype::b8:
+                return scalar<char>();
+            case dtype::u8:
+                return scalar<unsigned char>();
+            case dtype::s64:
+                return scalar<long long>();
+            case dtype::u64:
+                return scalar<unsigned long long>();
+            case dtype::s16:
+                return scalar<short>();
+            case dtype::u16:
+                return scalar<unsigned short>();
+            default:
+                throw std::invalid_argument(
+                    "Tensor::asScaler - no castable type exists."
+                );
+        }
+    }
+
+    /**
+     * Return a pointer to the tensor's underlying data per a certain type. This
+     * pointer exists on the computation device.
+     *
+     * \note The memory allocated here will not be freed until Tensor:unlock() is
+     * called.
+     *
+     * @return the requested pointer on the device.
+     */
+    template<typename T>
+    T* device() const;
+
+    /**
+     * Populate a pointer value with the address of a Tensor's underlying buffer
+     * on the computation device.
+     *
+     * \note The memory allocated here will not be freed until Tensor:unlock() is
+     * called.
+     *
+     * @param[in] ptr the pointer to populate with the Tensor's buffer location on
+     * device.
+     */
+    template<typename T>
+    void device(T** ptr) const;
+
+    /**
+     * Returns a pointer to the tensor's underlying data, but on the host. If the
+     * tensor is located on a device, makes a copy of device memory and returns a
+     * buffer on the host containing the relevant memory.
+     *
+     * @return the requested pointer on the host.
+     */
+    template<typename T>
+    T* host() const;
+
+    /**
+     * Populates an existing buffer with the tensor's underlying data, but on the
+     * host. If the tensor is located on a device, makes a copy of device memory
+     * and returns a buffer on the host containing the relevant memory.
+     *
+     * @param[in] ptr a pointer to the region of memory to populate with tensor
+     * values
+     */
+    template<typename T>
+    void host(T* ptr) const;
+
+    /**
+     * Returns a vector on the host contaning a flat representation of the tensor.
+     * The resulting vector is a copy of the underlying tensor memory, even if on
+     * the host.
+     *
+     * @return a vector in host memory containing
+     */
+    template<typename T>
+    std::vector<T> toHostVector() const {
+        if(isEmpty()) {
+            return std::vector<T>();
+        }
+        std::vector<T> vec(this->elements());
+        host(vec.data());
+        return vec;
+    }
+
+    /**
+     * Unlocks any device memory associated with the tensor that was acquired with
+     * Tensor::device(), making it eligible to be freed.
+     */
+    void unlock() const;
+
+    /**
+     * Returns true if the tensor has been memory-locked per a call to
+     * Tensor::device<T>(). After unlocking via Tensor::unlock(), the tensor is no
+     * longer locked.
+     *
+     * @return true if the tensor is locked and a device pointer is active.
+     */
+    bool isLocked() const;
+
+    /**
+     * Returns if the Tensor is contiguous in its memory-based representation.
+     *
+     * @return a bool denoting Tensor contiguousness
+     */
+    bool isContiguous() const;
+
+    /**
+     * Stores arbitrary data on a tensor. For internal use/benchmarking only. This
+     * may be a no-op for some backends.
+     *
+     * @param[in] data a pointer to arbitrary data to pass to a tensor impl.
+     */
+    void setContext(void* data);
+
+    /**
+     * Gets arbitrary data stored on a tensor. For internal use/benchmarking only.
+     * This may be a no-op for some backends.
+     *
+     * @return a pointer to some implementation-defined data, else nullptr if a
+     * no-op.
+     */
+    void* getContext() const;
+
+    /**
+     * Returns a string representation of a Tensor.
+     *
+     * \note This is backend-dependent. See Flashlight's serialization utilities
+     * for ways to serialize Tensors that are portable across Tensor backends.
+     *
+     * @return a string representation of the Tensor.
+     */
+    std::string toString() const;
+
+    /**
+     * Write a string representation of a tensor to an output stream.
+     */
+    std::ostream& operator<<(std::ostream& ostr) const;
+
+    /******************** Assignment Operators ********************/
+#define ASSIGN_TENSOR_OP(OP) Tensor & OP(const Tensor& val);
+#define ASSIGN_SCALAR_OP(OP)                   \
+        Tensor & OP(const double& val);        \
+        Tensor& OP(const float& val);          \
+        Tensor& OP(const int& val);            \
+        Tensor& OP(const unsigned& val);       \
+        Tensor& OP(const bool& val);           \
+        Tensor& OP(const char& val);           \
+        Tensor& OP(const unsigned char& val);  \
+        Tensor& OP(const short& val);          \
+        Tensor& OP(const unsigned short& val); \
+        Tensor& OP(const long& val);           \
+        Tensor& OP(const unsigned long& val);  \
+        Tensor& OP(const long long& val);      \
+        Tensor& OP(const unsigned long long& val);
+#define ASSIGN_OP(OP)         \
+        ASSIGN_TENSOR_OP(OP); \
+        ASSIGN_SCALAR_OP(OP);
+
+    ASSIGN_SCALAR_OP(operator=);
+    ASSIGN_OP(operator+=);
+    ASSIGN_OP(operator-=);
+    ASSIGN_OP(operator*=);
+    ASSIGN_OP(operator/=);
 #undef ASSIGN_TENSOR_OP
 #undef ASSIGN_SCALAR_OP
 #undef ASSIGN_OP
 
-  /* The following assignment operator differentiation via member method
-   * ref-qualifier ensures that
-   * 1. For `x = ...;`, the behavior is the same as the copy/move constructor.
-   * 2. For `... = ...`, a copy is made from the rhs tensor data to the lhs one.
-   *    This allows tensor mutation via indexing, e.g., `t(0, 0) = 42`.
-   */
-  Tensor& operator=(Tensor&& other) &;
-  Tensor& operator=(Tensor&& other) &&;
-  Tensor& operator=(const Tensor& other) &;
-  Tensor& operator=(const Tensor& other) &&;
+    /* The following assignment operator differentiation via member method
+     * ref-qualifier ensures that
+     * 1. For `x = ...;`, the behavior is the same as the copy/move constructor.
+     * 2. For `... = ...`, a copy is made from the rhs tensor data to the lhs one.
+     *    This allows tensor mutation via indexing, e.g., `t(0, 0) = 42`.
+     */
+    Tensor& operator=(Tensor&& other) &;
+    Tensor& operator=(Tensor&& other) &&;
+    Tensor& operator=(const Tensor& other) &;
+    Tensor& operator=(const Tensor& other) &&;
 };
 
 /**
@@ -659,9 +666,8 @@ class FL_API Tensor {
  * on the value type
  * @return a tensor of the specified shape filled with the specified value
  */
-template <typename T>
-FL_API Tensor
-fromScalar(const T& val, const dtype type = dtype_traits<T>::ctype);
+template<typename T>
+FL_API Tensor fromScalar(const T& val, const dtype type = dtype_traits<T>::ctype);
 
 /**
  * Creates a new Tensor with a given Shape and filled with a particular value.
@@ -672,11 +678,12 @@ fromScalar(const T& val, const dtype type = dtype_traits<T>::ctype);
  * on the value type
  * @return a tensor of the specified shape filled with the specified value
  */
-template <typename T>
+template<typename T>
 FL_API Tensor full(
     const Shape& dims,
     const T& val,
-    const dtype type = dtype_traits<T>::ctype);
+    const dtype type = dtype_traits<T>::ctype
+);
 
 /**
  * Return a the identity tensor of a given size and type.
@@ -697,12 +704,13 @@ FL_API Tensor identity(const Dim dim, const dtype type = dtype::f32);
  *
  * @return a tensor containing the evenly-spaced values
  */
-template <typename T>
+template<typename T>
 FL_API Tensor arange(
     const T& start,
     const T& end,
     const T& step = 1,
-    const dtype type = dtype_traits<T>::ctype);
+    const dtype type = dtype_traits<T>::ctype
+);
 
 /**
  * Create a tensor with [0, N] values along dimension given by seqDim and
@@ -716,8 +724,7 @@ FL_API Tensor arange(
  * @return a tensor with the given shape with the sequence along the given
  * dimension, tiled along other dimensions.
  */
-FL_API Tensor
-arange(const Shape& shape, const Dim seqDim = 0, const dtype type = dtype::f32);
+FL_API Tensor arange(const Shape& shape, const Dim seqDim = 0, const dtype type = dtype::f32);
 
 /**
  * Creates a sequence with the range `[0, dims.elements())` sequentially in the
@@ -735,8 +742,9 @@ arange(const Shape& shape, const Dim seqDim = 0, const dtype type = dtype::f32);
  */
 FL_API Tensor iota(
     const Shape& dims,
-    const Shape& tileDims = {1},
-    const dtype type = dtype::f32);
+    const Shape& tileDims = { 1 },
+    const dtype type = dtype::f32
+);
 
 /************************ Shaping and Indexing *************************/
 
@@ -779,8 +787,7 @@ FL_API Tensor tile(const Tensor& tensor, const Shape& shape);
  * @param[in] axis the axis along which to concatenate tensors
  * @return a concatenated tensor
  */
-FL_API Tensor
-concatenate(const std::vector<Tensor>& tensors, const unsigned axis = 0);
+FL_API Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis = 0);
 
 /**
  * Join or concatenate tensors together along a particular axis.
@@ -789,10 +796,10 @@ concatenate(const std::vector<Tensor>& tensors, const unsigned axis = 0);
  * @param[in] args tensors to concatenate
  * @return a concatenated tensor
  */
-template <typename... Ts>
+template<typename... Ts>
 Tensor concatenate(unsigned axis, const Ts&... args) {
-  std::vector<Tensor> tensors{{args...}};
-  return concatenate(tensors, axis);
+    std::vector<Tensor> tensors{{args...}};
+    return concatenate(tensors, axis);
 }
 
 /**
@@ -806,12 +813,12 @@ FL_API Tensor nonzero(const Tensor& tensor);
 
 /// Padding types for the pad operator.
 enum class PadType {
-  /// pad with a constant zero value.
-  Constant,
-  /// pad with the values at the edges of the tensor
-  Edge,
-  /// pad with a reflection of the tensor mirrored along each edge
-  Symmetric
+    /// pad with a constant zero value.
+    Constant,
+    /// pad with the values at the edges of the tensor
+    Edge,
+    /// pad with a reflection of the tensor mirrored along each edge
+    Symmetric
 };
 
 /**
@@ -824,10 +831,11 @@ enum class PadType {
  *
  * @return the padded tensor
  */
-FL_API Tensor
-pad(const Tensor& input,
+FL_API Tensor pad(
+    const Tensor& input,
     const std::vector<std::pair<int, int>>& padWidths,
-    const PadType type = PadType::Constant);
+    const PadType type = PadType::Constant
+);
 
 /************************** Unary Operators ***************************/
 /**
@@ -838,7 +846,7 @@ pad(const Tensor& input,
  */
 FL_API Tensor negative(const Tensor& tensor);
 inline Tensor operator-(const Tensor& tensor) {
-  return negative(tensor);
+    return negative(tensor);
 }
 
 /**
@@ -849,7 +857,7 @@ inline Tensor operator-(const Tensor& tensor) {
  */
 FL_API Tensor logicalNot(const Tensor& tensor);
 inline Tensor operator!(const Tensor& tensor) {
-  return logicalNot(tensor);
+    return logicalNot(tensor);
 }
 
 /**
@@ -942,7 +950,7 @@ FL_API Tensor absolute(const Tensor& tensor);
 
 // \copydoc absolute
 inline Tensor abs(const Tensor& tensor) {
-  return absolute(tensor);
+    return absolute(tensor);
 }
 
 /**
@@ -1154,7 +1162,7 @@ FL_API Tensor where(const Tensor& condition, const double& x, const Tensor& y);
 /*!
  * Sorting mode for sorting-related functions.
  */
-enum class SortMode { Descending = 0, Ascending = 1 };
+enum class SortMode {Descending = 0, Ascending = 1};
 
 /**
  * Get the top-k values and indices from a Tensor.
@@ -1174,7 +1182,8 @@ FL_API void topk(
     const Tensor& input,
     const unsigned k,
     const Dim axis,
-    const SortMode sortMode = SortMode::Descending);
+    const SortMode sortMode = SortMode::Descending
+);
 
 /**
  * Sort the values of a tensor, and return the sorted tensor.
@@ -1186,7 +1195,8 @@ FL_API void topk(
 FL_API Tensor sort(
     const Tensor& input,
     const Dim axis,
-    const SortMode sortMode = SortMode::Ascending);
+    const SortMode sortMode = SortMode::Ascending
+);
 
 /**
  * Sort the values of a tensor, and return the sorted tensor and sorted indices.
@@ -1202,7 +1212,8 @@ FL_API void sort(
     Tensor& indices,
     const Tensor& input,
     const Dim axis,
-    const SortMode sortMode = SortMode::Ascending);
+    const SortMode sortMode = SortMode::Ascending
+);
 
 /**
  * Sort the values of a tensor and return the sorted indices.
@@ -1214,35 +1225,36 @@ FL_API void sort(
 FL_API Tensor argsort(
     const Tensor& input,
     const Dim axis,
-    const SortMode sortMode = SortMode::Ascending);
+    const SortMode sortMode = SortMode::Ascending
+);
 
 /************************** Binary Operators ***************************/
 // \cond DOXYGEN_DO_NOT_DOCUMENT
-#define FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, TYPE)    \
-  FL_API Tensor FUNC(TYPE lhs, const Tensor& rhs);        \
-  FL_API Tensor FUNC(const Tensor& lhs, TYPE rhs);        \
-  FL_API Tensor operator OP(TYPE lhs, const Tensor& rhs); \
-  FL_API Tensor operator OP(const Tensor& lhs, TYPE rhs);
+#define FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, TYPE)          \
+        FL_API Tensor FUNC(TYPE lhs, const Tensor& rhs);        \
+        FL_API Tensor FUNC(const Tensor& lhs, TYPE rhs);        \
+        FL_API Tensor operator OP(TYPE lhs, const Tensor& rhs); \
+        FL_API Tensor operator OP(const Tensor& lhs, TYPE rhs);
 
-#define FL_BINARY_OP_LITERALS_DECL(OP, FUNC)                           \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const bool&);               \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const int&);                \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned&);           \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const char&);               \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned char&);      \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const long&);               \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned long&);      \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const long long&);          \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned long long&); \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const double&);             \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const float&);              \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const short&);              \
-  FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned short&);
+#define FL_BINARY_OP_LITERALS_DECL(OP, FUNC)                                 \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const bool&);               \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const int&);                \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned&);           \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const char&);               \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned char&);      \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const long&);               \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned long&);      \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const long long&);          \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned long long&); \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const double&);             \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const float&);              \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const short&);              \
+        FL_BINARY_OP_LITERAL_TYPE_DECL(OP, FUNC, const unsigned short&);
 
-#define FL_BINARY_OP_DECL(OP, FUNC)                                \
-  FL_API Tensor FUNC(const Tensor& lhs, const Tensor& rhs);        \
-  FL_API Tensor operator OP(const Tensor& lhs, const Tensor& rhs); \
-  FL_BINARY_OP_LITERALS_DECL(OP, FUNC);
+#define FL_BINARY_OP_DECL(OP, FUNC)                                      \
+        FL_API Tensor FUNC(const Tensor& lhs, const Tensor& rhs);        \
+        FL_API Tensor operator OP(const Tensor& lhs, const Tensor& rhs); \
+        FL_BINARY_OP_LITERALS_DECL(OP, FUNC);
 
 FL_BINARY_OP_DECL(+, add);
 FL_BINARY_OP_DECL(-, sub);
@@ -1366,7 +1378,7 @@ FL_API Tensor power(const double& lhs, const Tensor& rhs);
  * Transformations to apply to Tensors (i.e. matrices) before applying certain
  * operations (i.e. matmul).
  */
-enum class MatrixProperty { None = 0, Transpose = 1 };
+enum class MatrixProperty {None = 0, Transpose = 1};
 
 /**
  * Perform matrix multiplication between two tensors.
@@ -1384,7 +1396,8 @@ FL_API Tensor matmul(
     const Tensor& lhs,
     const Tensor& rhs,
     MatrixProperty lhsProp = MatrixProperty::None,
-    MatrixProperty rhsProp = MatrixProperty::None);
+    MatrixProperty rhsProp = MatrixProperty::None
+);
 
 /************************** Reductions ***************************/
 
@@ -1402,7 +1415,8 @@ FL_API Tensor matmul(
 FL_API Tensor amin(
     const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Compute the maximum value along multiple axes. If axes is left empty,
@@ -1418,7 +1432,8 @@ FL_API Tensor amin(
 FL_API Tensor amax(
     const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Compute the maximum value along multiple axes for a tensor, returning both
@@ -1438,7 +1453,8 @@ FL_API void min(
     Tensor& indices,
     const Tensor& input,
     const unsigned axis,
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Compute the maximum value along multiple axes for a tensor, returning both
@@ -1458,7 +1474,8 @@ FL_API void max(
     Tensor& indices,
     const Tensor& input,
     const unsigned axis,
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Return the indices of the maximum values along an axis.
@@ -1469,8 +1486,7 @@ FL_API void max(
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the indices of the max values along each axis
  */
-FL_API Tensor
-argmax(const Tensor& input, const unsigned axis, const bool keepDims = false);
+FL_API Tensor argmax(const Tensor& input, const unsigned axis, const bool keepDims = false);
 
 /**
  * Return the indices of the minimum values along an axis.
@@ -1481,8 +1497,7 @@ argmax(const Tensor& input, const unsigned axis, const bool keepDims = false);
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the indices of the max values along each axis
  */
-FL_API Tensor
-argmin(const Tensor& input, const unsigned axis, const bool keepDims = false);
+FL_API Tensor argmin(const Tensor& input, const unsigned axis, const bool keepDims = false);
 
 /**
  * Sum of tensor over given axes. If axes is left empty, computes the sum along
@@ -1495,10 +1510,11 @@ argmin(const Tensor& input, const unsigned axis, const bool keepDims = false);
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the sum(s)
  */
-FL_API Tensor
-sum(const Tensor& input,
+FL_API Tensor sum(
+    const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Compute the cumulative sum (or the prefix sum, scan, or inclusive scan) of a
@@ -1524,7 +1540,8 @@ FL_API Tensor cumsum(const Tensor& input, const unsigned axis);
 FL_API Tensor mean(
     const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Median of tensor over given axes. If axes is left empty, computes the median
@@ -1540,7 +1557,8 @@ FL_API Tensor mean(
 FL_API Tensor median(
     const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Variance of an tensor over given axes. If axes is left empty, computes the
@@ -1554,11 +1572,12 @@ FL_API Tensor median(
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the variance(s)
  */
-FL_API Tensor
-var(const Tensor& input,
+FL_API Tensor var(
+    const Tensor& input,
     const std::vector<int>& axes = {},
     const bool bias = false,
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Standard deviation of an tensor over given axes. If axes is left empty,
@@ -1571,10 +1590,11 @@ var(const Tensor& input,
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the standard deviation(s)
  */
-FL_API Tensor
-std(const Tensor& input,
+FL_API Tensor std(
+    const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Perform Lp-norm computation, reduced over specified dimensions. If axes is
@@ -1591,7 +1611,8 @@ FL_API Tensor norm(
     const Tensor& input,
     const std::vector<int>& axes = {},
     double p = 2,
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Counts the number of nonzero elements in a tensor.
@@ -1609,7 +1630,8 @@ FL_API Tensor norm(
 FL_API Tensor countNonzero(
     const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Checks for any true values in a tensor along one or more axes; returns true
@@ -1625,10 +1647,11 @@ FL_API Tensor countNonzero(
  * @return a bool tensor containing axis-wise values denoting truthy values
  * along that axis in the input tensor.
  */
-FL_API Tensor
-any(const Tensor& input,
+FL_API Tensor any(
+    const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /**
  * Checks if all values are true in a tensor along one or more axes; returns
@@ -1644,10 +1667,11 @@ any(const Tensor& input,
  * @return a bool tensor containing axis-wise values with true along
  * axes that contain only true values.
  */
-FL_API Tensor
-all(const Tensor& input,
+FL_API Tensor all(
+    const Tensor& input,
     const std::vector<int>& axes = {},
-    const bool keepDims = false);
+    const bool keepDims = false
+);
 
 /************************** Utilities ***************************/
 
@@ -1678,7 +1702,8 @@ FL_API void print(const Tensor& tensor);
 FL_API bool allClose(
     const fl::Tensor& a,
     const fl::Tensor& b,
-    const double absTolerance = 1e-5);
+    const double absTolerance = 1e-5
+);
 
 /**
  * @return if a Tensor contains any NaN or Inf values.
@@ -1710,48 +1735,57 @@ FL_API std::ostream& operator<<(std::ostream& os, const TensorBackendType type);
  * @param[in] t the tensor to convert
  * @returns a tensor backed by the specified compile time type
  */
-template <typename T>
+template<typename T>
 Tensor to(Tensor&& t) {
-  // Fast path -- types are the same
-  if (T::tensorBackendType == t.backendType()) {
-    return std::move(t);
-  }
+    // Fast path -- types are the same
+    if(T::tensorBackendType == t.backendType()) {
+        return std::move(t);
+    }
 
-  if (t.isSparse()) {
-    throw std::invalid_argument(
-        "Tensor type conversion between sparse "
-        "tensors not yet supported.");
-  } else {
-    // TODO: dynamically fix the memory location based on the type of
-    // backend/where base memory is
-    return Tensor(std::make_unique<T>(
-        t.shape(), t.type(), t.device<void>(), MemoryLocation::Device));
-  }
+    if(t.isSparse()) {
+        throw std::invalid_argument(
+            "Tensor type conversion between sparse "
+            "tensors not yet supported."
+        );
+    } else {
+        // TODO: dynamically fix the memory location based on the type of
+        // backend/where base memory is
+        return Tensor(
+            std::make_unique<T>(
+                t.shape(),
+                t.type(),
+                t.device<void>(),
+                MemoryLocation::Device
+            )
+        );
+    }
 }
 
 /** @} */
 
 namespace detail {
 
-bool areTensorTypesEqual(const Tensor& a, const Tensor& b);
+    bool areTensorTypesEqual(const Tensor& a, const Tensor& b);
 
-template <typename... Args>
-bool areTensorTypesEqual(
-    const Tensor& a,
-    const Tensor& b,
-    const Args&... args) {
-  return areTensorTypesEqual(a, b) && areTensorTypesEqual(a, args...);
-}
+    template<typename... Args>
+    bool areTensorTypesEqual(
+        const Tensor& a,
+        const Tensor& b,
+        const Args&... args
+    ) {
+        return areTensorTypesEqual(a, b) && areTensorTypesEqual(a, args...);
+    }
 
 } // namespace detail
 
 /**
  * Checks if a variadic number of Tensors have the same type.
  */
-#define FL_TENSOR_DTYPES_MATCH_CHECK(...)                                     \
-  if (!detail::areTensorTypesEqual(__VA_ARGS__)) {                            \
-    throw std::invalid_argument(                                              \
-        std::string(__func__) + ": tensors are not all of the same types. "); \
-  }
+#define FL_TENSOR_DTYPES_MATCH_CHECK(...)                               \
+        if(!detail::areTensorTypesEqual(__VA_ARGS__)) {                 \
+            throw std::invalid_argument(                                \
+    std::string(__func__) + ": tensors are not all of the same types. " \
+            );                                                          \
+        }
 
 } // namespace fl

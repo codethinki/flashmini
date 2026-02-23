@@ -13,12 +13,12 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
-Tensor loadJpeg(const std::string& fp, int desiredNumberOfChannels = 3);
+        Tensor loadJpeg(const std::string& fp, int desiredNumberOfChannels = 3);
 
-std::shared_ptr<Dataset> jpegLoader(std::vector<std::string> fps);
+        std::shared_ptr<Dataset> jpegLoader(std::vector<std::string> fps);
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl

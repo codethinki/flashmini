@@ -23,51 +23,56 @@ Tensor CudnnAutogradExtension::pool2d(
     const int px,
     const int py,
     const PoolingMode mode,
-    std::shared_ptr<detail::AutogradPayload>) {
-  auto inDesc = TensorDescriptor(input);
+    std::shared_ptr<detail::AutogradPayload>
+) {
+    auto inDesc = TensorDescriptor(input);
 
-  // init pooling descriptor
-  auto poolDesc = PoolingDescriptor(wx, wy, sx, sy, px, py, mode);
+    // init pooling descriptor
+    auto poolDesc = PoolingDescriptor(wx, wy, sx, sy, px, py, mode);
 
-  // init output descriptor
-  auto ix = input.dim(0);
-  auto iy = input.ndim() < 2 ? 1 : input.dim(1);
-  auto ox = 1 + (ix + 2 * px - wx) / sx;
-  auto oy = 1 + (iy + 2 * py - wy) / sy;
+    // init output descriptor
+    auto ix = input.dim(0);
+    auto iy = input.ndim() < 2 ? 1 : input.dim(1);
+    auto ox = 1 + (ix + 2 * px - wx) / sx;
+    auto oy = 1 + (iy + 2 * py - wy) / sy;
 
-  auto output = Tensor(
-      {ox,
-       oy,
-       input.ndim() < 3 ? 1 : input.dim(2),
-       input.ndim() < 4 ? 1 : input.dim(3)},
-      input.type());
-  auto outDesc = TensorDescriptor(output);
-  {
-    DevicePtr inputraw(input);
-    DevicePtr resultraw(output);
-    const auto& cudnnStream = getCudnnStream();
-    // ensure cudnn compute stream waits on streams of input/output tensors
-    relativeSync(cudnnStream, {input, output});
+    auto output = Tensor(
+        {ox,
+         oy,
+         input.ndim() < 3 ? 1 : input.dim(2),
+         input.ndim() < 4 ? 1 : input.dim(3)},
+        input.type()
+    );
+    auto outDesc = TensorDescriptor(output);
+    {
+        DevicePtr inputraw(input);
+        DevicePtr resultraw(output);
+        const auto& cudnnStream = getCudnnStream();
+        // ensure cudnn compute stream waits on streams of input/output tensors
+        relativeSync(cudnnStream, {input, output});
 
-    auto handle = getCudnnHandle();
-    const void* one = kOne(input.type());
-    const void* zero = kZero(input.type());
+        auto handle = getCudnnHandle();
+        const void* one = kOne(input.type());
+        const void* zero = kZero(input.type());
 
-    CUDNN_CHECK_ERR(cudnnPoolingForward(
-        handle,
-        poolDesc.descriptor,
-        one,
-        inDesc.descriptor,
-        inputraw.get(),
-        zero,
-        outDesc.descriptor,
-        resultraw.get()));
+        CUDNN_CHECK_ERR(
+            cudnnPoolingForward(
+                handle,
+                poolDesc.descriptor,
+                one,
+                inDesc.descriptor,
+                inputraw.get(),
+                zero,
+                outDesc.descriptor,
+                resultraw.get()
+            )
+        );
 
-    // ensure output tensor stream waits on cudnn compute stream
-    relativeSync({output}, cudnnStream);
-  }
+        // ensure output tensor stream waits on cudnn compute stream
+        relativeSync({output}, cudnnStream);
+    }
 
-  return output;
+    return output;
 }
 
 Tensor CudnnAutogradExtension::pool2dBackward(
@@ -81,44 +86,48 @@ Tensor CudnnAutogradExtension::pool2dBackward(
     const int px,
     const int py,
     const PoolingMode mode,
-    std::shared_ptr<detail::AutogradPayload>) {
-  auto i_desc = TensorDescriptor(input);
-  auto o_desc = TensorDescriptor(poolOutput);
-  auto p_desc = PoolingDescriptor(wx, wy, sx, sy, px, py, mode);
+    std::shared_ptr<detail::AutogradPayload>
+) {
+    auto i_desc = TensorDescriptor(input);
+    auto o_desc = TensorDescriptor(poolOutput);
+    auto p_desc = PoolingDescriptor(wx, wy, sx, sy, px, py, mode);
 
-  auto gradInput = Tensor(input.shape(), input.type());
+    auto gradInput = Tensor(input.shape(), input.type());
 
-  auto hndl = getCudnnHandle();
-  const auto& cudnnStream = getCudnnStream();
-  const void* oneg = kOne(input.type());
-  const void* zerog = kZero(input.type());
+    auto hndl = getCudnnHandle();
+    const auto& cudnnStream = getCudnnStream();
+    const void* oneg = kOne(input.type());
+    const void* zerog = kZero(input.type());
 
-  {
-    DevicePtr inraw(input);
-    DevicePtr outraw(poolOutput);
-    DevicePtr gradresultraw(gradOutput);
-    DevicePtr gradinputraw(gradInput);
-    // ensure cudnn compute stream waits on input/output tensor streams
-    relativeSync(cudnnStream, {input, poolOutput, gradOutput, gradInput});
+    {
+        DevicePtr inraw(input);
+        DevicePtr outraw(poolOutput);
+        DevicePtr gradresultraw(gradOutput);
+        DevicePtr gradinputraw(gradInput);
+        // ensure cudnn compute stream waits on input/output tensor streams
+        relativeSync(cudnnStream, {input, poolOutput, gradOutput, gradInput});
 
-    CUDNN_CHECK_ERR(cudnnPoolingBackward(
-        hndl,
-        p_desc.descriptor,
-        oneg,
-        o_desc.descriptor,
-        outraw.get(),
-        o_desc.descriptor,
-        gradresultraw.get(),
-        i_desc.descriptor,
-        inraw.get(),
-        zerog,
-        i_desc.descriptor,
-        gradinputraw.get()));
-    // ensure gradient input tensor stream waits on cudnn compute stream
-    relativeSync({gradInput}, cudnnStream);
-  }
+        CUDNN_CHECK_ERR(
+            cudnnPoolingBackward(
+                hndl,
+                p_desc.descriptor,
+                oneg,
+                o_desc.descriptor,
+                outraw.get(),
+                o_desc.descriptor,
+                gradresultraw.get(),
+                i_desc.descriptor,
+                inraw.get(),
+                zerog,
+                i_desc.descriptor,
+                gradinputraw.get()
+            )
+        );
+        // ensure gradient input tensor stream waits on cudnn compute stream
+        relativeSync({gradInput}, cudnnStream);
+    }
 
-  return gradInput;
+    return gradInput;
 }
 
 } // namespace fl

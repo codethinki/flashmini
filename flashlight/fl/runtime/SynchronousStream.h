@@ -17,20 +17,20 @@ namespace fl {
  * relative synchronization strategy, i.e., it merely delegates to `sync`.
  */
 class FL_API SynchronousStream : public StreamTrait<SynchronousStream> {
- protected:
-  X64Device& device_{DeviceManager::getInstance()
-                         .getActiveDevice(DeviceType::x64)
-                         .impl<X64Device>()};
+protected:
+    X64Device& device_{DeviceManager::getInstance()
+                       .getActiveDevice(DeviceType::x64)
+                       .impl<X64Device>()};
 
- public:
-  // prevent name hiding
-  using StreamTrait<SynchronousStream>::relativeSync;
+public:
+    // prevent name hiding
+    using StreamTrait<SynchronousStream>::relativeSync;
 
-  static constexpr StreamType type = StreamType::Synchronous;
+    static constexpr StreamType type = StreamType::Synchronous;
 
-  X64Device& device() override;
-  const X64Device& device() const override;
-  void relativeSync(const SynchronousStream& waitOn) const override;
+    X64Device& device() override;
+    const X64Device& device() const override;
+    void relativeSync(const SynchronousStream& waitOn) const override;
 };
 
 } // namespace fl

@@ -22,21 +22,22 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 /* A series of vector to vector mapping operations */
 
-std::shared_ptr<fl::lib::text::Trie> buildTrie(
-    const std::string& decoderType,
-    bool useLexicon,
-    std::shared_ptr<fl::lib::text::LM> lm,
-    const std::string& smearing,
-    const fl::lib::text::Dictionary& tokenDict,
-    const fl::lib::text::LexiconMap& lexicon,
-    const fl::lib::text::Dictionary& wordDict,
-    const int wordSeparatorIdx,
-    const int repLabel);
+        std::shared_ptr<fl::lib::text::Trie> buildTrie(
+            const std::string& decoderType,
+            bool useLexicon,
+            std::shared_ptr<fl::lib::text::LM> lm,
+            const std::string& smearing,
+            const fl::lib::text::Dictionary& tokenDict,
+            const fl::lib::text::LexiconMap& lexicon,
+            const fl::lib::text::Dictionary& wordDict,
+            const int wordSeparatorIdx,
+            const int repLabel
+        );
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

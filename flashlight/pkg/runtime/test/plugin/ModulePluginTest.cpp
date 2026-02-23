@@ -17,35 +17,35 @@ using namespace fl;
 fs::path pluginDir;
 
 TEST(ModulePluginTest, ModulePlugin) {
-  const fs::path libfile = pluginDir / "test_module_plugin.so";
+    const fs::path libfile = pluginDir / "test_module_plugin.so";
 
-  const int ninput = 80;
-  const int noutput = 10;
-  const int batchsize = 4;
+    const int ninput = 80;
+    const int noutput = 10;
+    const int batchsize = 4;
 
-  // Note: the following works only if the plugin is *not* statically
-  // linked against AF/FL.
-  //
-  // auto model = fl::pkg::runtime::ModulePlugin(libfile).arch(ninput, noutput);
-  //
-  // If AF/FL are linked, then there will be some issue at deallocation of
-  // the plugin.  For that reason, we stick to the following conservative
-  // way in this test (plugin destroyed after model).
-  fl::pkg::runtime::ModulePlugin plugin(libfile);
-  auto model = plugin.arch(ninput, noutput);
-  auto input = fl::randn({ninput, batchsize}, fl::dtype::f32);
-  auto output = model->forward({noGrad(input)}).front();
-  ASSERT_EQ(output.shape(), Shape({noutput, batchsize}));
+    // Note: the following works only if the plugin is *not* statically
+    // linked against AF/FL.
+    //
+    // auto model = fl::pkg::runtime::ModulePlugin(libfile).arch(ninput, noutput);
+    //
+    // If AF/FL are linked, then there will be some issue at deallocation of
+    // the plugin.  For that reason, we stick to the following conservative
+    // way in this test (plugin destroyed after model).
+    fl::pkg::runtime::ModulePlugin plugin(libfile);
+    auto model = plugin.arch(ninput, noutput);
+    auto input = fl::randn({ninput, batchsize}, fl::dtype::f32);
+    auto output = model->forward({noGrad(input)}).front();
+    ASSERT_EQ(output.shape(), Shape({noutput, batchsize}));
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
 
-  // Resolve directory for arch
+    // Resolve directory for arch
 #ifdef PLUGINDIR
-  pluginDir = PLUGINDIR;
+    pluginDir = PLUGINDIR;
 #endif
 
-  return RUN_ALL_TESTS();
+    return RUN_ALL_TESTS();
 }

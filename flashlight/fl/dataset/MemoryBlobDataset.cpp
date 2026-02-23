@@ -12,38 +12,41 @@
 namespace fl {
 
 MemoryBlobDataset::MemoryBlobDataset() {
-  readIndex();
+    readIndex();
 }
 
 int64_t MemoryBlobDataset::writeData(
     int64_t offset,
     const char* data,
-    int64_t size) const {
-  std::lock_guard<std::mutex> lock(writeMutex_);
-  if (offset + size > data_.size()) {
-    data_.resize(offset + size);
-  }
-  std::memcpy(data_.data() + offset, data, size);
-  return size;
+    int64_t size
+) const {
+    std::lock_guard<std::mutex> lock(writeMutex_);
+    if(offset + size > data_.size()) {
+        data_.resize(offset + size);
+    }
+    std::memcpy(data_.data() + offset, data, size);
+    return size;
 }
 
 int64_t MemoryBlobDataset::readData(int64_t offset, char* data, int64_t size)
-    const {
-  // what is available
-  int64_t maxSize = std::max(
-      static_cast<int64_t>(0), static_cast<int64_t>(data_.size()) - offset);
-  // min(what is available, wanted)
-  maxSize = std::min(maxSize, size);
-  std::memcpy(data, data_.data() + offset, maxSize);
-  return maxSize;
+const {
+    // what is available
+    int64_t maxSize = std::max(
+        static_cast<int64_t>(0),
+        static_cast<int64_t>(data_.size()) - offset
+    );
+    // min(what is available, wanted)
+    maxSize = std::min(maxSize, size);
+    std::memcpy(data, data_.data() + offset, maxSize);
+    return maxSize;
 }
 
 void MemoryBlobDataset::flushData() {
-  std::lock_guard<std::mutex> lock(writeMutex_);
+    std::lock_guard<std::mutex> lock(writeMutex_);
 }
 
 bool MemoryBlobDataset::isEmptyData() const {
-  return (data_.empty());
+    return data_.empty();
 }
 
 } // namespace fl

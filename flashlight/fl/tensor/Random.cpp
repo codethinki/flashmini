@@ -14,15 +14,15 @@
 namespace fl {
 
 void setSeed(const int seed) {
-  defaultTensorBackend().setSeed(seed);
+    defaultTensorBackend().setSeed(seed);
 }
 
 Tensor randn(const Shape& shape, dtype type) {
-  return defaultTensorBackend().randn(shape, type);
+    return defaultTensorBackend().randn(shape, type);
 }
 
 Tensor rand(const Shape& shape, dtype type) {
-  return defaultTensorBackend().rand(shape, type);
+    return defaultTensorBackend().rand(shape, type);
 }
 
 } // namespace fl

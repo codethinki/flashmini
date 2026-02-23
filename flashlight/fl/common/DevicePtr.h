@@ -36,52 +36,52 @@ class Tensor;
  *
  */
 class FL_API DevicePtr {
- public:
-  /**
-   * Creates a null DevicePtr.
-   */
-  DevicePtr() : ptr_(nullptr) {}
+public:
+    /**
+     * Creates a null DevicePtr.
+     */
+    DevicePtr() : ptr_(nullptr) {}
 
-  /**
-   * @param in input array to get device pointer
-   */
-  explicit DevicePtr(const Tensor& in);
+    /**
+     * @param in input array to get device pointer
+     */
+    explicit DevicePtr(const Tensor& in);
 
-  /**
-   *`.unlock()` is called on the underlying array in destructor
-   */
-  ~DevicePtr();
+    /**
+     *`.unlock()` is called on the underlying array in destructor
+     */
+    ~DevicePtr();
 
-  DevicePtr(const DevicePtr& other) = delete;
+    DevicePtr(const DevicePtr& other) = delete;
 
-  DevicePtr& operator=(const DevicePtr& other) = delete;
+    DevicePtr& operator=(const DevicePtr& other) = delete;
 
-  DevicePtr(DevicePtr&& d) noexcept;
+    DevicePtr(DevicePtr&& d) noexcept;
 
-  DevicePtr& operator=(DevicePtr&& other) noexcept;
+    DevicePtr& operator=(DevicePtr&& other) noexcept;
 
-  bool operator==(const DevicePtr& other) const {
-    return get() == other.get();
-  }
+    bool operator==(const DevicePtr& other) const {
+        return get() == other.get();
+    }
 
-  void* get() const;
+    void* get() const;
 
-  template <typename T>
-  T* getAs() const {
-    return reinterpret_cast<T*>(ptr_);
-  }
+    template<typename T>
+    T* getAs() const {
+        return reinterpret_cast<T*>(ptr_);
+    }
 
- protected:
-  std::unique_ptr<Tensor> tensor_;
+protected:
+    std::unique_ptr<Tensor> tensor_;
 
- private:
-  void* ptr_;
+private:
+    void* ptr_;
 };
 
 struct DevicePtrHasher {
-  std::size_t operator()(const DevicePtr& k) const {
-    return std::hash<void*>()(k.get());
-  }
+    std::size_t operator()(const DevicePtr& k) const {
+        return std::hash<void*>()(k.get());
+    }
 };
 
 } // namespace fl

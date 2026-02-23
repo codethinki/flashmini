@@ -99,7 +99,8 @@ FL_API void allReduceMultiple(
     std::vector<Variable> vars,
     double scale = 1.0,
     bool async = false,
-    bool contiguous = false);
+    bool contiguous = false
+);
 
 /**
  * Synchronizes a vector of pointers to arrays with allreduce.
@@ -116,7 +117,8 @@ FL_API void allReduceMultiple(
 FL_API void allReduceMultiple(
     std::vector<Tensor*> arrs,
     bool async = false,
-    bool contiguous = false);
+    bool contiguous = false
+);
 
 /**
  * Synchronizes operations in the Flashlight compute stream with operations in
@@ -138,17 +140,17 @@ FL_API void barrier();
 /** @} */
 
 namespace detail {
-class DistributedInfo {
- public:
-  static DistributedInfo& getInstance();
+    class DistributedInfo {
+    public:
+        static DistributedInfo& getInstance();
 
-  bool isInitialized_ = false;
-  DistributedInit initMethod_;
-  DistributedBackend backend_;
+        bool isInitialized_ = false;
+        DistributedInit initMethod_;
+        DistributedBackend backend_;
 
- private:
-  DistributedInfo() = default;
-};
+    private:
+        DistributedInfo() = default;
+    };
 } // namespace detail
 
 } // namespace fl

@@ -30,31 +30,30 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 /**
  * Given a filename, remove any filepath delimiters - returns a contiguous
  * string that won't be subdivided into a filepath.
  */
-std::string cleanFilepath(const fs::path& inputFileName);
+        std::string cleanFilepath(const fs::path& inputFileName);
 
 /**
  * Serialize gflags into a buffer.
  *
  * Only serializes gflags that aren't explicitly deprecated.
  */
-std::string serializeGflags(const std::string& separator = "\n");
+        std::string serializeGflags(const std::string& separator = "\n");
 
 /**
  * Sample indices for the `--pcttraineval` flag.
  */
-std::unordered_set<int64_t>
-getTrainEvalIds(int64_t dsSize, double pctTrainEval, int64_t seed);
+        std::unordered_set<int64_t> getTrainEvalIds(int64_t dsSize, double pctTrainEval, int64_t seed);
 
 /**
  * Read sample ids from an `Tensor`.
  */
-std::vector<std::string> readSampleIds(const Tensor& arr);
+        std::vector<std::string> readSampleIds(const Tensor& arr);
 
 /*
  * Utility function for creating a w2l dataset.
@@ -68,35 +67,38 @@ std::vector<std::string> readSampleIds(const Tensor& arr);
  * @param maxDurationPerBatch - is used for batchingStrategy="dynamic", max
  * total duration in a batch
  */
-std::shared_ptr<fl::Dataset> createDataset(
-    const std::vector<fs::path>& paths,
-    const fs::path& rootDir = "",
-    int batchSize = 1,
-    const fl::Dataset::DataTransformFunction& inputTransform = nullptr,
-    const fl::Dataset::DataTransformFunction& targetTransform = nullptr,
-    const fl::Dataset::DataTransformFunction& wordTransform = nullptr,
-    const std::tuple<int, int, int>& padVal =
-        std::tuple<int, int, int>{0, -1, -1},
-    int worldRank = 0,
-    int worldSize = 1,
-    const bool allowEmpty = false,
-    const std::string& batchingStrategy = kBatchStrategyNone,
-    int maxDurationPerBatch = 0);
+        std::shared_ptr<fl::Dataset> createDataset(
+            const std::vector<fs::path>& paths,
+            const fs::path& rootDir = "",
+            int batchSize = 1,
+            const fl::Dataset::DataTransformFunction& inputTransform = nullptr,
+            const fl::Dataset::DataTransformFunction& targetTransform = nullptr,
+            const fl::Dataset::DataTransformFunction& wordTransform = nullptr,
+            const std::tuple<int, int, int>& padVal =
+            std::tuple<int, int, int>{0, -1, -1},
+            int worldRank = 0,
+            int worldSize = 1,
+            const bool allowEmpty = false,
+            const std::string& batchingStrategy = kBatchStrategyNone,
+            int maxDurationPerBatch = 0
+        );
 
-std::shared_ptr<fl::Dataset> loadPrefetchDataset(
-    std::shared_ptr<fl::Dataset> dataset,
-    int prefetchThreads,
-    bool shuffle,
-    int shuffleSeed = 0);
+        std::shared_ptr<fl::Dataset> loadPrefetchDataset(
+            std::shared_ptr<fl::Dataset> dataset,
+            int prefetchThreads,
+            bool shuffle,
+            int shuffleSeed = 0
+        );
 
 /*
  * Function to parse valid set string describing multiple datasets into a vector
  * Input Format: d1:d1.lst,d2:d2.lst returns {{d1, d1.lst}, {d2, d2.lst}}
  * Input Format: d1.lst,d2.lst returns {{d1.lst, d1.lst}, {d2.lst, d2.lst}}
  */
-std::vector<std::pair<std::string, std::string>> parseValidSets(
-    const std::string& valid);
+        std::vector<std::pair<std::string, std::string>> parseValidSets(
+            const std::string& valid
+        );
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

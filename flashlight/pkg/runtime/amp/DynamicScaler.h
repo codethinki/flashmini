@@ -12,7 +12,7 @@
 
 namespace fl {
 namespace pkg {
-namespace runtime {
+    namespace runtime {
 
 /**
  * Dynamically scales up the training loss as well as all the gradients in back
@@ -36,48 +36,53 @@ namespace runtime {
  *   opt.step();
  * }
  */
-class DynamicScaler {
- public:
-  DynamicScaler(
-      double initFactor,
-      double maxFactor,
-      unsigned int updateInterval);
+        class DynamicScaler {
+        public:
+            DynamicScaler(
+                double initFactor,
+                double maxFactor,
+                unsigned int updateInterval
+            );
 
-  /*
-   * Scale loss before back propagation.
-   */
-  fl::Variable scale(const fl::Variable& loss);
+            /*
+             * Scale loss before back propagation.
+             */
+            fl::Variable scale(const fl::Variable& loss);
 
-  /*
-   * Unscale the gradients after back propagation.
-   * Return false when NAN or INF occurs in gradients and halve the scale
-   * factor, true otherwise.
-   */
-  bool unscale(std::vector<fl::Variable>& params);
+            /*
+             * Unscale the gradients after back propagation.
+             * Return false when NAN or INF occurs in gradients and halve the scale
+             * factor, true otherwise.
+             */
+            bool unscale(std::vector<fl::Variable>& params);
 
-  /*
-   * Increase scale factor
-   */
-  void update();
+            /*
+             * Increase scale factor
+             */
+            void update();
 
-  /*
-   * Return the current scale factor
-   */
-  double getScaleFactor() const;
+            /*
+             * Return the current scale factor
+             */
+            double getScaleFactor() const;
 
- private:
-  double scaleFactor_;
-  // The maximum value of scaleFactor_.
-  double maxScaleFactor_;
-  // Number of iterations without changing scaleFactor_.
-  unsigned int successCounter_{0};
-  // Double up the scaleFactor_ when successCounter_ equals updateInterval_.
-  unsigned int updateInterval_;
+        private:
+            double scaleFactor_;
+            // The maximum value of scaleFactor_.
+            double maxScaleFactor_;
+            // Number of iterations without changing scaleFactor_.
+            unsigned int successCounter_{0};
+            // Double up the scaleFactor_ when successCounter_ equals updateInterval_.
+            unsigned int updateInterval_;
 
-  FL_SAVE_LOAD(scaleFactor_, maxScaleFactor_, updateInterval_, successCounter_)
-  DynamicScaler() = default;
-};
+            FL_SAVE_LOAD(
+                scaleFactor_,
+                maxScaleFactor_,
+                updateInterval_,
+                successCounter_
+            ) DynamicScaler() = default;
+        };
 
-} // namespace runtime
+    } // namespace runtime
 } // namespace pkg
 } // namespace fl

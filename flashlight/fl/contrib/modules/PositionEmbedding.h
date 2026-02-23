@@ -24,40 +24,40 @@ namespace fl {
  *
  */
 class FL_API PositionEmbedding : public Module {
- public:
-  PositionEmbedding(int32_t layerDim, int32_t maxLen, double dropout = 0);
+public:
+    PositionEmbedding(int32_t layerDim, int32_t maxLen, double dropout = 0);
 
-  PositionEmbedding(const PositionEmbedding& other);
+    PositionEmbedding(const PositionEmbedding& other);
 
-  PositionEmbedding& operator=(const PositionEmbedding& other);
+    PositionEmbedding& operator=(const PositionEmbedding& other);
 
-  PositionEmbedding(PositionEmbedding&& other) = default;
+    PositionEmbedding(PositionEmbedding&& other) = default;
 
-  PositionEmbedding& operator=(PositionEmbedding&& other) = default;
+    PositionEmbedding& operator=(PositionEmbedding&& other) = default;
 
-  /**
-   * PositionEmbedding::forward(input) expects input[0] to be of
-   * dimensions C x T x B with C = layerDim and T <= maxLen.
-   *
-   * output[0] = input[0] + pos_emb, where pos_emb is a Tensor of dimensions
-   * C x T x B, and pos_emb = this.param_[0][:T], so pos_emb will be randomly
-   * initialized absolute position embeddings, that can be learned end-to-end.
-   *
-   */
-  std::vector<Variable> forward(const std::vector<Variable>& input) override;
+    /**
+     * PositionEmbedding::forward(input) expects input[0] to be of
+     * dimensions C x T x B with C = layerDim and T <= maxLen.
+     *
+     * output[0] = input[0] + pos_emb, where pos_emb is a Tensor of dimensions
+     * C x T x B, and pos_emb = this.param_[0][:T], so pos_emb will be randomly
+     * initialized absolute position embeddings, that can be learned end-to-end.
+     *
+     */
+    std::vector<Variable> forward(const std::vector<Variable>& input) override;
 
-  std::vector<Variable> operator()(const std::vector<Variable>& input);
+    std::vector<Variable> operator()(const std::vector<Variable>& input);
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(Module, dropout_)
+private:
+    FL_SAVE_LOAD_WITH_BASE(Module, dropout_)
 
-  double dropout_;
+    double dropout_;
 
-  PositionEmbedding();
+    PositionEmbedding();
 };
 
 } // namespace fl

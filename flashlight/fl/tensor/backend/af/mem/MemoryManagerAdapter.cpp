@@ -16,61 +16,64 @@ namespace fl {
 
 MemoryManagerAdapter::MemoryManagerAdapter(
     std::shared_ptr<MemoryManagerDeviceInterface> itf,
-    std::ostream* logStream)
-    : deviceInterface(itf), logStream_(logStream) {
-  if (!itf) {
-    throw std::invalid_argument(
-        "MemoryManagerAdapter::MemoryManagerAdapter - "
-        "memory manager device interface is null");
-  }
-  if (logStream_) {
-    loggingEnabled_ = true;
-  }
+    std::ostream* logStream
+) : deviceInterface(itf),
+    logStream_(logStream) {
+    if(!itf) {
+        throw std::invalid_argument(
+            "MemoryManagerAdapter::MemoryManagerAdapter - "
+            "memory manager device interface is null"
+        );
+    }
+    if(logStream_) {
+        loggingEnabled_ = true;
+    }
 
-  // Create handle and set payload to point to this instance
-  AF_CHECK(af_create_memory_manager(&interface_));
-  AF_CHECK(af_memory_manager_set_payload(interface_, (void*)this));
+    // Create handle and set payload to point to this instance
+    AF_CHECK(af_create_memory_manager(&interface_));
+    AF_CHECK(af_memory_manager_set_payload(interface_, (void*) this));
 }
 
 MemoryManagerAdapter::~MemoryManagerAdapter() {
-  // Flush the log buffer and log stream
-  if (logStream_) {
-    *logStream_ << logStreamBuffer_.str();
-    logStream_->flush();
-  }
+    // Flush the log buffer and log stream
+    if(logStream_) {
+        *logStream_ << logStreamBuffer_.str();
+        logStream_->flush();
+    }
 
-  if (interface_) {
-    af_release_memory_manager(interface_); // nothrow
-  }
+    if(interface_) {
+        af_release_memory_manager(interface_); // nothrow
+    }
 }
 
 void MemoryManagerAdapter::setLogStream(std::ostream* logStream) {
-  logStream_ = logStream;
+    logStream_ = logStream;
 }
 
 std::ostream* MemoryManagerAdapter::getLogStream() const {
-  return logStream_;
+    return logStream_;
 }
 
 void MemoryManagerAdapter::setLoggingEnabled(bool log) {
-  loggingEnabled_ = log;
+    loggingEnabled_ = log;
 }
 
 void MemoryManagerAdapter::setLogFlushInterval(size_t interval) {
-  if (interval < 1) {
-    throw std::invalid_argument(
-        "MemoryManagerAdapter::setLogFlushInterval - "
-        "flush interval must be great than zero.");
-  }
-  logFlushInterval_ = interval;
+    if(interval < 1) {
+        throw std::invalid_argument(
+            "MemoryManagerAdapter::setLogFlushInterval - "
+            "flush interval must be great than zero."
+        );
+    }
+    logFlushInterval_ = interval;
 }
 
 af_memory_manager MemoryManagerAdapter::getHandle() const {
-  return interface_;
+    return interface_;
 }
 
 size_t MemoryManagerAdapter::getMemStepSize() {
-  return -1; //  -1 denotes stepsize is not used by the custom memory manager
+    return -1; // -1 denotes stepsize is not used by the custom memory manager
 }
 
 void MemoryManagerAdapter::setMemStepSize(size_t size) {}

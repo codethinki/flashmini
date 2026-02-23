@@ -22,53 +22,57 @@ using namespace fl;
 
 // Extension interface
 class TestTensorExtension : public TensorExtension<TestTensorExtension> {
- public:
-  static constexpr TensorExtensionType extensionType =
-      TensorExtensionType::Generic;
+public:
+    static constexpr TensorExtensionType extensionType =
+        TensorExtensionType::Generic;
 
-  TestTensorExtension() = default;
-  virtual ~TestTensorExtension() = default;
+    TestTensorExtension() = default;
+    virtual ~TestTensorExtension() = default;
 
-  virtual Tensor testExtensionFunc(const Tensor& tensor) = 0;
+    virtual Tensor testExtensionFunc(const Tensor& tensor) = 0;
 };
 
 // Specific extension implementation
 class TestArrayFireTensorExtension : public TestTensorExtension {
- public:
-  Tensor testExtensionFunc(const Tensor& tensor) override {
-    return tensor + 1;
-  }
+public:
+    Tensor testExtensionFunc(const Tensor& tensor) override {
+        return tensor + 1;
+    }
 
-  bool isDataTypeSupported(const fl::dtype&) const override {
-    return true;
-  }
+    bool isDataTypeSupported(const fl::dtype&) const override {
+        return true;
+    }
 };
 
 // Op in API
 Tensor testExtensionFunc(const Tensor& tensor) {
-  return tensor.backend().getExtension<TestTensorExtension>().testExtensionFunc(
-      tensor);
+    return tensor.backend().getExtension<TestTensorExtension>().testExtensionFunc(
+        tensor
+    );
 }
 
 FL_REGISTER_TENSOR_EXTENSION(TestArrayFireTensorExtension, ArrayFire);
 
 TEST(TensorExtensionTest, TestExtension) {
-  auto a = fl::rand({4, 5, 6});
+    auto a = fl::rand({4, 5, 6});
 
-  // TODO: this test only works with the ArrayFire backend - gate accordingly
-  if (Tensor().backendType() != TensorBackendType::ArrayFire) {
-    GTEST_SKIP() << "Flashlight not built with ArrayFire backend.";
-  }
+    // TODO: this test only works with the ArrayFire backend - gate accordingly
+    if(Tensor().backendType() != TensorBackendType::ArrayFire) {
+        GTEST_SKIP() << "Flashlight not built with ArrayFire backend.";
+    }
 
-  // TODO: add a fixture to check with available backends
-  ASSERT_TRUE(::fl::registerTensorExtension<TestArrayFireTensorExtension>(
-      TensorBackendType::ArrayFire));
+    // TODO: add a fixture to check with available backends
+    ASSERT_TRUE(
+        ::fl::registerTensorExtension<TestArrayFireTensorExtension>(
+            TensorBackendType::ArrayFire
+        )
+    );
 
-  ASSERT_TRUE(allClose(testExtensionFunc(a), a + 1));
+    ASSERT_TRUE(allClose(testExtensionFunc(a), a + 1));
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

@@ -16,16 +16,17 @@ namespace fl {
 class Tensor;
 
 namespace pkg {
-namespace runtime {
+    namespace runtime {
 
 /**
  * Build a sequential module by parsing a file that
  * defines the model architecture.
  */
-std::shared_ptr<fl::Sequential> buildSequentialModule(
-    const fs::path& archfile,
-    int64_t nFeatures,
-    int64_t nClasses);
+        std::shared_ptr<fl::Sequential> buildSequentialModule(
+            const fs::path& archfile,
+            int64_t nFeatures,
+            int64_t nClasses
+        );
 
 /**
  * Utility function for to run forward with pad masking
@@ -35,11 +36,12 @@ std::shared_ptr<fl::Sequential> buildSequentialModule(
  * with a transformer block in it!
  * TODO remove with landing plugin arch instead of arch files
  */
-fl::Variable forwardSequentialModuleWithPadMask(
-    const fl::Variable& input,
-    std::shared_ptr<fl::Module> ntwrk,
-    const Tensor& inputSizes);
+        fl::Variable forwardSequentialModuleWithPadMask(
+            const fl::Variable& input,
+            std::shared_ptr<fl::Module> ntwrk,
+            const Tensor& inputSizes
+        );
 
-} // namespace runtime
+    } // namespace runtime
 } // namespace pkg
 } // namespace fl

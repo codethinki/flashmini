@@ -13,28 +13,29 @@ namespace fl {
 
 TransformDataset::TransformDataset(
     std::shared_ptr<const Dataset> dataset,
-    const std::vector<TransformFunction>& transformfns)
-    : dataset_(dataset), transformFns_(transformfns) {
-  if (!dataset_) {
-    throw std::invalid_argument("dataset to be transformed is null");
-  }
+    const std::vector<TransformFunction>& transformfns
+) : dataset_(dataset),
+    transformFns_(transformfns) {
+    if(!dataset_) {
+        throw std::invalid_argument("dataset to be transformed is null");
+    }
 }
 
 std::vector<Tensor> TransformDataset::get(const int64_t idx) const {
-  checkIndexBounds(idx);
+    checkIndexBounds(idx);
 
-  auto result = dataset_->get(idx);
+    auto result = dataset_->get(idx);
 
-  for (int64_t i = 0; i < result.size(); ++i) {
-    if (i >= transformFns_.size() || !transformFns_[i]) {
-      continue;
+    for(int64_t i = 0; i < result.size(); ++i) {
+        if(i >= transformFns_.size() || !transformFns_[i]) {
+            continue;
+        }
+        result[i] = transformFns_[i](result[i]);
     }
-    result[i] = transformFns_[i](result[i]);
-  }
-  return result;
+    return result;
 }
 
 int64_t TransformDataset::size() const {
-  return dataset_->size();
+    return dataset_->size();
 }
 } // namespace fl

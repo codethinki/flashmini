@@ -15,42 +15,43 @@
 #include "flashlight/fl/tensor/Init.h"
 
 TEST(DynamicScalerTest, Scaling) {
-  auto dynamicScaler = fl::pkg::runtime::DynamicScaler(
-      32, // initFactor
-      32, // maxFactor
-      100 // updateInterval
-  );
+    auto dynamicScaler = fl::pkg::runtime::DynamicScaler(
+        32, // initFactor
+        32, // maxFactor
+        100 // updateInterval
+    );
 
-  auto loss = fl::uniform({5, 5, 5, 5});
+    auto loss = fl::uniform({5, 5, 5, 5});
 
-  auto scaledLoss = dynamicScaler.scale(loss);
-  ASSERT_TRUE(allClose(loss * 32, scaledLoss));
+    auto scaledLoss = dynamicScaler.scale(loss);
+    ASSERT_TRUE(allClose(loss * 32, scaledLoss));
 
-  scaledLoss.addGrad(scaledLoss);
-  std::vector<fl::Variable> params{scaledLoss};
-  bool unscaleStatus = dynamicScaler.unscale(params);
-  ASSERT_TRUE(unscaleStatus);
-  ASSERT_TRUE(allClose(loss, scaledLoss.grad()));
+    scaledLoss.addGrad(scaledLoss);
+    std::vector<fl::Variable> params{scaledLoss};
+    bool unscaleStatus = dynamicScaler.unscale(params);
+    ASSERT_TRUE(unscaleStatus);
+    ASSERT_TRUE(allClose(loss, scaledLoss.grad()));
 }
 
 TEST(DynamicScalerTest, Serialization) {
-  auto dynamicScaler = std::make_shared<fl::pkg::runtime::DynamicScaler>(
-      32, // initFactor
-      32, // maxFactor
-      100 // updateInterval
-  );
+    auto dynamicScaler = std::make_shared<fl::pkg::runtime::DynamicScaler>(
+        32, // initFactor
+        32, // maxFactor
+        100 // updateInterval
+    );
 
-  const fs::path path = fs::temp_directory_path() / "DynamicScaler.bin";
-  fl::save(path, dynamicScaler);
+    const fs::path path = fs::temp_directory_path() / "DynamicScaler.bin";
+    fl::save(path, dynamicScaler);
 
-  std::shared_ptr<fl::pkg::runtime::DynamicScaler> dynamicScaler1;
-  fl::load(path, dynamicScaler1);
-  ASSERT_TRUE(
-      dynamicScaler->getScaleFactor() == dynamicScaler1->getScaleFactor());
+    std::shared_ptr<fl::pkg::runtime::DynamicScaler> dynamicScaler1;
+    fl::load(path, dynamicScaler1);
+    ASSERT_TRUE(
+        dynamicScaler->getScaleFactor() == dynamicScaler1->getScaleFactor()
+    );
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

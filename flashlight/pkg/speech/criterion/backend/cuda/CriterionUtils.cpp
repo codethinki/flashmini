@@ -22,71 +22,75 @@ using ViterbiPath = fl::lib::cuda::ViterbiPath<float>;
 namespace fl::pkg::speech {
 
 Tensor viterbiPath(const Tensor& input, const Tensor& trans) {
-  if (input.ndim() != 3) {
-    throw std::invalid_argument(
-        "Criterion viterbiPath expects input of shape {N, T, B}");
-  }
-  if (trans.ndim() != 2) {
-    throw std::invalid_argument(
-        "Criterion viterbiPath expects trans of shape {N, N}");
-  }
+    if(input.ndim() != 3) {
+        throw std::invalid_argument(
+            "Criterion viterbiPath expects input of shape {N, T, B}"
+        );
+    }
+    if(trans.ndim() != 2) {
+        throw std::invalid_argument(
+            "Criterion viterbiPath expects trans of shape {N, N}"
+        );
+    }
 
-  auto B = input.dim(2);
-  auto T = input.dim(1);
-  auto N = input.dim(0);
+    auto B = input.dim(2);
+    auto T = input.dim(1);
+    auto N = input.dim(0);
 
-  if (N != trans.dim(0) || N != trans.dim(1)) {
-    throw std::invalid_argument("viterbiPath: mismatched dims");
-  } else if (input.type() != fl::dtype::f32) {
-    throw std::invalid_argument("viterbiPath: input must be float32");
-  } else if (trans.type() != fl::dtype::f32) {
-    throw std::invalid_argument("viterbiPath: trans must be float32");
-  }
+    if(N != trans.dim(0) || N != trans.dim(1)) {
+        throw std::invalid_argument("viterbiPath: mismatched dims");
+    } else if(input.type() != fl::dtype::f32) {
+        throw std::invalid_argument("viterbiPath: input must be float32");
+    } else if(trans.type() != fl::dtype::f32) {
+        throw std::invalid_argument("viterbiPath: trans must be float32");
+    }
 
-  Tensor path({T, B}, fl::dtype::s32);
-  Tensor workspace(
-      {static_cast<long long>(ViterbiPath::getWorkspaceSize(B, T, N))},
-      fl::dtype::u8);
+    Tensor path({T, B}, fl::dtype::s32);
+    Tensor workspace(
+        {static_cast<long long>(ViterbiPath::getWorkspaceSize(B, T, N))},
+        fl::dtype::u8);
 
-  {
-    fl::DevicePtr inputRaw(input);
-    fl::DevicePtr transRaw(trans);
-    fl::DevicePtr pathRaw(path);
-    fl::DevicePtr workspaceRaw(workspace);
+    {
+        fl::DevicePtr inputRaw(input);
+        fl::DevicePtr transRaw(trans);
+        fl::DevicePtr pathRaw(path);
+        fl::DevicePtr workspaceRaw(workspace);
 
-    ViterbiPath::compute(
-        B,
-        T,
-        N,
-        static_cast<const float*>(inputRaw.get()),
-        static_cast<const float*>(transRaw.get()),
-        static_cast<int*>(pathRaw.get()),
-        workspaceRaw.get(),
-        input.stream().impl<CUDAStream>().handle());
-  }
+        ViterbiPath::compute(
+            B,
+            T,
+            N,
+            static_cast<const float*>(inputRaw.get()),
+            static_cast<const float*>(transRaw.get()),
+            static_cast<int*>(pathRaw.get()),
+            workspaceRaw.get(),
+            input.stream().impl<CUDAStream>().handle()
+        );
+    }
 
-  return path;
+    return path;
 }
 
 Tensor getTargetSizeArray(const Tensor& target, int maxSize) {
-  int B = target.dim(1);
-  int L = target.dim(0);
+    int B = target.dim(1);
+    int L = target.dim(0);
 
-  Tensor targetSize({B}, fl::dtype::s32);
+    Tensor targetSize({B}, fl::dtype::s32);
 
-  {
-    fl::DevicePtr targetRaw(target);
-    fl::DevicePtr targetSizeRaw(targetSize);
+    {
+        fl::DevicePtr targetRaw(target);
+        fl::DevicePtr targetSizeRaw(targetSize);
 
-    CriterionUtils::batchTargetSize(
-        B,
-        L,
-        maxSize,
-        static_cast<const int*>(targetRaw.get()),
-        static_cast<int*>(targetSizeRaw.get()),
-        target.stream().impl<CUDAStream>().handle());
-  }
+        CriterionUtils::batchTargetSize(
+            B,
+            L,
+            maxSize,
+            static_cast<const int*>(targetRaw.get()),
+            static_cast<int*>(targetSizeRaw.get()),
+            target.stream().impl<CUDAStream>().handle()
+        );
+    }
 
-  return targetSize;
+    return targetSize;
 }
 } // namespace fl

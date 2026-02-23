@@ -14,29 +14,32 @@ Normalize::Normalize(
     const std::vector<int>& axes,
     double p /* = 2 */,
     double eps /* = 1e-12 */,
-    double value /* = 1 */)
-    : axes_(axes), p_(p), eps_(eps), value_(value) {}
+    double value /* = 1 */
+) : axes_(axes),
+    p_(p),
+    eps_(eps),
+    value_(value) {}
 
 Variable Normalize::forward(const Variable& input) {
-  return value_ * normalize(input, axes_, p_, eps_);
+    return value_ * normalize(input, axes_, p_, eps_);
 }
 
 std::unique_ptr<Module> Normalize::clone() const {
-  return std::make_unique<Normalize>(*this);
+    return std::make_unique<Normalize>(*this);
 }
 
 std::string Normalize::prettyString() const {
-  std::ostringstream ss;
-  ss << "Normalize";
-  ss << " ( axis : { ";
-  for (auto d : axes_) {
-    ss << d << " ";
-  }
-  ss << "} , p : " << p_;
-  ss << ", eps : " << eps_;
-  ss << ", value : " << value_;
-  ss << " )";
-  return ss.str();
+    std::ostringstream ss;
+    ss << "Normalize";
+    ss << " ( axis : { ";
+    for(auto d : axes_) {
+        ss << d << " ";
+    }
+    ss << "} , p : " << p_;
+    ss << ", eps : " << eps_;
+    ss << ", value : " << value_;
+    ss << " )";
+    return ss.str();
 }
 
 } // namespace fl

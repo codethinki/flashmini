@@ -17,8 +17,8 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
-namespace sfx {
+    namespace speech {
+        namespace sfx {
 /**
  * The additive noise sound effect loads noise files and augments them to the
  * signal with hyper parameters that are chosen randomly within a configured
@@ -36,36 +36,37 @@ namespace sfx {
  * augmented interval. rms(noise) is calculated on the sum of all noise clipse
  * over the augmented interval.
  */
-class AdditiveNoise : public SoundEffect {
- public:
-  struct Config {
-    /**
-     * probability of aapplying reverb.
-     */
-    float proba_ = 1.0;
-    double ratio_ = 1.0;
-    double minSnr_ = 0;
-    double maxSnr_ = 30;
-    int nClipsMin_ = 1;
-    int nClipsMax_ = 3;
-    std::string listFilePath_;
-    std::string prettyString() const;
-  };
+            class AdditiveNoise : public SoundEffect {
+            public:
+                struct Config {
+                    /**
+                     * probability of aapplying reverb.
+                     */
+                    float proba_ = 1.0;
+                    double ratio_ = 1.0;
+                    double minSnr_ = 0;
+                    double maxSnr_ = 30;
+                    int nClipsMin_ = 1;
+                    int nClipsMax_ = 3;
+                    std::string listFilePath_;
+                    std::string prettyString() const;
+                };
 
-  explicit AdditiveNoise(
-      const AdditiveNoise::Config& config,
-      unsigned int seed = 0);
-  ~AdditiveNoise() override = default;
-  void apply(std::vector<float>& signal) override;
-  std::string prettyString() const override;
+                explicit AdditiveNoise(
+                    const AdditiveNoise::Config& config,
+                    unsigned int seed = 0
+                );
+                ~AdditiveNoise() override = default;
+                void apply(std::vector<float>& signal) override;
+                std::string prettyString() const override;
 
- private:
-  const AdditiveNoise::Config conf_;
-  std::vector<std::string> noiseFiles_;
-  RandomNumberGenerator rng_;
-};
+            private:
+                const AdditiveNoise::Config conf_;
+                std::vector<std::string> noiseFiles_;
+                RandomNumberGenerator rng_;
+            };
 
-} // namespace sfx
-} // namespace speech
+        } // namespace sfx
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

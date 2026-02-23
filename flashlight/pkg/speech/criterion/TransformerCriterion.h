@@ -18,141 +18,148 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-struct TS2SState {
-  fl::Variable alpha;
-  std::vector<fl::Variable> hidden;
-  fl::Variable summary;
-  int step;
+        struct TS2SState {
+            fl::Variable alpha;
+            std::vector<fl::Variable> hidden;
+            fl::Variable summary;
+            int step;
 
-  TS2SState() : step(0) {}
-};
+            TS2SState() : step(0) {}
+        };
 
-typedef std::shared_ptr<TS2SState> TS2SStatePtr;
+        typedef std::shared_ptr<TS2SState> TS2SStatePtr;
 
-class TransformerCriterion : public SequenceCriterion {
- public:
-  TransformerCriterion(
-      int nClass,
-      int hiddenDim,
-      int eos,
-      int pad,
-      int maxDecoderOutputLen,
-      int nLayer,
-      std::shared_ptr<AttentionBase> attention,
-      std::shared_ptr<WindowBase> window,
-      bool trainWithWindow,
-      double labelSmooth,
-      double pctTeacherForcing,
-      double pDropout,
-      double pLayerDrop);
+        class TransformerCriterion : public SequenceCriterion {
+        public:
+            TransformerCriterion(
+                int nClass,
+                int hiddenDim,
+                int eos,
+                int pad,
+                int maxDecoderOutputLen,
+                int nLayer,
+                std::shared_ptr<AttentionBase> attention,
+                std::shared_ptr<WindowBase> window,
+                bool trainWithWindow,
+                double labelSmooth,
+                double pctTeacherForcing,
+                double pDropout,
+                double pLayerDrop
+            );
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::vector<fl::Variable> forward(
-      const std::vector<fl::Variable>& inputs) override;
+            std::vector<fl::Variable> forward(
+                const std::vector<fl::Variable>& inputs
+            ) override;
 
-  Tensor viterbiPath(const Tensor& input, const Tensor& inputSizes = Tensor())
-      override;
+            Tensor viterbiPath(const Tensor& input, const Tensor& inputSizes = Tensor())
+            override;
 
-  std::pair<Tensor, fl::Variable>
-  viterbiPathBase(const Tensor& input, const Tensor& inputSizes, bool saveAttn);
+            std::pair<Tensor, fl::Variable> viterbiPathBase(
+                const Tensor& input,
+                const Tensor& inputSizes,
+                bool saveAttn
+            );
 
-  std::pair<fl::Variable, fl::Variable> vectorizedDecoder(
-      const fl::Variable& input,
-      const fl::Variable& target,
-      const Tensor& inputSizes,
-      const Tensor& targetSizes);
+            std::pair<fl::Variable, fl::Variable> vectorizedDecoder(
+                const fl::Variable& input,
+                const fl::Variable& target,
+                const Tensor& inputSizes,
+                const Tensor& targetSizes
+            );
 
-  std::pair<fl::Variable, TS2SState> decodeStep(
-      const fl::Variable& xEncoded,
-      const fl::Variable& y,
-      const TS2SState& inState,
-      const Tensor& inputSizes) const;
+            std::pair<fl::Variable, TS2SState> decodeStep(
+                const fl::Variable& xEncoded,
+                const fl::Variable& y,
+                const TS2SState& inState,
+                const Tensor& inputSizes
+            ) const;
 
-  std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>>
-  decodeBatchStep(
-      const fl::Variable& xEncoded,
-      std::vector<fl::Variable>& ys,
-      const std::vector<TS2SState*>& inStates,
-      const int attentionThreshold,
-      const float smoothingTemperature) const;
+            std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>> decodeBatchStep(
+                const fl::Variable& xEncoded,
+                std::vector<fl::Variable>& ys,
+                const std::vector<TS2SState*>& inStates,
+                const int attentionThreshold,
+                const float smoothingTemperature
+            ) const;
 
-  void clearWindow() {
-    trainWithWindow_ = false;
-    window_ = nullptr;
-  }
+            void clearWindow() {
+                trainWithWindow_ = false;
+                window_ = nullptr;
+            }
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
-  std::shared_ptr<fl::Embedding> embedding() const {
-    return std::static_pointer_cast<fl::Embedding>(module(0));
-  }
+            std::shared_ptr<fl::Embedding> embedding() const {
+                return std::static_pointer_cast<fl::Embedding>(module(0));
+            }
 
-  std::shared_ptr<fl::Transformer> layer(int i) const {
-    return std::static_pointer_cast<fl::Transformer>(module(i + 1));
-  }
+            std::shared_ptr<fl::Transformer> layer(int i) const {
+                return std::static_pointer_cast<fl::Transformer>(module(i + 1));
+            }
 
-  std::shared_ptr<fl::Linear> linearOut() const {
-    return std::static_pointer_cast<fl::Linear>(module(nLayer_ + 1));
-  }
+            std::shared_ptr<fl::Linear> linearOut() const {
+                return std::static_pointer_cast<fl::Linear>(module(nLayer_ + 1));
+            }
 
-  std::shared_ptr<AttentionBase> attention() const {
-    return std::static_pointer_cast<AttentionBase>(module(nLayer_ + 2));
-  }
+            std::shared_ptr<AttentionBase> attention() const {
+                return std::static_pointer_cast<AttentionBase>(module(nLayer_ + 2));
+            }
 
-  fl::Variable startEmbedding() const {
-    return params_.back();
-  }
+            fl::Variable startEmbedding() const {
+                return params_.back();
+            }
 
- private:
-  int nClass_;
-  int eos_;
-  int pad_;
-  int maxDecoderOutputLen_;
-  int nLayer_;
-  std::shared_ptr<WindowBase> window_;
-  bool trainWithWindow_;
-  double labelSmooth_;
-  double pctTeacherForcing_;
+        private:
+            int nClass_;
+            int eos_;
+            int pad_;
+            int maxDecoderOutputLen_;
+            int nLayer_;
+            std::shared_ptr<WindowBase> window_;
+            bool trainWithWindow_;
+            double labelSmooth_;
+            double pctTeacherForcing_;
 
-  FL_SAVE_LOAD_WITH_BASE(
-      SequenceCriterion,
-      nClass_,
-      eos_,
-      maxDecoderOutputLen_,
-      nLayer_,
-      window_,
-      trainWithWindow_,
-      labelSmooth_,
-      pctTeacherForcing_,
-      fl::versioned(pad_, 1))
+            FL_SAVE_LOAD_WITH_BASE(
+                SequenceCriterion,
+                nClass_,
+                eos_,
+                maxDecoderOutputLen_,
+                nLayer_,
+                window_,
+                trainWithWindow_,
+                labelSmooth_,
+                pctTeacherForcing_,
+                fl::versioned(pad_, 1)
+            ) TransformerCriterion() = default;
+        };
 
-  TransformerCriterion() = default;
-};
+        struct TS2SDecoderBuffer {
+            fl::Variable input;
+            TS2SState dummyState;
+            std::vector<fl::Variable> ys;
+            std::vector<TS2SState*> prevStates;
+            int attentionThreshold;
+            double smoothingTemperature;
 
-struct TS2SDecoderBuffer {
-  fl::Variable input;
-  TS2SState dummyState;
-  std::vector<fl::Variable> ys;
-  std::vector<TS2SState*> prevStates;
-  int attentionThreshold;
-  double smoothingTemperature;
+            TS2SDecoderBuffer(int beamSize, int attnThre, float smootTemp)
+                : attentionThreshold(attnThre), smoothingTemperature(smootTemp) {
+                ys.reserve(beamSize);
+                prevStates.reserve(beamSize);
+            }
+        };
 
-  TS2SDecoderBuffer(int beamSize, int attnThre, float smootTemp)
-      : attentionThreshold(attnThre), smoothingTemperature(smootTemp) {
-    ys.reserve(beamSize);
-    prevStates.reserve(beamSize);
-  }
-};
-
-EmittingModelUpdateFunc buildSeq2SeqTransformerUpdateFunction(
-    std::shared_ptr<SequenceCriterion>& criterion,
-    int beamSize,
-    float attThr,
-    float smoothingTemp);
-} // namespace speech
+        EmittingModelUpdateFunc buildSeq2SeqTransformerUpdateFunction(
+            std::shared_ptr<SequenceCriterion>& criterion,
+            int beamSize,
+            float attThr,
+            float smoothingTemp
+        );
+    } // namespace speech
 } // namespace pkg
 } // namespace fl
 

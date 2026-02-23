@@ -26,73 +26,76 @@ constexpr const int kLnVariableAxisSize = -1;
  * \f$\beta\f$ are learnable parameters for affine transformation.
  */
 class FL_API LayerNorm : public UnaryModule {
- public:
-  /**
-   * Constructs a LayerNorm module.
-   *
-   * @param axis the axis along which normalization is computed. Usually set as
-   * the feature axis.
-   * @param eps \f$\epsilon\f$
-   * @param affine a boolean value that controls the learning of \f$\gamma\f$
-   *  and \f$\beta\f$. \f$\gamma\f$ and \f$\beta\f$ are set to 1, 0 respectively
-   *  if set to `false`, or initialized as learnable parameters
-   *  if set to `true`.
-   * @param axisSize total size of features specified by `axis` to perform
-   *  elementwise affine transform. If the feat size is variable, use
-   *  `kLnVariableAxisSize` which uses singleton weight, bias and tiles them
-   *  dynamically according to the given input.
-   */
-  explicit LayerNorm(
-      int axis,
-      double eps = 1e-5,
-      bool affine = true,
-      int axisSize = kLnVariableAxisSize);
+public:
+    /**
+     * Constructs a LayerNorm module.
+     *
+     * @param axis the axis along which normalization is computed. Usually set as
+     * the feature axis.
+     * @param eps \f$\epsilon\f$
+     * @param affine a boolean value that controls the learning of \f$\gamma\f$
+     *  and \f$\beta\f$. \f$\gamma\f$ and \f$\beta\f$ are set to 1, 0 respectively
+     *  if set to `false`, or initialized as learnable parameters
+     *  if set to `true`.
+     * @param axisSize total size of features specified by `axis` to perform
+     *  elementwise affine transform. If the feat size is variable, use
+     *  `kLnVariableAxisSize` which uses singleton weight, bias and tiles them
+     *  dynamically according to the given input.
+     */
+    explicit LayerNorm(
+        int axis,
+        double eps = 1e-5,
+        bool affine = true,
+        int axisSize = kLnVariableAxisSize
+    );
 
-  /**
-   * Constructs a LayerNorm module.
-   *
-   * @param axis the axis along which normalization is computed. Usually set as
-   * the feature axis.
-   * @param eps \f$\epsilon\f$
-   * @param affine a boolean value that controls the learning of \f$\gamma\f$
-   *  and \f$\beta\f$. \f$\gamma\f$ and \f$\beta\f$ are set to 1, 0 respectively
-   *  if set to `false`, or initialized as learnable parameters
-   *  if set to `true`.
-   * @param axisSize total size of features specified by `axis` to perform
-   *  elementwise affine transform. If the feat size is variable, use
-   *  `kLnVariableAxisSize` which uses singleton weight, bias and tiles them
-   *  dynamically according to the given input.
-   */
-  explicit LayerNorm(
-      const std::vector<int>& axis,
-      double eps = 1e-5,
-      bool affine = true,
-      int axisSize = kLnVariableAxisSize);
+    /**
+     * Constructs a LayerNorm module.
+     *
+     * @param axis the axis along which normalization is computed. Usually set as
+     * the feature axis.
+     * @param eps \f$\epsilon\f$
+     * @param affine a boolean value that controls the learning of \f$\gamma\f$
+     *  and \f$\beta\f$. \f$\gamma\f$ and \f$\beta\f$ are set to 1, 0 respectively
+     *  if set to `false`, or initialized as learnable parameters
+     *  if set to `true`.
+     * @param axisSize total size of features specified by `axis` to perform
+     *  elementwise affine transform. If the feat size is variable, use
+     *  `kLnVariableAxisSize` which uses singleton weight, bias and tiles them
+     *  dynamically according to the given input.
+     */
+    explicit LayerNorm(
+        const std::vector<int>& axis,
+        double eps = 1e-5,
+        bool affine = true,
+        int axisSize = kLnVariableAxisSize
+    );
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
- private:
-  LayerNorm() = default;
+private:
+    LayerNorm() = default;
 
-  // For legacy reasons, we store the complement of `axis`
-  // to not break serialization
-  std::vector<int> axisComplement_;
-  double epsilon_;
-  bool affine_;
-  int axisSize_{kLnVariableAxisSize};
+    // For legacy reasons, we store the complement of `axis`
+    // to not break serialization
+    std::vector<int> axisComplement_;
+    double epsilon_;
+    bool affine_;
+    int axisSize_{kLnVariableAxisSize};
 
-  FL_SAVE_LOAD_WITH_BASE(
-      UnaryModule,
-      axisComplement_,
-      epsilon_,
-      affine_,
-      fl::versioned(axisSize_, 1))
+    FL_SAVE_LOAD_WITH_BASE(
+        UnaryModule,
+        axisComplement_,
+        epsilon_,
+        affine_,
+        fl::versioned(axisSize_, 1)
+    )
 
-  void initialize();
+    void initialize();
 };
 
 } // namespace fl

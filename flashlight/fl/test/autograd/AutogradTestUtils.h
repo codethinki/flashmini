@@ -18,60 +18,60 @@
 namespace fl {
 namespace detail {
 
-class AutogradTestF16 : public ::testing::Test {
-    void SetUp() override {
-        // Ensures all operations will be in f16
-        OptimMode::get().setOptimLevel(OptimLevel::O3);
-    }
-
-    void TearDown() override {
-        OptimMode::get().setOptimLevel(OptimLevel::DEFAULT);
-    }
-};
-
-using JacobianFunc = std::function<Variable(Variable&)>;
-inline bool jacobianTestImpl(
-    const JacobianFunc& func,
-    Variable& input,
-    float precision = 1E-5,
-    float perturbation = 1E-4,
-    const std::vector<Variable*>& zeroGradientVariables = {}) {
-    auto fwdJacobian =
-        Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
-
-    for (int i = 0; i < input.elements(); ++i) {
-        Tensor orig = input.tensor().flatten()(i);
-        input.tensor().flat(i) = orig - perturbation;
-        auto outa = func(input).tensor();
-
-        input.tensor().flat(i) = orig + perturbation;
-        auto outb = func(input).tensor();
-        input.tensor().flat(i) = orig;
-
-        fwdJacobian(fl::span, i) =
-            fl::reshape((outb - outa), {static_cast<Dim>(outa.elements())}) * 0.5 /
-            perturbation;
-    }
-
-    auto bwdJacobian =
-        Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
-    auto dout =
-        Variable(fl::full(func(input).shape(), 0, func(input).type()), false);
-
-    for (int i = 0; i < dout.elements(); ++i) {
-        dout.tensor().flat(i) = 1; // element in 1D view
-        input.zeroGrad();
-        for (auto* var : zeroGradientVariables) {
-            var->zeroGrad();
+    class AutogradTestF16 : public ::testing::Test {
+        void SetUp() override {
+            // Ensures all operations will be in f16
+            OptimMode::get().setOptimLevel(OptimLevel::O3);
         }
-        auto out = func(input);
-        out.backward(dout);
 
-        bwdJacobian(i) = fl::reshape(input.grad().tensor(), {input.elements()});
-        dout.tensor().flat(i) = 0;
+        void TearDown() override {
+            OptimMode::get().setOptimLevel(OptimLevel::DEFAULT);
+        }
+    };
+
+    using JacobianFunc = std::function<Variable (Variable&)>;
+    inline bool jacobianTestImpl(
+        const JacobianFunc& func,
+        Variable& input,
+        float precision = 1E-5,
+        float perturbation = 1E-4,
+        const std::vector<Variable*>& zeroGradientVariables = {}) {
+        auto fwdJacobian =
+            Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
+
+        for(int i = 0; i < input.elements(); ++i) {
+            Tensor orig = input.tensor().flatten()(i);
+            input.tensor().flat(i) = orig - perturbation;
+            auto outa = func(input).tensor();
+
+            input.tensor().flat(i) = orig + perturbation;
+            auto outb = func(input).tensor();
+            input.tensor().flat(i) = orig;
+
+            fwdJacobian(fl::span, i) =
+                fl::reshape((outb - outa), {static_cast<Dim>(outa.elements())}) * 0.5
+                / perturbation;
+        }
+
+        auto bwdJacobian =
+            Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
+        auto dout =
+            Variable(fl::full(func(input).shape(), 0, func(input).type()), false);
+
+        for(int i = 0; i < dout.elements(); ++i) {
+            dout.tensor().flat(i) = 1; // element in 1D view
+            input.zeroGrad();
+            for(auto* var : zeroGradientVariables) {
+                var->zeroGrad();
+            }
+            auto out = func(input);
+            out.backward(dout);
+
+            bwdJacobian(i) = fl::reshape(input.grad().tensor(), {input.elements()});
+            dout.tensor().flat(i) = 0;
+        }
+        return allClose(fwdJacobian, bwdJacobian, precision);
     }
-    return allClose(fwdJacobian, bwdJacobian, precision);
-}
 
 }
 } // namespace fl

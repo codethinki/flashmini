@@ -4,13 +4,13 @@
 // On GNU/Linux, you have few choices to get the most out of your stack trace.
 //
 // By default you get:
-//	- object filename
-//	- function name
+// - object filename
+// - function name
 //
 // In order to add:
-//	- source filename
-//	- line and column numbers
-//	- source code snippet (assuming the file is accessible)
+// - source filename
+// - line and column numbers
+// - source code snippet (assuming the file is accessible)
 
 // Install one of the following libraries then uncomment one of the macro (or
 // better, add the detection of the lib and the macro definition in your build
@@ -44,9 +44,9 @@
 namespace fl::detail {
 
 void initBackward() {
-  // If not built with backward, this function is a noop
+    // If not built with backward, this function is a noop
 #if FL_USE_BACKWARD_CPP
-  static ::backward::SignalHandling sh;
+    static ::backward::SignalHandling sh;
 #endif
 }
 

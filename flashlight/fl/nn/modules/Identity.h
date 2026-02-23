@@ -15,14 +15,14 @@ namespace fl {
  * Identity returns the inputs at forward.
  */
 class FL_API Identity : public Module {
- public:
-  Identity() = default;
-  std::vector<Variable> forward(const std::vector<Variable>& inputs) override;
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+public:
+    Identity() = default;
+    std::vector<Variable> forward(const std::vector<Variable>& inputs) override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(Module)
+private:
+    FL_SAVE_LOAD_WITH_BASE(Module)
 };
 
 } // namespace fl

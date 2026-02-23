@@ -12,19 +12,19 @@
 
 namespace fl {
 namespace pkg {
-namespace runtime {
+    namespace runtime {
 
-typedef Module* (*w2l_module_plugin_t)(int64_t nFeatures, int64_t nClasses);
+        typedef Module* (*w2l_module_plugin_t)(int64_t nFeatures, int64_t nClasses);
 
-class ModulePlugin : public Plugin {
- public:
-  explicit ModulePlugin(const std::string& name);
-  std::shared_ptr<fl::Module> arch(int64_t nFeatures, int64_t nClasses);
+        class ModulePlugin : public Plugin {
+        public:
+            explicit ModulePlugin(const std::string& name);
+            std::shared_ptr<fl::Module> arch(int64_t nFeatures, int64_t nClasses);
 
- private:
-  w2l_module_plugin_t arch_;
-};
+        private:
+            w2l_module_plugin_t arch_;
+        };
 
-} // namespace runtime
+    } // namespace runtime
 } // namespace pkg
 } // namespace fl

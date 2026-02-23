@@ -14,32 +14,33 @@ namespace fl {
 PrecisionCast::PrecisionCast(fl::dtype targetType) : targetType_(targetType) {}
 
 std::vector<Variable> PrecisionCast::forward(
-    const std::vector<Variable>& inputs) {
-  std::vector<Variable> outputs;
-  for (const auto& input : inputs) {
-    auto output = input.astype(targetType_);
-    outputs.push_back(output);
-  }
-  return outputs;
+    const std::vector<Variable>& inputs
+) {
+    std::vector<Variable> outputs;
+    for(const auto& input : inputs) {
+        auto output = input.astype(targetType_);
+        outputs.push_back(output);
+    }
+    return outputs;
 }
 
 Variable PrecisionCast::forward(const Variable& input) {
-  return forward(std::vector<Variable>{input}).front();
+    return forward(std::vector<Variable>{input}).front();
 }
 
 Variable PrecisionCast::operator()(const Variable& input) {
-  return this->forward(input);
+    return this->forward(input);
 }
 
 std::unique_ptr<Module> PrecisionCast::clone() const {
-  return std::make_unique<PrecisionCast>(*this);
+    return std::make_unique<PrecisionCast>(*this);
 }
 
 std::string PrecisionCast::prettyString() const {
-  std::ostringstream ss;
-  ss << "PrecisionCast";
-  ss << " * -> " << targetType_;
-  return ss.str();
+    std::ostringstream ss;
+    ss << "PrecisionCast";
+    ss << " * -> " << targetType_;
+    return ss.str();
 }
 
 } // namespace fl

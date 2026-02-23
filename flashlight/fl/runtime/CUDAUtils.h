@@ -15,7 +15,7 @@
 #include <cuda_runtime.h>
 
 #define FL_CUDA_CHECK(...) \
-  ::fl::cuda::detail::check(__VA_ARGS__, __FILE__, __LINE__)
+        ::fl::cuda::detail::check(__VA_ARGS__, __FILE__, __LINE__)
 
 namespace fl {
 namespace cuda {
@@ -25,22 +25,22 @@ namespace cuda {
  *
  * @return the native id of the active CUDA device.
  */
-FL_API int getActiveDeviceId();
+    FL_API int getActiveDeviceId();
 
 /**
  * Return a mapping from native CUDA device id to available CUDA devices.
  *
  * @return an unordered map from native CUDA device id to CUDA device.
  */
-FL_API std::unordered_map<int, const std::unique_ptr<Device>> createCUDADevices();
+    FL_API std::unordered_map<int, const std::unique_ptr<Device>> createCUDADevices();
 
-namespace detail {
+    namespace detail {
 
-FL_API void check(cudaError_t err, const char* file, int line);
+        FL_API void check(cudaError_t err, const char* file, int line);
 
-FL_API void check(cudaError_t err, const char* prefix, const char* file, int line);
+        FL_API void check(cudaError_t err, const char* prefix, const char* file, int line);
 
-} // namespace detail
+    } // namespace detail
 
 } // namespace cuda
 } // namespace fl

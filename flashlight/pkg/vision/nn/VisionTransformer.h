@@ -11,7 +11,7 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
 /*
  * Implementation of the transformer blocks of Vision Transformer (ViT) models
@@ -20,71 +20,71 @@ namespace vision {
  *
  * This implementation is highly inspired by [timm](https://git.io/JYOql).
  */
-class VisionTransformer : public Container {
- public:
-  VisionTransformer(
-      int32_t modelDim,
-      int32_t headDim,
-      int32_t mlpDim,
-      int32_t nHeads,
-      float pDropout,
-      float pLayerdrop);
-  VisionTransformer(const VisionTransformer& other);
-  VisionTransformer(VisionTransformer&& other) = default;
+        class VisionTransformer : public Container {
+        public:
+            VisionTransformer(
+                int32_t modelDim,
+                int32_t headDim,
+                int32_t mlpDim,
+                int32_t nHeads,
+                float pDropout,
+                float pLayerdrop
+            );
+            VisionTransformer(const VisionTransformer& other);
+            VisionTransformer(VisionTransformer&& other) = default;
 
-  VisionTransformer& operator=(const VisionTransformer& other);
-  VisionTransformer& operator=(VisionTransformer&& other) = default;
+            VisionTransformer& operator=(const VisionTransformer& other);
+            VisionTransformer& operator=(VisionTransformer&& other) = default;
 
-  ~VisionTransformer() override = default;
+            ~VisionTransformer() override = default;
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::vector<Variable> forward(const std::vector<Variable>& input) override;
-  std::string prettyString() const override;
+            std::vector<Variable> forward(const std::vector<Variable>& input) override;
+            std::string prettyString() const override;
 
- private:
-  int32_t modelDim_;
-  int32_t headDim_;
-  int32_t mlpDim_;
-  int32_t nHeads_;
-  double pDropout_;
-  double pLayerdrop_;
-  std::shared_ptr<Linear> w1_, w2_;
-  std::shared_ptr<Linear> wq_, wk_, wv_;
-  std::shared_ptr<Linear> wf_;
-  std::shared_ptr<LayerNorm> norm1_, norm2_;
+        private:
+            int32_t modelDim_;
+            int32_t headDim_;
+            int32_t mlpDim_;
+            int32_t nHeads_;
+            double pDropout_;
+            double pLayerdrop_;
+            std::shared_ptr<Linear> w1_, w2_;
+            std::shared_ptr<Linear> wq_, wk_, wv_;
+            std::shared_ptr<Linear> wf_;
+            std::shared_ptr<LayerNorm> norm1_, norm2_;
 
-  void createLayers();
-  void copy(const VisionTransformer& other);
+            void createLayers();
+            void copy(const VisionTransformer& other);
 
-  Variable gelu(const Variable& input);
-  Variable mlp(const Variable& input);
-  Variable selfAttention(const Variable& input);
-  Variable dropPath(const Variable& input);
+            Variable gelu(const Variable& input);
+            Variable mlp(const Variable& input);
+            Variable selfAttention(const Variable& input);
+            Variable dropPath(const Variable& input);
 
-  FL_SAVE_LOAD_WITH_BASE(
-      Container,
-      w1_,
-      w2_,
-      wq_,
-      wk_,
-      wv_,
-      wf_,
-      norm1_,
-      norm2_,
-      modelDim_,
-      headDim_,
-      mlpDim_,
-      nHeads_,
-      pDropout_,
-      pLayerdrop_)
+            FL_SAVE_LOAD_WITH_BASE(
+                Container,
+                w1_,
+                w2_,
+                wq_,
+                wk_,
+                wv_,
+                wf_,
+                norm1_,
+                norm2_,
+                modelDim_,
+                headDim_,
+                mlpDim_,
+                nHeads_,
+                pDropout_,
+                pLayerdrop_
+            ) VisionTransformer() = default;
 
-  VisionTransformer() = default;
+            std::shared_ptr<fl::Linear> initLinear(int inDim, int outDim);
+        };
 
-  std::shared_ptr<fl::Linear> initLinear(int inDim, int outDim);
-};
-
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl
 

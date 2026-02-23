@@ -13,26 +13,28 @@
 
 namespace fl {
 
-std::shared_ptr<fl::DynamicBenchmark>
-CudnnAutogradExtension::createBenchmarkOptions() {
-  return std::make_shared<fl::DynamicBenchmark>(
-      std::make_shared<fl::DynamicBenchmarkOptions<KernelMode>>(
-          std::vector<KernelMode>(
-              {KernelMode::F32,
-               KernelMode::F32_ALLOW_CONVERSION,
-               KernelMode::F16}),
-          fl::kDynamicBenchmarkDefaultCount));
+std::shared_ptr<fl::DynamicBenchmark> CudnnAutogradExtension::createBenchmarkOptions() {
+    return std::make_shared<fl::DynamicBenchmark>(
+        std::make_shared<fl::DynamicBenchmarkOptions<KernelMode>>(
+            std::vector<KernelMode>(
+                {KernelMode::F32,
+                 KernelMode::F32_ALLOW_CONVERSION,
+                 KernelMode::F16}
+            ),
+            fl::kDynamicBenchmarkDefaultCount
+        )
+    );
 }
 
 bool CudnnAutogradExtension::isDataTypeSupported(const fl::dtype& dtype) const {
-  switch (dtype) {
-    case fl::dtype::f16:
-    case fl::dtype::f32:
-    case fl::dtype::f64:
-      return true;
-    default:
-      return false;
-  }
+    switch(dtype) {
+        case fl::dtype::f16:
+        case fl::dtype::f32:
+        case fl::dtype::f64:
+            return true;
+        default:
+            return false;
+    }
 }
 
 } // namespace fl

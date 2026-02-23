@@ -41,32 +41,32 @@ class Tensor;
  * \endcode
  */
 class FL_API AverageValueMeter {
- public:
-  /** Constructor of `AverageValueMeter`. */
-  AverageValueMeter();
+public:
+    /** Constructor of `AverageValueMeter`. */
+    AverageValueMeter();
 
-  /** Updates counters with the given value `val` with weight `w`. */
-  void add(const double val, const double w = 1.0);
+    /** Updates counters with the given value `val` with weight `w`. */
+    void add(const double val, const double w = 1.0);
 
-  /** Updates counters with all values in `vals` with equal weights. */
-  void add(const Tensor& vals);
+    /** Updates counters with all values in `vals` with equal weights. */
+    void add(const Tensor& vals);
 
-  /** Returns a vector of four values:
-   * - `unbiased mean`: \f$ \tilde{mu} \f$
-   * - `unbiased variance`: \f$ \tilde{sigma}^2 = \frac{(\tilde{mu}_2 -
-   * \tilde{mu}^2)}{1 - Sum(P^2)} \f$
-   * - `weight_sum`: \f$ Sum(W) \f$
-   * - `weight_squared_sum`: \f$ Sum(W^2) \f$
-   */
-  std::vector<double> value() const;
+    /** Returns a vector of four values:
+     * - `unbiased mean`: \f$ \tilde{mu} \f$
+     * - `unbiased variance`: \f$ \tilde{sigma}^2 = \frac{(\tilde{mu}_2 -
+     * \tilde{mu}^2)}{1 - Sum(P^2)} \f$
+     * - `weight_sum`: \f$ Sum(W) \f$
+     * - `weight_squared_sum`: \f$ Sum(W^2) \f$
+     */
+    std::vector<double> value() const;
 
-  /** Sets all the counters to 0. */
-  void reset();
+    /** Sets all the counters to 0. */
+    void reset();
 
- private:
-  double curMean_;
-  double curMeanSquaredSum_;
-  double curWeightSum_;
-  double curWeightSquaredSum_;
+private:
+    double curMean_;
+    double curMeanSquaredSum_;
+    double curWeightSum_;
+    double curWeightSquaredSum_;
 };
 } // namespace fl

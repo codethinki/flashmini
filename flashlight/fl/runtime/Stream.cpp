@@ -10,10 +10,11 @@
 namespace fl {
 
 void Stream::relativeSync(
-  const std::unordered_set<const Stream*>& waitOns) const {
-  for (const auto* waitOn : waitOns) {
-    this->relativeSync(*waitOn);
-  }
+    const std::unordered_set<const Stream*>& waitOns
+) const {
+    for(const auto* waitOn : waitOns) {
+        this->relativeSync(*waitOn);
+    }
 }
 
 } // namespace fl

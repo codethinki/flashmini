@@ -10,38 +10,41 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
-class HungarianMatcher {
- public:
-  HungarianMatcher() = default;
+        class HungarianMatcher {
+        public:
+            HungarianMatcher() = default;
 
-  HungarianMatcher(
-      const float costClass,
-      const float costBbox,
-      const float costGiou);
+            HungarianMatcher(
+                const float costClass,
+                const float costBbox,
+                const float costGiou
+            );
 
-  std::vector<std::pair<Tensor, Tensor>> compute(
-      const Tensor& predBoxes,
-      const Tensor& predLogits,
-      const std::vector<Tensor>& targetBoxes,
-      const std::vector<Tensor>& targetClasses) const;
+            std::vector<std::pair<Tensor, Tensor>> compute(
+                const Tensor& predBoxes,
+                const Tensor& predLogits,
+                const std::vector<Tensor>& targetBoxes,
+                const std::vector<Tensor>& targetClasses
+            ) const;
 
- private:
-  float costClass_;
-  float costBbox_;
-  float costGiou_;
+        private:
+            float costClass_;
+            float costBbox_;
+            float costGiou_;
 
-  // First is SrcIdx, second is ColIdx
-  std::pair<Tensor, Tensor> matchBatch(
-      const Tensor& predBoxes,
-      const Tensor& predLogits,
-      const Tensor& targetBoxes,
-      const Tensor& targetClasses) const;
+            // First is SrcIdx, second is ColIdx
+            std::pair<Tensor, Tensor> matchBatch(
+                const Tensor& predBoxes,
+                const Tensor& predLogits,
+                const Tensor& targetBoxes,
+                const Tensor& targetClasses
+            ) const;
 
-  Tensor getCostMatrix(const Tensor& input, const Tensor& target);
-};
+            Tensor getCostMatrix(const Tensor& input, const Tensor& target);
+        };
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl

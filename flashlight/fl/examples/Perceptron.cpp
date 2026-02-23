@@ -18,61 +18,61 @@
 using namespace fl;
 
 int main() {
-  fl::init();
+    fl::init();
 
-  // Create dataset
-  const int nSamples = 10000;
-  const int nFeat = 10;
-  auto X = fl::rand({nFeat, nSamples}) + 1; // X elements in [1, 2]
-  auto Y = /* signal */ fl::transpose(fl::sum(fl::power(X, 3), {0})) +
-      /* noise */ fl::sin(2 * M_PI * fl::rand({nSamples}));
-  // Create Dataset to simplify the code for iterating over samples
-  TensorDataset data({X, Y});
-  const int inputIdx = 0, targetIdx = 1;
+    // Create dataset
+    const int nSamples = 10000;
+    const int nFeat = 10;
+    auto X = fl::rand({nFeat, nSamples}) + 1; // X elements in [1, 2]
+    auto Y = /* signal */ fl::transpose(fl::sum(fl::power(X, 3), {0}))
+        + /* noise */ fl::sin(2 * M_PI * fl::rand({nSamples}));
+    // Create Dataset to simplify the code for iterating over samples
+    TensorDataset data({X, Y});
+    const int inputIdx = 0, targetIdx = 1;
 
-  // Model definition - 2-layer Perceptron with ReLU activation
-  Sequential model;
-  model.add(Linear(nFeat, 100));
-  model.add(ReLU());
-  model.add(Linear(100, 1));
-  // MSE loss
-  auto loss = MeanSquaredError();
+    // Model definition - 2-layer Perceptron with ReLU activation
+    Sequential model;
+    model.add(Linear(nFeat, 100));
+    model.add(ReLU());
+    model.add(Linear(100, 1));
+    // MSE loss
+    auto loss = MeanSquaredError();
 
-  // Optimizer definition
-  const float learningRate = 0.0001;
-  const float momentum = 0.9;
-  auto sgd = SGDOptimizer(model.params(), learningRate, momentum);
+    // Optimizer definition
+    const float learningRate = 0.0001;
+    const float momentum = 0.9;
+    auto sgd = SGDOptimizer(model.params(), learningRate, momentum);
 
-  // Meter definition
-  AverageValueMeter meter;
+    // Meter definition
+    AverageValueMeter meter;
 
-  // Start training
+    // Start training
 
-  std::cout << "[Multi-layer Perceptron] Started..." << std::endl;
+    std::cout << "[Multi-layer Perceptron] Started..." << std::endl;
 
-  const int nEpochs = 100;
-  for (int e = 1; e <= nEpochs; ++e) {
-    meter.reset();
-    for (auto& sample : data) {
-      sgd.zeroGrad();
+    const int nEpochs = 100;
+    for(int e = 1; e <= nEpochs; ++e) {
+        meter.reset();
+        for(auto& sample : data) {
+            sgd.zeroGrad();
 
-      // Forward propagation
-      auto result = model(input(sample[inputIdx]));
+            // Forward propagation
+            auto result = model(input(sample[inputIdx]));
 
-      // Calculate loss
-      auto l = loss(result, noGrad(sample[targetIdx]));
+            // Calculate loss
+            auto l = loss(result, noGrad(sample[targetIdx]));
 
-      // Backward propagation
-      l.backward();
+            // Backward propagation
+            l.backward();
 
-      // Update parameters
-      sgd.step();
+            // Update parameters
+            sgd.step();
 
-      meter.add(l.scalar<float>());
+            meter.add(l.scalar<float>());
+        }
+        std::cout << "Epoch: " << e << " Mean Squared Error: " << meter.value()[0]
+        << std::endl;
     }
-    std::cout << "Epoch: " << e << " Mean Squared Error: " << meter.value()[0]
-              << std::endl;
-  }
-  std::cout << "[Multi-layer Perceptron] Done!" << std::endl;
-  return 0;
+    std::cout << "[Multi-layer Perceptron] Done!" << std::endl;
+    return 0;
 }

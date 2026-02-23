@@ -23,9 +23,9 @@ using ::testing::Pointwise;
 const size_t sampleRate = 16000;
 
 MATCHER_P(FloatNearPointwise, tol, "Out of range") {
-  return (
-      std::get<0>(arg) > std::get<1>(arg) - tol &&
-      std::get<0>(arg) < std::get<1>(arg) + tol);
+    return
+        std::get<0>(arg) > std::get<1>(arg) - tol
+        && std::get<0>(arg) < std::get<1>(arg) + tol;
 }
 
 /**
@@ -38,64 +38,67 @@ MATCHER_P(FloatNearPointwise, tol, "Out of range") {
  * considering the SNR value.
  */
 TEST(AdditiveNoise, Snr) {
-  const fs::path tmpDir = fs::temp_directory_path() / "AdditiveNoise";
-  fs::create_directory(tmpDir);
-  const fs::path listFilePath = tmpDir / "noise.lst";
-  const fs::path noiseFilePath = tmpDir / "noise.flac";
+    const fs::path tmpDir = fs::temp_directory_path() / "AdditiveNoise";
+    fs::create_directory(tmpDir);
+    const fs::path listFilePath = tmpDir / "noise.lst";
+    const fs::path noiseFilePath = tmpDir / "noise.flac";
 
-  const float signalAmplitude = -1.0;
-  const int signalLen = 10;
-  std::vector<float> signal(signalLen, signalAmplitude);
-  const float noiseAmplitude = 1.0;
-  const int noiseLen = 10;
-  std::vector<float> noise(noiseLen, noiseAmplitude);
+    const float signalAmplitude = -1.0;
+    const int signalLen = 10;
+    std::vector<float> signal(signalLen, signalAmplitude);
+    const float noiseAmplitude = 1.0;
+    const int noiseLen = 10;
+    std::vector<float> noise(noiseLen, noiseAmplitude);
 
-  saveSound(
-      noiseFilePath,
-      noise,
-      sampleRate,
-      1,
-      fl::pkg::speech::SoundFormat::FLAC,
-      fl::pkg::speech::SoundSubFormat::PCM_16);
+    saveSound(
+        noiseFilePath,
+        noise,
+        sampleRate,
+        1,
+        fl::pkg::speech::SoundFormat::FLAC,
+        fl::pkg::speech::SoundSubFormat::PCM_16
+    );
 
-  // Create test list file
-  {
-    std::ofstream listFile(listFilePath);
-    listFile << noiseFilePath.string();
-  }
-
-  float threshold = 0.02; // allow 2% difference from expected value
-
-  for (float snr = 1; snr < 30; ++snr) {
-    AdditiveNoise::Config conf;
-    conf.proba_ = 1.0;
-    conf.ratio_ = 1.0;
-    conf.minSnr_ = snr;
-    conf.maxSnr_ = snr;
-    conf.nClipsMin_ = 1;
-    conf.nClipsMax_ = 1;
-    conf.listFilePath_ = listFilePath;
-
-    AdditiveNoise sfx(conf);
-    auto augmented = signal;
-    sfx.apply(augmented);
-
-    std::vector<float> extractNoise(augmented.size());
-    for (int i = 0; i < extractNoise.size(); ++i) {
-      extractNoise[i] = (augmented[i] - signal[i]);
+    // Create test list file
+    {
+        std::ofstream listFile(listFilePath);
+        listFile << noiseFilePath.string();
     }
 
-    ASSERT_LE(
-        signalToNoiseRatio(signal, extractNoise),
-        (conf.maxSnr_ * (1 + threshold)));
-    ASSERT_GE(
-        signalToNoiseRatio(signal, extractNoise),
-        (conf.minSnr_ * (1 - threshold)));
-  }
+    float threshold = 0.02; // allow 2% difference from expected value
+
+    for(float snr = 1; snr < 30; ++snr) {
+        AdditiveNoise::Config conf;
+        conf.proba_ = 1.0;
+        conf.ratio_ = 1.0;
+        conf.minSnr_ = snr;
+        conf.maxSnr_ = snr;
+        conf.nClipsMin_ = 1;
+        conf.nClipsMax_ = 1;
+        conf.listFilePath_ = listFilePath;
+
+        AdditiveNoise sfx(conf);
+        auto augmented = signal;
+        sfx.apply(augmented);
+
+        std::vector<float> extractNoise(augmented.size());
+        for(int i = 0; i < extractNoise.size(); ++i) {
+            extractNoise[i] = (augmented[i] - signal[i]);
+        }
+
+        ASSERT_LE(
+            signalToNoiseRatio(signal, extractNoise),
+            (conf.maxSnr_ * (1 + threshold))
+        );
+        ASSERT_GE(
+            signalToNoiseRatio(signal, extractNoise),
+            (conf.minSnr_ * (1 - threshold))
+        );
+    }
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

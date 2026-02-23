@@ -16,14 +16,14 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 /*
  * Utility function to create an attention for s2s in encoder-decoder.
  * From gflags it uses FLAGS_attention, FLAGS_encoderdim, FLAGS_attnconvkernel,
  * FLAGS_attnconvchannel, FLAGS_attndim, FLAGS_encoderdim, FLAGS_numattnhead
  */
-std::shared_ptr<AttentionBase> createAttention();
+        std::shared_ptr<AttentionBase> createAttention();
 
 /*
  * Utility function to create an force attention (attention window)
@@ -32,8 +32,8 @@ std::shared_ptr<AttentionBase> createAttention();
  * FLAGS_leftWindowSize, FLAGS_rightWindowSize FLAGS_softwstd, FLAGS_softwrate,
  * FLAGS_softwoffset
  */
-std::shared_ptr<WindowBase> createAttentionWindow();
+        std::shared_ptr<WindowBase> createAttentionWindow();
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

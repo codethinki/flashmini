@@ -8,12 +8,12 @@
 #pragma once
 
 #if FL_USE_ARRAYFIRE
-  #include "flashlight/fl/tensor/backend/af/ArrayFireBackend.h"
-  #include "flashlight/fl/tensor/backend/af/ArrayFireTensor.h"
+#include "flashlight/fl/tensor/backend/af/ArrayFireBackend.h"
+#include "flashlight/fl/tensor/backend/af/ArrayFireTensor.h"
 #endif
 #if FL_USE_TENSOR_STUB
-  #include "flashlight/fl/tensor/backend/stub/StubBackend.h"
-  #include "flashlight/fl/tensor/backend/stub/StubTensor.h"
+#include "flashlight/fl/tensor/backend/stub/StubBackend.h"
+#include "flashlight/fl/tensor/backend/stub/StubTensor.h"
 #endif
 
 namespace fl {

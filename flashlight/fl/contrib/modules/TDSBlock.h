@@ -18,46 +18,47 @@ namespace fl {
  * This [link](https://imgur.com/a/LAdlwZK) shows the diagram of TDSBlock.
  */
 class FL_API TDSBlock : public Container {
- private:
-  TDSBlock() = default;
-  FL_SAVE_LOAD_WITH_BASE(Container)
+private:
+    TDSBlock() = default;
+    FL_SAVE_LOAD_WITH_BASE(Container)
 
- public:
-  /**
-   * Constructs a TDS Block. Input/Output Dim: T x W x C x B, where
-   *    T = number of time-steps
-   *    W = input/output width
-   *    C = input/output channels
-   *    B = batch size
-   *
-   * @param channels Number of input (and output) channels
-   * @param kernelSize Kernel size for convolution
-   * @param width Input width
-   * @param dropout Amount of dropout to be used
-   * @param innerLinearDim If > 0, the two linear layers perform the `input`->
-      `output` channel transform as `linearDim` -> `innerLinearDim` and
-      `innerLinearDim` -> `linearDim`, where `linearDim` = `W * C`
-   * @param rightPadding Amount of right padding for asymmetric convolutions.
-      By default (= `-1`), performs symmetric padding for the "SAME" conv.
-   * @param lNormIncludeTime If `true`, normalization is performed on the
-      [T, W, C] axes as in the original paper. If `false`, exclude time
-      dimension from computing stats to follow standard LayerNorm ==>
-      normalization is performed on the [W, C] axes with scalar affine
-      transformation.
-   */
-  explicit TDSBlock(
-      int channels,
-      int kernelSize,
-      int width,
-      double dropout = 0,
-      int innerLinearDim = 0,
-      int rightPadding = -1,
-      bool lNormIncludeTime = true);
+public:
+    /**
+     * Constructs a TDS Block. Input/Output Dim: T x W x C x B, where
+     *    T = number of time-steps
+     *    W = input/output width
+     *    C = input/output channels
+     *    B = batch size
+     *
+     * @param channels Number of input (and output) channels
+     * @param kernelSize Kernel size for convolution
+     * @param width Input width
+     * @param dropout Amount of dropout to be used
+     * @param innerLinearDim If > 0, the two linear layers perform the `input`->
+        `output` channel transform as `linearDim` -> `innerLinearDim` and
+        `innerLinearDim` -> `linearDim`, where `linearDim` = `W * C`
+     * @param rightPadding Amount of right padding for asymmetric convolutions.
+        By default (= `-1`), performs symmetric padding for the "SAME" conv.
+     * @param lNormIncludeTime If `true`, normalization is performed on the
+        [T, W, C] axes as in the original paper. If `false`, exclude time
+        dimension from computing stats to follow standard LayerNorm ==>
+        normalization is performed on the [W, C] axes with scalar affine
+        transformation.
+     */
+    explicit TDSBlock(
+        int channels,
+        int kernelSize,
+        int width,
+        double dropout = 0,
+        int innerLinearDim = 0,
+        int rightPadding = -1,
+        bool lNormIncludeTime = true
+    );
 
-  std::vector<Variable> forward(const std::vector<Variable>& inputs) override;
-  std::string prettyString() const override;
+    std::vector<Variable> forward(const std::vector<Variable>& inputs) override;
+    std::string prettyString() const override;
 
-  FL_BASIC_CONTAINER_CLONING(TDSBlock)
+    FL_BASIC_CONTAINER_CLONING(TDSBlock)
 };
 
 } // namespace fl

@@ -19,58 +19,59 @@ NAGOptimizer::NAGOptimizer(
     const vector<Variable>& parameters,
     float learningRate,
     float momentum /* = 0 */,
-    float weightDecay /* = 0 */)
-    : FirstOrderOptimizer(parameters, learningRate),
-      mu_(momentum),
-      wd_(weightDecay),
-      velocities_(),
-      oldLr_(learningRate) {
-  if (momentum <= 0) {
-    throw std::runtime_error(
-        "Invalid momentum for NAG optimizer, it should be > 0");
-  }
-  velocities_.reserve(parameters.size());
-  for (const auto& parameter : parameters_) {
-    velocities_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
-    fl::eval(velocities_.back());
-  }
+    float weightDecay /* = 0 */
+) : FirstOrderOptimizer(parameters, learningRate),
+    mu_(momentum),
+    wd_(weightDecay),
+    velocities_(),
+    oldLr_(learningRate) {
+    if(momentum <= 0) {
+        throw std::runtime_error(
+            "Invalid momentum for NAG optimizer, it should be > 0"
+        );
+    }
+    velocities_.reserve(parameters.size());
+    for(const auto& parameter : parameters_) {
+        velocities_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
+        fl::eval(velocities_.back());
+    }
 }
 
 void NAGOptimizer::step() {
-  float correctedLr = lr_ / oldLr_;
+    float correctedLr = lr_ / oldLr_;
 
-  for (size_t i = 0; i < parameters_.size(); i++) {
-    if (!parameters_[i].isGradAvailable()) {
-      continue;
+    for(size_t i = 0; i < parameters_.size(); i++) {
+        if(!parameters_[i].isGradAvailable()) {
+            continue;
+        }
+
+        Tensor& grad = parameters_[i].grad().tensor();
+        Tensor& data = parameters_[i].tensor();
+
+        if(wd_ != 0) {
+            // Weight decay term
+            data = data * (1 - lr_ * wd_);
+        }
+        Tensor& velocity = velocities_[i];
+        // this velocity corresponds to fairseq velocity * -1
+        velocity = mu_ * velocity * correctedLr + lr_ * grad;
+        fl::eval(velocity);
+        grad = grad * lr_ + velocity * mu_;
+        data = data - grad;
+        fl::eval(data);
     }
-
-    Tensor& grad = parameters_[i].grad().tensor();
-    Tensor& data = parameters_[i].tensor();
-
-    if (wd_ != 0) {
-      // Weight decay term
-      data = data * (1 - lr_ * wd_);
-    }
-    Tensor& velocity = velocities_[i];
-    // this velocity corresponds to fairseq velocity * -1
-    velocity = mu_ * velocity * correctedLr + lr_ * grad;
-    fl::eval(velocity);
-    grad = grad * lr_ + velocity * mu_;
-    data = data - grad;
-    fl::eval(data);
-  }
-  oldLr_ = lr_;
+    oldLr_ = lr_;
 }
 
 std::string NAGOptimizer::prettyString() const {
-  std::ostringstream ss;
-  ss << "NAG (lr=" << lr_ << " ); (previous lr=" << oldLr_ << ");";
+    std::ostringstream ss;
+    ss << "NAG (lr=" << lr_ << " ); (previous lr=" << oldLr_ << ");";
 
-  if (wd_ != 0) {
-    ss << " (weight decay=" << wd_ << ");";
-  }
-  ss << " (Nesterov momentum=" << mu_ << ")";
-  return ss.str();
+    if(wd_ != 0) {
+        ss << " (weight decay=" << wd_ << ");";
+    }
+    ss << " (Nesterov momentum=" << mu_ << ")";
+    return ss.str();
 }
 
 } // namespace fl

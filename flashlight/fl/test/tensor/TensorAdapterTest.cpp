@@ -16,29 +16,29 @@ using namespace ::testing;
 using namespace fl;
 
 TEST(TensorBaseTest, DefaultBackend) {
-  Tensor t;
-  ASSERT_EQ(t.backendType(), DefaultTensorType_t::tensorBackendType);
+    Tensor t;
+    ASSERT_EQ(t.backendType(), DefaultTensorType_t::tensorBackendType);
 }
 
 TEST(TensorBaseTest, ImplTypeConversion) {
-  // Converting to the same type is a noop
-  auto a = fl::rand({6, 8});
-  auto c = a.copy();
-  TensorBackendType aBackend = a.backendType();
-  auto b = to<DefaultTensorType_t>(std::move(a));
-  ASSERT_EQ(aBackend, b.backendType());
-  ASSERT_TRUE(allClose(b, c));
+    // Converting to the same type is a noop
+    auto a = fl::rand({6, 8});
+    auto c = a.copy();
+    TensorBackendType aBackend = a.backendType();
+    auto b = to<DefaultTensorType_t>(std::move(a));
+    ASSERT_EQ(aBackend, b.backendType());
+    ASSERT_TRUE(allClose(b, c));
 }
 
 TEST(TensorBaseTest, hasAdapter) {
-  Tensor a = fromScalar(3.14, fl::dtype::f32);
-  ASSERT_TRUE(a.hasAdapter());
-  detail::releaseAdapterUnsafe(a);
-  ASSERT_FALSE(a.hasAdapter());
+    Tensor a = fromScalar(3.14, fl::dtype::f32);
+    ASSERT_TRUE(a.hasAdapter());
+    detail::releaseAdapterUnsafe(a);
+    ASSERT_FALSE(a.hasAdapter());
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

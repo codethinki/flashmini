@@ -11,49 +11,51 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-class ContentAttention : public AttentionBase {
- public:
-  ContentAttention(bool keyValue = false) : keyValue_(keyValue) {}
+        class ContentAttention : public AttentionBase {
+        public:
+            ContentAttention(bool keyValue = false) : keyValue_(keyValue) {}
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::pair<Variable, Variable> forwardBase(
-      const Variable& state,
-      const Variable& xEncoded,
-      const Variable& prevAttn,
-      const Variable& logAttnWeight,
-      const Variable& xEncodedSizes) override;
+            std::pair<Variable, Variable> forwardBase(
+                const Variable& state,
+                const Variable& xEncoded,
+                const Variable& prevAttn,
+                const Variable& logAttnWeight,
+                const Variable& xEncodedSizes
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  bool keyValue_;
+        private:
+            bool keyValue_;
 
-  FL_SAVE_LOAD_WITH_BASE(AttentionBase, fl::versioned(keyValue_, 1))
-};
+            FL_SAVE_LOAD_WITH_BASE(AttentionBase, fl::versioned(keyValue_, 1))
+        };
 
-class NeuralContentAttention : public AttentionBase {
- public:
-  NeuralContentAttention() {}
-  explicit NeuralContentAttention(int dim, int layers = 1);
+        class NeuralContentAttention : public AttentionBase {
+        public:
+            NeuralContentAttention() {}
+            explicit NeuralContentAttention(int dim, int layers = 1);
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::pair<Variable, Variable> forwardBase(
-      const Variable& state,
-      const Variable& xEncoded,
-      const Variable& prevAttn,
-      const Variable& logAttnWeight,
-      const Variable& xEncodedSizes) override;
+            std::pair<Variable, Variable> forwardBase(
+                const Variable& state,
+                const Variable& xEncoded,
+                const Variable& prevAttn,
+                const Variable& logAttnWeight,
+                const Variable& xEncodedSizes
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(AttentionBase)
-};
-} // namespace speech
+        private:
+            FL_SAVE_LOAD_WITH_BASE(AttentionBase)
+        };
+    } // namespace speech
 } // namespace pkg
 } // namespace fl
 

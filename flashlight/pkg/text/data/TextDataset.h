@@ -18,16 +18,16 @@
 
 namespace fl {
 namespace pkg {
-namespace text {
+    namespace text {
 
-namespace {
+        namespace {
 
 // Maximum number of tokens to keep in memory for each `TextDataset` instance.
 // Setting the default value to 10,000,000,000 which requires 40GB in memory,
 // since indices are stored as int32.
-constexpr size_t kMaxTokenInBuffer = 10000000000;
+            constexpr size_t kMaxTokenInBuffer = 10000000000;
 
-} // namespace
+        } // namespace
 
 /**
  * TextDataset prepares text data for LM training. It returns a single tensor of
@@ -58,38 +58,39 @@ constexpr size_t kMaxTokenInBuffer = 10000000000;
  * batch, samples are sorted by length.
  */
 
-class TextDataset : public fl::Dataset {
- public:
-  TextDataset(
-      const fs::path& dataDirectory,
-      const std::string& filenames,
-      fl::lib::text::PartialFileReader& reader,
-      const fl::lib::text::Tokenizer& tokenizer,
-      const fl::lib::text::Dictionary& dictionary,
-      int64_t tokensPerSample = 1024,
-      int64_t batchSize = 1,
-      const std::string& sampleBreakMode = "none",
-      const bool useDynamicBatching = false,
-      const size_t reserveSpaceSize = kMaxTokenInBuffer);
+        class TextDataset : public fl::Dataset {
+        public:
+            TextDataset(
+                const fs::path& dataDirectory,
+                const std::string& filenames,
+                fl::lib::text::PartialFileReader& reader,
+                const fl::lib::text::Tokenizer& tokenizer,
+                const fl::lib::text::Dictionary& dictionary,
+                int64_t tokensPerSample = 1024,
+                int64_t batchSize = 1,
+                const std::string& sampleBreakMode = "none",
+                const bool useDynamicBatching = false,
+                const size_t reserveSpaceSize = kMaxTokenInBuffer
+            );
 
-  int64_t size() const override;
+            int64_t size() const override;
 
-  std::vector<Tensor> get(const int64_t idx) const override;
+            std::vector<Tensor> get(const int64_t idx) const override;
 
-  void shuffle(uint64_t seed);
+            void shuffle(uint64_t seed);
 
- private:
-  int pad_;
+        private:
+            int pad_;
 
-  struct SamplePosition {
-    int64_t first;
-    int64_t last;
-  };
+            struct SamplePosition {
+                int64_t first;
+                int64_t last;
+            };
 
-  std::vector<int> data_; // eos prepended, so all indices shifted by 1
-  std::vector<std::vector<SamplePosition>> batches_;
-};
+            std::vector<int> data_; // eos prepended, so all indices shifted by 1
+            std::vector<std::vector<SamplePosition>> batches_;
+        };
 
-} // namespace text
+    } // namespace text
 } // namespace pkg
 } // namespace fl

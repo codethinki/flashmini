@@ -26,7 +26,8 @@ Tensor histogram(
     const Tensor& tensor,
     const unsigned numBins,
     const double minVal,
-    const double maxVal);
+    const double maxVal
+);
 Tensor histogram(const Tensor& tensor, const unsigned numBins);
 
 /**
@@ -45,7 +46,7 @@ Tensor equalize(const Tensor& input, const Tensor& histogram);
  * TODO{fl::Tensor} -- consider moving this to a more general place - other
  * things will need to support interpolation
  */
-enum class InterpolationMode { Nearest, Linear, Bilinear, Cubic, Bicubic };
+enum class InterpolationMode {Nearest, Linear, Bilinear, Cubic, Bicubic};
 
 /**
  * Resize a tensor, performing interpolation as needed.
@@ -59,7 +60,8 @@ enum class InterpolationMode { Nearest, Linear, Bilinear, Cubic, Bicubic };
 Tensor resize(
     const Tensor& tensor,
     const Shape& shape,
-    const InterpolationMode mode = InterpolationMode::Nearest);
+    const InterpolationMode mode = InterpolationMode::Nearest
+);
 
 /**
  * Rotate a tensor by a given angle, filling in unfilled locations as needed.
@@ -70,8 +72,7 @@ Tensor resize(
  * empty image regions post-transformation
  * @return a Tensor with the rotation operation applied.
  */
-Tensor
-rotate(const Tensor& input, const float theta, const Tensor& fill = Tensor());
+Tensor rotate(const Tensor& input, const float theta, const Tensor& fill = Tensor());
 
 /**
  * Rotate a tensor by a given angle, filling in unfilled locations as needed.
@@ -85,7 +86,8 @@ rotate(const Tensor& input, const float theta, const Tensor& fill = Tensor());
 Tensor rotate(
     const Tensor& input,
     const float theta,
-    const InterpolationMode mode = InterpolationMode::Nearest);
+    const InterpolationMode mode = InterpolationMode::Nearest
+);
 
 /**
  * Translate a tensor by given amounts along some axes, filling in unfilled
@@ -104,7 +106,8 @@ Tensor translate(
     const Tensor& input,
     const Shape& translation,
     const Shape& outputDims = {},
-    const Tensor& fill = Tensor());
+    const Tensor& fill = Tensor()
+);
 
 /**
  * Translate a tensor by given amounts along some axes, filling in unfilled
@@ -123,7 +126,8 @@ Tensor translate(
     const Tensor& input,
     const Shape& translation,
     const Shape& outputDims = {},
-    const InterpolationMode mode = InterpolationMode::Nearest);
+    const InterpolationMode mode = InterpolationMode::Nearest
+);
 
 /**
  * Apply a shear transformation (also called a skew transformation) to an input
@@ -142,7 +146,8 @@ Tensor shear(
     const Tensor& input,
     const std::vector<float>& skews,
     const Shape& outputDims = {},
-    const Tensor& fill = Tensor());
+    const Tensor& fill = Tensor()
+);
 
 /**
  * Apply a shear transformation (also called a skew transformation) to an input
@@ -161,7 +166,8 @@ Tensor shear(
     const Tensor& input,
     const std::vector<float>& skews,
     const Shape& outputDims = {},
-    const InterpolationMode mode = InterpolationMode::Nearest);
+    const InterpolationMode mode = InterpolationMode::Nearest
+);
 
 /**
  * Create a Tensor with the given shape that is Gaussian distributed across the

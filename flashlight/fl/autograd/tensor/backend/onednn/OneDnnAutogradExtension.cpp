@@ -10,9 +10,10 @@
 namespace fl {
 
 bool OneDnnAutogradExtension::isDataTypeSupported(
-    const fl::dtype& dtype) const {
-  // fp16 computation is not supported with onednn
-  return dtype != fl::dtype::f16;
+    const fl::dtype& dtype
+) const {
+    // fp16 computation is not supported with onednn
+    return dtype != fl::dtype::f16;
 }
 
 } // namespace fl

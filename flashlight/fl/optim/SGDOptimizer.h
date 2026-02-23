@@ -29,40 +29,40 @@ namespace fl {
  * http://cs231n.github.io/neural-networks-3/#sgd
  */
 class FL_API SGDOptimizer : public FirstOrderOptimizer {
- private:
-  FL_SAVE_LOAD_WITH_BASE(
-      FirstOrderOptimizer,
-      useNesterov_,
-      fl::serializeAs<double>(mu_),
-      fl::serializeAs<double>(wd_),
-      velocities_)
+private:
+    FL_SAVE_LOAD_WITH_BASE(
+        FirstOrderOptimizer,
+        useNesterov_,
+        fl::serializeAs<double>(mu_),
+        fl::serializeAs<double>(wd_),
+        velocities_
+    ) SGDOptimizer() = default; // Intentionally private
 
-  SGDOptimizer() = default; // Intentionally private
+    bool useNesterov_;
+    float mu_;
+    float wd_;
+    std::vector<Tensor> velocities_;
 
-  bool useNesterov_;
-  float mu_;
-  float wd_;
-  std::vector<Tensor> velocities_;
+public:
+    /** SGDOptimizer constructor.
+     * @param parameters The parameters from e.g. `model.parameters()`
+     * @param learningRate The learning rate.
+     * @param momentum The momentum.
+     * @param weightDecay The amount of L2 weight decay to use for all the
+     * parameters.
+     * @param useNesterov Whether or not to use nesterov style momentum.
+     */
+    SGDOptimizer(
+        const std::vector<Variable>& parameters,
+        float learningRate,
+        float momentum = 0,
+        float weightDecay = 0,
+        bool useNesterov = false
+    );
 
- public:
-  /** SGDOptimizer constructor.
-   * @param parameters The parameters from e.g. `model.parameters()`
-   * @param learningRate The learning rate.
-   * @param momentum The momentum.
-   * @param weightDecay The amount of L2 weight decay to use for all the
-   * parameters.
-   * @param useNesterov Whether or not to use nesterov style momentum.
-   */
-  SGDOptimizer(
-      const std::vector<Variable>& parameters,
-      float learningRate,
-      float momentum = 0,
-      float weightDecay = 0,
-      bool useNesterov = false);
+    void step() override;
 
-  void step() override;
-
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 } // namespace fl

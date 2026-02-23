@@ -17,34 +17,35 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
-namespace sfx {
+    namespace speech {
+        namespace sfx {
 
 /**
  * Add gaussian noise to the samples with given Signal to Noise Ratio (SNR)
  */
-class GaussianNoise : public SoundEffect {
- public:
-  struct Config {
-    float proba_ = 1.0;
-    double minSnr_ = 0;
-    double maxSnr_ = 30;
-    std::string prettyString() const;
-  };
+            class GaussianNoise : public SoundEffect {
+            public:
+                struct Config {
+                    float proba_ = 1.0;
+                    double minSnr_ = 0;
+                    double maxSnr_ = 30;
+                    std::string prettyString() const;
+                };
 
-  explicit GaussianNoise(
-      const GaussianNoise::Config& config,
-      unsigned int seed = 0);
-  ~GaussianNoise() override = default;
-  void apply(std::vector<float>& signal) override;
-  std::string prettyString() const override;
+                explicit GaussianNoise(
+                    const GaussianNoise::Config& config,
+                    unsigned int seed = 0
+                );
+                ~GaussianNoise() override = default;
+                void apply(std::vector<float>& signal) override;
+                std::string prettyString() const override;
 
- private:
-  const GaussianNoise::Config conf_;
-  RandomNumberGenerator rng_;
-};
+            private:
+                const GaussianNoise::Config conf_;
+                RandomNumberGenerator rng_;
+            };
 
-} // namespace sfx
-} // namespace speech
+        } // namespace sfx
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

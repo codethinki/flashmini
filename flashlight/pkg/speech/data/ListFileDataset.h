@@ -16,7 +16,7 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 /**
  *
@@ -43,35 +43,37 @@ namespace speech {
  * `target`, `word_transcription`, `sample_id` in the same order.
  *
  */
-class ListFileDataset : public fl::Dataset {
- public:
-  explicit ListFileDataset(
-      const std::string& filename,
-      const DataTransformFunction& inFeatFunc = nullptr,
-      const DataTransformFunction& tgtFeatFunc = nullptr,
-      const DataTransformFunction& wrdFeatFunc = nullptr);
+        class ListFileDataset : public fl::Dataset {
+        public:
+            explicit ListFileDataset(
+                const std::string& filename,
+                const DataTransformFunction& inFeatFunc = nullptr,
+                const DataTransformFunction& tgtFeatFunc = nullptr,
+                const DataTransformFunction& wrdFeatFunc = nullptr
+            );
 
-  int64_t size() const override;
+            int64_t size() const override;
 
-  std::vector<Tensor> get(const int64_t idx) const override;
+            std::vector<Tensor> get(const int64_t idx) const override;
 
-  float getInputSize(const int64_t idx) const;
+            float getInputSize(const int64_t idx) const;
 
-  int64_t getTargetSize(const int64_t idx) const;
+            int64_t getTargetSize(const int64_t idx) const;
 
-  virtual std::pair<std::vector<float>, Shape> loadAudio(
-      const std::string& handle) const;
+            virtual std::pair<std::vector<float>, Shape> loadAudio(
+                const std::string& handle
+            ) const;
 
- protected:
-  DataTransformFunction inFeatFunc_, tgtFeatFunc_, wrdFeatFunc_;
-  int64_t numRows_;
-  std::vector<std::string> ids_;
-  std::vector<std::string> inputs_;
-  std::vector<std::string> targets_;
-  std::vector<float> inputSizes_;
-  mutable std::vector<int64_t> targetSizesCache_;
-};
+        protected:
+            DataTransformFunction inFeatFunc_, tgtFeatFunc_, wrdFeatFunc_;
+            int64_t numRows_;
+            std::vector<std::string> ids_;
+            std::vector<std::string> inputs_;
+            std::vector<std::string> targets_;
+            std::vector<float> inputSizes_;
+            mutable std::vector<int64_t> targetSizesCache_;
+        };
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

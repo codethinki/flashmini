@@ -51,100 +51,102 @@ namespace lib {
  *
  */
 
-template <typename T>
-class ProducerConsumerQueue {
- public:
-  explicit ProducerConsumerQueue(int maxSize = 3000)
-      : maxSize_(maxSize), isAddingFinished_(false) {}
+    template<typename T>
+    class ProducerConsumerQueue {
+    public:
+        explicit ProducerConsumerQueue(int maxSize = 3000) : maxSize_(maxSize),
+                                                             isAddingFinished_(false) {}
 
-  /*
-   * - Adds an element to the queue.
-   * - Ignores the current one if adding is finished.
-   * - Notifies another producer when queue is not full.
-   * - Notifies a consumer.
-   */
-  void add(T unit) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    producerCondition_.wait(
-        lock, [this]() { return !isFull() || isAddingFinished_; });
+        /*
+         * - Adds an element to the queue.
+         * - Ignores the current one if adding is finished.
+         * - Notifies another producer when queue is not full.
+         * - Notifies a consumer.
+         */
+        void add(T unit) {
+            std::unique_lock<std::mutex> lock(mutex_);
+            producerCondition_.wait(
+                lock,
+                [this]() { return !isFull() || isAddingFinished_; });
 
-    if (isAddingFinished_) {
-      return;
-    }
-    queue_.push(std::move(unit));
+            if(isAddingFinished_) {
+                return;
+            }
+            queue_.push(std::move(unit));
 
-    if (!isFull()) {
-      producerCondition_.notify_one();
-    }
-    consumerCondition_.notify_one();
-  }
+            if(!isFull()) {
+                producerCondition_.notify_one();
+            }
+            consumerCondition_.notify_one();
+        }
 
-  /*
-   * - Pops an element from the queue.
-   * - Returns false when adding is finished and queue is empty.
-   * - Notifies another consumer when queue is not empty.
-   * - Notifies a producer.
-   */
-  bool get(T& unit) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    consumerCondition_.wait(
-        lock, [this]() { return !isEmpty() || isAddingFinished_; });
-    if (isEmpty()) {
-      return false;
-    }
-    unit = std::move(queue_.front());
-    queue_.pop();
+        /*
+         * - Pops an element from the queue.
+         * - Returns false when adding is finished and queue is empty.
+         * - Notifies another consumer when queue is not empty.
+         * - Notifies a producer.
+         */
+        bool get(T& unit) {
+            std::unique_lock<std::mutex> lock(mutex_);
+            consumerCondition_.wait(
+                lock,
+                [this]() { return !isEmpty() || isAddingFinished_; });
+            if(isEmpty()) {
+                return false;
+            }
+            unit = std::move(queue_.front());
+            queue_.pop();
 
-    if (!isEmpty()) {
-      consumerCondition_.notify_one();
-    }
-    producerCondition_.notify_one();
+            if(!isEmpty()) {
+                consumerCondition_.notify_one();
+            }
+            producerCondition_.notify_one();
 
-    return true;
-  }
+            return true;
+        }
 
-  /*
-   * - Sets the status of the queue to be adding-finished.
-   * - Notifies all the consumers to consume the remaining elements.
-   */
-  void finishAdding() {
-    std::unique_lock<std::mutex> lock(mutex_);
-    isAddingFinished_ = true;
-    consumerCondition_.notify_all();
-  }
+        /*
+         * - Sets the status of the queue to be adding-finished.
+         * - Notifies all the consumers to consume the remaining elements.
+         */
+        void finishAdding() {
+            std::unique_lock<std::mutex> lock(mutex_);
+            isAddingFinished_ = true;
+            consumerCondition_.notify_all();
+        }
 
-  /*
-   * - Clears the queue.
-   * - Resets the status of the queue to be adding-unfinished.
-   * - Notifies all the consumers and producers to work.
-   */
-  void clear() {
-    std::unique_lock<std::mutex> lock(mutex_);
-    while (!isEmpty()) {
-      queue_.pop();
-    }
-    isAddingFinished_ = false;
+        /*
+         * - Clears the queue.
+         * - Resets the status of the queue to be adding-unfinished.
+         * - Notifies all the consumers and producers to work.
+         */
+        void clear() {
+            std::unique_lock<std::mutex> lock(mutex_);
+            while(!isEmpty()) {
+                queue_.pop();
+            }
+            isAddingFinished_ = false;
 
-    producerCondition_.notify_all();
-    consumerCondition_.notify_all();
-  }
+            producerCondition_.notify_all();
+            consumerCondition_.notify_all();
+        }
 
- private:
-  std::condition_variable producerCondition_;
-  std::condition_variable consumerCondition_;
+    private:
+        std::condition_variable producerCondition_;
+        std::condition_variable consumerCondition_;
 
-  std::mutex mutex_;
-  std::queue<T> queue_;
-  int maxSize_;
-  bool isAddingFinished_;
+        std::mutex mutex_;
+        std::queue<T> queue_;
+        int maxSize_;
+        bool isAddingFinished_;
 
-  bool isFull() const {
-    return queue_.size() >= maxSize_;
-  }
+        bool isFull() const {
+            return queue_.size() >= maxSize_;
+        }
 
-  bool isEmpty() const {
-    return queue_.size() == 0;
-  }
-};
+        bool isEmpty() const {
+            return queue_.size() == 0;
+        }
+    };
 } // namespace lib
 } // namespace fl

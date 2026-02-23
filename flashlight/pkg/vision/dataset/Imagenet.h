@@ -39,13 +39,14 @@
  */
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
 /* Given the path to the imagenet labels file labels.txt,
  * create a map with a unique id for each label that can be used for training
  */
-std::unordered_map<std::string, uint64_t> getImagenetLabels(
-    const fs::path& labelFile);
+        std::unordered_map<std::string, uint64_t> getImagenetLabels(
+            const fs::path& labelFile
+        );
 
 /*
  * Creates an `ImageDataset` by globbing for images in
@@ -65,14 +66,15 @@ std::unordered_map<std::string, uint64_t> getImagenetLabels(
  * std::cout << sample[1].shape() << std::endl; // {1, 1, 1, 1}
  *
  */
-std::shared_ptr<Dataset> imagenetDataset(
-    const fs::path& imgDir,
-    const std::unordered_map<std::string, uint64_t>& labelMap,
-    std::vector<Dataset::TransformFunction> transformfns);
+        std::shared_ptr<Dataset> imagenetDataset(
+            const fs::path& imgDir,
+            const std::unordered_map<std::string, uint64_t>& labelMap,
+            std::vector<Dataset::TransformFunction> transformfns
+        );
 
-constexpr uint64_t kImagenetInputIdx = 0;
-constexpr uint64_t kImagenetTargetIdx = 1;
+        constexpr uint64_t kImagenetInputIdx = 0;
+        constexpr uint64_t kImagenetTargetIdx = 1;
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl

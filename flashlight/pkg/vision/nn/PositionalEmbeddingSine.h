@@ -12,43 +12,45 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
-class PositionalEmbeddingSine : public Container {
- public:
-  PositionalEmbeddingSine(
-      const int numPosFeats,
-      const int temperature,
-      const bool normalize,
-      const float scale);
+        class PositionalEmbeddingSine : public Container {
+        public:
+            PositionalEmbeddingSine(
+                const int numPosFeats,
+                const int temperature,
+                const bool normalize,
+                const float scale
+            );
 
-  PositionalEmbeddingSine(const PositionalEmbeddingSine& other);
-  PositionalEmbeddingSine(PositionalEmbeddingSine&& other) = default;
-  PositionalEmbeddingSine& operator=(const PositionalEmbeddingSine& other);
-  PositionalEmbeddingSine& operator=(PositionalEmbeddingSine&& other) = default;
-  std::unique_ptr<Module> clone() const override;
+            PositionalEmbeddingSine(const PositionalEmbeddingSine& other);
+            PositionalEmbeddingSine(PositionalEmbeddingSine&& other) = default;
+            PositionalEmbeddingSine& operator=(const PositionalEmbeddingSine& other);
+            PositionalEmbeddingSine& operator=(PositionalEmbeddingSine&& other) = default;
+            std::unique_ptr<Module> clone() const override;
 
-  std::vector<Variable> forward(const std::vector<Variable>& input) override;
+            std::vector<Variable> forward(const std::vector<Variable>& input) override;
 
-  std::vector<Variable> operator()(const std::vector<Variable>& input);
+            std::vector<Variable> operator()(const std::vector<Variable>& input);
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  PositionalEmbeddingSine() = default;
-  FL_SAVE_LOAD_WITH_BASE(
-      fl::Container,
-      numPosFeats_,
-      temperature_,
-      normalize_,
-      scale_)
-  int numPosFeats_;
-  int temperature_;
-  bool normalize_;
-  float scale_;
-};
+        private:
+            PositionalEmbeddingSine() = default;
+            FL_SAVE_LOAD_WITH_BASE(
+                fl::Container,
+                numPosFeats_,
+                temperature_,
+                normalize_,
+                scale_
+            )
+            int numPosFeats_;
+            int temperature_;
+            bool normalize_;
+            float scale_;
+        };
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl
 CEREAL_REGISTER_TYPE(fl::pkg::vision::PositionalEmbeddingSine)

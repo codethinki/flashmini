@@ -19,15 +19,20 @@
 #include "flashlight/fl/tensor/TensorBase.h"
 #include "flashlight/fl/tensor/Types.h"
 
-#define AF_CHECK(fn)                                                          \
-  do {                                                                        \
-    af_err __err = fn;                                                        \
-    if (__err == AF_SUCCESS) {                                                \
-      break;                                                                  \
-    }                                                                         \
-    throw af::exception(                                                      \
-        "ArrayFire error: ", __PRETTY_FUNCTION__, __FILE__, __LINE__, __err); \
-  } while (0)
+#define AF_CHECK(fn)                  \
+        do {                          \
+            af_err __err = fn;        \
+            if(__err == AF_SUCCESS) { \
+                break;                \
+            }                         \
+            throw af::exception(      \
+    "ArrayFire error: ",              \
+    __PRETTY_FUNCTION__,              \
+    __FILE__,                         \
+    __LINE__,                         \
+    __err                             \
+            );                        \
+        } while(0)
 
 namespace fl {
 namespace detail {
@@ -35,59 +40,59 @@ namespace detail {
 /**
  * Convert an fl::dtype into an ArrayFire af::dtype
  */
-af::dtype flToAfType(fl::dtype type);
+    af::dtype flToAfType(fl::dtype type);
 
 /**
  * Convert an ArrayFire af::dtype into an fl::dtype
  */
-fl::dtype afToFlType(af::dtype type);
+    fl::dtype afToFlType(af::dtype type);
 
 /**
  * Convert a Flashlight matrix property into an ArrayFire matrix property.
  */
-af_mat_prop flToAfMatrixProperty(MatrixProperty property);
+    af_mat_prop flToAfMatrixProperty(MatrixProperty property);
 
 /**
  * Convert a Flashlight tensor storage type into an ArrayFire storage type.
  */
-af_storage flToAfStorageType(StorageType storageType);
+    af_storage flToAfStorageType(StorageType storageType);
 
 /**
  * Convert a Flashlight tensor sort mode into an ArrayFire topk sort mode.
  */
-af_topk_function flToAfTopKSortMode(SortMode sortMode);
+    af_topk_function flToAfTopKSortMode(SortMode sortMode);
 
 /**
  * Convert an fl::Shape into an ArrayFire af::dim4
  */
-af::dim4 flToAfDims(const Shape& shape);
+    af::dim4 flToAfDims(const Shape& shape);
 
 /**
  * Convert an ArrayFire af::dim4 into an fl::Shape
  */
-Shape afToFlDims(const af::dim4& d, const unsigned numDims);
+    Shape afToFlDims(const af::dim4& d, const unsigned numDims);
 
 /**
  * Convert an ArrayFire af::dim4 into an fl::Shape, in-place
  */
-void afToFlDims(const af::dim4& d, const unsigned numDims, Shape& s);
+    void afToFlDims(const af::dim4& d, const unsigned numDims, Shape& s);
 
 /**
  * Convert an fl::range into an af::seq.
  */
-af::seq flRangeToAfSeq(const fl::range& range);
+    af::seq flRangeToAfSeq(const fl::range& range);
 
 /**
  * Convert an fl::Index into an af::index.
  */
-af::index flToAfIndex(const fl::Index& idx);
+    af::index flToAfIndex(const fl::Index& idx);
 
-std::vector<af::index> flToAfIndices(const std::vector<fl::Index>& flIndices);
+    std::vector<af::index> flToAfIndices(const std::vector<fl::Index>& flIndices);
 
 /**
  * Strip leading 1 indices from an ArrayFire dim4.
  */
-af::dim4 condenseDims(const af::dim4& dims);
+    af::dim4 condenseDims(const af::dim4& dims);
 
 /**
  * Modify the dimensions (in place via af::moddims) or an Array to have no 1
@@ -98,31 +103,33 @@ af::dim4 condenseDims(const af::dim4& dims);
  *
  * If keepDims is true, this is a noop, and the array is returned as is.
  */
-af::array condenseIndices(
-    const af::array& arr,
-    const bool keepDims = false,
-    const std::optional<std::vector<detail::IndexType>>& indexTypes = {},
-    const bool isFlat = false);
+    af::array condenseIndices(
+        const af::array& arr,
+        const bool keepDims = false,
+        const std::optional<std::vector<detail::IndexType>>& indexTypes = {},
+        const bool isFlat = false
+    );
 
 /**
  * Convert a Flashlight Location into an ArrayFire location (host or device).
  */
-af_source flToAfLocation(Location location);
+    af_source flToAfLocation(Location location);
 
 /**
  * Construct an ArrayFire array from a buffer and Flashlight details.
  */
-af::array fromFlData(
-    const Shape& shape,
-    const void* ptr,
-    fl::dtype type,
-    fl::Location memoryLocation);
+    af::array fromFlData(
+        const Shape& shape,
+        const void* ptr,
+        fl::dtype type,
+        fl::Location memoryLocation
+    );
 
 /**
  * Convert a Flashlight PadType to an ArrayFire af_border_type for describing
  * padding.
  */
-af_border_type flToAfPadType(PadType type);
+    af_border_type flToAfPadType(PadType type);
 
 } // namespace detail
 } // namespace fl

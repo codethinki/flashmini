@@ -12,29 +12,30 @@
 
 namespace fl {
 namespace lib {
-namespace audio {
+    namespace audio {
 
 // Compute first order (deltas) and second order (acceleration) derivatives of
-//  cepstral coefficients
-//    d(i) =    0.5 * SUM_t (t * (c(i + t) - c (i - t))) / SUM_t t^2
-//      where t in [1, maxlagsize]
+// cepstral coefficients
+// d(i) =    0.5 * SUM_t (t * (c(i + t) - c (i - t))) / SUM_t t^2
+// where t in [1, maxlagsize]
 
-class Derivatives {
- public:
-  Derivatives(int deltawindow, int accwindow);
+        class Derivatives {
+        public:
+            Derivatives(int deltawindow, int accwindow);
 
-  std::vector<float> apply(const std::vector<float>& input, int numfeat) const;
+            std::vector<float> apply(const std::vector<float>& input, int numfeat) const;
 
- private:
-  int deltaWindow_; // delta derivatives lag size
-  int accWindow_; // acceleration derivatives lag size
+        private:
+            int deltaWindow_; // delta derivatives lag size
+            int accWindow_; // acceleration derivatives lag size
 
-  // Helper function to compute derivatives of single order
-  std::vector<float> computeDerivative(
-      const std::vector<float>& input,
-      int windowlen,
-      int numfeat) const;
-};
-} // namespace audio
+            // Helper function to compute derivatives of single order
+            std::vector<float> computeDerivative(
+                const std::vector<float>& input,
+                int windowlen,
+                int numfeat
+            ) const;
+        };
+    } // namespace audio
 } // namespace lib
 } // namespace fl

@@ -13,17 +13,16 @@
 
 namespace fl {
 namespace pkg {
-namespace runtime {
+    namespace runtime {
 /**
  * Get a certain checkpoint by `runidx`.
  */
-std::string
-getRunFile(const std::string& name, int runidx, const fs::path& runpath);
+        std::string getRunFile(const std::string& name, int runidx, const fs::path& runpath);
 
 /**
  * Serialize gflags into a buffer.
  */
-std::string serializeGflags(const std::string& separator = "\n");
+        std::string serializeGflags(const std::string& separator = "\n");
 
 /**
  * Properly scale the loss for back-propogation.
@@ -35,22 +34,23 @@ std::string serializeGflags(const std::string& separator = "\n");
  * gradients.
  * @param[in] reducer - to synchronize gradients in back-propogation.
  */
-bool backwardWithScaling(
-    const fl::Variable& loss,
-    std::vector<fl::Variable>& params,
-    std::shared_ptr<fl::pkg::runtime::DynamicScaler> dynamicScaler,
-    std::shared_ptr<fl::Reducer> reducer);
+        bool backwardWithScaling(
+            const fl::Variable& loss,
+            std::vector<fl::Variable>& params,
+            std::shared_ptr<fl::pkg::runtime::DynamicScaler> dynamicScaler,
+            std::shared_ptr<fl::Reducer> reducer
+        );
 
 /**
  * Returns the current date as a string
  */
-std::string getCurrentDate();
+        std::string getCurrentDate();
 
 /**
  * Returns the current time as a string
  */
-std::string getCurrentTime();
+        std::string getCurrentTime();
 
-} // namespace runtime
+    } // namespace runtime
 } // namespace pkg
 } // namespace fl

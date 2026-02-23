@@ -78,12 +78,12 @@ FL_API void initLogging();
 
 /// \ingroup logging
 enum class LogLevel {
-  DISABLED, // use only for when calling setMaxLoggingLevel() or
-  // setting DEFAULT_MAX_FL_LOGGING_LEVEL.
-  FATAL,
-  ERROR,
-  WARNING,
-  INFO,
+    DISABLED, // use only for when calling setMaxLoggingLevel() or
+    // setting DEFAULT_MAX_FL_LOGGING_LEVEL.
+    FATAL,
+    ERROR,
+    WARNING,
+    INFO,
 };
 
 /**
@@ -130,114 +130,114 @@ constexpr int DEFAULT_MAX_VERBOSE_FL_LOGGING_LEVEL = 0;
 #define FL_VLOG(level) fl::VerboseLogging(level, __FILE__, __LINE__)
 
 // Optimization macros that allow to run code only we are going to log it.
-#define IF_LOG(level) if (fl::Logging::ifLog(level))
-#define IF_VLOG(level) if (fl::VerboseLogging::ifLog(level))
+#define IF_LOG(level) if(fl::Logging::ifLog(level))
+#define IF_VLOG(level) if(fl::VerboseLogging::ifLog(level))
 
 /// \ingroup logging
 #define FL_LOG_IF(level, exp) \
-  if (exp)                    \
-  fl::Logging(level, __FILE__, __LINE__)
+        if(exp)               \
+        fl::Logging(level, __FILE__, __LINE__)
 /// \ingroup logging
 #define FL_VLOG_IF(level, exp) \
-  if (exp)                     \
-  fl::VerboseLogging(level, __FILE__, __LINE__)
+        if(exp)                \
+        fl::VerboseLogging(level, __FILE__, __LINE__)
 
 class FL_API Logging {
- public:
-  Logging(LogLevel level, const char* filename, int lineNumber);
-  ~Logging();
+public:
+    Logging(LogLevel level, const char* filename, int lineNumber);
+    ~Logging();
 
-  // Prints t to stdout along with context and sensible font color.
-  template <typename T>
-  Logging&& print(T& t) {
-    if (level_ <= Logging::maxLoggingLevel_) {
-      stringStream_ << t;
+    // Prints t to stdout along with context and sensible font color.
+    template<typename T>
+    Logging && print(T & t) {
+        if(level_ <= Logging::maxLoggingLevel_) {
+            stringStream_ << t;
+        }
+        return std::move(*this);
     }
-    return std::move(*this);
-  }
 
-  // Overrides DEFAULT_MAX_FL_LOGGING_LEVEL value.
-  static void setMaxLoggingLevel(LogLevel maxLoggingLevel);
+    // Overrides DEFAULT_MAX_FL_LOGGING_LEVEL value.
+    static void setMaxLoggingLevel(LogLevel maxLoggingLevel);
 
-  static bool ifLog(LogLevel level) {
-    return (maxLoggingLevel_ >= level);
-  }
+    static bool ifLog(LogLevel level) {
+        return maxLoggingLevel_ >= level;
+    }
 
- private:
-  static LogLevel maxLoggingLevel_;
-  const LogLevel level_;
-  std::stringstream stringStream_;
-  std::ostream* outputStreamPtr_;
+private:
+    static LogLevel maxLoggingLevel_;
+    const LogLevel level_;
+    std::stringstream stringStream_;
+    std::ostream* outputStreamPtr_;
 };
 
 class FL_API VerboseLogging {
- public:
-  VerboseLogging(int level, const char* filename, int lineNumber);
-  ~VerboseLogging();
+public:
+    VerboseLogging(int level, const char* filename, int lineNumber);
+    ~VerboseLogging();
 
-  // Prints t to stdout along with logging level and context.
-  template <typename T>
-  VerboseLogging&& print(T& t) {
-    if (level_ <= VerboseLogging::maxLoggingLevel_) {
-      stringStream_ << t;
+    // Prints t to stdout along with logging level and context.
+    template<typename T>
+    VerboseLogging && print(T & t) {
+        if(level_ <= VerboseLogging::maxLoggingLevel_) {
+            stringStream_ << t;
+        }
+        return std::move(*this);
     }
-    return std::move(*this);
-  }
 
-  // Overrides DEFAULT_MAX_VERBOSE_FL_LOGGING_LEVEL value.
-  static void setMaxLoggingLevel(int maxLoggingLevel);
+    // Overrides DEFAULT_MAX_VERBOSE_FL_LOGGING_LEVEL value.
+    static void setMaxLoggingLevel(int maxLoggingLevel);
 
-  static bool ifLog(int level) {
-    return (maxLoggingLevel_ >= level);
-  }
+    static bool ifLog(int level) {
+        return maxLoggingLevel_ >= level;
+    }
 
- private:
-  static int maxLoggingLevel_;
-  const int level_;
-  std::stringstream stringStream_;
+private:
+    static int maxLoggingLevel_;
+    const int level_;
+    std::stringstream stringStream_;
 };
 
 // Can't use template here since the compiler will try resolve
 // to all kind of other existing function before it considers
 // instantiating a template.
-FL_API Logging&& operator<<(Logging&& log, const std::string& s);
-FL_API Logging&& operator<<(Logging&& log, const char* s);
-FL_API Logging&& operator<<(Logging&& log, const void* s);
-FL_API Logging&& operator<<(Logging&& log, char c);
-FL_API Logging&& operator<<(Logging&& log, unsigned char u);
-FL_API Logging&& operator<<(Logging&& log, int i);
-FL_API Logging&& operator<<(Logging&& log, unsigned int u);
-FL_API Logging&& operator<<(Logging&& log, long l);
-FL_API Logging&& operator<<(Logging&& log, long long l);
-FL_API Logging&& operator<<(Logging&& log, unsigned long u);
-FL_API Logging&& operator<<(Logging&& log, unsigned long long u);
-FL_API Logging&& operator<<(Logging&& log, float f);
-FL_API Logging&& operator<<(Logging&& log, double d);
-FL_API Logging&& operator<<(Logging&& log, bool b);
+FL_API Logging && operator<<(Logging && log, const std::string& s);
+FL_API Logging && operator<<(Logging && log, const char* s);
+FL_API Logging && operator<<(Logging && log, const void* s);
+FL_API Logging && operator<<(Logging && log, char c);
+FL_API Logging && operator<<(Logging && log, unsigned char u);
+FL_API Logging && operator<<(Logging && log, int i);
+FL_API Logging && operator<<(Logging && log, unsigned int u);
+FL_API Logging && operator<<(Logging && log, long l);
+FL_API Logging && operator<<(Logging && log, long long l);
+FL_API Logging && operator<<(Logging && log, unsigned long u);
+FL_API Logging && operator<<(Logging && log, unsigned long long u);
+FL_API Logging && operator<<(Logging && log, float f);
+FL_API Logging && operator<<(Logging && log, double d);
+FL_API Logging && operator<<(Logging && log, bool b);
 
 // Catch all designed mostly for <iomanip> stuff.
-template <typename T>
-Logging&& operator<<(Logging&& log, const T& t) {
-  return log.print(t);
+template<typename T>
+Logging && operator<<(Logging&& log, const T& t) {
+    return log.print(t);
 }
 
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, const std::string& s);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, const char* s);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, const void* s);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, char c);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, unsigned char u);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, int i);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, unsigned int u);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, long l);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, unsigned long u);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, float f);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, double d);
-FL_API VerboseLogging&& operator<<(VerboseLogging&& log, bool b);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, const std::string& s);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, const char* s);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, const void* s);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, char c);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, unsigned char u);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, int i);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, unsigned int u);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, long l);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, unsigned long u);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, float f);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, double d);
+FL_API VerboseLogging && operator<<(VerboseLogging && log, bool b);
 
 // Catch all designed mostly for <iomanip> stuff.
-template <typename T>
-VerboseLogging&& operator<<(VerboseLogging&& log, const T& t) {
-  return log.print(t);
+template<typename T>
+VerboseLogging && operator<<(VerboseLogging&& log, const T& t) {
+    return log.print(t);
 }
 
 } // namespace fl

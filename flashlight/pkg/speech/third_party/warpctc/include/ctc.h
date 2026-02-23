@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-//forward declare of CUDA typedef to avoid needing to pull in CUDA headers
+// forward declare of CUDA typedef to avoid needing to pull in CUDA headers
 typedef struct CUstream_st* CUstream;
 
 typedef enum {
@@ -92,16 +92,18 @@ struct ctcOptions {
  *  \return Status information
  *
  * */
-ctcStatus_t compute_ctc_loss(const float* const activations,
-                             float* gradients,
-                             const int* const flat_labels,
-                             const int* const label_lengths,
-                             const int* const input_lengths,
-                             int alphabet_size,
-                             int minibatch,
-                             float *costs,
-                             void *workspace,
-                             ctcOptions options);
+ctcStatus_t compute_ctc_loss(
+    const float* const activations,
+    float* gradients,
+    const int* const flat_labels,
+    const int* const label_lengths,
+    const int* const input_lengths,
+    int alphabet_size,
+    int minibatch,
+    float* costs,
+    void* workspace,
+    ctcOptions options
+);
 
 
 /** For a given set of labels and minibatch size return the required workspace
@@ -121,11 +123,14 @@ ctcStatus_t compute_ctc_loss(const float* const activations,
  *
  *  \return Status information
  **/
-ctcStatus_t get_workspace_size(const int* const label_lengths,
-                               const int* const input_lengths,
-                               int alphabet_size, int minibatch,
-                               ctcOptions info,
-                               size_t* size_bytes);
+ctcStatus_t get_workspace_size(
+    const int* const label_lengths,
+    const int* const input_lengths,
+    int alphabet_size,
+    int minibatch,
+    ctcOptions info,
+    size_t* size_bytes
+);
 
 #ifdef __cplusplus
 }

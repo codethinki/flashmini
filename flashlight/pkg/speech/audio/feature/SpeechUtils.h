@@ -13,21 +13,23 @@
 
 namespace fl {
 namespace lib {
-namespace audio {
+    namespace audio {
 
 // Convert the speech signal into frames
 
-std::vector<float> frameSignal(
-    const std::vector<float>& input,
-    const FeatureParams& params);
+        std::vector<float> frameSignal(
+            const std::vector<float>& input,
+            const FeatureParams& params
+        );
 
 // row major;  matA - m x k , matB - k x n
 
-std::vector<float> cblasGemm(
-    const std::vector<float>& matA,
-    const std::vector<float>& matB,
-    int n,
-    int k);
-} // namespace audio
+        std::vector<float> cblasGemm(
+            const std::vector<float>& matA,
+            const std::vector<float>& matB,
+            int n,
+            int k
+        );
+    } // namespace audio
 } // namespace lib
 } // namespace fl

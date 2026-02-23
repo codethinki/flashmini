@@ -11,19 +11,19 @@
 
 namespace fl::lib::audio {
 
-Dither::Dither(float ditherVal)
-    : ditherVal_(ditherVal), rng_((ditherVal > 0.0) ? 123456 : time(nullptr)){};
+Dither::Dither(float ditherVal) : ditherVal_(ditherVal),
+                                  rng_((ditherVal > 0.0) ? 123456 : time(nullptr)) {};
 
 std::vector<float> Dither::apply(const std::vector<float>& input) {
-  auto output(input);
-  applyInPlace(output);
-  return output;
+    auto output(input);
+    applyInPlace(output);
+    return output;
 }
 
 void Dither::applyInPlace(std::vector<float>& input) {
-  std::uniform_real_distribution<float> distribution(0.0, 1.0);
-  for (auto& i : input) {
-    i += ditherVal_ * distribution(rng_);
-  }
+    std::uniform_real_distribution<float> distribution(0.0, 1.0);
+    for(auto& i : input) {
+        i += ditherVal_ * distribution(rng_);
+    }
 }
 } // namespace fl

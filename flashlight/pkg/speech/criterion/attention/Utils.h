@@ -11,11 +11,12 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-fl::Variable maskAttention(
-    const fl::Variable& input,
-    const fl::Variable& sizes);
-} // namespace speech
+        fl::Variable maskAttention(
+            const fl::Variable& input,
+            const fl::Variable& sizes
+        );
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

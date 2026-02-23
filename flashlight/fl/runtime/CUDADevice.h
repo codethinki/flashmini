@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -16,31 +15,31 @@ namespace fl {
  * Represents a CUDA device.
  */
 class FL_API CUDADevice : public DeviceTrait<CUDADevice> {
-  // native ID of the underlying CUDA device
-  const int nativeId_;
-  // TODO metadata, e.g., memory/compute capacity
+    // native ID of the underlying CUDA device
+    const int nativeId_;
+    // TODO metadata, e.g., memory/compute capacity
 
- public:
-  static constexpr DeviceType type = DeviceType::CUDA;
+public:
+    static constexpr DeviceType type = DeviceType::CUDA;
 
-  /**
-   * Creates a wrapper around the CUDA device with given native device ID.
-   *
-   * @param[in] nativeId the CUDA device ID with which to create this Device.
-   */
-  explicit CUDADevice(int nativeId);
+    /**
+     * Creates a wrapper around the CUDA device with given native device ID.
+     *
+     * @param[in] nativeId the CUDA device ID with which to create this Device.
+     */
+    explicit CUDADevice(int nativeId);
 
-  /**
-   * Returns the native CUDA device ID.
-   *
-   * @return an integer representing the native CUDA device ID.
-   */
-  int nativeId() const override;
+    /**
+     * Returns the native CUDA device ID.
+     *
+     * @return an integer representing the native CUDA device ID.
+     */
+    int nativeId() const override;
 
-  /**
-   * Set the underlying CUDA device as active.
-   */
-  void setActiveImpl() const override;
+    /**
+     * Set the underlying CUDA device as active.
+     */
+    void setActiveImpl() const override;
 };
 
 } // namespace fl

@@ -16,13 +16,13 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-using GetConvLmScoreFunc = std::function<std::vector<
-    float>(const std::vector<int>&, const std::vector<int>&, int, int)>;
+        using GetConvLmScoreFunc = std::function<std::vector<
+            float>(const std::vector<int>&, const std::vector<int>&, int, int)>;
 
-GetConvLmScoreFunc buildGetConvLmScoreFunction(std::shared_ptr<Module> network);
+        GetConvLmScoreFunc buildGetConvLmScoreFunction(std::shared_ptr<Module> network);
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

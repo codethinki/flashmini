@@ -10,58 +10,58 @@
 namespace fl {
 
 TimeMeter::TimeMeter(bool unit /* = false */) : useUnit_(unit) {
-  reset();
+    reset();
 }
 
 void TimeMeter::reset() {
-  curN_ = 0;
-  curValue_ = 0.;
-  isStopped_ = true;
+    curN_ = 0;
+    curValue_ = 0.;
+    isStopped_ = true;
 }
 
 void TimeMeter::set(double val, int64_t num /* = 1 */) {
-  curValue_ = val;
-  curN_ = num;
-  start_ = std::chrono::system_clock::now();
+    curValue_ = val;
+    curN_ = num;
+    start_ = std::chrono::system_clock::now();
 }
 
 double TimeMeter::value() const {
-  double val = curValue_;
-  if (!isStopped_) {
-    std::chrono::duration<double> duration =
-        std::chrono::system_clock::now() - start_;
-    val += duration.count();
-  }
-  if (useUnit_) {
-    val = (curN_ > 0) ? (val / curN_) : 0.0;
-  }
-  return val;
+    double val = curValue_;
+    if(!isStopped_) {
+        std::chrono::duration<double> duration =
+            std::chrono::system_clock::now() - start_;
+        val += duration.count();
+    }
+    if(useUnit_) {
+        val = (curN_ > 0) ? (val / curN_) : 0.0;
+    }
+    return val;
 }
 
 void TimeMeter::stop() {
-  if (isStopped_) {
-    return;
-  }
-  std::chrono::duration<double> duration =
-      std::chrono::system_clock::now() - start_;
-  curValue_ += duration.count();
-  isStopped_ = true;
+    if(isStopped_) {
+        return;
+    }
+    std::chrono::duration<double> duration =
+        std::chrono::system_clock::now() - start_;
+    curValue_ += duration.count();
+    isStopped_ = true;
 }
 
 void TimeMeter::resume() {
-  if (!isStopped_) {
-    return;
-  }
-  start_ = std::chrono::system_clock::now();
-  isStopped_ = false;
+    if(!isStopped_) {
+        return;
+    }
+    start_ = std::chrono::system_clock::now();
+    isStopped_ = false;
 }
 
 void TimeMeter::incUnit(int64_t num) {
-  curN_ += num;
+    curN_ += num;
 }
 
 void TimeMeter::stopAndIncUnit(int64_t num) {
-  stop();
-  incUnit(num);
+    stop();
+    incUnit(num);
 }
 } // namespace fl

@@ -11,36 +11,38 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-class MedianWindow : public WindowBase {
- public:
-  MedianWindow();
-  MedianWindow(int wL, int wR);
+        class MedianWindow : public WindowBase {
+        public:
+            MedianWindow();
+            MedianWindow(int wL, int wR);
 
-  Variable computeWindow(
-      const Variable& prevAttn,
-      int step,
-      int targetLen,
-      int inputSteps,
-      int batchSize,
-      const Tensor& inputSizes = Tensor(),
-      const Tensor& targetSizes = Tensor()) const override;
+            Variable computeWindow(
+                const Variable& prevAttn,
+                int step,
+                int targetLen,
+                int inputSteps,
+                int batchSize,
+                const Tensor& inputSizes = Tensor(),
+                const Tensor& targetSizes = Tensor()
+            ) const override;
 
-  Variable computeVectorizedWindow(
-      int targetLen,
-      int inputSteps,
-      int batchSize,
-      const Tensor& inputSizes = Tensor(),
-      const Tensor& targetSizes = Tensor()) const override;
+            Variable computeVectorizedWindow(
+                int targetLen,
+                int inputSteps,
+                int batchSize,
+                const Tensor& inputSizes = Tensor(),
+                const Tensor& targetSizes = Tensor()
+            ) const override;
 
- private:
-  int wL_;
-  int wR_;
+        private:
+            int wL_;
+            int wR_;
 
-  FL_SAVE_LOAD_WITH_BASE(WindowBase, wL_, wR_)
-};
-} // namespace speech
+            FL_SAVE_LOAD_WITH_BASE(WindowBase, wL_, wR_)
+        };
+    } // namespace speech
 } // namespace pkg
 } // namespace fl
 

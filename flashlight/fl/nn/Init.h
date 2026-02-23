@@ -42,11 +42,12 @@ namespace detail {
  *
  * \ingroup nn_init_utils
  */
-FL_API Tensor uniform(
-    const Shape& shape,
-    double min = 0,
-    double max = 1,
-    fl::dtype type = fl::dtype::f32);
+    FL_API Tensor uniform(
+        const Shape& shape,
+        double min = 0,
+        double max = 1,
+        fl::dtype type = fl::dtype::f32
+    );
 
 /**
  * Creates a `Tensor` representing a tensor of up to rank 4 with arbitrary
@@ -64,11 +65,12 @@ FL_API Tensor uniform(
  *
  * \ingroup nn_init_utils
  */
-FL_API Tensor normal(
-    const Shape& shape,
-    double stdv = 1,
-    double mean = 0,
-    fl::dtype type = fl::dtype::f32);
+    FL_API Tensor normal(
+        const Shape& shape,
+        double stdv = 1,
+        double mean = 0,
+        fl::dtype type = fl::dtype::f32
+    );
 
 /**
  * Creates a `Tensor` representing a tensor with given input dimensions where
@@ -87,8 +89,7 @@ FL_API Tensor normal(
  *
  * \ingroup nn_init_utils
  */
-FL_API Tensor
-kaimingUniform(const Shape& shape, int fanIn, fl::dtype type = fl::dtype::f32);
+    FL_API Tensor kaimingUniform(const Shape& shape, int fanIn, fl::dtype type = fl::dtype::f32);
 /**
  * Creates a `Tensor` representing a tensor with given input dimensions
  * where elements are normally distributed according to the method outlined in
@@ -104,8 +105,7 @@ kaimingUniform(const Shape& shape, int fanIn, fl::dtype type = fl::dtype::f32);
  *
  * \ingroup nn_init_utils
  */
-FL_API Tensor
-kaimingNormal(const Shape& shape, int fanIn, fl::dtype type = fl::dtype::f32);
+    FL_API Tensor kaimingNormal(const Shape& shape, int fanIn, fl::dtype type = fl::dtype::f32);
 
 /**
  * Creates a `Tensor` representing a tensor with given input dimensions
@@ -124,11 +124,12 @@ kaimingNormal(const Shape& shape, int fanIn, fl::dtype type = fl::dtype::f32);
  *
  * \ingroup nn_init_utils
  */
-FL_API Tensor glorotUniform(
-    const Shape& shape,
-    int fanIn,
-    int fanOut,
-    fl::dtype type = fl::dtype::f32);
+    FL_API Tensor glorotUniform(
+        const Shape& shape,
+        int fanIn,
+        int fanOut,
+        fl::dtype type = fl::dtype::f32
+    );
 
 /**
  * Creates a `Tensor` representing a tensor with given input dimensions
@@ -148,11 +149,12 @@ FL_API Tensor glorotUniform(
  *
  * \ingroup nn_init_utils
  */
-FL_API Tensor glorotNormal(
-    const Shape& shape,
-    int fanIn,
-    int fanOut,
-    fl::dtype type = fl::dtype::f32);
+    FL_API Tensor glorotNormal(
+        const Shape& shape,
+        int fanIn,
+        int fanOut,
+        fl::dtype type = fl::dtype::f32
+    );
 
 /*
  * Approximation of inverse error function.
@@ -195,7 +197,7 @@ FL_API Tensor glorotNormal(
     USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
  */
-FL_API Tensor erfinv(const Tensor& y);
+    FL_API Tensor erfinv(const Tensor& y);
 
 } // namespace detail
 
@@ -250,7 +252,8 @@ FL_API Variable constant(
     int inputSize,
     int outputSize,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor of up to rank 4 with arbitrary
@@ -270,7 +273,8 @@ FL_API Variable constant(
     double val,
     const Shape& shape,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a scalar with a given value and type.
@@ -284,10 +288,9 @@ FL_API Variable constant(
  *
  * \ingroup nn_init_utils
  */
-template <typename T>
-Variable
-scalar(T val, fl::dtype type = dtype_traits<T>::ctype, bool calcGrad = true) {
-  return Variable(fromScalar(val, type), calcGrad);
+template<typename T>
+Variable scalar(T val, fl::dtype type = dtype_traits<T>::ctype, bool calcGrad = true) {
+    return Variable(fromScalar(val, type), calcGrad);
 }
 
 /**
@@ -308,7 +311,8 @@ FL_API Variable identity(
     int inputSize,
     int outputSize,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing an identity tensor of up to rank 4 with
@@ -326,7 +330,8 @@ FL_API Variable identity(
 FL_API Variable identity(
     const Shape& shape,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor with dimensions `[inputSize,
@@ -353,7 +358,8 @@ FL_API Variable uniform(
     double min = 0,
     double max = 1,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor of up to rank 4 with arbitrary
@@ -378,7 +384,8 @@ FL_API Variable uniform(
     double min = 0,
     double max = 1,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor with dimensions `[inputSize,
@@ -405,7 +412,8 @@ FL_API Variable normal(
     double stdv = 1,
     double mean = 0,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor of up to rank 4 with arbitrary
@@ -430,7 +438,8 @@ FL_API Variable normal(
     double stdv = 1,
     double mean = 0,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor with given input dimensions where
@@ -453,7 +462,8 @@ FL_API Variable kaimingUniform(
     const Shape& shape,
     int fanIn,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 /**
  * Creates a `Variable` representing a tensor with given input dimensions where
  * elements are normally distributed according to the method
@@ -476,7 +486,8 @@ FL_API Variable kaimingNormal(
     const Shape& shape,
     int fanIn,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor with given input dimensions where
@@ -502,7 +513,8 @@ FL_API Variable glorotUniform(
     int fanIn,
     int fanOut,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor with given input dimensions where
@@ -529,7 +541,8 @@ FL_API Variable glorotNormal(
     int fanIn,
     int fanOut,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 /**
  * Creates a `Variable` representing a tensor with given input dimensions where
@@ -557,6 +570,7 @@ FL_API Variable truncNormal(
     double minCufOff = -2.,
     double maxCutOff = 2.,
     fl::dtype type = fl::dtype::f32,
-    bool calcGrad = true);
+    bool calcGrad = true
+);
 
 } // namespace fl

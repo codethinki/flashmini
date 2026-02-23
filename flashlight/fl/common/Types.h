@@ -20,7 +20,7 @@ namespace detail {
 /**
  * Precision specifications for autograd operators based on optimization level.
  */
-const std::unordered_map<OptimLevel, std::unordered_set<std::string>>
+    const std::unordered_map<OptimLevel, std::unordered_set<std::string>>
     kOptimLevelTypeExclusionMappings = {
         {OptimLevel::DEFAULT, {}}, // unused
         {OptimLevel::O1,
@@ -45,7 +45,7 @@ const std::unordered_map<OptimLevel, std::unordered_set<std::string>>
          // Perform all operations in fp16 except for:
          {"batchnorm"}},
         {OptimLevel::O3, {}} // Perform all operations in f16
-};
+    };
 
 } // namespace detail
 

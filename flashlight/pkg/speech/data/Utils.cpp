@@ -23,45 +23,49 @@ std::vector<std::string> wrd2Target(
     float targetSamplePct /* = 0 */,
     bool fallback2LtrWordSepLeft /* = false */,
     bool fallback2LtrWordSepRight /* = false */,
-    bool skipUnk /* = false */) {
-  // find the word in the lexicon and use its spelling
-  auto lit = lexicon.find(word);
-  if (lit != lexicon.end()) {
-    // sample random spelling if word has different spellings
-    if (lit->second.size() > 1 &&
-        targetSamplePct >
-            static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX)) {
-      return lit->second[std::rand() % lit->second.size()];
-    } else {
-      return lit->second[0];
+    bool skipUnk /* = false */
+) {
+    // find the word in the lexicon and use its spelling
+    auto lit = lexicon.find(word);
+    if(lit != lexicon.end()) {
+        // sample random spelling if word has different spellings
+        if(
+            lit->second.size() > 1
+            && targetSamplePct
+            > static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX)
+        ) {
+            return lit->second[std::rand() % lit->second.size()];
+        } else {
+            return lit->second[0];
+        }
     }
-  }
 
-  std::vector<std::string> word2tokens;
-  if (fallback2LtrWordSepLeft || fallback2LtrWordSepRight) {
-    if (fallback2LtrWordSepLeft && !wordSeparator.empty()) {
-      // add word separator at the beginning of fallback word
-      word2tokens.push_back(wordSeparator);
+    std::vector<std::string> word2tokens;
+    if(fallback2LtrWordSepLeft || fallback2LtrWordSepRight) {
+        if(fallback2LtrWordSepLeft && !wordSeparator.empty()) {
+            // add word separator at the beginning of fallback word
+            word2tokens.push_back(wordSeparator);
+        }
+        auto tokens = splitWrd(word);
+        for(const auto& tkn : tokens) {
+            if(dict.contains(tkn)) {
+                word2tokens.push_back(tkn);
+            } else if(!skipUnk) {
+                throw std::invalid_argument(
+                    "Unknown token '" + tkn
+                    + "' when falling back to letter target for the unknown word: "
+                    + word
+                );
+            }
+        }
+        if(fallback2LtrWordSepRight && !wordSeparator.empty()) {
+            // add word separator at the end of fallback word
+            word2tokens.push_back(wordSeparator);
+        }
+    } else if(!skipUnk) {
+        throw std::invalid_argument("Unknown word in the lexicon: " + word);
     }
-    auto tokens = splitWrd(word);
-    for (const auto& tkn : tokens) {
-      if (dict.contains(tkn)) {
-        word2tokens.push_back(tkn);
-      } else if (!skipUnk) {
-        throw std::invalid_argument(
-            "Unknown token '" + tkn +
-            "' when falling back to letter target for the unknown word: " +
-            word);
-      }
-    }
-    if (fallback2LtrWordSepRight && !wordSeparator.empty()) {
-      // add word separator at the end of fallback word
-      word2tokens.push_back(wordSeparator);
-    }
-  } else if (!skipUnk) {
-    throw std::invalid_argument("Unknown word in the lexicon: " + word);
-  }
-  return word2tokens;
+    return word2tokens;
 }
 
 std::vector<std::string> wrd2Target(
@@ -72,45 +76,51 @@ std::vector<std::string> wrd2Target(
     float targetSamplePct /* = 0 */,
     bool fallback2LtrWordSepLeft /* = false */,
     bool fallback2LtrWordSepRight /* = false */,
-    bool skipUnk /* = false */) {
-  std::vector<std::string> res;
-  for (const auto& w : words) {
-    auto w2tokens = wrd2Target(
-        w,
-        lexicon,
-        dict,
-        wordSeparator,
-        targetSamplePct,
-        fallback2LtrWordSepLeft,
-        fallback2LtrWordSepRight,
-        skipUnk);
+    bool skipUnk /* = false */
+) {
+    std::vector<std::string> res;
+    for(const auto& w : words) {
+        auto w2tokens = wrd2Target(
+            w,
+            lexicon,
+            dict,
+            wordSeparator,
+            targetSamplePct,
+            fallback2LtrWordSepLeft,
+            fallback2LtrWordSepRight,
+            skipUnk
+        );
 
-    if (w2tokens.empty()) {
-      continue;
+        if(w2tokens.empty()) {
+            continue;
+        }
+        res.insert(res.end(), w2tokens.begin(), w2tokens.end());
     }
-    res.insert(res.end(), w2tokens.begin(), w2tokens.end());
-  }
-  return res;
+    return res;
 }
 
 std::pair<int, FeatureType> getFeatureType(
     const std::string& featuresType,
     int channels,
-    const fl::lib::audio::FeatureParams& featParams) {
-  if (featuresType == kFeaturesPow) {
-    return std::make_pair(
-        featParams.powSpecFeatSz(), FeatureType::POW_SPECTRUM);
-  } else if (featuresType == kFeaturesMFSC) {
-    return std::make_pair(featParams.mfscFeatSz(), FeatureType::MFSC);
-  } else if (featuresType == kFeaturesMFSC) {
-    return std::make_pair(featParams.mfccFeatSz(), FeatureType::MFCC);
-  } else if (featuresType == kFeaturesRaw) {
-    return std::make_pair(channels, FeatureType::NONE);
-  } else {
-    throw std::runtime_error(
-        "Unsupported feature type for audio preprocessing '" + featuresType +
-        "'");
-  }
+    const fl::lib::audio::FeatureParams& featParams
+) {
+    if(featuresType == kFeaturesPow) {
+        return std::make_pair(
+            featParams.powSpecFeatSz(),
+            FeatureType::POW_SPECTRUM
+        );
+    } else if(featuresType == kFeaturesMFSC) {
+        return std::make_pair(featParams.mfscFeatSz(), FeatureType::MFSC);
+    } else if(featuresType == kFeaturesMFSC) {
+        return std::make_pair(featParams.mfccFeatSz(), FeatureType::MFCC);
+    } else if(featuresType == kFeaturesRaw) {
+        return std::make_pair(channels, FeatureType::NONE);
+    } else {
+        throw std::runtime_error(
+            "Unsupported feature type for audio preprocessing '" + featuresType
+            + "'"
+        );
+    }
 }
 
 } // namespace fl

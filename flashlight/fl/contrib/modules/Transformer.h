@@ -47,62 +47,62 @@ namespace fl {
  * @param preLN apply layer normalization before or after residual connection
  */
 class FL_API Transformer : public Container {
- public:
-  Transformer(
-      int32_t modelDim,
-      int32_t headDim,
-      int32_t mlpDim,
-      int32_t nHeads,
-      int32_t bptt,
-      float pDropout,
-      float pLayerdrop,
-      bool useMask = false,
-      bool preLN = false);
-  Transformer(const Transformer& other);
-  Transformer& operator=(const Transformer& other);
-  Transformer(Transformer&& other) = default;
-  Transformer& operator=(Transformer&& other) = default;
+public:
+    Transformer(
+        int32_t modelDim,
+        int32_t headDim,
+        int32_t mlpDim,
+        int32_t nHeads,
+        int32_t bptt,
+        float pDropout,
+        float pLayerdrop,
+        bool useMask = false,
+        bool preLN = false
+    );
+    Transformer(const Transformer& other);
+    Transformer& operator=(const Transformer& other);
+    Transformer(Transformer&& other) = default;
+    Transformer& operator=(Transformer&& other) = default;
 
-  std::vector<Variable> forward(const std::vector<Variable>& input) override;
-  void setDropout(float value);
-  void setLayerDropout(float value);
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::vector<Variable> forward(const std::vector<Variable>& input) override;
+    void setDropout(float value);
+    void setLayerDropout(float value);
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  int32_t nHeads_;
-  int32_t bptt_;
-  double pDropout_;
-  double pLayerdrop_;
-  bool useMask_;
-  bool preLN_;
-  std::shared_ptr<Linear> w1_, w2_, wq_, wk_, wv_, wf_;
-  std::shared_ptr<LayerNorm> norm1_, norm2_;
+private:
+    int32_t nHeads_;
+    int32_t bptt_;
+    double pDropout_;
+    double pLayerdrop_;
+    bool useMask_;
+    bool preLN_;
+    std::shared_ptr<Linear> w1_, w2_, wq_, wk_, wv_, wf_;
+    std::shared_ptr<LayerNorm> norm1_, norm2_;
 
-  void copy(const Transformer& other);
-  void createLayers();
-  Variable mlp(const Variable& input);
-  Variable getMask(int32_t n, bool cache = false);
-  Variable selfAttention(const std::vector<Variable>& input);
+    void copy(const Transformer& other);
+    void createLayers();
+    Variable mlp(const Variable& input);
+    Variable getMask(int32_t n, bool cache = false);
+    Variable selfAttention(const std::vector<Variable>& input);
 
-  FL_SAVE_LOAD_WITH_BASE(
-      Container,
-      w1_,
-      w2_,
-      wq_,
-      wk_,
-      wv_,
-      wf_,
-      norm1_,
-      norm2_,
-      nHeads_,
-      pDropout_,
-      pLayerdrop_,
-      bptt_,
-      useMask_,
-      preLN_)
-
-  Transformer();
+    FL_SAVE_LOAD_WITH_BASE(
+        Container,
+        w1_,
+        w2_,
+        wq_,
+        wk_,
+        wv_,
+        wf_,
+        norm1_,
+        norm2_,
+        nHeads_,
+        pDropout_,
+        pLayerdrop_,
+        bptt_,
+        useMask_,
+        preLN_
+    ) Transformer();
 };
 
 } // namespace fl

@@ -24,45 +24,46 @@ namespace fl {
  * Note this module cannot be serialized.
  */
 class FL_API Transform : public UnaryModule {
- private:
-  Transform() = default; // Intentionally private
+private:
+    Transform() = default; // Intentionally private
 
-  std::function<Variable(const Variable&)> func_;
+    std::function<Variable(const Variable&)> func_;
 
-  std::string name_;
+    std::string name_;
 
-  /**
-   * Transform layers cannot be serialized. This function throws a runtime
-   * exception.
-   */
-  FL_SAVE_LOAD_DECLARE()
+    /**
+     * Transform layers cannot be serialized. This function throws a runtime
+     * exception.
+     */
+    FL_SAVE_LOAD_DECLARE()
 
- public:
-  /**
-   * Construct a Transform (lambda) layer.
-   * @param func a lambda function which accepts an input Variable and returns
-   * an output Variable.
-   * @param name an optional name used by prettyString.
-   */
-  explicit Transform(
-      const std::function<Variable(const Variable&)>& func,
-      const std::string& name = "");
+public:
+    /**
+     * Construct a Transform (lambda) layer.
+     * @param func a lambda function which accepts an input Variable and returns
+     * an output Variable.
+     * @param name an optional name used by prettyString.
+     */
+    explicit Transform(
+        const std::function<Variable(const Variable&)>& func,
+        const std::string& name = ""
+    );
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
-template <class Archive>
+template<class Archive>
 void Transform::save(Archive& /* ar */, const uint32_t /* version */) const {
-  throw std::runtime_error("Transform module does not support serialization");
+    throw std::runtime_error("Transform module does not support serialization");
 }
 
-template <class Archive>
+template<class Archive>
 void Transform::load(Archive& /* ar */, const uint32_t /* version */) {
-  throw std::runtime_error("Transform module does not support serialization");
+    throw std::runtime_error("Transform module does not support serialization");
 }
 
 } // namespace fl

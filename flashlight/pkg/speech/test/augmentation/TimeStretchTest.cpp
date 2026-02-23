@@ -28,29 +28,29 @@ const float amplitude = 0.5;
  *      signal times the factor.
  */
 TEST(TimeStretch, SinWave) {
-  float tolerance = 0.05;
+    float tolerance = 0.05;
 
-  const std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    const std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
 
-  for (float factor = 0.5; factor <= 2; factor += 0.1) {
-    std::vector<float> augmented = signal;
+    for(float factor = 0.5; factor <= 2; factor += 0.1) {
+        std::vector<float> augmented = signal;
 
-    TimeStretch::Config conf = {
-        .proba_ = 1.0, .minFactor_ = factor, .maxFactor_ = factor};
-    TimeStretch sfx(conf);
-    sfx.apply(augmented);
+        TimeStretch::Config conf = {
+            .proba_ = 1.0, .minFactor_ = factor, .maxFactor_ = factor};
+        TimeStretch sfx(conf);
+        sfx.apply(augmented);
 
-    const float stretchRatio = static_cast<float>(augmented.size()) /
-        static_cast<float>(signal.size());
+        const float stretchRatio = static_cast<float>(augmented.size())
+            / static_cast<float>(signal.size());
 
-    EXPECT_GE(stretchRatio, factor * (1 - tolerance));
-    EXPECT_LE(stretchRatio, factor * (1 + tolerance));
-  }
+        EXPECT_GE(stretchRatio, factor * (1 - tolerance));
+        EXPECT_LE(stretchRatio, factor * (1 + tolerance));
+    }
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

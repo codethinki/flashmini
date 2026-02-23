@@ -12,93 +12,98 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
-class ConvBnAct : public fl::Sequential {
- public:
-  ConvBnAct(
-      const int inChannels,
-      const int outChannels,
-      const int kw,
-      const int kh,
-      const int sx = 1,
-      const int sy = 1,
-      bool bn = true,
-      bool act = true);
+        class ConvBnAct : public fl::Sequential {
+        public:
+            ConvBnAct(
+                const int inChannels,
+                const int outChannels,
+                const int kw,
+                const int kh,
+                const int sx = 1,
+                const int sy = 1,
+                bool bn = true,
+                bool act = true
+            );
 
- private:
-  ConvBnAct();
-  FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
-};
+        private:
+            ConvBnAct();
+            FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
+        };
 
-class ResNetBlock : public fl::Container {
- private:
-  FL_SAVE_LOAD_WITH_BASE(fl::Container)
-  ResNetBlock();
+        class ResNetBlock : public fl::Container {
+        private:
+            FL_SAVE_LOAD_WITH_BASE(fl::Container) ResNetBlock();
 
- public:
-  ResNetBlock(
-      const int inChannels,
-      const int outChannels,
-      const int stride = 1);
+        public:
+            ResNetBlock(
+                const int inChannels,
+                const int outChannels,
+                const int stride = 1
+            );
 
-  std::vector<fl::Variable> forward(
-      const std::vector<fl::Variable>& inputs) override;
+            std::vector<fl::Variable> forward(
+                const std::vector<fl::Variable>& inputs
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
-  FL_BASIC_CONTAINER_CLONING(ResNetBlock)
-};
+            FL_BASIC_CONTAINER_CLONING(ResNetBlock)
+        };
 
-class ResNetBottleneckBlock : public fl::Container {
- private:
-  FL_SAVE_LOAD_WITH_BASE(fl::Container)
-  ResNetBottleneckBlock();
+        class ResNetBottleneckBlock : public fl::Container {
+        private:
+            FL_SAVE_LOAD_WITH_BASE(fl::Container) ResNetBottleneckBlock();
 
- public:
-  ResNetBottleneckBlock(
-      const int inChannels,
-      const int outChannels,
-      const int stride = 1);
+        public:
+            ResNetBottleneckBlock(
+                const int inChannels,
+                const int outChannels,
+                const int stride = 1
+            );
 
-  std::vector<fl::Variable> forward(
-      const std::vector<fl::Variable>& inputs) override;
+            std::vector<fl::Variable> forward(
+                const std::vector<fl::Variable>& inputs
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
-  FL_BASIC_CONTAINER_CLONING(ResNetBottleneckBlock)
-};
+            FL_BASIC_CONTAINER_CLONING(ResNetBottleneckBlock)
+        };
 
-class ResNetBottleneckStage : public fl::Sequential {
- public:
-  ResNetBottleneckStage(
-      const int inChannels,
-      const int outChannels,
-      const int numBlocks,
-      const int stride);
+        class ResNetBottleneckStage : public fl::Sequential {
+        public:
+            ResNetBottleneckStage(
+                const int inChannels,
+                const int outChannels,
+                const int numBlocks,
+                const int stride
+            );
 
- private:
-  ResNetBottleneckStage();
-  FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
-};
+        private:
+            ResNetBottleneckStage();
+            FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
+        };
 
-class ResNetStage : public fl::Sequential {
- public:
-  ResNetStage(
-      const int inChannels,
-      const int outChannels,
-      const int numBlocks,
-      const int stride);
+        class ResNetStage : public fl::Sequential {
+        public:
+            ResNetStage(
+                const int inChannels,
+                const int outChannels,
+                const int numBlocks,
+                const int stride
+            );
 
- private:
-  ResNetStage();
-  FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
-};
+        private:
+            ResNetStage();
+            FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
+        };
 
-std::shared_ptr<Sequential> resnet34();
-std::shared_ptr<Sequential> resnet50();
+        std::shared_ptr<Sequential> resnet34();
+        std::shared_ptr<Sequential> resnet50();
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl
 CEREAL_REGISTER_TYPE(fl::pkg::vision::ConvBnAct)

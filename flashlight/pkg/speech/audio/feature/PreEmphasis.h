@@ -12,23 +12,23 @@
 
 namespace fl {
 namespace lib {
-namespace audio {
+    namespace audio {
 
 // Pre-emphasise the signal by applying the first order difference equation
-//    s'(n) = s(n) - k * s(n-1)  where k in [0, 1)
+// s'(n) = s(n) - k * s(n-1)  where k in [0, 1)
 
-class PreEmphasis {
- public:
-  PreEmphasis(float alpha, int N);
+        class PreEmphasis {
+        public:
+            PreEmphasis(float alpha, int N);
 
-  std::vector<float> apply(const std::vector<float>& input) const;
+            std::vector<float> apply(const std::vector<float>& input) const;
 
-  void applyInPlace(std::vector<float>& input) const;
+            void applyInPlace(std::vector<float>& input) const;
 
- private:
-  float preemCoef_;
-  int windowLength_;
-};
-} // namespace audio
+        private:
+            float preemCoef_;
+            int windowLength_;
+        };
+    } // namespace audio
 } // namespace lib
 } // namespace fl

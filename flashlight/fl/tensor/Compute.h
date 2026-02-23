@@ -68,7 +68,8 @@ FL_API void sync(const std::unordered_set<const Device*>& devices);
  */
 FL_API void relativeSync(
     const Stream& wait,
-    const std::vector<const Tensor*>& waitOns);
+    const std::vector<const Tensor*>& waitOns
+);
 
 /**
  * Synchronize future tasks on given stream w.r.t. current tasks on all unique
@@ -82,7 +83,8 @@ FL_API void relativeSync(
  */
 FL_API void relativeSync(
     const Stream& wait,
-    const std::vector<Tensor>& waitOns);
+    const std::vector<Tensor>& waitOns
+);
 
 /**
  * Synchronize future tasks on the streams of `waits` w.r.t. current task on
@@ -95,7 +97,8 @@ FL_API void relativeSync(
  */
 FL_API void relativeSync(
     const std::vector<Tensor>& waits,
-    const Stream& waitOn);
+    const Stream& waitOn
+);
 
 /**
  * Launches computation, [usually] asynchronously, on operations needed to make
@@ -155,10 +158,11 @@ namespace detail {
  * This function may be a noop for backends that do not implement memory
  * managers with configurable logging.
  */
-FL_API void getMemMgrInfo(
-    const char* msg,
-    const int deviceId,
-    std::ostream* ostream = &std::cout);
+    FL_API void getMemMgrInfo(
+        const char* msg,
+        const int deviceId,
+        std::ostream* ostream = & std::cout
+    );
 
 /**
  * Configures memory manager log output to write to a specified output stream.
@@ -169,7 +173,7 @@ FL_API void getMemMgrInfo(
  *
  * @returns the number of active devices usable in Flashlight.
  */
-FL_API void setMemMgrLogStream(std::ostream* stream);
+    FL_API void setMemMgrLogStream(std::ostream* stream);
 
 /**
  * Sets (or unsets) logging for memory management. This function may be a noop
@@ -180,7 +184,7 @@ FL_API void setMemMgrLogStream(std::ostream* stream);
  *
  * @param[in] enabled true to enable logging, false to disable.
  */
-FL_API void setMemMgrLoggingEnabled(const bool enabled);
+    FL_API void setMemMgrLoggingEnabled(const bool enabled);
 
 /**
  * Configures memory manager log output to flush to the output stream after a
@@ -192,7 +196,7 @@ FL_API void setMemMgrLoggingEnabled(const bool enabled);
  * @param[in] interval the number of lines after which to flush the temporary
  * log buffer. Supplied interval must be greater than 1.
  */
-FL_API void setMemMgrFlushInterval(const size_t interval);
+    FL_API void setMemMgrFlushInterval(const size_t interval);
 
 } // namespace detail
 } // namespace fl

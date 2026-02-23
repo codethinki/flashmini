@@ -14,7 +14,7 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 /*
  * Utility function to create an optimizer.
@@ -22,12 +22,13 @@ namespace speech {
  * `amsgrad`, `novograd`. From gflags it uses FLAGS_optimrho, FLAGS_adambeta1,
  * FLAGS_adambeta2, FLAGS_optimepsilon,
  */
-std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
-    const std::vector<std::shared_ptr<fl::Module>>& nets,
-    const std::string& optimizer,
-    double lr,
-    double momentum,
-    double weightdecay);
-} // namespace speech
+        std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
+            const std::vector<std::shared_ptr<fl::Module>>& nets,
+            const std::string& optimizer,
+            double lr,
+            double momentum,
+            double weightdecay
+        );
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

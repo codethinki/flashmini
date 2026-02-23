@@ -15,19 +15,19 @@ namespace fl {
 Dropout::Dropout(double drop_ratio) : ratio_(drop_ratio) {}
 
 Variable Dropout::forward(const Variable& input) {
-  if (train_) {
-    return dropout(input, ratio_);
-  } else {
-    return input;
-  }
+    if(train_) {
+        return dropout(input, ratio_);
+    } else {
+        return input;
+    }
 }
 
 std::unique_ptr<Module> Dropout::clone() const {
-  return std::make_unique<Dropout>(*this);
+    return std::make_unique<Dropout>(*this);
 }
 
 std::string Dropout::prettyString() const {
-  return ("Dropout (" + std::to_string(ratio_) + ")");
+    return "Dropout (" + std::to_string(ratio_) + ")";
 }
 
 } // namespace fl
