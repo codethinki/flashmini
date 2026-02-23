@@ -182,9 +182,9 @@ int main(int argc, char** argv) {
         std::tie(val_loss, val_error) = eval_loop(model, valset);
 
         std::cout << "Epoch " << e << std::setprecision(3)
-        << ": Avg Train Loss: " << train_loss
-        << " Validation Loss: " << val_loss
-        << " Validation Error (%): " << val_error << std::endl;
+                  << ": Avg Train Loss: " << train_loss
+                  << " Validation Loss: " << val_loss
+                  << " Validation Error (%): " << val_error << std::endl;
     }
 
     Tensor test_x;
@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
     double test_loss, test_error;
     std::tie(test_loss, test_error) = eval_loop(model, testset);
     std::cout << "Test Loss: " << test_loss << " Test Error (%): " << test_error
-    << std::endl;
+              << std::endl;
 
     return 0;
 }

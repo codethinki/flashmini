@@ -81,7 +81,7 @@ TEST(MfccTest, htkCompareTest) {
     std::cerr << "| Max diff across all dimensions " << max << "\n"; // 0.325853
 
     std::cerr << "| Avg diff across all dimensions " << sum / feat.size()
-    << "\n"; // 0.00252719
+              << "\n"; // 0.00252719
 }
 
 TEST(MfccTest, BatchingTest) {

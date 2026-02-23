@@ -156,7 +156,7 @@ void testFragmentation(
 
     if(b != AF_BACKEND_CUDA)
         GTEST_SKIP()
-        << "CachingMemoryManager fragmentation tests require CUDA backend";
+            << "CachingMemoryManager fragmentation tests require CUDA backend";
 
     const auto mms = deviceInterface_->getMaxMemorySize(0);
     const auto maxNumf32 = mms / sizeof(float); // AF f32 is supposed to be 32b
@@ -178,8 +178,8 @@ void testFragmentation(
             ASSERT_EQ(ex.err(), AF_ERR_NO_MEM);
         else
             EXPECT_TRUE(false)
-            << "CachingMemoryManagerTest fragmentaiton not supposed to throw: "
-            << ex.what();
+                << "CachingMemoryManagerTest fragmentaiton not supposed to throw: "
+                << ex.what();
     }
 }
 

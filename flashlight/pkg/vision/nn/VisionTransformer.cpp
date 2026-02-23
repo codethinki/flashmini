@@ -178,10 +178,10 @@ std::vector<Variable> VisionTransformer::forward(
 std::string VisionTransformer::prettyString() const {
     std::ostringstream ss;
     ss << "VisionTransformer (nHeads: " << nHeads_ << "), "
-    << "(modelDim_: " << modelDim_ << "), "
-    << "(mlpDim_: " << mlpDim_ << "), "
-    << "(pDropout: " << pDropout_ << "), "
-    << "(pLayerdrop: " << pLayerdrop_ << "), ";
+       << "(modelDim_: " << modelDim_ << "), "
+       << "(mlpDim_: " << mlpDim_ << "), "
+       << "(pDropout: " << pDropout_ << "), "
+       << "(pLayerdrop: " << pLayerdrop_ << "), ";
     return ss.str();
 }
 

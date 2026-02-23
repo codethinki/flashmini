@@ -24,8 +24,8 @@ void Shape::checkDimsOrThrow(const size_t dim) const {
     if(dim > ndim() - 1) {
         std::stringstream ss;
         ss << "Shape index " << std::to_string(dim)
-        << " out of bounds for shape with " << std::to_string(dims_.size())
-        << " dimensions.";
+           << " out of bounds for shape with " << std::to_string(dims_.size())
+           << " dimensions.";
         throw std::invalid_argument(ss.str());
     }
 }

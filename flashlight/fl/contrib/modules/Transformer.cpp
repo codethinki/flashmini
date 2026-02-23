@@ -220,11 +220,11 @@ std::unique_ptr<Module> Transformer::clone() const {
 std::string Transformer::prettyString() const {
     std::ostringstream ss;
     ss << "Transformer (nHeads: " << nHeads_ << "), "
-    << "(pDropout: " << pDropout_ << "), "
-    << "(pLayerdrop: " << pLayerdrop_ << "), "
-    << "(bptt: " << bptt_ << "), "
-    << "(useMask: " << useMask_ << "), "
-    << "(preLayerNorm: " << preLN_ << ")";
+       << "(pDropout: " << pDropout_ << "), "
+       << "(pLayerdrop: " << pLayerdrop_ << "), "
+       << "(bptt: " << bptt_ << "), "
+       << "(useMask: " << useMask_ << "), "
+       << "(preLayerNorm: " << preLN_ << ")";
     return ss.str();
 }
 

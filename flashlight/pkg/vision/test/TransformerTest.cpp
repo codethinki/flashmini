@@ -221,11 +221,11 @@ TEST(Tranformer, Size) {
     };
     auto output = tr(inputs)[0];
     ASSERT_EQ(output.dim(0), C)
-    << "Transformer should return model dim as first dimension";
+        << "Transformer should return model dim as first dimension";
     ASSERT_EQ(output.dim(1), bbox_queries)
-    << "Transformer did not return the correct number of labels";
+        << "Transformer did not return the correct number of labels";
     ASSERT_EQ(output.dim(2), B)
-    << "Transformer did not return the correct number of batches";
+        << "Transformer did not return the correct number of batches";
 }
 
 TEST(Tranformer, Masked) {

@@ -253,17 +253,17 @@ int main(int argc, char** argv) {
         double iter_time = timer.value();
 
         std::cout << "Epoch " << e + 1 << std::setprecision(3)
-        << " - Train Loss: " << train_loss
-        << " Validation Loss: " << val_loss
-        << " Validation Perplexity: " << std::exp(val_loss)
-        << " Time per iteration (ms): " << iter_time * 1000 << std::endl;
+                  << " - Train Loss: " << train_loss
+                  << " Validation Loss: " << val_loss
+                  << " Validation Perplexity: " << std::exp(val_loss)
+                  << " Time per iteration (ms): " << iter_time * 1000 << std::endl;
     }
 
     LMDataset testset(test_dir, batch_size, time_steps, preproc);
 
     double test_loss = eval_loop(testset);
     std::cout << " Test Loss: " << test_loss
-    << " Test Perplexity: " << std::exp(test_loss) << std::endl;
+              << " Test Perplexity: " << std::exp(test_loss) << std::endl;
 
     return 0;
 }

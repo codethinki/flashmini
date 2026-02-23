@@ -845,18 +845,18 @@ void handleDeprecatedFlags() {
         if(deprecatedFlagSet && newFlagSet) {
             // Use the new flag value
             std::cerr << "[WARNING] Both deprecated flag " << flagPair.first
-            << " and new flag " << flagPair.second
-            << " are set. Only the new flag will be "
-            << "serialized when the model saved." << std::endl;
+                      << " and new flag " << flagPair.second
+                      << " are set. Only the new flag will be "
+                      << "serialized when the model saved." << std::endl;
             ;
         } else if(deprecatedFlagSet && !newFlagSet) {
             std::cerr
-            << "[WARNING] Usage of flag --" << flagPair.first
-            << " is deprecated and has been replaced with "
-            << "--" << flagPair.second
-            << ". Setting the new flag equal to the value of the deprecated flag."
-            << "The old flag will not be serialized when the model is saved."
-            << std::endl;
+                << "[WARNING] Usage of flag --" << flagPair.first
+                << " is deprecated and has been replaced with "
+                << "--" << flagPair.second
+                << ". Setting the new flag equal to the value of the deprecated flag."
+                << "The old flag will not be serialized when the model is saved."
+                << std::endl;
             if(
                 gflags::SetCommandLineOption(
                     flagPair.second.c_str(),
@@ -866,7 +866,7 @@ void handleDeprecatedFlags() {
             ) {
                 std::stringstream ss;
                 ss << "Failed to set new flag " << flagPair.second << " to value from "
-                << flagPair.first << ".";
+                   << flagPair.first << ".";
                 throw std::logic_error(ss.str());
             }
         }

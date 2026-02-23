@@ -465,7 +465,7 @@ TEST(AutogradTest, GetAdvancedIndex) {
     // TODO: remove me
     if(!FL_BACKEND_CUDA)
         GTEST_SKIP()
-        << "Advanced indexing operator unsupported for non-CUDA backends";
+            << "Advanced indexing operator unsupported for non-CUDA backends";
     std::vector<fl::dtype> validIndexTypes = {
         fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64};
     for(const auto& dtype : validIndexTypes) {
@@ -494,7 +494,7 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
     // TODO: remove me
     if(!FL_BACKEND_CUDA)
         GTEST_SKIP()
-        << "Advanced indexing operator unsupported for non-CUDA backends";
+            << "Advanced indexing operator unsupported for non-CUDA backends";
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
     std::vector<fl::dtype> validIndexTypes = {

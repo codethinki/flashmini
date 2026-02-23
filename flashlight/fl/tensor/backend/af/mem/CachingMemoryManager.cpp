@@ -86,7 +86,7 @@ namespace {
                 return std::round(mb * kMB);
             } catch(std::exception& ex) {
                 std::cerr << "getEnvAsBytesFromFloatMb: Invalid environment "
-                << "variable value: name=" << name << " value=" << env;
+                          << "variable value: name=" << name << " value=" << env;
                 throw ex;
             }
         }
@@ -298,16 +298,16 @@ void CachingMemoryManager::mallocWithRetry(size_t size, void** ptr) {
         } catch(std::exception& ex) {
             // note: af exception inherits from std exception
             std::cerr << "Failed to allocate memory of size " << formatMemory(size)
-            << " (Device: " << memInfo.deviceId_ << ", Capacity: "
-            << formatMemory(
+                      << " (Device: " << memInfo.deviceId_ << ", Capacity: "
+                      << formatMemory(
                 this->deviceInterface->getMaxMemorySize(
                     memInfo.deviceId_
                 )
-            )
-            << ", Allocated: "
-            << formatMemory(memInfo.stats_.allocatedBytes_)
-            << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
-            << ") with error '" << ex.what() << "'" << std::endl;
+                )
+                      << ", Allocated: "
+                      << formatMemory(memInfo.stats_.allocatedBytes_)
+                      << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
+                      << ") with error '" << ex.what() << "'" << std::endl;
             // note: converting here an af exception to std exception prevents to
             // catch the af error code at the user level. Rethrowing.
             throw;
@@ -374,16 +374,16 @@ void CachingMemoryManager::printInfo(
     std::lock_guard<std::recursive_mutex> lock(memInfo.mutexAll_);
 
     ostream << msg << "\nType: CachingMemoryManager" << std::endl
-    << "\nDevice: " << memInfo.deviceId_ << ", Capacity: "
-    << formatMemory(
+            << "\nDevice: " << memInfo.deviceId_ << ", Capacity: "
+            << formatMemory(
         this->deviceInterface->getMaxMemorySize(memInfo.deviceId_)
-    )
-    << ", Allocated: " << formatMemory(memInfo.stats_.allocatedBytes_)
-    << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
-    << std::endl
-    << "\nTotal native calls: " << memInfo.stats_.totalNativeMallocs_
-    << "(mallocs), " << memInfo.stats_.totalNativeFrees_ << "(frees)"
-    << std::endl;
+        )
+            << ", Allocated: " << formatMemory(memInfo.stats_.allocatedBytes_)
+            << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
+            << std::endl
+            << "\nTotal native calls: " << memInfo.stats_.totalNativeMallocs_
+            << "(mallocs), " << memInfo.stats_.totalNativeFrees_ << "(frees)"
+            << std::endl;
 }
 
 void CachingMemoryManager::userLock(const void* ptr) {

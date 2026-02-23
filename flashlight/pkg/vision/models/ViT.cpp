@@ -143,7 +143,7 @@ std::vector<fl::Variable> ViT::forward(
 std::string ViT::prettyString() const {
     std::ostringstream ss;
     ss << "ViT (" << nClasses_ << " classes) with " << nLayers_
-    << " Transformers:\n";
+       << " Transformers:\n";
     for(const auto& transformers : transformers_)
         ss << transformers->prettyString() << "\n";
     return ss.str();

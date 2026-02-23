@@ -77,10 +77,10 @@ std::string ReverbEcho::prettyString() const {
 std::string ReverbEcho::Config::prettyString() const {
     std::stringstream ss;
     ss << " proba_=" << proba_ << " initialMin_=" << initialMin_
-    << " initialMax_=" << initialMax_ << " rt60Min_=" << rt60Min_
-    << " rt60Max_=" << rt60Max_ << " firstDelayMin_=" << firstDelayMin_
-    << " firstDelayMax_=" << firstDelayMax_ << " repeat_=" << repeat_
-    << " jitter_=" << jitter_ << " sampleRate_=" << sampleRate_;
+       << " initialMax_=" << initialMax_ << " rt60Min_=" << rt60Min_
+       << " rt60Max_=" << rt60Max_ << " firstDelayMin_=" << firstDelayMin_
+       << " firstDelayMax_=" << firstDelayMax_ << " repeat_=" << repeat_
+       << " jitter_=" << jitter_ << " sampleRate_=" << sampleRate_;
     return ss.str();
 }
 

@@ -17,7 +17,7 @@ namespace fl::pkg::speech::sfx {
 std::string GaussianNoise::Config::prettyString() const {
     std::stringstream ss;
     ss << "GaussianNoise::Config{minSnr_=" << minSnr_ << " maxSnr_=" << maxSnr_
-    << '}';
+       << '}';
     return ss.str();
 }
 

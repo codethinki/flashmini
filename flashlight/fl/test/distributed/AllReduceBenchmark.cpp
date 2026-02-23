@@ -53,10 +53,10 @@ int main() {
             auto timesAf = Tensor::fromVector({kNumIters}, times);
             if(wRank == 0)
                 std::cout << "Size: " << size
-                << " ; avg: " << fl::mean(timesAf).asScalar<double>() * 1000
-                << "ms ; p50: "
-                << fl::median(timesAf).asScalar<double>() * 1000 << "ms"
-                << std::endl;
+                          << " ; avg: " << fl::mean(timesAf).asScalar<double>() * 1000
+                          << "ms ; p50: "
+                          << fl::median(timesAf).asScalar<double>() * 1000 << "ms"
+                          << std::endl;
             curMaxSize = std::max(curMaxSize, size);
             size *= multiplier;
         }

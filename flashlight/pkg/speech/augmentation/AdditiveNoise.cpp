@@ -21,8 +21,8 @@ namespace fl::pkg::speech::sfx {
 std::string AdditiveNoise::Config::prettyString() const {
     std::stringstream ss;
     ss << "AdditiveNoise::Config{ratio_=" << ratio_ << " minSnr_=" << minSnr_
-    << " maxSnr_=" << maxSnr_ << " nClipsMin_=" << nClipsMin_ << " nClipsMax_"
-    << nClipsMax_ << " listFilePath_=" << listFilePath_ << '}';
+       << " maxSnr_=" << maxSnr_ << " nClipsMin_=" << nClipsMin_ << " nClipsMax_"
+       << nClipsMax_ << " listFilePath_=" << listFilePath_ << '}';
     return ss.str();
 }
 
@@ -87,7 +87,7 @@ void AdditiveNoise::apply(std::vector<float>& signal) {
             signal[i] += mixedNoise[i] * noiseMult;
     } else
         FL_LOG(fl::LogLevel::WARNING)
-        << "AdditiveNoise::apply() invalid noiseRms=" << noiseRms;
+            << "AdditiveNoise::apply() invalid noiseRms=" << noiseRms;
 }
 
 } // namespace fl

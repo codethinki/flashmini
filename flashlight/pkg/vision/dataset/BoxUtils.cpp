@@ -170,8 +170,8 @@ std::tuple<fl::Variable, fl::Variable> boxIou(
     if(bboxes1.ndim() != 3 || bboxes2.ndim() != 3) {
         std::stringstream ss;
         ss << "vision::boxIou - bbox inputs must be of shape "
-        "[4, N, B] and [4, M, B]. Got boxes with dimensions "
-        << bboxes1.shape() << " and " << bboxes2.shape();
+            "[4, N, B] and [4, M, B]. Got boxes with dimensions "
+           << bboxes1.shape() << " and " << bboxes2.shape();
         throw std::invalid_argument(ss.str());
     }
     auto area1 = boxArea(bboxes1);

@@ -86,7 +86,7 @@ std::string TDSBlock::prettyString() const {
     int l2 = linW.dim(0);
     ss << "Time-Depth Separable Block (";
     ss << kw << ", " << w << ", " << c << ") [" << l << " -> " << l2 << " -> "
-    << l << "]";
+       << l << "]";
     return ss.str();
 }
 

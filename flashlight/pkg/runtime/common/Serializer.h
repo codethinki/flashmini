@@ -67,7 +67,7 @@ namespace pkg {
                     ar(args...);
                 } catch(const std::exception& ex) {
                     FL_LOG(fl::LogLevel::ERROR)
-                    << "Error while saving \"" << filepath << "\": " << ex.what() << "\n";
+                        << "Error while saving \"" << filepath << "\": " << ex.what() << "\n";
                     throw;
                 }
             }
@@ -84,7 +84,7 @@ namespace pkg {
                     ar(args...);
                 } catch(const std::exception& ex) {
                     FL_LOG(fl::LogLevel::ERROR) << "Error while loading \"" << filepath
-                    << "\": " << ex.what() << "\n";
+                                                << "\": " << ex.what() << "\n";
                     throw;
                 }
             }

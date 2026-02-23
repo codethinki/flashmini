@@ -19,7 +19,7 @@ constexpr size_t kRunFileNameIntWidth = 3;
 std::string getRunFile(const std::string& name, const int runidx, const fs::path& runpath) {
     std::stringstream ss;
     ss << std::setw(kRunFileNameIntWidth) << std::setfill('0') << runidx << "_"
-    << name;
+       << name;
     return runpath / ss.str();
 };
 

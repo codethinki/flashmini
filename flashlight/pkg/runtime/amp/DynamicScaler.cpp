@@ -36,14 +36,14 @@ bool DynamicScaler::unscale(std::vector<fl::Variable>& params) {
             if(scaleFactor_ >= fl::kAmpMinimumScaleFactorValue) {
                 scaleFactor_ = scaleFactor_ / 2.0f;
                 FL_LOG(LogLevel::INFO)
-                << "AMP: Scale factor decreased. New value:\t" << scaleFactor_;
+                    << "AMP: Scale factor decreased. New value:\t" << scaleFactor_;
             } else
                 FL_LOG(LogLevel::FATAL)
-                << "Minimum loss scale reached: " << fl::kAmpMinimumScaleFactorValue
-                << " with over/underflowing gradients. Lowering the "
-                << "learning rate, using gradient clipping, or "
-                << "increasing the batch size can help resolve "
-                << "loss explosion.";
+                    << "Minimum loss scale reached: " << fl::kAmpMinimumScaleFactorValue
+                    << " with over/underflowing gradients. Lowering the "
+                    << "learning rate, using gradient clipping, or "
+                    << "increasing the batch size can help resolve "
+                    << "loss explosion.";
             successCounter_ = 0;
             return false;
         }

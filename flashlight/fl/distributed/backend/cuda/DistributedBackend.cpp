@@ -294,7 +294,7 @@ void distributedInit(
     detail::DistributedInfo::getInstance().backend_ = DistributedBackend::NCCL;
     if(getWorldRank() == 0)
         std::cout << "Initialized NCCL " << NCCL_MAJOR << "." << NCCL_MINOR << "."
-        << NCCL_PATCH << " successfully!\n";
+                  << NCCL_PATCH << " successfully!\n";
 }
 
 namespace detail {

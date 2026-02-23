@@ -88,8 +88,8 @@ void RawWavSpecAugment::precomputeFilters() {
         int width = 2. / (1e-6 + transBandKhz[fidx]);
         if(width * 2 + 1 > maxKernelSize_) {
             FL_LOG(fl::LogLevel::INFO)
-            << "RawWavSpecAugment raw wave: frequency " << cutoff_[fidx]
-            << " will be skipped for eval, too large kernel";
+                << "RawWavSpecAugment raw wave: frequency " << cutoff_[fidx]
+                << " will be skipped for eval, too large kernel";
             lowPassFilters_.push_back(nullptr);
             ignoredLowPassFilters_++;
             continue;

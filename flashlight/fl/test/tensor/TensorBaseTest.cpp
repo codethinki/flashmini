@@ -495,8 +495,8 @@ void assertScalarBehavior(fl::dtype type) {
 
     if(dtype_traits<ScalarArgType>::fl_type != type) {
         ASSERT_THROW(one.template scalar<ScalarArgType>(), std::invalid_argument)
-        << "dtype: " << type
-        << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
+            << "dtype: " << type
+            << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
         return;
     }
 
@@ -505,19 +505,19 @@ void assertScalarBehavior(fl::dtype type) {
         || (type == fl::dtype::f64)
     )
         ASSERT_FLOAT_EQ(one.template scalar<ScalarArgType>(), scalar)
-        << "dtype: " << type
-        << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
+            << "dtype: " << type
+            << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
     else
         ASSERT_EQ(one.template scalar<ScalarArgType>(), scalar)
-        << "dtype: " << type
-        << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
+            << "dtype: " << type
+            << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
 
     ScalarArgType val = static_cast<ScalarArgType>(rand());
     auto a = fl::full({5, 6}, val, type);
 
     ASSERT_TRUE(allClose(fl::full({1}, a.template scalar<ScalarArgType>(), type), a(0, 0)))
-    << "dtype: " << type
-    << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
+        << "dtype: " << type
+        << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
 }
 
 TEST(TensorBaseTest, scalar) {
@@ -570,13 +570,12 @@ TEST(TensorBaseTest, stream) {
 
 TEST(TensorBaseTest, asContiguousTensor) {
     auto t = fl::rand({5, 6, 7, 8});
-    auto indexed =
-        t(
-            fl::range(1, 4, 2),
-            fl::range(0, 6, 2),
-            fl::range(0, 6, 3),
-            fl::range(0, 5, 3)
-        );
+    auto indexed = t(
+        fl::range(1, 4, 2),
+        fl::range(0, 6, 2),
+        fl::range(0, 6, 3),
+        fl::range(0, 5, 3)
+    );
 
     auto contiguous = indexed.asContiguousTensor();
     std::vector<Dim> strides;

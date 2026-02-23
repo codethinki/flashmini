@@ -65,7 +65,7 @@ public:
         }
         totalExamples += v.size();
         std::cout << "Found " << v.size() << " examples for category " << lang
-        << ". Total: " << totalExamples << std::endl;
+                  << ". Total: " << totalExamples << std::endl;
         datasets[lang] = v;
     }
 
@@ -161,7 +161,7 @@ public:
         linear_(std::make_shared<Linear>(hiddenSize, numClasses)),
         logsoftmax_(0) {
         std::cout << "Creating a RNN Classifier with vocab size: " << vocabSize
-        << " and num classes: " << numClasses << std::endl;
+                  << " and num classes: " << numClasses << std::endl;
         createLayers();
     }
 
@@ -254,8 +254,8 @@ public:
         const bool passes = p == expectedLabel;
         const std::string s = (passes ? "✓ " : "✗ ");
         std::cout << "input: " << std::setw(20) << input
-        << "\t expected: " << expectedLabel << "\t prediction: " << p
-        << "\t" << s << std::endl;
+                  << "\t expected: " << expectedLabel << "\t prediction: " << p
+                  << "\t" << s << std::endl;
         return passes;
     }
 
@@ -269,14 +269,14 @@ private:
 int main(int argc, char** argv) {
     fl::init();
     std::cout << "RnnClassification (path to the data dir) (learning rate) (num "
-    "epochs) (hiddensize)"
-    << std::endl;
+        "epochs) (hiddensize)"
+              << std::endl;
     std::cout << "Dataset : https://download.pytorch.org/tutorial/data.zip"
-    << std::endl;
+              << std::endl;
     if(argc < 2) {
         std::cout << "To setup the dataset: " << std::endl;
         std::cout << "wget https://download.pytorch.org/tutorial/data.zip"
-        << std::endl;
+                  << std::endl;
         std::cout << "unzip data.zip" << std::endl;
         std::cout << "./RnnClassification data/names" << std::endl;
         return 0;
@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
 
         double trainLoss = trainLossMeter.value()[0];
         std::cout << "Epoch " << e + 1 << std::setprecision(3)
-        << " - Train Loss: " << trainLoss << std::endl;
+                  << " - Train Loss: " << trainLoss << std::endl;
 
         // compute the accuracy confusion matrix:
         const unsigned nCategories = ClassificationDataset::Label2Id.size();
@@ -346,8 +346,8 @@ int main(int argc, char** argv) {
         std::cout << "Global accuracy=" << numMatch / nConfusion << "\t ";
         for(unsigned i = 0; i < nCategories; ++i)
             std::cout << ClassificationDataset::Id2Label[i] << ":" << std::fixed
-            << std::setprecision(2) << confusion(i, i).scalar<float>()
-            << " ";
+                      << std::setprecision(2) << confusion(i, i).scalar<float>()
+                      << " ";
         std::cout << std::endl;
     }
     // List of names not in the training dataset
@@ -370,7 +370,7 @@ int main(int argc, char** argv) {
         std::cin >> name;
         Variable output, h, c;
         std::cout << ClassificationDataset::Id2Label[model.infer(name, h, c)]
-        << " ?" << std::endl;
+                  << " ?" << std::endl;
     }
     std::cout << "Finished" << std::endl;
     return 0;

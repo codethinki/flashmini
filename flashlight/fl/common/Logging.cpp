@@ -97,8 +97,8 @@ namespace {
             threadId = threadId.substr(threadId.size() - maxThreadIdNumDigits);
 
         (*outputStream) << dateTimeWithMicroSeconds() << ' '
-        << threadId << ' '
-        << getFileName(fullPath) << ':' << lineNumber << ' ';
+                        << threadId << ' '
+                        << getFileName(fullPath) << ':' << lineNumber << ' ';
     }
 
 } // namespace
@@ -144,8 +144,8 @@ Logging::~Logging() {
 void Logging::setMaxLoggingLevel(LogLevel maxLoggingLevel) {
     if(maxLoggingLevel != Logging::maxLoggingLevel_) {
         std::cerr << "Logging::setMaxLoggingLevel(maxLoggingLevel="
-        << logLevelName(maxLoggingLevel) << ") Logging::maxLoggingLevel_="
-        << logLevelName(Logging::maxLoggingLevel_) << std::endl;
+                  << logLevelName(maxLoggingLevel) << ") Logging::maxLoggingLevel_="
+                  << logLevelName(Logging::maxLoggingLevel_) << std::endl;
         Logging::maxLoggingLevel_ = maxLoggingLevel;
     }
 }
@@ -196,8 +196,8 @@ VerboseLogging::~VerboseLogging() {
 void VerboseLogging::setMaxLoggingLevel(int maxLoggingLevel) {
     if(maxLoggingLevel != VerboseLogging::maxLoggingLevel_) {
         std::cerr << "VerboseLogging::setMaxLoggingLevel(maxLoggingLevel="
-        << maxLoggingLevel << ") VerboseLogging::maxLoggingLevel_="
-        << VerboseLogging::maxLoggingLevel_ << std::endl;
+                  << maxLoggingLevel << ") VerboseLogging::maxLoggingLevel_="
+                  << VerboseLogging::maxLoggingLevel_ << std::endl;
         VerboseLogging::maxLoggingLevel_ = maxLoggingLevel;
     }
 }
@@ -241,8 +241,8 @@ std::string logLevelName(LogLevel level) {
             return flLogLevelNames.at(i);
     std::stringstream ss;
     ss << "logLevelName(level=" << static_cast<int>(level)
-    << ") invalid level. Level should be in the range [0.."
-    << (flLogLevelNames.size() - 1) << "]";
+       << ") invalid level. Level should be in the range [0.."
+       << (flLogLevelNames.size() - 1) << "]";
     throw std::invalid_argument(ss.str());
 }
 
@@ -252,7 +252,7 @@ LogLevel logLevelValue(const std::string& level) {
             return flLogLevelValues.at(i);
     std::stringstream ss;
     ss << "logLevelValue(level=" << level
-    << ") invalid level. Level should be INFO, WARNING, ERROR or FATAL";
+       << ") invalid level. Level should be INFO, WARNING, ERROR or FATAL";
     throw std::invalid_argument(ss.str());
 }
 

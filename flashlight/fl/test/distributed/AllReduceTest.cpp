@@ -187,8 +187,8 @@ int main(int argc, char** argv) {
     } catch(const std::exception& ex) {
         // Don't run the test if distributed initialization fails
         std::cerr
-        << "Distributed initialization failed; tests will be skipped. Reason: "
-        << ex.what() << std::endl;
+            << "Distributed initialization failed; tests will be skipped. Reason: "
+            << ex.what() << std::endl;
     }
 
     return RUN_ALL_TESTS();

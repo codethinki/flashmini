@@ -105,7 +105,7 @@ int main() {
         fl::allReduce(mseArr);
         if(isMaster)
             std::cout << "Epoch: " << e << " Mean Squared Error: "
-            << mseArr.scalar<double>() / worldSize << std::endl;
+                      << mseArr.scalar<double>() / worldSize << std::endl;
     }
     if(isMaster)
         std::cout << "[Multi-layer Perceptron] Done!" << std::endl;

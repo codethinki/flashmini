@@ -163,7 +163,7 @@ std::string Residual::prettyString() const {
                     ss << "output";
                 if(shortcut.second != -1)
                     ss << " with transformation: "
-                    << modules_[shortcut.second]->prettyString() << ";";
+                       << modules_[shortcut.second]->prettyString() << ";";
                 ss << " ";
             }
         }

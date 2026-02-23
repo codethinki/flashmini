@@ -57,7 +57,7 @@ TextDataset::TextDataset(
             const auto indices = dictionary.mapEntriesToIndices(tokens);
             if(data_.size() + indices.size() > kMaxTokenInBuffer) {
                 FL_LOG(LogLevel::INFO)
-                << "[TextDataset] stop loading at 10,000,000,000 tokens";
+                    << "[TextDataset] stop loading at 10,000,000,000 tokens";
                 break;
             }
             sentenceRanges.emplace_back(currentEosPosition, -1);
@@ -134,9 +134,9 @@ TextDataset::TextDataset(
         );
 
     FL_LOG(LogLevel::INFO) << "[TextDataset] (" << reader.getRank() << "/"
-    << reader.getTotalReaders() << ") Loaded " << nTokens
-    << " tokens, " << sentenceRanges.size()
-    << " sentences and " << size() << " batches";
+                           << reader.getTotalReaders() << ") Loaded " << nTokens
+                           << " tokens, " << sentenceRanges.size()
+                           << " sentences and " << size() << " batches";
 }
 
 int64_t TextDataset::size() const {

@@ -200,7 +200,7 @@ std::string Conv2D::prettyString() const {
     std::ostringstream ss;
     ss << "Conv2D";
     ss << " (" << nIn_ << "->" << nOut_ << ", " << xFilter_ << "x" << yFilter_
-    << ", " << xStride_ << "," << yStride_ << ", ";
+       << ", " << xStride_ << "," << yStride_ << ", ";
     if(xPad_ == static_cast<int>(PaddingMode::SAME))
         ss << "SAME";
     else

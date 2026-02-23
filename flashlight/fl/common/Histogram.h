@@ -208,7 +208,7 @@ std::string HistogramStats<T>::prettyString(
 ) const {
     std::stringstream ss;
     ss << "HistogramStats{"
-    << " min=[";
+       << " min=[";
     fromatValuesIntoStream(ss, min);
     ss << "] max_=[";
     fromatValuesIntoStream(ss, max);
@@ -230,7 +230,7 @@ std::string HistogramStats<T>::prettyString(
                 countPerTick,
                 fromatCountIntoStream,
                 fromatValuesIntoStream
-            );
+                );
             ss << std::endl;
         }
     }

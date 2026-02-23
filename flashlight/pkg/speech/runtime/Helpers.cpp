@@ -116,7 +116,7 @@ std::shared_ptr<fl::Dataset> createDataset(
             );
 #else
             LOG(FATAL) << "EverstoreDataset not supported: "
-            << "build with -DFL_BUILD_FB_DEPENDENCIES";
+                       << "build with -DFL_BUILD_FB_DEPENDENCIES";
 #endif
         } else
             curListDs = std::make_shared<ListFileDataset>(

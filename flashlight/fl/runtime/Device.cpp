@@ -16,8 +16,8 @@ void deviceImplTypeCheck(DeviceType expect, DeviceType actual) {
     if(expect != actual) {
         std::ostringstream oss;
         oss << "[fl::Device::impl] "
-        << "specified device type: [" << expect << "] "
-        << "doesn't match actual device type: [" << actual << "]";
+            << "specified device type: [" << expect << "] "
+            << "doesn't match actual device type: [" << actual << "]";
         throw std::invalid_argument(oss.str());
     }
 }

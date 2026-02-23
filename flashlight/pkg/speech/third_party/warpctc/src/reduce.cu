@@ -148,13 +148,13 @@ struct ReduceHelper {
         if(axis) {
             grid_size = num_cols;
             reduce_rows<128> << < grid_size, 128, 0, stream >>
-            > (f, g, input, output, num_rows, num_cols);
+                > (f, g, input, output, num_rows, num_cols);
 
         } else {
             dim3 tpb(warp_size, 128 / warp_size);
             grid_size = (num_cols + warp_size - 1) / warp_size;
             reduce_cols<128> << < grid_size, tpb, 0, stream >>
-            > (f, g, input, output, num_rows, num_cols);
+                > (f, g, input, output, num_rows, num_cols);
 
         }
     }

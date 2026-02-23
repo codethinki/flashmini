@@ -80,7 +80,7 @@ void printDiscrepancies(
     const Tensor& baseline
 ) {
     std::cerr << prefix << "discrepancy=" << std::setprecision(17)
-    << discrepancy(compare, baseline);
+              << discrepancy(compare, baseline);
     // Check for NaN discrepancies manually.
     auto compareNaN = fl::isnan(compare);
     auto baselineNaN = fl::isnan(baseline);

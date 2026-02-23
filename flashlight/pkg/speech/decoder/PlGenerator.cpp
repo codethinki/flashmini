@@ -225,8 +225,8 @@ std::string PlGenerator::regeneratePl(
         auto sampleId = readSampleIds(sample[kSampleIdx]).front();
         auto inputPath = readSampleIds(sample[kPathIdx]).front();
         plStream << sampleId << "\t" << inputPath << "\t"
-        << std::to_string(duration) << "\t" << lib::join(" ", words)
-        << std::endl;
+                 << std::to_string(duration) << "\t" << lib::join(" ", words)
+                 << std::endl;
     }
     plStream.close();
 

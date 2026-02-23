@@ -115,7 +115,7 @@ std::string AdaptiveEmbedding::prettyString() const {
     for(int i = 0; i < cutoff_.size() - 1; i++)
         ss << cutoff_[i] << ", ";
     ss << cutoff_[cutoff_.size() - 1] << "), "
-    << "(divValue: " << divValue_ << ")";
+       << "(divValue: " << divValue_ << ")";
     return ss.str();
 }
 

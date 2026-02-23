@@ -37,7 +37,7 @@ namespace detail {
         if(err != cudaSuccess) {
             std::ostringstream ess;
             ess << prefix << '[' << file << ':' << line
-            << "] CUDA error: " << cudaGetErrorString(err);
+                << "] CUDA error: " << cudaGetErrorString(err);
             throw std::runtime_error(ess.str());
         }
     }

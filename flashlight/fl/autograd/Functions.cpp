@@ -36,7 +36,7 @@ namespace detail {
             if(rdims[i] % idimsSize != 0) {
                 std::stringstream ss;
                 ss << "Invalid dims for tileAs for input dims " << idims
-                << " to output dims " << rdims;
+                   << " to output dims " << rdims;
                 throw std::invalid_argument(ss.str());
             }
             dims[i] = rdims[i] / idimsSize;

@@ -52,7 +52,7 @@ std::unique_ptr<Module> Embedding::clone() const {
 std::string Embedding::prettyString() const {
     std::ostringstream ss;
     ss << "Embedding (embeddings: " << numEmbeddings_
-    << ") (dim: " << embeddingDim_ << ")";
+       << ") (dim: " << embeddingDim_ << ")";
     return ss.str();
 }
 

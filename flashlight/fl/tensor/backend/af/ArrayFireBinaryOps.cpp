@@ -56,8 +56,8 @@ namespace {
         else {
             std::stringstream ss;
             ss << "doBinaryOpOrBroadcast: cannot perform operation "
-            "or broadcasting with tensors of shapes "
-            << lhs.shape() << " and " << rhs.shape() << " - dimension mismatch.";
+                "or broadcasting with tensors of shapes "
+               << lhs.shape() << " and " << rhs.shape() << " - dimension mismatch.";
             throw std::invalid_argument(ss.str());
         }
     }

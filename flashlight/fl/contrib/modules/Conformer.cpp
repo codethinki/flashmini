@@ -293,13 +293,13 @@ std::unique_ptr<Module> Conformer::clone() const {
 std::string Conformer::prettyString() const {
     std::ostringstream ss;
     ss << "Conformer "
-    << "(modelDim: " << params_[1].dim(1) << "), "
-    << "(mlpDim: " << params_[1].dim(0) << "), "
-    << "(nHeads: " << nHeads_ << "), "
-    << "(pDropout: " << pDropout_ << "), "
-    << "(pLayerDropout: " << pLayerDropout_ << "), "
-    << "(posEmbContextSize: " << posEmbContextSize_ << "), "
-    << "(convKernelSize: " << convKernelSize_ << ") ";
+       << "(modelDim: " << params_[1].dim(1) << "), "
+       << "(mlpDim: " << params_[1].dim(0) << "), "
+       << "(nHeads: " << nHeads_ << "), "
+       << "(pDropout: " << pDropout_ << "), "
+       << "(pLayerDropout: " << pLayerDropout_ << "), "
+       << "(posEmbContextSize: " << posEmbContextSize_ << "), "
+       << "(convKernelSize: " << convKernelSize_ << ") ";
     return ss.str();
 }
 

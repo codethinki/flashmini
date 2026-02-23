@@ -53,6 +53,6 @@ int main() {
     fl::sync();
     auto e = fl::Timer::stop(s);
     std::cout << "Total time (fwd+bwd pass) " << std::setprecision(5)
-    << e * 1000.0 / ntimes << " msec" << std::endl;
+              << e * 1000.0 / ntimes << " msec" << std::endl;
     return 0;
 }

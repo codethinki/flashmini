@@ -44,8 +44,8 @@ namespace {
 
             if(i != *isamp) {
                 LOG(ERROR) << "outputFlow number of bytes written=" << i
-                << " expected=" << *isamp
-                << " priv->data->size()=" << priv->data->size();
+                           << " expected=" << *isamp
+                           << " priv->data->size()=" << priv->data->size();
                 return SOX_EOF;
             }
         }
@@ -203,7 +203,7 @@ namespace detail {
         if(status != SOX_SUCCESS) {
             std::stringstream ss;
             ss << file << ':' << line << "] libsox error: " << status
-            << " when executing: " << msg;
+               << " when executing: " << msg;
             LOG(ERROR) << ss.str();
             throw std::runtime_error(ss.str());
         }
@@ -213,7 +213,7 @@ namespace detail {
         if(!ptr) {
             std::stringstream ss;
             ss << file << ':' << line
-            << "] libsox failed to allocate when executing: " << msg;
+               << "] libsox failed to allocate when executing: " << msg;
             LOG(ERROR) << ss.str();
             throw std::runtime_error(ss.str());
         }

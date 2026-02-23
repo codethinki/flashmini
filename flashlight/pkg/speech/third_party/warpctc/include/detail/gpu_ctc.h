@@ -297,14 +297,14 @@ ctcStatus_t GpuCTC<ProbT>::launch_alpha_beta_kernels(
 
     if(compute_alpha)
         compute_alpha_kernel<ProbT, NT, VT><< < grid_size, NT, 0, stream_ >>
-        > (probs, label_sizes_, utt_length_,
+            > (probs, label_sizes_, utt_length_,
             repeats_, labels_without_blanks_, label_offsets_,
             labels_with_blanks_, alphas_, nll_forward_,
             stride, out_dim_, S_, T_, blank_label_);
 
     if(compute_beta) {
         compute_betas_and_grad_kernel<ProbT, NT, VT><< < grid_size, NT, 0, stream_ >>
-        > (probs, label_sizes_, utt_length_, repeats_,
+            > (probs, label_sizes_, utt_length_, repeats_,
             labels_with_blanks_, alphas_, nll_forward_, nll_backward_,
             grads, stride, out_dim_, S_, T_, blank_label_);
 
@@ -416,7 +416,7 @@ ctcStatus_t GpuCTC<ProbT>::compute_log_probs(const ProbT* const activations) {
     const int grid_size = ctc_helper::div_up(num_elements, NV);
 
     prepare_stable_SM_kernel<ProbT, VT> << < grid_size, NT, 0, stream_ >>
-    > (ctc_helper::identity<ProbT>(), probs_,
+        > (ctc_helper::identity<ProbT>(), probs_,
         denoms_, out_dim_, num_elements);
 
     // Reduce along columns to calculate denominator
@@ -434,7 +434,7 @@ ctcStatus_t GpuCTC<ProbT>::compute_log_probs(const ProbT* const activations) {
 
     // Kernel launch to calculate probabilities
     compute_log_probs_kernel<ProbT, VT><< < grid_size, NT, 0, stream_ >>
-    > (ctc_helper::logarithmic<ProbT>(), probs_,
+        > (ctc_helper::logarithmic<ProbT>(), probs_,
         denoms_, out_dim_, num_elements);
 
     return CTC_STATUS_SUCCESS;

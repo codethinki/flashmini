@@ -65,7 +65,7 @@ void DefaultMemoryManager::cleanDeviceMemoryManager(int device) {
 
     std::stringstream ss;
     ss << "GC: Clearing " << freePtrs.size() << " buffers |"
-    << std::to_string(bytesFreed) << " bytes";
+       << std::to_string(bytesFreed) << " bytes";
     this->log(ss.str());
 
     // Free memory outside of the lock
@@ -288,9 +288,9 @@ void DefaultMemoryManager::printInfo(
     const MemoryInfo& current = this->getCurrentMemoryInfo();
 
     ostream << msg << std::endl
-    << "---------------------------------------------------------\n"
-    << "|     POINTER      |    SIZE    |  AF LOCK  | USER LOCK |\n"
-    << "---------------------------------------------------------\n";
+            << "---------------------------------------------------------\n"
+            << "|     POINTER      |    SIZE    |  AF LOCK  | USER LOCK |\n"
+            << "---------------------------------------------------------\n";
 
     std::lock_guard<std::mutex> lock(this->memoryMutex);
     for(auto& kv : current.lockedMap) {
@@ -309,7 +309,7 @@ void DefaultMemoryManager::printInfo(
         }
 
         ostream << "|  " << kv.first << "  |  " << size << " " << unit << " | "
-        << statusMngr << " | " << statusUser << " |\n";
+                << statusMngr << " | " << statusUser << " |\n";
     }
 
     for(auto& kv : current.freeMap) {
@@ -325,7 +325,7 @@ void DefaultMemoryManager::printInfo(
 
         for(auto& ptr : kv.second)
             ostream << "|  " << ptr << "  |  " << size << " " << unit << " | "
-            << statusMngr << " | " << statusUser << " |\n";
+                    << statusMngr << " | " << statusUser << " |\n";
     }
 
     ostream << "---------------------------------------------------------\n";

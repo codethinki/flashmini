@@ -71,7 +71,7 @@ int main() {
             meter.add(l.scalar<float>());
         }
         std::cout << "Epoch: " << e << " Mean Squared Error: " << meter.value()[0]
-        << std::endl;
+                  << std::endl;
     }
     std::cout << "[Multi-layer Perceptron] Done!" << std::endl;
     return 0;

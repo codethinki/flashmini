@@ -41,8 +41,8 @@ void TimeStretch::apply(std::vector<float>& signal) {
 std::string TimeStretch::Config::prettyString() const {
     std::stringstream ss;
     ss << "TimeStretch::Config{minFactor_=" << minFactor_
-    << " maxFactor_=" << maxFactor_ << " proba_=" << proba_
-    << " sampleRate_=" << sampleRate_ << '}';
+       << " maxFactor_=" << maxFactor_ << " proba_=" << proba_
+       << " sampleRate_=" << sampleRate_ << '}';
     return ss.str();
 }
 

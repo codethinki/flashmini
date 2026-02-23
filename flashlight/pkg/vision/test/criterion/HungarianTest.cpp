@@ -69,7 +69,7 @@ TEST(HungarianTest, FullPipelineSimple1) {
     for(int c = 0; c < N; c++)
         for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
-            << "Assignment differs at row " << r << " and col " << c;
+                << "Assignment differs at row " << r << " and col " << c;
 }
 
 TEST(HungarianTest, FullPipelineSimple2) {
@@ -84,7 +84,7 @@ TEST(HungarianTest, FullPipelineSimple2) {
     for(int c = 0; c < N; c++)
         for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
-            << "Assignment differs at row " << r << " and col " << c;
+                << "Assignment differs at row " << r << " and col " << c;
 }
 
 TEST(HungarianTest, FullPipelineSimple3) {
@@ -98,7 +98,7 @@ TEST(HungarianTest, FullPipelineSimple3) {
     for(int c = 0; c < N; c++)
         for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
-            << "Assignment differs at row " << r << " and col " << c;
+                << "Assignment differs at row " << r << " and col " << c;
 }
 
 TEST(HungarianTest, FullPipelineSize6) {
@@ -116,7 +116,7 @@ TEST(HungarianTest, FullPipelineSize6) {
     for(int c = 0; c < N; c++)
         for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
-            << "Assignment differs at row " << r << " and col " << c;
+                << "Assignment differs at row " << r << " and col " << c;
 }
 TEST(HungarianTest, 6x6Example2) {
     int M = 6; // Rows
@@ -133,7 +133,7 @@ TEST(HungarianTest, 6x6Example2) {
     for(int c = 0; c < N; c++)
         for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
-            << "Assignment differs at row " << r << " and col " << c;
+                << "Assignment differs at row " << r << " and col " << c;
 }
 
 TEST(HungarianTest, NonSquare2) {

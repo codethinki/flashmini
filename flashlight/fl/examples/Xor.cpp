@@ -99,11 +99,11 @@ int main(int argc, const char** argv) {
             // TODO: Use loss function
             Tensor diff = out - result.tensor();
             std::cout << "Average Error at iteration (" << i + 1
-            << ") : " << fl::mean(fl::abs(diff)).scalar<float>() << "\n";
+                      << ") : " << fl::mean(fl::abs(diff)).scalar<float>() << "\n";
             std::cout << "Predicted\n"
-            << result.tensor() << std::endl
-            << "Expected\n"
-            << out << std::endl;
+                      << result.tensor() << std::endl
+                      << "Expected\n"
+                      << out << std::endl;
         }
     }
     return 0;

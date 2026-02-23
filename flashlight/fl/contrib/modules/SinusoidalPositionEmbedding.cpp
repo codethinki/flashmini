@@ -100,7 +100,7 @@ std::unique_ptr<Module> SinusoidalPositionEmbedding::clone() const {
 std::string SinusoidalPositionEmbedding::prettyString() const {
     std::ostringstream ss;
     ss << "Sinusoidal Position Embedding Layer (embDim: " << layerDim_
-    << "), (input scale " << inputScale_ << ")";
+       << "), (input scale " << inputScale_ << ")";
     return ss.str();
 }
 

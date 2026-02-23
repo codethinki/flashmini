@@ -190,17 +190,17 @@ void Variable::addGrad(const Variable& childGrad) {
         if(childGrad.type() != this->type()) {
             std::stringstream ss;
             ss << "Variable::addGrad: attempted to add child gradient of type "
-            << childGrad.type() << " to a Variable of type " << this->type()
-            << ". You might be performing an operation with "
-            "two inputs of different types.";
+               << childGrad.type() << " to a Variable of type " << this->type()
+               << ". You might be performing an operation with "
+                "two inputs of different types.";
             throw std::invalid_argument(ss.str());
         }
         if(childGrad.shape() != this->shape()) {
             std::stringstream ss;
             ss << "Variable::addGrad: given gradient has dimensions not equal "
-            "to this Variable's dimensions: this variable has shape "
-            << this->shape() << " whereas the child gradient has dimensions "
-            << childGrad.shape() << std::endl;
+                "to this Variable's dimensions: this variable has shape "
+               << this->shape() << " whereas the child gradient has dimensions "
+               << childGrad.shape() << std::endl;
             throw std::invalid_argument(ss.str());
         }
         if(sharedGrad_->grad)

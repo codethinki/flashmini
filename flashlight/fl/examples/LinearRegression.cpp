@@ -58,7 +58,7 @@ int main() {
         }
 
         std::cout << "Epoch: " << e
-        << " Mean Squared Error: " << error.scalar<float>() << std::endl;
+                  << " Mean Squared Error: " << error.scalar<float>() << std::endl;
     }
 
     std::cout << "[Linear Regression] Done!" << std::endl;

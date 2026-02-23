@@ -30,8 +30,8 @@ void assertTensorScalarBinop(
     auto result = op(in, scalar);
     auto expect = expectOut.astype(result.type());
     ASSERT_TRUE(allClose(result, expect))
-    << "in.type(): " << in.type()
-    << ", ScalarType: " << dtype_traits<ScalarType>::getName();
+        << "in.type(): " << in.type()
+        << ", ScalarType: " << dtype_traits<ScalarType>::getName();
 }
 
 template<typename ScalarType, typename Op>
@@ -44,8 +44,8 @@ void assertScalarTensorBinop(
     auto result = op(scalar, in);
     auto expect = expectOut.astype(result.type());
     ASSERT_TRUE(allClose(result, expect))
-    << "ScalarType: " << dtype_traits<ScalarType>::getName()
-    << ", in.type(): " << in.type();
+        << "ScalarType: " << dtype_traits<ScalarType>::getName()
+        << ", in.type(): " << in.type();
 }
 
 template<typename Op>
@@ -67,9 +67,9 @@ void assertCommutativeBinop(
     const Tensor& out
 ) {
     ASSERT_TRUE(allClose(op(in1, in2), out))
-    << "in1.type(): " << in1.type() << ", in2.type(): " << in2.type();
+        << "in1.type(): " << in1.type() << ", in2.type(): " << in2.type();
     ASSERT_TRUE(allClose(op(in2, in1), out))
-    << "in1.type(): " << in1.type() << ", in2.type(): " << in2.type();
+        << "in1.type(): " << in1.type() << ", in2.type(): " << in2.type();
 }
 
 void applyToAllFpDtypes(std::function<void(fl::dtype)> func) {
@@ -316,34 +316,34 @@ TEST(TensorBinaryOpsTest, BinaryOperatorIncompatibleShapes) {
             ASSERT_THROW((void) Values(lhs * rhs), std::invalid_argument) << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs / rhs), std::invalid_argument) << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs == rhs), std::invalid_argument)
-            << "dtype: " << type;
+                << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs != rhs), std::invalid_argument)
-            << "dtype: " << type;
+                << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs < rhs), std::invalid_argument) << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs <= rhs), std::invalid_argument)
-            << "dtype: " << type;
+                << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs > rhs), std::invalid_argument) << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs >= rhs), std::invalid_argument)
-            << "dtype: " << type;
+                << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs || rhs), std::invalid_argument)
-            << "dtype: " << type;
+                << "dtype: " << type;
             ASSERT_THROW((void) Values(lhs && rhs), std::invalid_argument)
-            << "dtype: " << type;
+                << "dtype: " << type;
             // TODO ArrayFire needs software impl for fp16 modulo on CUDA backend;
             // bring this test back when supported.
             if(type != dtype::f16)
                 ASSERT_THROW((void) Values(lhs % rhs), std::invalid_argument)
-                << "dtype: " << type;
+                    << "dtype: " << type;
             // these operators are generally not well-defined for fps
             if(type != dtype::f16 && type != dtype::f32 && type != dtype::f64) {
                 ASSERT_THROW((void) Values(lhs | rhs), std::invalid_argument)
-                << "dtype: " << type;
+                    << "dtype: " << type;
                 ASSERT_THROW((void) Values(lhs ^ rhs), std::invalid_argument)
-                << "dtype: " << type;
+                    << "dtype: " << type;
                 ASSERT_THROW((void) Values(lhs << rhs), std::invalid_argument)
-                << "dtype: " << type;
+                    << "dtype: " << type;
                 ASSERT_THROW((void) Values(lhs >> rhs), std::invalid_argument)
-                << "dtype: " << type;
+                    << "dtype: " << type;
             }
         };
 
@@ -474,7 +474,7 @@ TEST(TensorBinaryOpsTest, broadcasting) {
 
             std::stringstream ss;
             ss << "lhs: " << shapeData.lhs << " rhs: " << shapeData.rhs
-            << " function: " << funcp.second;
+               << " function: " << funcp.second;
             auto testData = ss.str();
 
             ASSERT_EQ(actualOut.shape(), expectedShape) << testData;

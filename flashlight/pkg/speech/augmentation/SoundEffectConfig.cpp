@@ -104,7 +104,7 @@ void writeSoundEffectConfigFile(
     } catch(std::exception& ex) {
         std::stringstream ss;
         ss << "writeSoundEffectConfigFile(filename=" << filename
-        << ") failed with error={" << ex.what() << "}";
+           << ") failed with error={" << ex.what() << "}";
         throw std::runtime_error(ss.str());
     }
 }
@@ -121,7 +121,7 @@ std::vector<SoundEffectConfig> readSoundEffectConfigFile(
     } catch(std::exception& ex) {
         std::stringstream ss;
         ss << "readSoundEffectConfigFile(filename=" << filename
-        << ") failed with error={" << ex.what() << "}";
+           << ") failed with error={" << ex.what() << "}";
         throw std::runtime_error(ss.str());
     }
 }

@@ -265,26 +265,26 @@ TEST(AutogradBinaryOpsTest, matmul) {
         // matmul
         auto funcMatmulLhs = [&](Variable& input) { return matmul(input, b); };
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMatmulLhs, a, 1E-6))
-        << "matmul lhs gradient: lhs " << a.shape() << " rhs " << b.shape();
+            << "matmul lhs gradient: lhs " << a.shape() << " rhs " << b.shape();
         auto funcMatmulRhs = [&](Variable& input) { return matmul(a, input); };
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMatmulRhs, b, 1E-6))
-        << "matmul rhs gradient: lhs " << a.shape() << " rhs " << b.shape();
+            << "matmul rhs gradient: lhs " << a.shape() << " rhs " << b.shape();
 
         // matmulTN
         auto funcMatmulTNLhs = [&](Variable& input) { return matmulTN(input, b); };
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMatmulTNLhs, aT, 1E-6))
-        << "matmulTN lhs gradient: lhs " << a.shape() << " rhs " << b.shape();
+            << "matmulTN lhs gradient: lhs " << a.shape() << " rhs " << b.shape();
         auto funcMatmulTNRhs = [&](Variable& input) { return matmulTN(aT, input); };
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMatmulTNRhs, b, 1E-6))
-        << "matmulTN rhs gradient: lhs " << a.shape() << " rhs " << b.shape();
+            << "matmulTN rhs gradient: lhs " << a.shape() << " rhs " << b.shape();
 
         // matmulNT
         auto funcMatmulNTLhs = [&](Variable& input) { return matmulNT(input, bT); };
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMatmulNTLhs, a, 1E-6))
-        << "matmulTN lhs gradient: lhs " << a.shape() << " rhs " << b.shape();
+            << "matmulTN lhs gradient: lhs " << a.shape() << " rhs " << b.shape();
         auto funcMatmulNTRhs = [&](Variable& input) { return matmulNT(a, input); };
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMatmulNTRhs, bT, 1E-6))
-        << "matmulTN rhs gradient: lhs " << a.shape() << " rhs " << b.shape();
+            << "matmulTN rhs gradient: lhs " << a.shape() << " rhs " << b.shape();
     }
 }
 

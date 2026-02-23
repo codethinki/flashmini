@@ -44,7 +44,7 @@ void timeBeamSearch() {
         fl::sync();
         auto e = fl::Timer::stop(s);
         std::cout << "Total time (beam size: " << b << ") " << std::setprecision(5)
-        << e * 1000.0 / iters << " msec" << std::endl;
+                  << e * 1000.0 / iters << " msec" << std::endl;
     }
 }
 
@@ -80,7 +80,7 @@ void timeForwardBackward() {
     fl::sync();
     auto e = fl::Timer::stop(s);
     std::cout << "Total time (fwd+bwd pass) " << std::setprecision(5)
-    << e * 1000.0 / iters << " msec" << std::endl;
+              << e * 1000.0 / iters << " msec" << std::endl;
 }
 
 int main() {
