@@ -437,6 +437,7 @@ endfunction()
    :param OPTIONAL: If specified, do not raise FATAL_ERROR if uncrustify is not found
    :param files: List of source files to format
 
+   :pre expects uncrustify.cfg in root directory
    :post: A custom target is created if found, or configuration terminates with FATAL_ERROR if not found (unless OPTIONAL)
 
    .. note::
@@ -477,7 +478,7 @@ function(fm_add_uncrustify_target TARGET_NAME)
 
     add_custom_target(
         ${TARGET_NAME}
-        COMMAND ${UNCRUSTIFY_EXECUTABLE} --replace --no-backup -F ${FILE_LIST_PATH}
+        COMMAND ${UNCRUSTIFY_EXECUTABLE} --replace --no-backup -c uncrustify.cfg -q -F ${FILE_LIST_PATH}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Formatting all source files with uncrustify..."
         VERBATIM

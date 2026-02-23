@@ -1,4 +1,4 @@
-name: Clang Format
+name: Uncrustify Format
 
 on:
   push: { branches: ["master", "_master/add_ci"] }
@@ -10,12 +10,10 @@ permissions: { contents: read }
 # CONFIG
 # ---------------------------------------------------------
 env:
-  CLANG_FORMAT_VERSION: "21.1.0"
+  UNCRUSTIFY_CONFIG: "uncrustify.cfg" # Make sure this matches your config file's name/path
   CHECK_PATH: "flashlight"
   FILE_EXTENSIONS: "c|cpp|h|hpp|cu"
   FILES_PER_THREAD: "40"
-
-
 
 # ---------------------------------------------------------
 # JOB
@@ -27,13 +25,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install clang-format
-      run: pipx install clang-format==${{ env.CLANG_FORMAT_VERSION }}
+    - name: Install uncrustify
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y uncrustify
       
-    - name: Run clang-format style check
+    - name: Run uncrustify style check
       run: |
         find ${{ env.CHECK_PATH }} \
           -type f \
           -regextype posix-extended \
           -regex ".*\.(${{ env.FILE_EXTENSIONS }})$" \
-          | xargs -r -P $(nproc) -n ${{ env.FILES_PER_THREAD }} clang-format --style=file --dry-run --Werror
+          | xargs -r -P $(nproc) -n ${{ env.FILES_PER_THREAD }} uncrustify -c ${{ env.UNCRUSTIFY_CONFIG }} --check
