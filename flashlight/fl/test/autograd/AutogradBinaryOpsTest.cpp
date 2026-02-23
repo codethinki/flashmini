@@ -83,7 +83,8 @@ TEST(AutogradBinaryOpsTest, CrossEntropy) {
     auto ignoreIdx = y(0, 0).scalar<int>();
 
     std::vector<ReduceMode> modes = {
-        ReduceMode::NONE, ReduceMode::SUM, ReduceMode::MEAN};
+        ReduceMode::NONE, ReduceMode::SUM, ReduceMode::MEAN
+    };
     for(auto mode : modes) {
         auto func = [&](Variable& input) {
                 return categoricalCrossEntropy(input, y, mode);
@@ -242,7 +243,10 @@ TEST(AutogradBinaryOpsTest, matmul) {
         {mkb2, kn},
         {mkb2, knb2},
         {mkb2b3, kn},
-        {mkb2b3, knb2b3}};
+        {
+            mkb2b3, knb2b3
+        }
+    };
 
     auto trFirstTwoDims = [](const Shape& in) -> Shape {
             Shape out = in;

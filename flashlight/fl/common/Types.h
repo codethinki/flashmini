@@ -23,27 +23,35 @@ namespace detail {
     const std::unordered_map<OptimLevel, std::unordered_set<std::string>>
     kOptimLevelTypeExclusionMappings = {
         {OptimLevel::DEFAULT, {}}, // unused
-        {OptimLevel::O1,
-         // Perform all operations in fp16 except for:
-         {"batchnorm",
-          "reciprocal",
-          "erf",
-          "exp",
-          "log",
-          "log1p",
-          "pow",
-          "sum",
-          "mean",
-          "var",
-          "norm",
-          "normalize",
-          "softmax",
-          "logSoftmax",
-          "categoricalCrossEntropy",
-          "gelu"}},
-        {OptimLevel::O2,
-         // Perform all operations in fp16 except for:
-         {"batchnorm"}},
+        {
+            OptimLevel::O1,
+            // Perform all operations in fp16 except for:
+            {
+                "batchnorm",
+                "reciprocal",
+                "erf",
+                "exp",
+                "log",
+                "log1p",
+                "pow",
+                "sum",
+                "mean",
+                "var",
+                "norm",
+                "normalize",
+                "softmax",
+                "logSoftmax",
+                "categoricalCrossEntropy",
+                "gelu"
+            }
+        },
+        {
+            OptimLevel::O2,
+            // Perform all operations in fp16 except for:
+            {
+                "batchnorm"
+            }
+        },
         {OptimLevel::O3, {}} // Perform all operations in f16
     };
 

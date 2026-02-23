@@ -222,7 +222,10 @@ SetCriterion::LossDict SetCriterion::lossBoxes(
     if(srcIdx.first.isEmpty())
         return {
             {"lossGiou", fl::Variable(fl::fromScalar(0, predBoxes.type()), false)},
-            {"lossBbox", fl::Variable(fl::fromScalar(0, predBoxes.type()), false)}};
+            {
+                "lossBbox", fl::Variable(fl::fromScalar(0, predBoxes.type()), false)
+            }
+        };
     auto colIdxs = fl::reshape(srcIdx.second, {1, srcIdx.second.dim(0)});
     auto batchIdxs = fl::reshape(srcIdx.first, {1, srcIdx.first.dim(0)});
 

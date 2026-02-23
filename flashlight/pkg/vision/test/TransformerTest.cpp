@@ -257,7 +257,8 @@ TEST(Tranformer, Masked) {
         Variable(fl::rand({maskW, maskH, C, B}), false), // input Projection
         Variable(fl::full({maskW, maskH, 1, B}, 1), false), // mask
         Variable(fl::rand({C, bbox_queries}), false), // query_embed
-        nonMaskPos};
+        nonMaskPos
+    };
     auto nonMaskOutput = tr(nonMaskInput)[0];
 
     auto nonMaskedSrc = fl::rand({W, H, C, B});
@@ -270,6 +271,7 @@ TEST(Tranformer, Masked) {
         Variable(nonMaskedSrc, false), // input Projection
         Variable(mask, false), // mask
         nonMaskInput[2], // query_embed
-        maskPos};
+        maskPos
+    };
     auto maskOutput = tr(maskInput)[0];
 }

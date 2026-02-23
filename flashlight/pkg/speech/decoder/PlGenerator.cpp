@@ -205,8 +205,10 @@ std::string PlGenerator::regeneratePl(
             if(usePlugin)
                 rawEmission = ntwrk
                     ->forward(
-                        {fl::input(sample[kInputIdx]),
-                         fl::noGrad(sample[kDurationIdx])}
+                        {
+                            fl::input(sample[kInputIdx]),
+                            fl::noGrad(sample[kDurationIdx])
+                        }
                     )
                     .front();
             else

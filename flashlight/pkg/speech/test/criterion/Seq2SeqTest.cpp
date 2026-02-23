@@ -263,8 +263,10 @@ TEST(Seq2SeqTest, Seq2SeqMixedAttn) {
         N - 2,
         N - 1,
         maxoutputlen,
-        {std::make_shared<ContentAttention>(),
-         std::make_shared<MultiHeadContentAttention>(H, nHead)},
+        {
+            std::make_shared<ContentAttention>(),
+            std::make_shared<MultiHeadContentAttention>(H, nHead)
+        },
         std::make_shared<StepWindow>(1, 20, 2.2, 5.8),
         false,
         100,
@@ -387,7 +389,8 @@ TEST(Seq2SeqTest, BatchedDecoderStep) {
             nRnnLayer,
             nAttnRound,
             0.0
-        )};
+        )
+    };
 
     for(auto& seq2seq : criterions) {
         seq2seq.eval();

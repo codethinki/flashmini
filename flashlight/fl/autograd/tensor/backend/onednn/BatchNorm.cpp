@@ -45,20 +45,24 @@ namespace {
         Shape inDescDims;
         if(minAxis == 0)
             inDescDims = Shape(
-                {1,
-                 1,
-                 nfeatures,
-                 static_cast<long long>(input.elements() / nfeatures)}
+                {
+                    1,
+                    1,
+                    nfeatures,
+                    static_cast<long long>(input.elements() / nfeatures)
+                }
             );
         else {
             int batchsz = 1;
             for(int i = maxAxis + 1; i < input.ndim(); ++i)
                 batchsz *= input.dim(i);
             inDescDims = Shape(
-                {1,
-                 static_cast<long long>(input.elements() / (nfeatures * batchsz)),
-                 nfeatures,
-                 batchsz}
+                {
+                    1,
+                    static_cast<long long>(input.elements() / (nfeatures * batchsz)),
+                    nfeatures,
+                    batchsz
+                }
             );
         }
 
@@ -66,7 +70,8 @@ namespace {
             inDescDims[kBatchSizeIdx],
             inDescDims[kChannelSizeIdx],
             inDescDims[kHIdx],
-            inDescDims[kWIdx]};
+            inDescDims[kWIdx]
+        };
 
         return inputOutputDims;
     }
@@ -185,7 +190,10 @@ Tensor OneDnnAutogradExtension::batchnorm(
         {DNNL_ARG_VARIANCE, varMemory.getMemory()},
         {DNNL_ARG_DST, outputMemory.getMemory()},
         {DNNL_ARG_SCALE, weightsMemory.getMemory()},
-        {DNNL_ARG_SHIFT, biasMemory.getMemory()}};
+        {
+            DNNL_ARG_SHIFT, biasMemory.getMemory()
+        }
+    };
 
     // Execute
     std::vector<dnnl::primitive> network;
@@ -267,7 +275,11 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::batchnormBackward(
             {DNNL_ARG_DIFF_SRC, gradInputMem.getMemory()},
             {DNNL_ARG_DIFF_DST, gradOutputMem.getMemory()},
             {DNNL_ARG_DIFF_SCALE, gradWeightsMem.getMemory()},
-            {DNNL_ARG_DIFF_SHIFT, gradBiasMem.getMemory()}}};
+            {
+                DNNL_ARG_DIFF_SHIFT, gradBiasMem.getMemory()
+            }
+        }
+    };
 
     networkBackwards.push_back(*bwdPrim);
     detail::executeNetwork(networkBackwards, bwdArgs);

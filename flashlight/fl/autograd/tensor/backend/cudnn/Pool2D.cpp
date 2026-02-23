@@ -37,10 +37,12 @@ Tensor CudnnAutogradExtension::pool2d(
     auto oy = 1 + (iy + 2 * py - wy) / sy;
 
     auto output = Tensor(
-        {ox,
-         oy,
-         input.ndim() < 3 ? 1 : input.dim(2),
-         input.ndim() < 4 ? 1 : input.dim(3)},
+        {
+            ox,
+            oy,
+            input.ndim() < 3 ? 1 : input.dim(2),
+            input.ndim() < 4 ? 1 : input.dim(3)
+        },
         input.type()
     );
     auto outDesc = TensorDescriptor(output);

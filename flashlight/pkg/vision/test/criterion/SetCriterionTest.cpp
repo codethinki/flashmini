@@ -18,7 +18,10 @@ using namespace fl::pkg::vision;
 
 std::unordered_map<std::string, float> getLossWeights() {
     const std::unordered_map<std::string, float> lossWeightsBase = {
-        {"lossCe", 1.f}, {"lossGiou", 1.f}, {"lossBbox", 1.f}};
+        {"lossCe", 1.f}, {"lossGiou", 1.f}, {
+            "lossBbox", 1.f
+        }
+    };
 
     std::unordered_map<std::string, float> lossWeights;
     for(int i = 0; i < 6; i++)
@@ -46,15 +49,19 @@ TEST(SetCriterion, PytorchRepro) {
     auto predLogits =
         fl::Variable(fl::full({numClasses + 1, numPreds, numBatches}, 1), true);
 
-    std::vector<fl::Variable> targetBoxes = {fl::Variable(
-        Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
-        false
-                                             )};
+    std::vector<fl::Variable> targetBoxes = {
+        fl::Variable(
+            Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
+            false
+        )
+    };
 
-    std::vector<fl::Variable> targetClasses = {fl::Variable(
-        Tensor::fromVector({numTargets, numBatches}, targetClassVec),
-        false
-                                               )};
+    std::vector<fl::Variable> targetClasses = {
+        fl::Variable(
+            Tensor::fromVector({numTargets, numBatches}, targetClassVec),
+            false
+        )
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);
@@ -79,15 +86,19 @@ TEST(SetCriterion, PytorchReproMultiplePreds) {
     auto predLogits =
         fl::Variable(fl::full({numClasses + 1, numPreds, numBatches}, 1), true);
 
-    std::vector<fl::Variable> targetBoxes = {fl::Variable(
-        Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
-        false
-                                             )};
+    std::vector<fl::Variable> targetBoxes = {
+        fl::Variable(
+            Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
+            false
+        )
+    };
 
-    std::vector<fl::Variable> targetClasses = {fl::Variable(
-        Tensor::fromVector({1, numTargets, numBatches}, targetClassVec),
-        false
-                                               )};
+    std::vector<fl::Variable> targetClasses = {
+        fl::Variable(
+            Tensor::fromVector({1, numTargets, numBatches}, targetClassVec),
+            false
+        )
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);
@@ -120,15 +131,19 @@ TEST(SetCriterion, PytorchReproMultipleTargets) {
     auto predLogits =
         fl::Variable(fl::full({numClasses + 1, numPreds, numBatches}, 1), true);
 
-    std::vector<fl::Variable> targetBoxes = {fl::Variable(
-        Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
-        false
-                                             )};
+    std::vector<fl::Variable> targetBoxes = {
+        fl::Variable(
+            Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
+            false
+        )
+    };
 
-    std::vector<fl::Variable> targetClasses = {fl::Variable(
-        Tensor::fromVector({numTargets, numBatches}, targetClassVec),
-        false
-                                               )};
+    std::vector<fl::Variable> targetClasses = {
+        fl::Variable(
+            Tensor::fromVector({numTargets, numBatches}, targetClassVec),
+            false
+        )
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);
@@ -143,7 +158,8 @@ TEST(SetCriterion, PytorchReproNoPerfectMatch) {
     std::vector<float> predBoxesVec = {2, 2, 3, 3, 1, 1, 2, 2};
 
     std::vector<float> targetBoxesVec = {
-        0.9, 0.8, 1.9, 1.95, 1.9, 1.95, 2.9, 2.95};
+        0.9, 0.8, 1.9, 1.95, 1.9, 1.95, 2.9, 2.95
+    };
 
     // std::vector<float> predLogitsVec((numClasses + 1) * numPreds * numPreds,
     // 0.0);
@@ -157,15 +173,19 @@ TEST(SetCriterion, PytorchReproNoPerfectMatch) {
     auto predLogits =
         fl::Variable(fl::full({numClasses + 1, numPreds, numBatches}, 1), true);
 
-    std::vector<fl::Variable> targetBoxes = {fl::Variable(
-        Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
-        false
-                                             )};
+    std::vector<fl::Variable> targetBoxes = {
+        fl::Variable(
+            Tensor::fromVector({4, numTargets, numBatches}, targetBoxesVec),
+            false
+        )
+    };
 
-    std::vector<fl::Variable> targetClasses = {fl::Variable(
-        Tensor::fromVector({numTargets, numBatches}, targetClassVec),
-        false
-                                               )};
+    std::vector<fl::Variable> targetClasses = {
+        fl::Variable(
+            Tensor::fromVector({numTargets, numBatches}, targetClassVec),
+            false
+        )
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);
@@ -307,7 +327,8 @@ TEST(SetCriterion, PytorchReproBatching) {
         fl::Variable(
             Tensor::fromVector({4, numTargets, numPreds}, targetBoxesVec2),
             false
-        )};
+        )
+    };
 
     std::vector<fl::Variable> targetClasses = {
         fl::Variable(
@@ -317,7 +338,8 @@ TEST(SetCriterion, PytorchReproBatching) {
         fl::Variable(
             Tensor::fromVector({numTargets, numPreds, 1}, targetClassVec),
             false
-        )};
+        )
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);
@@ -330,7 +352,8 @@ TEST(SetCriterion, DifferentNumberOfLabels) {
     const int numPreds = 2;
     const int numBatches = 2;
     std::vector<float> predBoxesVec = {
-        2, 2, 3, 3, 1, 1, 2, 2, 2, 2, 3, 3, 1, 1, 2, 2};
+        2, 2, 3, 3, 1, 1, 2, 2, 2, 2, 3, 3, 1, 1, 2, 2
+    };
 
     std::vector<float> targetBoxesVec1 = {
         1,
@@ -364,11 +387,13 @@ TEST(SetCriterion, DifferentNumberOfLabels) {
 
     std::vector<fl::Variable> targetBoxes = {
         fl::Variable(Tensor::fromVector({4, 2, 1}, targetBoxesVec1), false),
-        fl::Variable(Tensor::fromVector({4, 1, 1}, targetBoxesVec2), false)};
+        fl::Variable(Tensor::fromVector({4, 1, 1}, targetBoxesVec2), false)
+    };
 
     std::vector<fl::Variable> targetClasses = {
         fl::Variable(fl::full({2, 1, 1}, 1), false),
-        fl::Variable(fl::full({1, 1, 1}, 1), false)};
+        fl::Variable(fl::full({1, 1, 1}, 1), false)
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);
@@ -380,8 +405,10 @@ TEST(SetCriterion, DifferentNumberOfLabelsClass) {
     const int numClasses = 80;
     const int numPreds = 3;
     const int numBatches = 2;
-    std::vector<float> predBoxesVec = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    std::vector<float> predBoxesVec = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    };
 
     std::vector<float> targetBoxesVec1 = {1, 1, 1, 1, 1, 1, 1, 1};
 
@@ -404,11 +431,13 @@ TEST(SetCriterion, DifferentNumberOfLabelsClass) {
 
     std::vector<fl::Variable> targetBoxes = {
         fl::Variable(Tensor::fromVector({4, 2, 1}, targetBoxesVec1), false),
-        fl::Variable(Tensor::fromVector({4, 1, 1}, targetBoxesVec2), false)};
+        fl::Variable(Tensor::fromVector({4, 1, 1}, targetBoxesVec2), false)
+    };
 
     std::vector<fl::Variable> targetClasses = {
         fl::Variable(fl::iota({2}), false),
-        fl::Variable(fl::full({1, 1, 1}, 9), false)};
+        fl::Variable(fl::full({1, 1, 1}, 9), false)
+    };
     auto matcher = HungarianMatcher(1, 1, 1);
     auto crit = SetCriterion(80, matcher, getLossWeights(), 0.0);
     auto loss = crit.forward(predBoxes, predLogits, targetBoxes, targetClasses);

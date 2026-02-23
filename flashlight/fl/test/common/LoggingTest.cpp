@@ -82,7 +82,8 @@ TEST(Logging, logOnOff) {
         fl::LogLevel::FATAL,
         fl::LogLevel::ERROR,
         fl::LogLevel::WARNING,
-        fl::LogLevel::INFO};
+        fl::LogLevel::INFO
+    };
     for(LogLevel l : logLevels) {
         stdoutBuffer.clear();
         stderrBuffer.clear();
@@ -131,7 +132,8 @@ TEST(LoggingDeathTest, FatalOnOff) {
 
     Logging::setMaxLoggingLevel(fl::LogLevel::FATAL);
     EXPECT_DEATH_IF_SUPPORTED(
-        {FL_LOG(fl::LogLevel::FATAL) << "log-fatal";
+        {
+            FL_LOG(fl::LogLevel::FATAL) << "log-fatal";
         },
         ""
     );

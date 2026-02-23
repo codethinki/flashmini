@@ -157,10 +157,12 @@ std::vector<Tensor> TextDataset::get(const int64_t idx) const {
             sizeof(int) * (pos.last - pos.first + 1)
         );
     }
-    return {Tensor::fromVector(
-        {maxLength, static_cast<long long>(batch.size())},
-        buffer
-            )};
+    return {
+        Tensor::fromVector(
+            {maxLength, static_cast<long long>(batch.size())},
+            buffer
+        )
+    };
 }
 
 void TextDataset::shuffle(uint64_t seed) {

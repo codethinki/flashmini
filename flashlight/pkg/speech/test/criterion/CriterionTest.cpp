@@ -201,7 +201,8 @@ TEST(CriterionTest, CTCCompareTensorflow) {
         0.111121, -0.411608, 0.278779, 0.0055756, 0.00569609, 0.010436,
         0.0357786, 0.633813, -0.678582, 0.00249248, 0.00272882, 0.0037688,
         0.0663296, -0.356151, 0.280111, 0.00283995, 0.0035545, 0.00331533,
-        -0.541765, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107};
+        -0.541765, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107
+    };
 
     auto ctc1 = ConnectionistTemporalClassificationCriterion();
     auto input1af = Variable(Tensor::fromArray({N1, T1, 1}, input1), true);
@@ -331,7 +332,8 @@ TEST(CriterionTest, ASGAlternatingBlanks) {
         0x1.9bc5aep-1, 0x1.3c7dacp-1, 0x1.3e2852p-1, 0x1.6699f4p-1,
         0x1.095a5p+0, 0x1.1840bcp-1, 0x1.465a4ep-1, 0x1.2c4cacp-1,
         0x1.754998p-1, 0x1.cb6698p-2, -0x1.1cadcp+0, 0x1.757b88p-2,
-        0x1.3dec32p+0, 0x1.320fp+0, -0x1.9eb1a4p-1, -0x1.e43beap-2};
+        0x1.3dec32p+0, 0x1.320fp+0, -0x1.9eb1a4p-1, -0x1.e43beap-2
+    };
     Tensor x = Tensor::fromVector(Shape({C, T, B}), xV);
     Tensor y = fl::full({mL* 2 + 1, B}, -1, fl::dtype::s32);
     int L;
@@ -485,7 +487,8 @@ TEST(CriterionTest, CTCViterbiPathConstrainedBeginAndEndWithSpace) {
 TEST(CriterionTest, FCCCost) {
     // Test case: 1
     std::array<float, 12> input1 = {
-        1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0};
+        1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0
+    };
     std::transform(
         input1.begin(),
         input1.end(),
@@ -560,7 +563,8 @@ TEST(CriterionTest, FCCJacobian) {
 TEST(CriterionTest, FACCost) {
     // Test case: 1
     std::array<float, 12> input1 = {
-        1.0, 0.0, 0.0, 1.0, 0.5, 0.5, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0};
+        1.0, 0.0, 0.0, 1.0, 0.5, 0.5, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0
+    };
     std::array<int, 4> target1 = {0, 1, 0, 1};
     const int N1 = 2, L1 = 2, T1 = 3, B1 = 2;
 
@@ -612,7 +616,8 @@ TEST(CriterionTest, ASGCost) {
     // Test case: 1
     constexpr int N1 = 2, L1 = 2, T1 = 3, B1 = 2;
     std::array<float, (B1* T1* N1)> input1 = {
-        1.0, 0.0, 0.0, 1.0, 0.5, 0.5, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0};
+        1.0, 0.0, 0.0, 1.0, 0.5, 0.5, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0
+    };
     std::transform(
         input1.begin(),
         input1.end(),

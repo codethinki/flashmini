@@ -49,7 +49,10 @@ const std::unordered_map<SoundFormat, int, EnumClassHash> formats{
     {SoundFormat::WVE, SF_FORMAT_WVE},
     {SoundFormat::OGG, SF_FORMAT_OGG},
     {SoundFormat::MPC2K, SF_FORMAT_MPC2K},
-    {SoundFormat::RF64, SF_FORMAT_RF64}};
+    {
+        SoundFormat::RF64, SF_FORMAT_RF64
+    }
+};
 
 const std::unordered_map<SoundSubFormat, int, EnumClassHash> subformats{
     {SoundSubFormat::PCM_S8, SF_FORMAT_PCM_S8},
@@ -74,7 +77,10 @@ const std::unordered_map<SoundSubFormat, int, EnumClassHash> subformats{
     {SoundSubFormat::DWVW_N, SF_FORMAT_DWVW_N},
     {SoundSubFormat::DPCM_8, SF_FORMAT_DPCM_8},
     {SoundSubFormat::DPCM_16, SF_FORMAT_DPCM_16},
-    {SoundSubFormat::VORBIS, SF_FORMAT_VORBIS}};
+    {
+        SoundSubFormat::VORBIS, SF_FORMAT_VORBIS
+    }
+};
 } // namespace
 
 namespace fl::pkg::speech {
@@ -189,11 +195,13 @@ SoundInfo loadSoundInfo(const std::string& filename) {
 }
 
 SoundInfo loadSoundInfo(std::istream& f) {
-    SF_VIRTUAL_IO vsf = {sf_vio_ro_get_filelen,
-                         sf_vio_ro_seek,
-                         sf_vio_ro_read,
-                         sf_vio_ro_write,
-                         sf_vio_ro_tell};
+    SF_VIRTUAL_IO vsf = {
+        sf_vio_ro_get_filelen,
+        sf_vio_ro_seek,
+        sf_vio_ro_read,
+        sf_vio_ro_write,
+        sf_vio_ro_tell
+    };
 
     SNDFILE* file;
     SF_INFO info;
@@ -225,11 +233,13 @@ std::vector<T> loadSound(const std::string& filename) {
 
 template<typename T>
 std::vector<T> loadSound(std::istream& f) {
-    SF_VIRTUAL_IO vsf = {sf_vio_ro_get_filelen,
-                         sf_vio_ro_seek,
-                         sf_vio_ro_read,
-                         sf_vio_ro_write,
-                         sf_vio_ro_tell};
+    SF_VIRTUAL_IO vsf = {
+        sf_vio_ro_get_filelen,
+        sf_vio_ro_seek,
+        sf_vio_ro_read,
+        sf_vio_ro_write,
+        sf_vio_ro_tell
+    };
     SNDFILE* file;
     SF_INFO info;
 
@@ -288,11 +298,13 @@ void saveSound(
     SoundFormat format,
     SoundSubFormat subformat
 ) {
-    SF_VIRTUAL_IO vsf = {sf_vio_wo_get_filelen,
-                         sf_vio_wo_seek,
-                         sf_vio_wo_read,
-                         sf_vio_wo_write,
-                         sf_vio_wo_tell};
+    SF_VIRTUAL_IO vsf = {
+        sf_vio_wo_get_filelen,
+        sf_vio_wo_seek,
+        sf_vio_wo_read,
+        sf_vio_wo_write,
+        sf_vio_wo_tell
+    };
     SNDFILE* file;
     SF_INFO info;
 

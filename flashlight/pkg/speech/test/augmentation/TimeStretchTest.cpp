@@ -37,7 +37,8 @@ TEST(TimeStretch, SinWave) {
         std::vector<float> augmented = signal;
 
         TimeStretch::Config conf = {
-            .proba_ = 1.0, .minFactor_ = factor, .maxFactor_ = factor};
+            .proba_ = 1.0, .minFactor_ = factor, .maxFactor_ = factor
+        };
         TimeStretch sfx(conf);
         sfx.apply(augmented);
 

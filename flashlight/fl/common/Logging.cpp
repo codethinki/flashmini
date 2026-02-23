@@ -231,7 +231,8 @@ constexpr std::array<fl::LogLevel, 5> flLogLevelValues = {
     fl::LogLevel::WARNING,
     fl::LogLevel::ERROR,
     fl::LogLevel::FATAL,
-    fl::LogLevel::DISABLED};
+    fl::LogLevel::DISABLED
+};
 constexpr std::array<const char* const, 5> flLogLevelNames =
 {"INFO", "WARNING", "ERROR", "FATAL", "DISABLED"};
 

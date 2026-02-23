@@ -58,7 +58,8 @@ std::vector<Tensor> crop(const std::vector<Tensor>& in, int x, int y, int tw, in
         in[ImageIdIdx],
         in[OriginalSizeIdx],
         croppedBoxes,
-        labels};
+        labels
+    };
 };
 
 std::vector<Tensor> hflip(const std::vector<Tensor>& in) {
@@ -81,7 +82,8 @@ std::vector<Tensor> hflip(const std::vector<Tensor>& in) {
         in[ImageIdIdx],
         in[OriginalSizeIdx],
         bboxes,
-        in[ClassesIdx]};
+        in[ClassesIdx]
+    };
 }
 
 std::vector<Tensor> normalize(const std::vector<Tensor>& in) {
@@ -103,7 +105,8 @@ std::vector<Tensor> normalize(const std::vector<Tensor>& in) {
         in[ImageIdIdx],
         in[OriginalSizeIdx],
         boxes,
-        in[ClassesIdx]};
+        in[ClassesIdx]
+    };
 }
 
 std::vector<Tensor> randomResize(std::vector<Tensor> inputs, int size, int maxsize) {
@@ -148,7 +151,8 @@ std::vector<Tensor> randomResize(std::vector<Tensor> inputs, int size, int maxsi
         const float ratioHeight = float(resizedDims[1]) / float(originalDims[1]);
 
         const std::vector<float> resizeVector = {
-            ratioWidth, ratioHeight, ratioWidth, ratioHeight};
+            ratioWidth, ratioHeight, ratioWidth, ratioHeight
+        };
         Tensor resizedArray = Tensor::fromVector(resizeVector);
         boxes = boxes * resizedArray;
     }
@@ -161,7 +165,8 @@ std::vector<Tensor> randomResize(std::vector<Tensor> inputs, int size, int maxsi
         inputs[ImageIdIdx],
         inputs[OriginalSizeIdx],
         boxes,
-        inputs[ClassesIdx]};
+        inputs[ClassesIdx]
+    };
 }
 
 TransformAllFunction Normalize(
@@ -194,7 +199,8 @@ TransformAllFunction Normalize(
                    in[ImageIdIdx],
                    in[OriginalSizeIdx],
                    boxes,
-                   in[ClassesIdx]};
+                   in[ClassesIdx]
+               };
                return outputs;
            };
 }

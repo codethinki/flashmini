@@ -48,7 +48,8 @@ namespace pkg {
                     throw std::invalid_argument("Invalid inputs size");
                 return {
                     fcc_.forward(inputs[0], inputs[1])
-                    - fac_.forward(inputs[0], inputs[1])};
+                    - fac_.forward(inputs[0], inputs[1])
+                };
             }
 
             Tensor viterbiPath(const Tensor& input, const Tensor& inputSize = Tensor())

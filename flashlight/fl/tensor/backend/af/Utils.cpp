@@ -28,7 +28,10 @@ af::dtype flToAfType(fl::dtype type) {
         {fl::dtype::u8, af::dtype::u8},
         {fl::dtype::u16, af::dtype::u16},
         {fl::dtype::u32, af::dtype::u32},
-        {fl::dtype::u64, af::dtype::u64}};
+        {
+            fl::dtype::u64, af::dtype::u64
+        }
+    };
     return kFlashlightTypeToArrayFire.at(type);
 }
 
@@ -45,7 +48,10 @@ fl::dtype afToFlType(af::dtype type) {
         {af::dtype::u8, fl::dtype::u8},
         {af::dtype::u16, fl::dtype::u16},
         {af::dtype::u32, fl::dtype::u32},
-        {af::dtype::u64, fl::dtype::u64}};
+        {
+            af::dtype::u64, fl::dtype::u64
+        }
+    };
     return kArrayFireTypeToFlashlight.at(type);
 }
 

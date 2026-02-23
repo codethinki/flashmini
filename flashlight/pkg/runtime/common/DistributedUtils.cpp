@@ -22,17 +22,25 @@ void initDistributed(
             fl::DistributedInit::MPI,
             -1, // unused for MPI
             -1, // unused for MPI
-            {{fl::DistributedConstants::kMaxDevicePerNode,
-                std::to_string(maxDevicesPerNode)}}
+            {{
+                fl::DistributedConstants::kMaxDevicePerNode,
+                std::to_string(maxDevicesPerNode)
+            }
+            }
         );
     else
         distributedInit(
             fl::DistributedInit::FILE_SYSTEM,
             worldRank,
             worldSize,
-            {{fl::DistributedConstants::kMaxDevicePerNode,
-                std::to_string(maxDevicesPerNode)},
-                {fl::DistributedConstants::kFilePath, rndvFilepath}}
+            {{
+                fl::DistributedConstants::kMaxDevicePerNode,
+                std::to_string(maxDevicesPerNode)
+            },
+                {
+                    fl::DistributedConstants::kFilePath, rndvFilepath
+                }
+            }
         );
 }
 

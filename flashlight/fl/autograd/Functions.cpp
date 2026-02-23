@@ -178,8 +178,10 @@ Variable operator*(const Variable& lhs, const Variable& rhs) {
         };
     return Variable(
         result,
-        {rhs.isCalcGrad() ? lhs : lhs.withoutData(),
-         lhs.isCalcGrad() ? rhs : rhs.withoutData()},
+        {
+            rhs.isCalcGrad() ? lhs : lhs.withoutData(),
+            lhs.isCalcGrad() ? rhs : rhs.withoutData()
+        },
         gradFunc
     );
 }

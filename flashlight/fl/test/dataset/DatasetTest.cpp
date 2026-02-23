@@ -21,7 +21,8 @@ using namespace fl;
 
 TEST(DatasetTest, TensorDataset) {
     std::vector<Tensor> tensormap = {
-        fl::rand({100, 200, 300}), fl::rand({150, 300})};
+        fl::rand({100, 200, 300}), fl::rand({150, 300})
+    };
     TensorDataset tensords(tensormap);
 
     // Check `size` method
@@ -150,7 +151,8 @@ TEST(DatasetTest, ResampleDataset) {
 
 TEST(DatasetTest, SpanDataset) {
     std::vector<Tensor> tensormap = {
-        fl::rand({100, 200, 300}), fl::rand({150, 300})};
+        fl::rand({100, 200, 300}), fl::rand({150, 300})
+    };
     auto tensords = std::make_shared<TensorDataset>(tensormap);
 
     SpanDataset frontspands(tensords, 0, 13);

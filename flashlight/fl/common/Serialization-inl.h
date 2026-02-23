@@ -122,7 +122,8 @@ detail::SerializeAs<S,
 template<typename S, typename T, typename SaveConvFn, typename LoadConvFn>
 detail::SerializeAs<S, T> serializeAs(T&& t, SaveConvFn saveConverter, LoadConvFn loadConverter) {
     return detail::SerializeAs<S, T>{
-        std::forward<T>(t), std::move(saveConverter), std::move(loadConverter)};
+        std::forward<T>(t), std::move(saveConverter), std::move(loadConverter)
+    };
 }
 
 template<typename... Args>

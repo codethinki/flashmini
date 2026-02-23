@@ -30,7 +30,8 @@ TEST(Crop, CropBasic) {
         Tensor(),
         Tensor(),
         Tensor::fromVector({4, 2}, bboxesVector),
-        fl::full({1, 2}, 0.)};
+        fl::full({1, 2}, 0.)
+    };
 
     // Crop from x, y (10, 10), with target heigh and width to be ten
     std::vector<Tensor> out = fl::pkg::vision::crop(in, 10, 5, 20, 25);
@@ -74,7 +75,8 @@ TEST(Crop, CropClip) {
         Tensor(),
         Tensor(),
         Tensor::fromVector({numElementsPerBoxes, numBoxes}, bboxesVector),
-        fl::iota({1, 3})};
+        fl::iota({1, 3})
+    };
 
     // Crop from x, y (10, 10), with target heigh and width to be ten
     std::vector<Tensor> out = fl::pkg::vision::crop(in, 5, 5, 100, 100);

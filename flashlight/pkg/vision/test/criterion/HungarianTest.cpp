@@ -76,7 +76,8 @@ TEST(HungarianTest, FullPipelineSimple2) {
     int M = 3; // Rows
     int N = 3; // Columns
     std::vector<float> costsVec = {
-        2500, 4000, 2000, 4000, 6000, 4000, 3500, 3500, 2500};
+        2500, 4000, 2000, 4000, 6000, 4000, 3500, 3500, 2500
+    };
 
     std::vector<int> expAssignment = {0, 0, 1, 1, 0, 0, 0, 1, 0};
     std::vector<int> assignment(N * M);
@@ -104,13 +105,17 @@ TEST(HungarianTest, FullPipelineSimple3) {
 TEST(HungarianTest, FullPipelineSize6) {
     int M = 6; // Rows
     int N = 6; // Columns
-    std::vector<float> costsVec = {7, 9, 3, 7, 8, 4, 2, 6, 8, 9, 4, 2,
-                                   1, 9, 3, 4, 7, 9, 9, 5, 1, 2, 4, 3,
-                                   4, 5, 8, 2, 8, 1, 4, 2, 9, 3, 2, 9};
+    std::vector<float> costsVec = {
+        7, 9, 3, 7, 8, 4, 2, 6, 8, 9, 4, 2,
+        1, 9, 3, 4, 7, 9, 9, 5, 1, 2, 4, 3,
+        4, 5, 8, 2, 8, 1, 4, 2, 9, 3, 2, 9
+    };
 
-    std::vector<int> expAssignment = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-                                      1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                      0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0};
+    std::vector<int> expAssignment = {
+        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0
+    };
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
     for(int c = 0; c < N; c++)
@@ -121,13 +126,17 @@ TEST(HungarianTest, FullPipelineSize6) {
 TEST(HungarianTest, 6x6Example2) {
     int M = 6; // Rows
     int N = 6; // Columns
-    std::vector<float> costsVec = {7, 9, 3, 7, 8, 4, 2, 6, 8, 9, 4, 2,
-                                   1, 9, 3, 4, 7, 9, 1, 3, 4, 8, 2, 7,
-                                   4, 5, 8, 2, 8, 1, 4, 2, 9, 3, 2, 9};
+    std::vector<float> costsVec = {
+        7, 9, 3, 7, 8, 4, 2, 6, 8, 9, 4, 2,
+        1, 9, 3, 4, 7, 9, 1, 3, 4, 8, 2, 7,
+        4, 5, 8, 2, 8, 1, 4, 2, 9, 3, 2, 9
+    };
 
-    std::vector<int> expAssignment = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-                                      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-                                      0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0};
+    std::vector<int> expAssignment = {
+        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+        0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0
+    };
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
     for(int c = 0; c < N; c++)

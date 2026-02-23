@@ -282,22 +282,28 @@ namespace {
         int seqLength = input.ndim() < 3 ? 1 : input.dim(2);
         dnnl::memory::dims inputDims = {seqLength, batchSize, inSize};
         dnnl::memory::dims outputDims = {
-            seqLength, batchSize, hiddenSize* directionMult};
+            seqLength, batchSize, hiddenSize* directionMult
+        };
         auto dType = detail::dnnlMapToType(input.type());
         int totalLayers = numLayers;
         int outSize = hiddenSize;
         dnnl::memory::dims hDims = {
-            totalLayers, directionMult, batchSize, hiddenSize};
+            totalLayers, directionMult, batchSize, hiddenSize
+        };
         dnnl::memory::dims cDims = {
-            totalLayers, directionMult, batchSize, hiddenSize};
+            totalLayers, directionMult, batchSize, hiddenSize
+        };
         int extraBias = mode == RnnMode::GRU ? 1 : 0; // for LBR GRU
         dnnl::memory::dims biasDims = {
-            numLayers, directionMult, numGates + extraBias, hiddenSize};
+            numLayers, directionMult, numGates + extraBias, hiddenSize
+        };
         // ldigo
         dnnl::memory::dims weightsInputDims = {
-            numLayers, directionMult, inSize, numGates, hiddenSize};
+            numLayers, directionMult, inSize, numGates, hiddenSize
+        };
         dnnl::memory::dims weightsHiddenDims = {
-            numLayers, directionMult, hiddenSize, numGates, hiddenSize};
+            numLayers, directionMult, hiddenSize, numGates, hiddenSize
+        };
 
         // Out tensors: output (y), hidden state output (hy), cell state output (cy)
         auto y = Tensor({outSize, batchSize, seqLength}, input.type());
@@ -354,7 +360,10 @@ namespace {
             {DNNL_ARG_WEIGHTS_ITER, weightsHiddenMemInit},
             {DNNL_ARG_BIAS, biasMemInit.getMemory()},
             {DNNL_ARG_DST_LAYER, outputMemInit.getMemory()},
-            {DNNL_ARG_DST_ITER, hiddenOutMemInit.getMemory()}};
+            {
+                DNNL_ARG_DST_ITER, hiddenOutMemInit.getMemory()
+            }
+        };
 
         // Workspace memory, if needed
         dnnl::memory workspace;
@@ -367,7 +376,10 @@ namespace {
         );
         fwdArgs.push_back(
             {{DNNL_ARG_FROM, weightsInputMemRawInit.getMemory()},
-                {DNNL_ARG_TO, weightsInputMemInit}}
+                {
+                    DNNL_ARG_TO, weightsInputMemInit
+                }
+            }
         );
         // reorder iter weights
         network.push_back(
@@ -375,7 +387,10 @@ namespace {
         );
         fwdArgs.push_back(
             {{DNNL_ARG_FROM, weightsHiddenMemRawInit.getMemory()},
-                {DNNL_ARG_TO, weightsHiddenMemInit}}
+                {
+                    DNNL_ARG_TO, weightsHiddenMemInit
+                }
+            }
         );
 
         // Initialize descriptors

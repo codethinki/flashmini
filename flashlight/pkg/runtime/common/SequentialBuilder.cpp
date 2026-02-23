@@ -136,7 +136,10 @@ std::shared_ptr<Module> parseLines(
             {std::stoi(params[2]), std::stoi(params[3])},
             {std::stoi(params[4]), std::stoi(params[5])},
             {std::stoi(params[6]), std::stoi(params[7])},
-            {std::stoi(params[8]), std::stoi(params[9])}};
+            {
+                std::stoi(params[8]), std::stoi(params[9])
+            }
+        };
         // TODO{fl::Tensor} -- rearrange arguments
         return std::make_shared<Padding>(paddings, val);
     }

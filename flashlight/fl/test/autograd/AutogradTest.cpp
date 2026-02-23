@@ -40,125 +40,147 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
 
     // Binary operators
     EXPECT_THROW(
-        {auto res = f16 + f32;
+        {
+            auto res = f16 + f32;
         },
         std::invalid_argument
     ); // +
     EXPECT_THROW(
-        {auto res = f16 - f32;
+        {
+            auto res = f16 - f32;
         },
         std::invalid_argument
     ); // -
     EXPECT_THROW(
-        {auto res = f16 * f32;
+        {
+            auto res = f16 * f32;
         },
         std::invalid_argument
     ); // *
     EXPECT_THROW(
-        {auto res = f16 / f32;
+        {
+            auto res = f16 / f32;
         },
         std::invalid_argument
     ); ///
     EXPECT_THROW(
-        {auto res = f16 > f32;
+        {
+            auto res = f16 > f32;
         },
         std::invalid_argument
     ); // >
     EXPECT_THROW(
-        {auto res = f16 < f32;
+        {
+            auto res = f16 < f32;
         },
         std::invalid_argument
     ); // <
     EXPECT_THROW(
-        {auto res = f16 >= f32;
+        {
+            auto res = f16 >= f32;
         },
         std::invalid_argument
     ); // >=
     EXPECT_THROW(
-        {auto res = f16 <= f32;
+        {
+            auto res = f16 <= f32;
         },
         std::invalid_argument
     ); // <=
     EXPECT_THROW(
-        {auto res = f16 && f32;
+        {
+            auto res = f16 && f32;
         },
         std::invalid_argument
     ); // &&
     EXPECT_THROW(
-        {max(f16, f32);
+        {
+            max(f16, f32);
         },
         std::invalid_argument
     ); // max
     EXPECT_THROW(
-        {min(f16, f32);
+        {
+            min(f16, f32);
         },
         std::invalid_argument
     ); // min
     EXPECT_THROW(
-        {matmul(f16, f32);
+        {
+            matmul(f16, f32);
         },
         std::invalid_argument
     ); // matmul
     EXPECT_THROW(
-        {matmulTN(f16, f32);
+        {
+            matmulTN(f16, f32);
         },
         std::invalid_argument
     ); // matmulTN
     EXPECT_THROW(
-        {matmulNT(f16, f32);
+        {
+            matmulNT(f16, f32);
         },
         std::invalid_argument
     ); // matmulNT
     EXPECT_NO_THROW(
-        {binaryCrossEntropy(f16, f32);
+        {
+            binaryCrossEntropy(f16, f32);
         }
     );
     EXPECT_NO_THROW(
-    {
-        categoricalCrossEntropy(
-            Variable(fl::rand({7, 10, 4}, fl::dtype::f16), true),
-            Variable(
-                (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
-                false
-            )
-        );
-    }
-    );
-    EXPECT_NO_THROW(
-        {pool2d(f16, 1, 1, 1, 1, 1, 1);
+        {
+            categoricalCrossEntropy(
+                Variable(fl::rand({7, 10, 4}, fl::dtype::f16), true),
+                Variable(
+                    (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
+                    false
+                )
+            );
         }
     );
     EXPECT_NO_THROW(
-        {embedding(f16, f32);
+        {
+            pool2d(f16, 1, 1, 1, 1, 1, 1);
+        }
+    );
+    EXPECT_NO_THROW(
+        {
+            embedding(f16, f32);
         }
     ); // lookup is of a different type
     // Ternary operators
     auto f32_2 = Variable(fl::rand({2, 2}, fl::dtype::f32), true);
     auto f16_2 = Variable(fl::rand({2, 2}, fl::dtype::f16), true);
     EXPECT_THROW(
-        {linear(f16, f32, f16_2);
+        {
+            linear(f16, f32, f16_2);
         },
         std::invalid_argument
     ); // linear
     EXPECT_THROW(
-        {linear(f16, f32, f32_2);
+        {
+            linear(f16, f32, f32_2);
         },
         std::invalid_argument
     ); // linear
     auto w = Variable(fl::rand({1}, fl::dtype::f32), true);
     auto b = Variable(fl::rand({1}, fl::dtype::f32), true);
     EXPECT_THROW(
-        {batchnorm(f16, f32, f32_2, w, b, {1}, true, 0.01, 0.01);
+        {
+            batchnorm(f16, f32, f32_2, w, b, {1}, true, 0.01, 0.01);
         },
         std::invalid_argument
     );
     EXPECT_THROW(
-        {batchnorm(f16, f32, f16_2, w, b, {1}, true, 0.01, 0.01);
+        {
+            batchnorm(f16, f32, f16_2, w, b, {1}, true, 0.01, 0.01);
         },
         std::invalid_argument
     );
     EXPECT_THROW(
-        {conv2d(f16, f32, f16_2, 1, 1, 0, 0, 1, 1);
+        {
+            conv2d(f16, f32, f16_2, 1, 1, 0, 0, 1, 1);
         },
         std::invalid_argument
     );
@@ -166,25 +188,26 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     auto f16_3 = Variable(fl::rand({2, 2, 3}, fl::dtype::f16), false);
     auto f16_4 = Variable(fl::rand({50}, fl::dtype::f16), false);
     EXPECT_THROW(
-    {
-        rnn(
-            f16_3,
-            Variable(Tensor(fl::dtype::f32), false),
-            Variable(Tensor(fl::dtype::f32), false),
-            f16_4,
-            2,
-            2,
-            RnnMode::LSTM,
-            true,
-            0.0
-        );
-    },
+        {
+            rnn(
+                f16_3,
+                Variable(Tensor(fl::dtype::f32), false),
+                Variable(Tensor(fl::dtype::f32), false),
+                f16_4,
+                2,
+                2,
+                RnnMode::LSTM,
+                true,
+                0.0
+            );
+        },
         std::invalid_argument
     );
     // Variadic operators
     std::vector<Variable> concatInputs = {f16, f32, f16_2, f32_2};
     EXPECT_THROW(
-        {concatenate(concatInputs, 0);
+        {
+            concatenate(concatInputs, 0);
         },
         std::invalid_argument
     );
@@ -198,7 +221,8 @@ TEST(AutogradTest, CastingAsDifferentGradTypes) {
     auto f16 = Variable(fl::rand({5, 5}, fl::dtype::f16), true);
     // Computing gradients with mixed types fails when the op is applied
     ASSERT_THROW(
-        {f32 + f16;
+        {
+            f32 + f16;
         },
         std::invalid_argument
     );
@@ -467,7 +491,8 @@ TEST(AutogradTest, GetAdvancedIndex) {
         GTEST_SKIP()
             << "Advanced indexing operator unsupported for non-CUDA backends";
     std::vector<fl::dtype> validIndexTypes = {
-        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64};
+        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64
+    };
     for(const auto& dtype : validIndexTypes) {
         auto x = Variable(fl::rand({20, 50, 40, 30}, fl::dtype::f32), true);
         Tensor a({6}, dtype);
@@ -498,7 +523,8 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
     std::vector<fl::dtype> validIndexTypes = {
-        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64};
+        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64
+    };
     for(const auto& dtype : validIndexTypes) {
         auto x = Variable(fl::rand({20, 50, 40, 30}, fl::dtype::f16), true);
         Tensor a({6}, dtype);

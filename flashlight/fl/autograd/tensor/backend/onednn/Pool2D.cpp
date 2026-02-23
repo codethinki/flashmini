@@ -52,16 +52,20 @@ namespace {
     ) {
         DimsData d;
         d.inputDims = detail::convertToDnnlDims(
-            {input.dim(kBatchSizeIdx),
-             input.dim(kChannelSizeIdx),
-             input.dim(kHIdx),
-             input.dim(kWIdx)}
+            {
+                input.dim(kBatchSizeIdx),
+                input.dim(kChannelSizeIdx),
+                input.dim(kHIdx),
+                input.dim(kWIdx)
+            }
         );
         d.outputDims = detail::convertToDnnlDims(
-            {input.dim(kBatchSizeIdx),
-             input.dim(kChannelSizeIdx),
-             output.dim(kHIdx),
-             output.dim(kWIdx)}
+            {
+                input.dim(kBatchSizeIdx),
+                input.dim(kChannelSizeIdx),
+                output.dim(kHIdx),
+                output.dim(kWIdx)
+            }
         );
         d.windowDims = {wy, wx};
         d.strideDims = {sy, sx};
@@ -176,7 +180,10 @@ Tensor OneDnnAutogradExtension::pool2d(
         );
         fwdArgs.push_back(
             {{DNNL_ARG_FROM, payload->outputMemory},
-                {DNNL_ARG_TO, outputMemInit.getMemory()}}
+                {
+                    DNNL_ARG_TO, outputMemInit.getMemory()
+                }
+            }
         );
     }
 
@@ -248,7 +255,10 @@ Tensor OneDnnAutogradExtension::pool2dBackward(
     std::unordered_map<int, dnnl::memory> bwdPoolingArgs = {
         {DNNL_ARG_DIFF_SRC, gradInputMemInit.getMemory()},
         {DNNL_ARG_DIFF_DST, gradOutputMemory},
-        {DNNL_ARG_WORKSPACE, payload->workspace}};
+        {
+            DNNL_ARG_WORKSPACE, payload->workspace
+        }
+    };
     bwdArgs.push_back(bwdPoolingArgs);
     networkBackward.push_back(poolBwd);
 

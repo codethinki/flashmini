@@ -146,8 +146,10 @@ std::shared_ptr<fl::Dataset> DecodeMaster::forward(
             continue;
         if(usePlugin_)
             output = net_->forward(
-                {fl::input(batch[kInputIdx]),
-                 fl::noGrad(batch[kDurationIdx])}
+                {
+                    fl::input(batch[kInputIdx]),
+                    fl::noGrad(batch[kDurationIdx])
+                }
             )
                 .front()
                 .tensor();
@@ -248,7 +250,8 @@ std::shared_ptr<fl::Dataset> TokenDecodeMaster::decode(
         .lmWeight = opt.lmWeight,
         .silScore = opt.silScore,
         .logAdd = opt.logAdd,
-        .criterionType = fl::lib::text::CriterionType::CTC};
+        .criterionType = fl::lib::text::CriterionType::CTC
+    };
     auto silIdx = tokenDict_.getIndex(opt.silToken);
     auto blankIdx = tokenDict_.getIndex(opt.blankToken);
     fl::lib::text::LexiconFreeDecoder decoder(
@@ -271,7 +274,8 @@ std::shared_ptr<fl::Dataset> TokenDecodeMaster::decode(
         .unkScore = opt.unkScore,
         .silScore = opt.silScore,
         .logAdd = opt.logAdd,
-        .criterionType = fl::lib::text::CriterionType::CTC};
+        .criterionType = fl::lib::text::CriterionType::CTC
+    };
     auto silIdx = tokenDict_.getIndex(opt.silToken);
     auto blankIdx = tokenDict_.getIndex(opt.blankToken);
     auto unkWordIdx = wordDict_.getIndex(fl::lib::text::kUnkToken);
@@ -336,7 +340,8 @@ std::shared_ptr<fl::Dataset> WordDecodeMaster::decode(
         .unkScore = opt.unkScore,
         .silScore = opt.silScore,
         .logAdd = opt.logAdd,
-        .criterionType = fl::lib::text::CriterionType::CTC};
+        .criterionType = fl::lib::text::CriterionType::CTC
+    };
     auto silIdx = tokenDict_.getIndex(opt.silToken);
     auto blankIdx = tokenDict_.getIndex(opt.blankToken);
     auto unkWordIdx = wordDict_.getIndex(opt.unkToken);

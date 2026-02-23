@@ -532,7 +532,8 @@ TEST(TensorBaseTest, scalar) {
         fl::dtype::u64,
         fl::dtype::f16,
         fl::dtype::f32,
-        fl::dtype::f64};
+        fl::dtype::f64
+    };
     for(auto type : types) {
         assertScalarBehavior<char>(type);
         assertScalarBehavior<unsigned char>(type);

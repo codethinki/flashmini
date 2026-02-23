@@ -125,7 +125,8 @@ std::vector<Tensor> ListFileDataset::get(const int64_t idx) const {
         sampleIdx,
         samplePath,
         sampleDuration,
-        sampleTargetSize};
+        sampleTargetSize
+    };
 }
 
 std::pair<std::vector<float>, Shape> ListFileDataset::loadAudio(

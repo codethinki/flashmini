@@ -141,7 +141,8 @@ private:
                 auto possibilities = {
                     column[y].sum() + 1,
                     column[y - 1].sum() + 1,
-                    lastdiagonal.sum() + ((*curin1 == *curin2) ? 0 : 1)};
+                    lastdiagonal.sum() + ((*curin1 == *curin2) ? 0 : 1)
+                };
                 auto min_it =
                     std::min_element(possibilities.begin(), possibilities.end());
                 if(

@@ -37,8 +37,10 @@ class ArrayFireBackend : public TensorBackend {
     // NOTE using a `shared_ptr` to allow its capture in setActive callback;
     // see constructor for details.
     std::shared_ptr<std::unordered_map<int, std::shared_ptr<const Stream>>>
-    afIdToStream_{std::make_shared<
-        std::unordered_map<int, std::shared_ptr<const Stream>>>()};
+    afIdToStream_{
+        std::make_shared<
+            std::unordered_map<int, std::shared_ptr<const Stream>>>()
+    };
 
     // Intentionally private. Only one instance should exist/it should be accessed
     // via getInstance().

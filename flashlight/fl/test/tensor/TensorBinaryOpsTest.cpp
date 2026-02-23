@@ -399,7 +399,17 @@ TEST(TensorBinaryOpsTest, broadcasting) {
         {{1, 10}, {8, 10}, {8, 1}, {1, 1}},
         {{2, 1, 5, 1}, {2, 3, 5, 3}, {1, 3, 1, 3}, {1, 1, 1, 1}},
         {{3, 1, 2, 1}, {1, 4, 1, 5}, {1, 4, 1, 5}, {3, 1, 2, 1}},
-        {{3, 2, 1}, {3, 1, 4, 1}, {1, 1, 4}, {1, 2, 1, 1}}};
+        {{
+            3, 2, 1
+        }, {
+                3, 1, 4, 1
+            }, {
+                1, 1, 4
+            }, {
+                1, 2, 1, 1
+            }
+        }
+    };
 
     std::unordered_map<binaryOpFunc_t, std::string> functions = {
         {fl::minimum, "minimum"},
@@ -422,7 +432,10 @@ TEST(TensorBinaryOpsTest, broadcasting) {
         {fl::bitwiseOr, "bitwiseOr"},
         {fl::bitwiseXor, "bitwiseXor"},
         {fl::lShift, "lShift"},
-        {fl::rShift, "rShift"}};
+        {
+            fl::rShift, "rShift"
+        }
+    };
 
     auto doBinaryOp = [](const Tensor& lhs,
         const Tensor& rhs,
@@ -431,7 +444,8 @@ TEST(TensorBinaryOpsTest, broadcasting) {
         binaryOpFunc_t func) -> std::pair<Tensor, Tensor> {
             assert(lhs.ndim() <= rhs.ndim());
             return {
-            func(lhs, rhs), func(tile(lhs, tileShapeLhs), tile(rhs, tileShapeRhs))};
+            func(lhs, rhs), func(tile(lhs, tileShapeLhs), tile(rhs, tileShapeRhs))
+            };
         };
 
     auto computeBroadcastShape = [](const Shape& lhsShape,

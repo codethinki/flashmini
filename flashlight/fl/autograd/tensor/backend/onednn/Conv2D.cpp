@@ -74,31 +74,39 @@ namespace {
         OneDnnConv2DData out;
         // Create memory dims
         out.inputDims = detail::convertToDnnlDims(
-            {inputShape.dim(kIOBatchSizeIdx),
-             inputShape.dim(kIOChannelSizeIdx),
-             inputShape.dim(kHIdx),
-             inputShape.dim(kWIdx)}
+            {
+                inputShape.dim(kIOBatchSizeIdx),
+                inputShape.dim(kIOChannelSizeIdx),
+                inputShape.dim(kHIdx),
+                inputShape.dim(kWIdx)
+            }
         );
         if(groups == 1)
             out.weightDims = detail::convertToDnnlDims(
-                {weightsShape.dim(kWeightOutputChannelSizeIdx),
-                 inputShape.dim(kIOChannelSizeIdx),
-                 weightsShape.dim(kHIdx),
-                 weightsShape.dim(kWIdx)}
+                {
+                    weightsShape.dim(kWeightOutputChannelSizeIdx),
+                    inputShape.dim(kIOChannelSizeIdx),
+                    weightsShape.dim(kHIdx),
+                    weightsShape.dim(kWIdx)
+                }
             );
         else
             out.weightDims = detail::convertToDnnlDims(
-                {groups,
-                 weightsShape.dim(kWeightOutputChannelSizeIdx) / groups,
-                 inputShape.dim(kIOChannelSizeIdx) / groups,
-                 weightsShape.dim(kHIdx),
-                 weightsShape.dim(kWIdx)}
+                {
+                    groups,
+                    weightsShape.dim(kWeightOutputChannelSizeIdx) / groups,
+                    inputShape.dim(kIOChannelSizeIdx) / groups,
+                    weightsShape.dim(kHIdx),
+                    weightsShape.dim(kWIdx)
+                }
             );
         out.outputDims = detail::convertToDnnlDims(
-            {inputShape.dim(kIOBatchSizeIdx),
-             weightsShape.dim(kWeightOutputChannelSizeIdx),
-             outputShape.dim(kHIdx),
-             outputShape.dim(kWIdx)}
+            {
+                inputShape.dim(kIOBatchSizeIdx),
+                weightsShape.dim(kWeightOutputChannelSizeIdx),
+                outputShape.dim(kHIdx),
+                outputShape.dim(kWIdx)
+            }
         );
         out.biasDims = detail::convertToDnnlDims(
             {weightsShape.dim(kWeightOutputChannelSizeIdx)}
@@ -183,14 +191,16 @@ Tensor OneDnnAutogradExtension::conv2d(
     // row major transposes along all axis into NCHW for the input and output
     // and OIHW for the weights
     auto output = Tensor(
-        {1
-         + (input.dim(kWIdx) + (2 * px) - (1 + (weights.dim(kWIdx) - 1) * dx))
-         / sx,
-         1
-         + (input.dim(kHIdx) + (2 * py) - (1 + (weights.dim(kHIdx) - 1) * dy))
-         / sy,
-         weights.dim(kWeightOutputChannelSizeIdx),
-         input.dim(kIOBatchSizeIdx)},
+        {
+            1
+            + (input.dim(kWIdx) + (2 * px) - (1 + (weights.dim(kWIdx) - 1) * dx))
+            / sx,
+            1
+            + (input.dim(kHIdx) + (2 * py) - (1 + (weights.dim(kHIdx) - 1) * dy))
+            / sy,
+            weights.dim(kWeightOutputChannelSizeIdx),
+            input.dim(kIOBatchSizeIdx)
+        },
         input.type()
     );
     auto hasBias = bias.elements() > 0;
@@ -264,7 +274,10 @@ Tensor OneDnnAutogradExtension::conv2d(
     std::unordered_map<int, dnnl::memory> convFwdArgs = {
         {DNNL_ARG_SRC, inputMemory},
         {DNNL_ARG_WEIGHTS, weightsMemory},
-        {DNNL_ARG_DST, outputMemory}};
+        {
+            DNNL_ARG_DST, outputMemory
+        }
+    };
     if(hasBias)
         convFwdArgs[DNNL_ARG_BIAS] = biasMemory.getMemory();
     fwdArgs.push_back(convFwdArgs);
@@ -274,7 +287,10 @@ Tensor OneDnnAutogradExtension::conv2d(
         network.push_back(dnnl::reorder(outputMemory, outputMemInit.getMemory()));
         fwdArgs.push_back(
             {{DNNL_ARG_FROM, outputMemory},
-                {DNNL_ARG_TO, outputMemInit.getMemory()}}
+                {
+                    DNNL_ARG_TO, outputMemInit.getMemory()
+                }
+            }
         );
     }
 
@@ -375,7 +391,10 @@ Tensor OneDnnAutogradExtension::conv2dBackwardData(
     bwdDataArgs.push_back(
         {{DNNL_ARG_DIFF_SRC, gradInputMemory},
             {DNNL_ARG_WEIGHTS, weightsMemoryBackwards},
-            {DNNL_ARG_DIFF_DST, gradOutputMemory}}
+            {
+                DNNL_ARG_DIFF_DST, gradOutputMemory
+            }
+        }
     );
     networkBackwards.push_back(*convBwdData);
 
@@ -386,7 +405,10 @@ Tensor OneDnnAutogradExtension::conv2dBackwardData(
         );
         bwdDataArgs.push_back(
             {{DNNL_ARG_FROM, gradInputMemory},
-                {DNNL_ARG_TO, gradInputMemInit.getMemory()}}
+                {
+                    DNNL_ARG_TO, gradInputMemInit.getMemory()
+                }
+            }
         );
     }
 
@@ -505,7 +527,10 @@ std::pair<Tensor, Tensor> OneDnnAutogradExtension::conv2dBackwardFilterBias(
     std::unordered_map<int, dnnl::memory> bwdConvWeightsArgs = {
         {DNNL_ARG_SRC, inputMemoryBackwards},
         {DNNL_ARG_DIFF_WEIGHTS, gradWeightsMemory},
-        {DNNL_ARG_DIFF_DST, gradOutputMemory}};
+        {
+            DNNL_ARG_DIFF_DST, gradOutputMemory
+        }
+    };
 
     if(computeBiasGrad) {
         const detail::DnnlMemoryWrapper gradBiasMem(
@@ -522,7 +547,10 @@ std::pair<Tensor, Tensor> OneDnnAutogradExtension::conv2dBackwardFilterBias(
         );
         bwdWeightsArgs.push_back(
             {{DNNL_ARG_FROM, gradWeightsMemory},
-                {DNNL_ARG_TO, gradWeightsMemInit.getMemory()}}
+                {
+                    DNNL_ARG_TO, gradWeightsMemInit.getMemory()
+                }
+            }
         );
     }
 

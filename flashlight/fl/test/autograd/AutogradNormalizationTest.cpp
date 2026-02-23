@@ -124,7 +124,8 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputMultipleAxis) {
     ));
     for(int i = 0; i < nfeatures; ++i) {
         std::array<fl::Index, 4> sel = {
-            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span};
+            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span
+        };
         auto thisInput = input.tensor()(sel[0], sel[1], sel[2], sel[3]);
         auto thisMean = runningMean.tensor().flatten()(i).scalar<float>();
         auto thisVar = runningVar.tensor().flatten()(i).scalar<float>();
@@ -152,7 +153,8 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputMultipleAxis) {
     ));
     for(int i = 0; i < nfeatures; ++i) {
         std::array<fl::Index, 4> sel = {
-            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span};
+            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span
+        };
         auto thisInput = input.tensor()(sel[0], sel[1], sel[2], sel[3]);
         auto thisMean = runningMean.tensor().flatten()(i).scalar<float>();
         auto thisVar = runningVar.tensor().flatten()(i).scalar<float>();
@@ -228,7 +230,8 @@ TEST(AutogradNormalizationTest, BatchNormTrainModeOutputMultipleAxis) {
 
     for(int i = 0; i < nfeatures; ++i) {
         std::array<fl::Index, 4> sel = {
-            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span};
+            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span
+        };
         auto thisInput = input.tensor()(sel[0], sel[1], sel[2], sel[3]);
         auto thisMean = avg.tensor().flatten()(i).scalar<float>();
         auto thisVar = variance.tensor().flatten()(i).scalar<float>();

@@ -17,37 +17,43 @@ using fl::lib::audio::PreEmphasis;
 TEST(PreEmphasisTest, matlabCompareTest) {
     int N = 8;
     PreEmphasis preemphasis1d(0.95, N);
-    std::vector<float> input{0.098589,
-                             0.715877,
-                             0.750572,
-                             0.787636,
-                             0.116829,
-                             0.242914,
-                             0.327526,
-                             0.410389};
+    std::vector<float> input{
+        0.098589,
+        0.715877,
+        0.750572,
+        0.787636,
+        0.116829,
+        0.242914,
+        0.327526,
+        0.410389
+    };
     // ndim = 1
-    std::vector<float> matlaboutput1d{0.004929,
-                                      0.622218,
-                                      0.070489,
-                                      0.074592,
-                                      -0.631425,
-                                      0.131927,
-                                      0.096757,
-                                      0.099240};
+    std::vector<float> matlaboutput1d{
+        0.004929,
+        0.622218,
+        0.070489,
+        0.074592,
+        -0.631425,
+        0.131927,
+        0.096757,
+        0.099240
+    };
     auto output1d = preemphasis1d.apply(input);
     // Implementation should match with matlab.
     ASSERT_TRUE(compareVec<float>(output1d, matlaboutput1d));
 
     // ndim = 2
     PreEmphasis preemphasis2d(0.95, N / 2);
-    std::vector<float> matlaboutput2d{0.004929,
-                                      0.622218,
-                                      0.070489,
-                                      0.074592,
-                                      0.005841,
-                                      0.131927,
-                                      0.096757,
-                                      0.099240};
+    std::vector<float> matlaboutput2d{
+        0.004929,
+        0.622218,
+        0.070489,
+        0.074592,
+        0.005841,
+        0.131927,
+        0.096757,
+        0.099240
+    };
     auto output2d = preemphasis2d.apply(input);
     // Implementation should match with matlab.
     ASSERT_TRUE(compareVec<float>(output2d, matlaboutput2d));

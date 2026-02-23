@@ -321,5 +321,6 @@ std::vector<Tensor> LMDataset::get(const int64_t idx) const {
     int end = (idx + 1) * time_steps;
     return {
         data(fl::span, fl::range(start, end)),
-        data(fl::span, fl::range(start, end))};
+        data(fl::span, fl::range(start, end))
+    };
 }

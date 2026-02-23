@@ -74,7 +74,8 @@ namespace {
             .channels = 1, // Sounds effects are limited to single channel
             .precision = 16, // Any valid value is ok here.
             .length = 0,
-            .mult = nullptr};
+            .mult = nullptr
+        };
         return sigInfo;
     }
 
@@ -131,7 +132,8 @@ void SoxWrapper::addInput(
         /*drain=*/ inputDrain,
         /*stop=*/ nullptr,
         /*kill=*/ nullptr,
-        /*priv_size=*/ sizeof(SoxData)};
+        /*priv_size=*/ sizeof(SoxData)
+    };
     sox_effect_t* e = nullptr;
     FL_SOX_CHECK(e = sox_create_effect(&handler));
     auto input = (SoxData*) e->priv;
@@ -155,7 +157,8 @@ void SoxWrapper::addOutput(
         /*drain=*/ nullptr,
         /*stop=*/ nullptr,
         /*kill=*/ nullptr,
-        /*priv_size=*/ sizeof(SoxData)};
+        /*priv_size=*/ sizeof(SoxData)
+    };
     sox_effect_t* e = nullptr;
     FL_SOX_CHECK(e = sox_create_effect(&handler));
     auto output = (SoxData*) e->priv;
@@ -182,7 +185,8 @@ sox_effects_chain_t* SoxWrapper::createChain() const {
         .reverse_bytes = sox_option_no,
         .reverse_nibbles = sox_option_no,
         .reverse_bits = sox_option_no,
-        .opposite_endian = sox_false};
+        .opposite_endian = sox_false
+    };
     sox_effects_chain_t* chain = nullptr;
     FL_SOX_CHECK(chain = sox_create_effects_chain(&encoding, &encoding));
     return chain;

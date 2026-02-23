@@ -142,7 +142,10 @@ TEST(FeaturizationTest, localNormalize) {
     auto arrVec = arr.toHostVector<float>();
 
     std::vector<std::pair<int, int>> ctx = {
-        {0, 0}, {1, 1}, {2, 2}, {4, 4}, {1024, 1024}, {10, 0}, {2, 12}};
+        {0, 0}, {1, 1}, {2, 2}, {4, 4}, {1024, 1024}, {10, 0}, {
+            2, 12
+        }
+    };
 
     for(auto c : ctx) {
         auto arrVecNrm = localNormalize(
@@ -188,7 +191,8 @@ TEST(FeaturizationTest, TargetTknTestStandaloneSep) {
     );
 
     std::vector<std::string> resT = {
-        "ab", "cd", "ef", "||", "ab", "cd", "||", "t", "r", "||"};
+        "ab", "cd", "ef", "||", "ab", "cd", "||", "t", "r", "||"
+    };
     ASSERT_EQ(res.size(), resT.size());
     for(int index = 0; index < res.size(); index++)
         ASSERT_EQ(res[index], resT[index]);
@@ -205,7 +209,8 @@ TEST(FeaturizationTest, TargetTknTestStandaloneSep) {
     );
 
     std::vector<std::string> resT2 = {
-        "ab", "cd", "ef", "||", "ab", "cd", "||", "||", "t", "r"};
+        "ab", "cd", "ef", "||", "ab", "cd", "||", "||", "t", "r"
+    };
     ASSERT_EQ(res2.size(), resT2.size());
     for(int index = 0; index < res2.size(); index++)
         ASSERT_EQ(res2[index], resT2[index]);
@@ -240,7 +245,8 @@ TEST(FeaturizationTest, TargetTknTestInsideSep) {
     );
 
     std::vector<std::string> resT = {
-        "_", "a", "f", "f", "_hel", "lo", "_ma", "ma", "_", "a", "f"};
+        "_", "a", "f", "f", "_hel", "lo", "_ma", "ma", "_", "a", "f"
+    };
     ASSERT_EQ(res.size(), resT.size());
     for(int index = 0; index < res.size(); index++)
         ASSERT_EQ(res[index], resT[index]);
@@ -257,7 +263,8 @@ TEST(FeaturizationTest, TargetTknTestInsideSep) {
     );
 
     std::vector<std::string> resT2 = {
-        "a", "f", "f", "_", "_hel", "lo", "_ma", "ma", "_", "a", "f"};
+        "a", "f", "f", "_", "_hel", "lo", "_ma", "ma", "_", "a", "f"
+    };
     ASSERT_EQ(res.size(), resT2.size());
     for(int index = 0; index < res2.size(); index++)
         ASSERT_EQ(res2[index], resT2[index]);
@@ -403,7 +410,10 @@ TEST(FeaturizationTest, targetFeaturizer) {
     tokenDict.addEntry(kEosToken);
     auto lexicon = getLexicon();
     std::vector<std::vector<char>> targets = {
-        {'a', 'b', 'c', 'c', 'c'}, {'b', 'c', 'd', 'd'}};
+        {'a', 'b', 'c', 'c', 'c'}, {
+            'b', 'c', 'd', 'd'
+        }
+    };
 
     TargetGenerationConfig targetGenConfig(
         "",

@@ -164,14 +164,16 @@ void transformerPadMaskFwd(bool isfp16) {
     }
 
     auto output1 = tr.forward(
-        {input1NoPad,
-         Variable(
-             padMask(fl::range(0, timesteps / 2))(
-                 fl::span,
-                 fl::range(0, 1)
-             ),
-             false
-         )}
+        {
+            input1NoPad,
+            Variable(
+                padMask(fl::range(0, timesteps / 2))(
+                    fl::span,
+                    fl::range(0, 1)
+                ),
+                false
+            )
+        }
     )
         .front();
     auto output2 =

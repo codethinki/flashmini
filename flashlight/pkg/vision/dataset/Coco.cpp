@@ -70,7 +70,8 @@ CocoData cocoBatchFunc(const std::vector<std::vector<Tensor>>& batches) {
         makeBatch(batches[ImageIdIdx]),
         makeBatch(batches[OriginalSizeIdx]),
         batches[BboxesIdx],
-        batches[ClassesIdx]};
+        batches[ClassesIdx]
+    };
 }
 
 int64_t getImageId(const std::string& fp) {
@@ -154,7 +155,8 @@ CocoDataset::CocoDataset(
             }
             // image, size, imageId, original_size
             return std::vector<Tensor>{
-            image, targetSize, imageId, targetSize, bboxes, classes};
+            image, targetSize, imageId, targetSize, bboxes, classes
+            };
         }
     );
 
@@ -164,17 +166,24 @@ CocoDataset::CocoDataset(
             std::make_shared<TransformAllDataset>(ds, randomResize({800}, maxSize));
     else {
         std::vector<int> scales = {
-            480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800};
+            480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800
+        };
         TransformAllFunction trainTransform = compose(
-            {randomHorizontalFlip(0.5),
-             randomSelect(
-                 {randomResize(scales, maxSize),
-                  compose(
-                      {randomResize({400, 500, 600}, -1),
-                       randomSizeCrop(384, 600),
-                       randomResize(scales, 1333)}
-                  )}
-             )}
+            {
+                randomHorizontalFlip(0.5),
+                randomSelect(
+                    {
+                        randomResize(scales, maxSize),
+                        compose(
+                            {
+                                randomResize({400, 500, 600}, -1),
+                                randomSizeCrop(384, 600),
+                                randomResize(scales, 1333)
+                            }
+                        )
+                    }
+                )
+            }
         );
 
         ds = std::make_shared<TransformAllDataset>(ds, trainTransform);

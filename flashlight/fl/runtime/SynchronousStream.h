@@ -18,9 +18,11 @@ namespace fl {
  */
 class FL_API SynchronousStream : public StreamTrait<SynchronousStream> {
 protected:
-    X64Device& device_{DeviceManager::getInstance()
-                       .getActiveDevice(DeviceType::x64)
-                       .impl<X64Device>()};
+    X64Device& device_{
+        DeviceManager::getInstance()
+        .getActiveDevice(DeviceType::x64)
+        .impl<X64Device>()
+    };
 
 public:
     // prevent name hiding

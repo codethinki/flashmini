@@ -49,10 +49,12 @@ namespace {
         if(minAxis == 0) {
             modeOut = CUDNN_BATCHNORM_PER_ACTIVATION;
             inDescDimsOut = Shape(
-                {1,
-                 1,
-                 nfeatures,
-                 static_cast<long long>(input.elements() / nfeatures)}
+                {
+                    1,
+                    1,
+                    nfeatures,
+                    static_cast<long long>(input.elements() / nfeatures)
+                }
             );
             wtDescDimsOut = Shape({1, 1, nfeatures});
         } else {

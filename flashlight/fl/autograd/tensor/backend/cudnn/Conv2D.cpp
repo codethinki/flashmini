@@ -26,23 +26,32 @@ namespace {
     std::unordered_map<fl::CudnnAutogradExtension::KernelMode, cudnnMathType_t>
     kKernelModesToCudnnMathType = {
         {fl::CudnnAutogradExtension::KernelMode::F32, CUDNN_DEFAULT_MATH},
-        {fl::CudnnAutogradExtension::KernelMode::F32_ALLOW_CONVERSION,
-         CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION},
-        {fl::CudnnAutogradExtension::KernelMode::F16,
-         CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION}};
+        {
+            fl::CudnnAutogradExtension::KernelMode::F32_ALLOW_CONVERSION,
+            CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
+        },
+        {
+            fl::CudnnAutogradExtension::KernelMode::F16,
+            CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
+        }
+    };
 
     const std::unordered_set<cudnnConvolutionFwdAlgo_t> kFwdPreferredAlgos = {
         CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM,
-        CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED};
+        CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED
+    };
 
     const std::unordered_set<cudnnConvolutionBwdDataAlgo_t> kBwdDataPreferredAlgos =
-    {CUDNN_CONVOLUTION_BWD_DATA_ALGO_1,
-     CUDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD_NONFUSED};
+    {
+        CUDNN_CONVOLUTION_BWD_DATA_ALGO_1,
+        CUDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD_NONFUSED
+    };
 
     const std::unordered_set<cudnnConvolutionBwdFilterAlgo_t>
     kBwdFilterPreferredAlgos = {
         CUDNN_CONVOLUTION_BWD_FILTER_ALGO_1,
-        CUDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD_NONFUSED};
+        CUDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD_NONFUSED
+    };
 
     constexpr size_t kWorkspaceSizeLimitBytes = 512 * 1024 * 1024; // 512 MB
     constexpr cudnnConvolutionFwdAlgo_t kFwdDefaultAlgo =

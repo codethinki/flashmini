@@ -101,7 +101,8 @@ public:
             "French",
             "Polish",
             "Italian",
-            "Irish"};
+            "Irish"
+        };
         for(auto& l : lang)
             read(datasetPath, l);
         for(auto& it : Id2Label)
@@ -360,7 +361,10 @@ int main(int argc, char** argv) {
         {"Washington", "English"},
         {"Voltaire", "French"},
         {"Pfeiffer", "German"},
-        {"Tambellini", "Italian"}};
+        {
+            "Tambellini", "Italian"
+        }
+    };
     for(auto& p : quickList)
         model.unittest(p.first, p.second);
 
