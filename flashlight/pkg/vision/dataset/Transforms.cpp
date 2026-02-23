@@ -55,11 +55,12 @@ Tensor resizeSmallest(const Tensor& in, const int resize) {
     return fl::resize(in, {tw, th}, InterpolationMode::Bilinear);
 }
 
-Tensor resize(const Tensor& in, const int resize) { return fl::resize(
-    in,
-    {resize, resize},
-    InterpolationMode::Bilinear
-);
+Tensor resize(const Tensor& in, const int resize) {
+    return fl::resize(
+        in,
+        {resize, resize},
+        InterpolationMode::Bilinear
+    );
 }
 
 Tensor crop(const Tensor& in, const int x, const int y, const int w, const int h) {
@@ -286,7 +287,8 @@ std::pair<Tensor, Tensor> cutmixBatch(
     return {inputMixed, targetOneHotMixed};
 }
 
-ImageTransform resizeTransform(const uint64_t resize) { return [resize](const Tensor& in) {
+ImageTransform resizeTransform(const uint64_t resize) {
+    return [resize](const Tensor& in) {
                return resizeSmallest(in, resize);
            };
 }
@@ -300,7 +302,8 @@ ImageTransform compose(std::vector<ImageTransform> transformfns) {
            };
 }
 
-ImageTransform centerCropTransform(const int size) { return [size](const Tensor& in) {
+ImageTransform centerCropTransform(const int size) {
+    return [size](const Tensor& in) {
                return centerCrop(in, size);
            };
 };
