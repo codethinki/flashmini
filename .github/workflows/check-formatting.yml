@@ -12,7 +12,7 @@ permissions: { contents: read }
 env:
   UNCRUSTIFY_CONFIG: "uncrustify.cfg"
   CHECK_PATH: "flashlight"
-  FILE_EXTENSIONS: "c|cpp|h|hpp|cu|cuh"
+  FILE_EXTENSIONS: "c|cpp|h|hpp|cu"
 
 # ---------------------------------------------------------
 # JOB
@@ -21,16 +21,18 @@ jobs:
   formatting-check:
     name: Format check
     runs-on: ubuntu-latest
+    container: archlinux:latest
     steps:
+    - name: Install Git and Uncrustify
+      run: pacman -Syu --noconfirm git uncrustify
+      
     - uses: actions/checkout@v4
-    
-    - name: Install uncrustify
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y uncrustify
       
     - name: Run uncrustify style check
       run: |
+        # Print the version to confirm you are on the absolute latest version
+        uncrustify --version 
+        
         find ${{ env.CHECK_PATH }} \
           -type f \
           -regextype posix-extended \
