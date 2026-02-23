@@ -34,9 +34,8 @@ PositionalEmbeddingSine::PositionalEmbeddingSine(
     normalize_(other.normalize_),
     scale_(other.scale_) {
     train_ = other.train_;
-    for(auto& mod : other.modules_) {
+    for(auto& mod : other.modules_)
         add(mod->clone());
-    }
 }
 
 PositionalEmbeddingSine& PositionalEmbeddingSine::operator=(
@@ -48,9 +47,8 @@ PositionalEmbeddingSine& PositionalEmbeddingSine::operator=(
     normalize_ = other.normalize_;
     scale_ = other.scale_;
     clear();
-    for(auto& mod : other.modules_) {
+    for(auto& mod : other.modules_)
         add(mod->clone());
-    }
     return *this;
 }
 

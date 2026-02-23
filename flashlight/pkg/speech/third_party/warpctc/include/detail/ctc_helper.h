@@ -59,12 +59,10 @@ struct log_plus {
     typedef Res result_type;
     HOSTDEVICE
     Res operator()(const Arg1& p1, const Arg2& p2) {
-        if(p1 == neg_inf<Arg1>()) {
+        if(p1 == neg_inf<Arg1>())
             return p2;
-        }
-        if(p2 == neg_inf<Arg2>()) {
+        if(p2 == neg_inf<Arg2>())
             return p1;
-        }
         Res result = log1p(exp(-fabs(p1 - p2))) + maximum<Res>()(p1, p2);
         return result;
     }

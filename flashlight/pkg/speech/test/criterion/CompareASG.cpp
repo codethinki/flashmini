@@ -84,13 +84,12 @@ void printDiscrepancies(
     // Check for NaN discrepancies manually.
     auto compareNaN = fl::isnan(compare);
     auto baselineNaN = fl::isnan(baseline);
-    if(fl::any(compareNaN && !baselineNaN).asScalar<bool>()) {
+    if(fl::any(compareNaN && !baselineNaN).asScalar<bool>())
         std::cerr << " (warning: compare has NaNs where baseline does not)";
-    } else if(fl::any(compareNaN && baselineNaN).asScalar<bool>()) {
+    else if(fl::any(compareNaN && baselineNaN).asScalar<bool>())
         std::cerr << " (warning: both baseline and compare have NaNs)";
-    } else if(fl::any(baselineNaN).asScalar<bool>()) {
+    else if(fl::any(baselineNaN).asScalar<bool>())
         std::cerr << " (warning: baseline has NaNs where compare does not)";
-    }
     std::cerr << std::endl;
 }
 
@@ -98,38 +97,33 @@ void printDiscrepancies(
 
 int main(int argc, char** argv) {
     fl::init();
-    if(argc < 2) {
+    if(argc < 2)
         usage(argv[0]);
-    }
 
     std::string command = argv[1];
 
     if(command == "generate") {
-        if(argc != 3) {
+        if(argc != 3)
             usage(argv[0]);
-        }
 
         std::seed_seq seeds({rd(), rd(), rd(), rd()});
         std::mt19937 rng(seeds);
 
         // generate random target sizes
         std::vector<int> targetSize(B);
-        for(int b = 0; b < B; ++b) {
+        for(int b = 0; b < B; ++b)
             // ensure we have a sample with targetSize=1 and targetSize=L
             targetSize[b] = (b == B - 1) ? L : (b == B - 2) ? 1 : (1 + rng() % L);
-        }
         std::shuffle(targetSize.begin(), targetSize.end(), rng);
 
         // generate random targets with the above sizes
         std::vector<int> targetHost(B * L);
         for(int b = 0; b < B; ++b) {
             auto* targetCur = &targetHost[b * L];
-            for(int i = 0; i < targetSize[b]; ++i) {
+            for(int i = 0; i < targetSize[b]; ++i)
                 targetCur[i] = rng() % N;
-            }
-            for(int i = targetSize[b]; i < L; ++i) {
+            for(int i = targetSize[b]; i < L; ++i)
                 targetCur[i] = -1;
-            }
         }
 
         uint64_t afSeed = rng();
@@ -143,9 +137,8 @@ int main(int argc, char** argv) {
         fl::save(argv[2], input, target, trans);
         std::cerr << "input generated" << std::endl;
     } else if(command == "baseline") {
-        if(argc != 4) {
+        if(argc != 4)
             usage(argv[0]);
-        }
 
         Tensor input, target, trans;
         fl::load(argv[2], input, target, trans);
@@ -153,9 +146,8 @@ int main(int argc, char** argv) {
         fl::save(argv[3], out.loss, out.inputGrad, out.transGrad);
         std::cerr << "baseline saved" << std::endl;
     } else if(command == "compare") {
-        if(argc != 4) {
+        if(argc != 4)
             usage(argv[0]);
-        }
 
         Tensor input, target, trans;
         fl::load(argv[2], input, target, trans);
@@ -166,7 +158,6 @@ int main(int argc, char** argv) {
         printDiscrepancies("loss: ", out.loss, out0.loss);
         printDiscrepancies("inputGrad: ", out.inputGrad, out0.inputGrad);
         printDiscrepancies("transGrad: ", out.transGrad, out0.transGrad);
-    } else {
+    } else
         usage(argv[0]);
-    }
 }

@@ -27,16 +27,14 @@
 namespace fl {
 
 const af::array& toArray(const Tensor& tensor) {
-    if(tensor.backendType() != TensorBackendType::ArrayFire) {
+    if(tensor.backendType() != TensorBackendType::ArrayFire)
         throw std::invalid_argument("toArray: tensor is not ArrayFire-backed");
-    }
     return tensor.getAdapter<ArrayFireTensor>().getHandle();
 }
 
 af::array& toArray(Tensor& tensor) {
-    if(tensor.backendType() != TensorBackendType::ArrayFire) {
+    if(tensor.backendType() != TensorBackendType::ArrayFire)
         throw std::invalid_argument("toArray: tensor is not ArrayFire-backed");
-    }
     return tensor.getAdapter<ArrayFireTensor>().getHandle();
 }
 
@@ -244,12 +242,11 @@ void ArrayFireTensor::unlock() {
 bool ArrayFireTensor::isLocked() {
     bool res;
     auto err = af_is_locked_array(&res, getHandle().get());
-    if(err != AF_SUCCESS) {
+    if(err != AF_SUCCESS)
         throw std::runtime_error(
             "ArrayFireTensor::isLocked - af_is_locked_array returned error: "
             + std::to_string(err)
         );
-    }
     return res;
 }
 
@@ -273,12 +270,11 @@ Tensor ArrayFireTensor::astype(const dtype type) {
 }
 
 Tensor ArrayFireTensor::index(const std::vector<Index>& indices) {
-    if(indices.size() > AF_MAX_DIMS) {
+    if(indices.size() > AF_MAX_DIMS)
         throw std::invalid_argument(
             "ArrayFire-backed tensor was indexed with > 4 elements:"
             "ArrayFire tensors support up to 4 dimensions."
         );
-    }
 
     // TODO: vet and stress test this a lot more/add proper support for
     // multi-tensor
@@ -289,18 +285,17 @@ Tensor ArrayFireTensor::index(const std::vector<Index>& indices) {
         && indices.front().type() == detail::IndexType::Tensor
         && indices.front().get<Tensor>().elements() == getHandle().elements();
     std::vector<af::index> afIndices;
-    if(completeTensorIndex) {
+    if(completeTensorIndex)
         afIndices = {af::index(0)};
-    } else {
+    else {
         afIndices = {af::span, af::span, af::span, af::span}; // implicit spans
     }
 
-    if(indices.size() > afIndices.size()) {
+    if(indices.size() > afIndices.size())
         throw std::logic_error(
             "ArrayFireTensor::index internal error - passed indiecs is larger "
             "than the number of af indices"
         );
-    }
 
     // Fill in corresponding index types for each af index
     std::vector<detail::IndexType> indexTypes(afIndices.size());
@@ -310,9 +305,8 @@ Tensor ArrayFireTensor::index(const std::vector<Index>& indices) {
         afIndices[i] = detail::flToAfIndex(indices[i]);
     }
     // If we're adding implicit spans, fill those indexTypes in
-    for(; i < afIndices.size(); ++i) {
+    for(; i < afIndices.size(); ++i)
         indexTypes[i] = detail::IndexType::Span;
-    }
 
     getHandle(); // if this tensor was a view, run indexing and promote
 
@@ -320,17 +314,14 @@ Tensor ArrayFireTensor::index(const std::vector<Index>& indices) {
     // Compute numDums for the new Tensor
     unsigned newNumDims = numDims();
 
-    if(completeTensorIndex) {
+    if(completeTensorIndex)
         // TODO/FIXME: compute this based on the number of els in the indexing
         // tensor(s)
         newNumDims = 1;
-    } else {
-        for(const auto& type : indexTypes) {
-            if(type == detail::IndexType::Literal) {
+    else
+        for(const auto& type : indexTypes)
+            if(type == detail::IndexType::Literal)
                 newNumDims--;
-            }
-        }
-    }
     newNumDims = std::max(newNumDims, 1u); // can never index to a 0 dim tensor
 
     return fl::Tensor(
@@ -436,22 +427,20 @@ af::array ArrayFireTensor::adjustInPlaceOperandDims(const Tensor& operand) {
     if(indices_ && indices_.value().size() == 1) {
         // This case is only reachable via tensor-based indexing or indexing on a
         // tensor via Tensor::flat()
-        if(numDims_ != 1) {
+        if(numDims_ != 1)
             throw std::invalid_argument(
                 "ArrayFireTensor::adjustInPlaceOperandDims "
                 "index size was 1 but tensor has greater than 1 dimension."
             );
-        }
     } else if(indices_ && !indices_.value().empty()) {
         // All other indexing operations
         const auto& indices = indices_.value();
         const auto& indexTypes = indexTypes_.value();
-        if(indices.size() != indexTypes.size()) {
+        if(indices.size() != indexTypes.size())
             throw std::invalid_argument(
                 "ArrayFireTensor adjustInPlaceOperandDims - passed indices"
                 " and indexTypes are of different sizes."
             );
-        }
 
         // If the dimensions being indexed are 1 and collapsing them yields the same
         // shape as the operand, we can safely moddims, the operand, else there's a
@@ -459,14 +448,12 @@ af::array ArrayFireTensor::adjustInPlaceOperandDims(const Tensor& operand) {
         // {4, 5, 6, 7}(span, span, 5) --> {4, 5, 1, 7} --> {4, 5, 7}
         // {4, 5, 6, 7}(4) --> {1, 5, 1, 7} --> {5, 1, 7, 1}
         std::vector<unsigned> indicesToCompress;
-        for(unsigned i = 0; i < indices.size(); ++i) {
+        for(unsigned i = 0; i < indices.size(); ++i)
             // If an index literal, the corresponding dimension in the indexed array
             // is 1, then we indexed the input to a dim of 1, so we can condense that
             // index
-            if(indexTypes[i] == IndexType::Literal) {
+            if(indexTypes[i] == IndexType::Literal)
                 indicesToCompress.push_back(i);
-            }
-        }
 
         af::dim4 condensedDims(1, 1, 1, 1);
         af::dim4 postIdxDims = preIdxDims;
@@ -487,11 +474,10 @@ af::array ArrayFireTensor::adjustInPlaceOperandDims(const Tensor& operand) {
                         dim_t size;
                         AF_CHECK(af_get_elements(&size, indices[i].get().idx.arr));
                         postIdxDims[i] = size;
-                    } else if(indexTypes[i] == IndexType::Range) {
+                    } else if(indexTypes[i] == IndexType::Range)
                         postIdxDims[i] = af::seq(indices[i].get().idx.seq).size;
-                    } else if(indexTypes[i] == IndexType::Literal) {
+                    else if(indexTypes[i] == IndexType::Literal)
                         postIdxDims[i] = 1;
-                    }
                 }
                 condensedDims[outDimIdx] = postIdxDims[i];
                 outDimIdx++;
@@ -500,18 +486,16 @@ af::array ArrayFireTensor::adjustInPlaceOperandDims(const Tensor& operand) {
 
         // Can modify the operand to work with the proxy or array input only by
         // removing singleton dimensions
-        if(condensedDims == operandDims) {
+        if(condensedDims == operandDims)
             newDims = postIdxDims;
-        } else {
+        else
             throw std::invalid_argument(
                 "ArrayFireTensor adjustInPlaceOperandDims: can't apply operation "
                 "in-place to indexed ArrayFireTensor - dimensions don't match."
             );
-        }
-    } else {
+    } else
         // No indexing so no change in dimensions required
         newDims = operandDims;
-    }
 
     // af::moddims involves an eval. This will be fixed in AF 3.8.1/3.8.2
     bool doModdims = operandArr.dims() != newDims;
@@ -542,11 +526,11 @@ ASSIGN_OP_LITERALS(assign, = );
 void ArrayFireTensor::assign(const Tensor& tensor) {
     std::visit(
         [&tensor, this](auto&& arr) {
-            if(indices_) {
+            if(indices_)
                 // If this is an indexing op, do as other in-place ops with lvalue
                 // temporaries as a result of indexing do
                 arr.get(*this) = this->adjustInPlaceOperandDims(tensor);
-            } else {
+            else {
                 // Not an indexing op - just assign the tensor, but make sure to
                 // update the number of dims
                 arr.get(*this) = toArray(tensor);
@@ -619,13 +603,11 @@ void ArrayFireTensor::inPlaceAdd(const Tensor& tensor) {
             };
 
         unsigned i = 0;
-        for(; i < indices_.value().size(); ++i) {
+        for(; i < indices_.value().size(); ++i)
             idxFunc(indices_.value()[i], i);
-        }
         // The kernel needs to be padded with spans for remaining dims
-        for(; i < AF_MAX_DIMS; ++i) {
+        for(; i < AF_MAX_DIMS; ++i)
             idxFunc(af::span, i);
-        }
 
         fl::detail::advancedIndex(
             toArray(tensor),

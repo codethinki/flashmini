@@ -22,9 +22,8 @@ std::shared_ptr<fl::lib::text::Trie> buildTrie(
     const int wordSeparatorIdx,
     const int repLabel
 ) {
-    if(!(decoderType == "wrd" || useLexicon)) {
+    if(!(decoderType == "wrd" || useLexicon))
         return nullptr;
-    }
     auto trie = std::make_shared<fl::lib::text::Trie>(
         tokenDict.indexSize(),
         wordSeparatorIdx
@@ -46,16 +45,15 @@ std::shared_ptr<fl::lib::text::Trie> buildTrie(
     }
     // Smearing
     SmearingMode smearMode = SmearingMode::NONE;
-    if(smearing == "logadd") {
+    if(smearing == "logadd")
         smearMode = SmearingMode::LOGADD;
-    } else if(smearing == "max") {
+    else if(smearing == "max")
         smearMode = SmearingMode::MAX;
-    } else if(smearing != "none") {
+    else if(smearing != "none")
         throw std::runtime_error(
             "[buildTrie] Invalid smearing option, can be {logadd, max, none}, provided value is "
             + smearing
         );
-    }
     trie->smear(smearMode);
     return trie;
 }

@@ -43,19 +43,17 @@ TensorExtensionCallback& TensorExtensionRegistrar::getTensorExtensionCreationFun
     TensorBackendType backend,
     TensorExtensionType extensionType
 ) {
-    if(extensions_.find(backend) == extensions_.end()) {
+    if(extensions_.find(backend) == extensions_.end())
         throw std::invalid_argument(
             "TensorExtensionRegistrar::getTensorExtensionCreationFunc: "
             "no tensor extensions registered for given backend."
         );
-    }
     auto& _extensions = extensions_[backend];
-    if(_extensions.find(extensionType) == _extensions.end()) {
+    if(_extensions.find(extensionType) == _extensions.end())
         throw std::invalid_argument(
             "TensorExtensionRegistrar::getTensorExtensionCreationFunc: "
             "no tensor extensions registered for backend " + tensorBackendTypeToString(backend)
         );
-    }
     return _extensions[extensionType];
 }
 

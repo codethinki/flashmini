@@ -38,12 +38,10 @@ ConvBnAct::ConvBnAct(
     const auto pad = PaddingMode::SAME;
     const bool bias = !bn;
     add(fl::Conv2D(inC, outC, kw, kh, sx, sy, pad, pad, 1, 1, bias));
-    if(bn) {
+    if(bn)
         add(fl::BatchNorm(2, outC));
-    }
-    if(act) {
+    if(act)
         add(fl::ReLU());
-    }
 }
 
 ResNetBlock::ResNetBlock() = default;
@@ -115,11 +113,10 @@ std::vector<fl::Variable> ResNetBottleneckBlock::forward(
     out = bn3->forward(out);
 
     std::vector<fl::Variable> shortcut;
-    if(modules().size() > 9) {
+    if(modules().size() > 9)
         shortcut = module(9)->forward(inputs);
-    } else {
+    else
         shortcut = inputs;
-    }
     return relu3->forward({out[0] + shortcut[0]});
 }
 
@@ -147,11 +144,10 @@ std::vector<fl::Variable> ResNetBlock::forward(
     out = bn2->forward(out);
 
     std::vector<fl::Variable> shortcut;
-    if(modules().size() > 6) {
+    if(modules().size() > 6)
         shortcut = module(6)->forward(inputs);
-    } else {
+    else
         shortcut = inputs;
-    }
     return relu2->forward({out[0] + shortcut[0]});
 }
 
@@ -171,9 +167,8 @@ ResNetBottleneckStage::ResNetBottleneckStage(
     add(ResNetBottleneckBlock(inC, outC, stride));
     const int expansionFactor = 4;
     const int inPlanes = outC * expansionFactor;
-    for(int i = 1; i < numBlocks; i++) {
+    for(int i = 1; i < numBlocks; i++)
         add(ResNetBottleneckBlock(inPlanes, outC));
-    }
 };
 
 ResNetBottleneckStage::ResNetBottleneckStage() = default;
@@ -187,9 +182,8 @@ ResNetStage::ResNetStage(
     const int stride
 ) {
     add(ResNetBlock(inC, outC, stride));
-    for(int i = 1; i < numBlocks; i++) {
+    for(int i = 1; i < numBlocks; i++)
         add(ResNetBlock(outC, outC));
-    }
 }
 std::shared_ptr<Sequential> resnet34() {
     auto model = std::make_shared<Sequential>();

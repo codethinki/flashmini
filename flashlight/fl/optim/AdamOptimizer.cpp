@@ -49,17 +49,15 @@ void AdamOptimizer::step() {
     float correctedLr = lr_ * std::sqrt(correctedBias2) / correctedBias1;
 
     for(size_t i = 0; i < parameters_.size(); i++) {
-        if(!parameters_[i].isGradAvailable()) {
+        if(!parameters_[i].isGradAvailable())
             continue;
-        }
 
         const Tensor& grad = parameters_[i].grad().tensor();
         Tensor& data = parameters_[i].tensor();
 
-        if(wd_ != 0) {
+        if(wd_ != 0)
             // Weight decay term
             data = data - wd_ * lr_ * data;
-        }
 
         Tensor& biasedFirst = biasedFirst_[i];
         Tensor& biasedSecond = biasedSecond_[i];
@@ -80,9 +78,8 @@ std::string AdamOptimizer::prettyString() const {
     std::ostringstream ss;
     ss << "Adam";
 
-    if(wd_ != 0) {
+    if(wd_ != 0)
         ss << " (weight decay=" << wd_ << ")";
-    }
 
     return ss.str();
 }

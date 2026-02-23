@@ -69,14 +69,12 @@ namespace lib {
                 lock,
                 [this]() { return !isFull() || isAddingFinished_; });
 
-            if(isAddingFinished_) {
+            if(isAddingFinished_)
                 return;
-            }
             queue_.push(std::move(unit));
 
-            if(!isFull()) {
+            if(!isFull())
                 producerCondition_.notify_one();
-            }
             consumerCondition_.notify_one();
         }
 
@@ -91,15 +89,13 @@ namespace lib {
             consumerCondition_.wait(
                 lock,
                 [this]() { return !isEmpty() || isAddingFinished_; });
-            if(isEmpty()) {
+            if(isEmpty())
                 return false;
-            }
             unit = std::move(queue_.front());
             queue_.pop();
 
-            if(!isEmpty()) {
+            if(!isEmpty())
                 consumerCondition_.notify_one();
-            }
             producerCondition_.notify_one();
 
             return true;

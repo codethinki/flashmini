@@ -36,9 +36,8 @@ BlobDatasetEntry BlobDatasetEntryBuffer::get(const int64_t idx) const {
     e.type = static_cast<fl::dtype>(data_[dataIdx++]);
     unsigned numDims = data_[dataIdx++];
     e.dims = Shape(std::vector<Dim>(numDims));
-    for(int i = 0; i < numDims; i++) {
+    for(int i = 0; i < numDims; i++)
         e.dims[i] = data_[dataIdx + i];
-    }
     e.offset = data_[dataIdx + maxNDims_];
     return e;
 }
@@ -47,9 +46,8 @@ void BlobDatasetEntryBuffer::add(const BlobDatasetEntry& e) {
     data_.push_back(static_cast<int64_t>(e.type));
     data_.push_back(static_cast<int64_t>(e.dims.ndim()));
     int i = 0;
-    for(; i < e.dims.ndim(); i++) {
+    for(; i < e.dims.ndim(); i++)
         data_.push_back(e.dims[i]);
-    }
     for(; i < maxNDims_; ++i) {
         data_.push_back(1); // placeholder dim
     }
@@ -96,12 +94,11 @@ void BlobDataset::add(const std::vector<Tensor>& sample) {
         offsets_.push_back(entries_.size());
         sizes_.push_back(sample.size());
         for(const auto& tensor : sample) {
-            if(tensor.ndim() > maxNDims_) {
+            if(tensor.ndim() > maxNDims_)
                 throw std::invalid_argument(
                     "BlobDataset::add - no support for serialization of "
                     "tensors with > 4 dimensions"
                 );
-            }
             BlobDatasetEntry e;
             e.type = tensor.type();
             e.dims = tensor.shape();
@@ -119,14 +116,12 @@ void BlobDataset::add(const std::vector<Tensor>& sample) {
 
 void BlobDataset::add(const BlobDataset& blob, int64_t chunkSize) {
     std::lock_guard<std::mutex> lock(mutex_);
-    if(chunkSize <= 0) {
+    if(chunkSize <= 0)
         throw std::runtime_error("chunkSize must be positive");
-    }
     sizes_.insert(sizes_.end(), blob.sizes_.begin(), blob.sizes_.end());
     std::vector<int64_t> offsets = blob.offsets_;
-    for(auto& offset : offsets) {
+    for(auto& offset : offsets)
         offset += entries_.size();
-    }
     offsets_.insert(offsets_.end(), offsets.begin(), offsets.end());
     for(int64_t i = 0; i < blob.entries_.size(); i++) {
         auto e = blob.entries_.get(i);
@@ -145,12 +140,10 @@ void BlobDataset::add(const BlobDataset& blob, int64_t chunkSize) {
             this->writeData(indexOffset_, buffer.data(), size);
             this->indexOffset_ += size;
         };
-    for(int64_t i = 0; i < nChunk; i++) {
+    for(int64_t i = 0; i < nChunk; i++)
         copyChunk(chunkSize);
-    }
-    if(remainCopySize > 0) {
+    if(remainCopySize > 0)
         copyChunk(remainCopySize);
-    }
 }
 
 std::vector<uint8_t> BlobDataset::readRawArray(
@@ -172,19 +165,17 @@ Tensor BlobDataset::readArray(const BlobDatasetEntry& e, int i) const {
     if(e.dims.elements() > 0) {
         auto buffer = readRawArray(e);
         auto keyval = hostTransforms_.find(i);
-        if(keyval == hostTransforms_.end()) {
+        if(keyval == hostTransforms_.end())
             return Tensor::fromBuffer(
                 e.dims,
                 e.type,
                 buffer.data(),
                 MemoryLocation::Host
             );
-        } else {
+        else
             return keyval->second(buffer.data(), e.dims, e.type);
-        }
-    } else {
+    } else
         return Tensor();
-    }
 }
 
 void BlobDataset::writeArray(const BlobDatasetEntry& e, const Tensor& array) {
@@ -224,9 +215,8 @@ void BlobDataset::readIndex() {
 
     int64_t magicNumberCheck = 0;
     int64_t offset = readData(0, (char*) &magicNumberCheck, sizeof(int64_t));
-    if(magicNumber != magicNumberCheck) {
+    if(magicNumber != magicNumberCheck)
         throw std::runtime_error("BlobDataset::readIndex - not a fl::BlobDataset");
-    }
     readData(offset, (char*) &indexOffset_, sizeof(int64_t));
     offset = indexOffset_;
 
@@ -256,9 +246,8 @@ void BlobDataset::setHostTransform(
 
 std::vector<BlobDatasetEntry> BlobDataset::getEntries(const int64_t idx) const {
     std::vector<BlobDatasetEntry> entries;
-    for(int64_t i = 0; i < sizes_.at(idx); i++) {
+    for(int64_t i = 0; i < sizes_.at(idx); i++)
         entries.push_back(entries_.get(offsets_.at(idx) + i));
-    }
     return entries;
 }
 

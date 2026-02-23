@@ -37,14 +37,12 @@ std::shared_ptr<Sequential> buildSequentialModule(
     std::vector<std::string> layers;
     {
         std::ifstream in(archfile);
-        if(!in) {
+        if(!in)
             throw std::runtime_error(
                 "fl::pkg::runtime::buildSequentialModule given invalid arch filepath"
             );
-        }
-        for(std::string str; std::getline(in, str);) {
+        for(std::string str; std::getline(in, str);)
             layers.emplace_back(str);
-        }
     }
 
     int numLinesParsed = 0;
@@ -87,11 +85,10 @@ fl::Variable forwardSequentialModuleWithPadMask(
     for(auto& module : ntwrkSeq->modules()) {
         auto tr = std::dynamic_pointer_cast<fl::Transformer>(module);
         auto cfr = std::dynamic_pointer_cast<fl::Conformer>(module);
-        if(tr != nullptr || cfr != nullptr) {
+        if(tr != nullptr || cfr != nullptr)
             output = module->forward({output, fl::noGrad(padMask)}).front();
-        } else {
+        else
             output = module->forward({output}).front();
-        }
     }
     return output.astype(input.type());
 }
@@ -119,24 +116,20 @@ std::shared_ptr<Module> parseLines(
     /* ========== TRANSFORMATIONS ========== */
 
     if((params[0] == "RO") || (params[0] == "V")) {
-        if(params.size() < 2) {
+        if(params.size() < 2)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         Shape shape(std::vector<Dim>(params.size() - 1));
-        for(unsigned i = 1; i < params.size(); ++i) {
+        for(unsigned i = 1; i < params.size(); ++i)
             shape[i - 1] = std::stoi(params[i]);
-        }
-        if(params[0] == "RO") {
+        if(params[0] == "RO")
             return std::make_shared<Reorder>(shape);
-        } else {
+        else
             return std::make_shared<View>(shape);
-        }
     }
 
     if(params[0] == "PD") {
-        if(!inRange(4, params.size(), 10) || (params.size() & 1)) {
+        if(!inRange(4, params.size(), 10) || (params.size() & 1))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         auto val = std::stod(params[1]);
         params.resize(10, "0");
         std::vector<std::pair<int, int>> paddings = {
@@ -151,9 +144,8 @@ std::shared_ptr<Module> parseLines(
     /* ========== TRANSFORMERS ========== */
 
     if(params[0] == "TR") {
-        if(!inRange(6, params.size(), 9)) {
+        if(!inRange(6, params.size(), 9))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int modelDim = std::stoi(params[1]);
         int mlpDim = std::stoi(params[2]);
         int nHead = std::stoi(params[3]);
@@ -176,9 +168,8 @@ std::shared_ptr<Module> parseLines(
     }
 
     if(params[0] == "CFR") {
-        if(!inRange(7, params.size(), 8)) {
+        if(!inRange(7, params.size(), 8))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int modelDim = std::stoi(params[1]);
         int mlpDim = std::stoi(params[2]);
         int nHead = std::stoi(params[3]);
@@ -199,9 +190,8 @@ std::shared_ptr<Module> parseLines(
     }
 
     if(params[0] == "POSEMB") {
-        if(!inRange(3, params.size(), 4)) {
+        if(!inRange(3, params.size(), 4))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int layerDim = std::stoi(params[1]);
         int csz = std::stoi(params[2]);
         float dropout = (params.size() >= 4) ? std::stof(params[3]) : 0.0;
@@ -209,9 +199,8 @@ std::shared_ptr<Module> parseLines(
     }
 
     if(params[0] == "SINPOSEMB") {
-        if(!inRange(2, params.size(), 3)) {
+        if(!inRange(2, params.size(), 3))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int layerDim = std::stoi(params[1]);
         float inputScale = (params.size() >= 3) ? std::stof(params[2]) : 1.0;
         return std::make_shared<SinusoidalPositionEmbedding>(layerDim, inputScale);
@@ -220,9 +209,8 @@ std::shared_ptr<Module> parseLines(
     /* ========== CONVOLUTIONS ========== */
 
     if(params[0] == "C" || params[0] == "C1") {
-        if(!inRange(5, params.size(), 7)) {
+        if(!inRange(5, params.size(), 7))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int cisz = std::stoi(params[1]);
         int cosz = std::stoi(params[2]);
         int cwx = std::stoi(params[3]);
@@ -233,9 +221,8 @@ std::shared_ptr<Module> parseLines(
     }
 
     if(params[0] == "TDS") {
-        if(!inRange(4, params.size(), 8)) {
+        if(!inRange(4, params.size(), 8))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int cisz = std::stoi(params[1]);
         int cwx = std::stoi(params[2]);
         int freqdim = std::stoi(params[3]);
@@ -256,9 +243,8 @@ std::shared_ptr<Module> parseLines(
     }
 
     if(params[0] == "AC") {
-        if(!inRange(5, params.size(), 8)) {
+        if(!inRange(5, params.size(), 8))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int cisz = std::stoi(params[1]);
         int cosz = std::stoi(params[2]);
         int cwx = std::stoi(params[3]);
@@ -278,9 +264,8 @@ std::shared_ptr<Module> parseLines(
     }
 
     if(params[0] == "C2") {
-        if(!inRange(7, params.size(), 11)) {
+        if(!inRange(7, params.size(), 11))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int cisz = std::stoi(params[1]);
         int cosz = std::stoi(params[2]);
         int cwx = std::stoi(params[3]);
@@ -308,9 +293,8 @@ std::shared_ptr<Module> parseLines(
     /* ========== LINEAR ========== */
 
     if(params[0] == "L") {
-        if(!inRange(3, params.size(), 4)) {
+        if(!inRange(3, params.size(), 4))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int lisz = std::stoi(params[1]);
         int losz = std::stoi(params[2]);
         bool bias = (params.size() == 4) && params[3] == "0" ? false : true;
@@ -320,56 +304,47 @@ std::shared_ptr<Module> parseLines(
     /* ========== EMBEDDING ========== */
 
     if(params[0] == "E") {
-        if(params.size() != 3) {
+        if(params.size() != 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int embsz = std::stoi(params[1]);
         int ntokens = std::stoi(params[2]);
         return std::make_shared<Embedding>(embsz, ntokens);
     }
 
     if(params[0] == "ADAPTIVEE") {
-        if(params.size() != 3) {
+        if(params.size() != 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int embsz = std::stoi(params[1]);
         std::vector<int> cutoffs;
         auto tokens = fl::lib::split(',', params[2], true);
-        for(const auto& token : tokens) {
+        for(const auto& token : tokens)
             cutoffs.push_back(std::stoi(fl::lib::trim(token)));
-        }
-        for(int i = 1; i < cutoffs.size(); ++i) {
-            if(cutoffs[i - 1] >= cutoffs[i]) {
+        for(int i = 1; i < cutoffs.size(); ++i)
+            if(cutoffs[i - 1] >= cutoffs[i])
                 throw std::invalid_argument("cutoffs must be strictly ascending");
-            }
-        }
         return std::make_shared<AdaptiveEmbedding>(embsz, cutoffs);
     }
 
     /* ========== NORMALIZATIONS ========== */
 
     if(params[0] == "BN") {
-        if(!inRange(3, params.size(), 5)) {
+        if(!inRange(3, params.size(), 5))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int featSz = std::stoi(params[1]);
         std::vector<int> featDims;
-        for(int i = 2; i < params.size(); ++i) {
+        for(int i = 2; i < params.size(); ++i)
             featDims.emplace_back(std::stoi(params[i]));
-        }
         return std::make_shared<BatchNorm>(featDims, featSz);
     }
 
     if(params[0] == "LN") {
-        if(!inRange(2, params.size(), 4)) {
+        if(!inRange(2, params.size(), 4))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         std::vector<int> featDims;
-        for(int i = 1; i < params.size(); ++i) {
+        for(int i = 1; i < params.size(); ++i)
             featDims.emplace_back(std::stoi(params[i]));
-        }
-        if(featDims == std::vector<int>{3}) {
-            if(!inRange(7, params.size(), 11)) {
+        if(featDims == std::vector<int>{3})
+            if(!inRange(7, params.size(), 11))
                 throw std::invalid_argument(
                     "Failed parsing - "
                     "flashlight LayerNorm API for specifying `featAxes` is modified "
@@ -377,24 +352,20 @@ std::shared_ptr<Module> parseLines(
                     "specify LN 0 1 2 instead of LN 3. If you really know what you're "
                     "doing, comment out this check and build again."
                 );
-            }
-        }
         return std::make_shared<LayerNorm>(featDims);
     }
 
     if(params[0] == "WN") {
-        if(params.size() < 3) {
+        if(params.size() < 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int dim = std::stoi(params[1]);
         std::string childStr = fl::lib::join(" ", params.begin() + 2, params.end());
         return std::make_shared<WeightNorm>(parseLine(childStr), dim);
     }
 
     if(params[0] == "DO") {
-        if(params.size() != 2) {
+        if(params.size() != 2)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         auto drpVal = std::stod(params[1]);
         return std::make_shared<Dropout>(drpVal);
     }
@@ -402,9 +373,8 @@ std::shared_ptr<Module> parseLines(
     /* ========== POOLING ========== */
 
     if((params[0] == "M") || (params[0] == "A")) {
-        if(params.size() < 5) {
+        if(params.size() < 5)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int wx = std::stoi(params[1]);
         int wy = std::stoi(params[2]);
         int dx = std::stoi(params[3]);
@@ -420,76 +390,66 @@ std::shared_ptr<Module> parseLines(
     /* ========== ACTIVATIONS ========== */
 
     if(params[0] == "ELU") {
-        if(params.size() != 1) {
+        if(params.size() != 1)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<ELU>();
     }
 
     if(params[0] == "R") {
-        if(params.size() != 1) {
+        if(params.size() != 1)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<ReLU>();
     }
 
     if(params[0] == "R6") {
-        if(params.size() != 1) {
+        if(params.size() != 1)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<ReLU6>();
     }
 
     if(params[0] == "PR") {
-        if(!inRange(1, params.size(), 3)) {
+        if(!inRange(1, params.size(), 3))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         auto numParams = params.size() > 1 ? std::stoi(params[1]) : 1;
         auto initVal = params.size() > 2 ? std::stod(params[2]) : 0.25;
         return std::make_shared<PReLU>(numParams, initVal);
     }
 
     if(params[0] == "LG") {
-        if(params.size() != 1) {
+        if(params.size() != 1)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<Log>();
     }
 
     if(params[0] == "HT") {
-        if(params.size() != 1) {
+        if(params.size() != 1)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<HardTanh>();
     }
 
     if(params[0] == "T") {
-        if(params.size() != 1) {
+        if(params.size() != 1)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<Tanh>();
     }
 
     if(params[0] == "GLU") {
-        if(params.size() != 2) {
+        if(params.size() != 2)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int dim = std::stoi(params[1]);
         return std::make_shared<GatedLinearUnit>(dim);
     }
 
     if(params[0] == "LSM") {
-        if(params.size() != 2) {
+        if(params.size() != 2)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         int dim = std::stoi(params[1]);
         return std::make_shared<LogSoftmax>(dim);
     }
 
     if(params[0] == "SH") {
-        if(!inRange(1, params.size(), 2)) {
+        if(!inRange(1, params.size(), 2))
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         auto beta = params.size() > 1 ? std::stof(params[1]) : 1.0;
         return std::make_shared<Swish>(beta);
     }
@@ -513,31 +473,27 @@ std::shared_ptr<Module> parseLines(
         };
 
     if(params[0] == "RNN") {
-        if(params.size() < 3) {
+        if(params.size() < 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return rnnLayer(params, RnnMode::RELU);
     }
 
     if(params[0] == "GRU") {
-        if(params.size() < 3) {
+        if(params.size() < 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return rnnLayer(params, RnnMode::GRU);
     }
 
     if(params[0] == "LSTM") {
-        if(params.size() < 3) {
+        if(params.size() < 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return rnnLayer(params, RnnMode::LSTM);
     }
 
     /* ========== Residual block ========== */
     if(params[0] == "RES") {
-        if(params.size() <= 3) {
+        if(params.size() <= 3)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
 
         auto residualBlock = [&](const std::vector<std::string>& prms,
             int& numResLayerAndSkip) {
@@ -548,37 +504,32 @@ std::shared_ptr<Module> parseLines(
                 int numProjections = 0;
 
                 for(int i = 1; i <= numResLayers + numSkipConnections; ++i) {
-                    if(lineIdx + i + numProjections >= lines.size()) {
+                    if(lineIdx + i + numProjections >= lines.size())
                         throw std::invalid_argument("Failed parsing Residual block");
-                    }
                     const std::string& resLine = lines[lineIdx + i + numProjections];
                     auto resLinePrms = fl::lib::splitOnWhitespace(resLine, true);
 
                     if(resLinePrms[0] == "SKIP") {
-                        if(!inRange(3, resLinePrms.size(), 4)) {
+                        if(!inRange(3, resLinePrms.size(), 4))
                             throw std::invalid_argument("Failed parsing - " + resLine);
-                        }
                         resPtr->addShortcut(
                             std::stoi(resLinePrms[1]),
                             std::stoi(resLinePrms[2])
                         );
-                        if(resLinePrms.size() == 4) {
+                        if(resLinePrms.size() == 4)
                             resPtr->addScale(
                                 std::stoi(resLinePrms[2]),
                                 std::stof(resLinePrms[3])
                             );
-                        }
                     } else if(resLinePrms[0] == "SKIPL") {
-                        if(!inRange(4, resLinePrms.size(), 5)) {
+                        if(!inRange(4, resLinePrms.size(), 5))
                             throw std::invalid_argument("Failed parsing - " + resLine);
-                        }
                         int numProjectionLayers = std::stoi(resLinePrms[3]);
                         auto projection = std::make_shared<Sequential>();
 
                         for(int j = 1; j <= numProjectionLayers; ++j) {
-                            if(lineIdx + i + numProjections + j >= lines.size()) {
+                            if(lineIdx + i + numProjections + j >= lines.size())
                                 throw std::invalid_argument("Failed parsing Residual block");
-                            }
                             projection->add(parseLine(lines[lineIdx + i + numProjections + j]));
                         }
                         resPtr->addShortcut(
@@ -586,16 +537,14 @@ std::shared_ptr<Module> parseLines(
                             std::stoi(resLinePrms[2]),
                             projection
                         );
-                        if(resLinePrms.size() == 5) {
+                        if(resLinePrms.size() == 5)
                             resPtr->addScale(
                                 std::stoi(resLinePrms[2]),
                                 std::stof(resLinePrms[4])
                             );
-                        }
                         numProjections += numProjectionLayers;
-                    } else {
+                    } else
                         resPtr->add(parseLine(resLine));
-                    }
                 }
 
                 numResLayerAndSkip = numResLayers + numSkipConnections + numProjections;
@@ -603,28 +552,24 @@ std::shared_ptr<Module> parseLines(
             };
 
         auto numBlocks = params.size() == 4 ? std::stoi(params.back()) : 1;
-        if(numBlocks <= 0) {
+        if(numBlocks <= 0)
             throw std::invalid_argument(
                 "Invalid number of residual blocks: " + std::to_string(numBlocks)
             );
-        }
 
         if(numBlocks > 1) {
             auto res = std::make_shared<Sequential>();
-            for(int n = 0; n < numBlocks; ++n) {
+            for(int n = 0; n < numBlocks; ++n)
                 res->add(residualBlock(params, numLinesParsed));
-            }
             return res;
-        } else {
+        } else
             return residualBlock(params, numLinesParsed);
-        }
     }
 
     /* ========== Data Augmentation  ========== */
     if(params[0] == "SAUG") {
-        if(params.size() != 7) {
+        if(params.size() != 7)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         return std::make_shared<SpecAugment>(
             std::stoi(params[1]),
             std::stoi(params[2]),
@@ -637,9 +582,8 @@ std::shared_ptr<Module> parseLines(
 
     /* ========== Precision Cast  ========== */
     if(params[0] == "PC") {
-        if(params.size() != 2) {
+        if(params.size() != 2)
             throw std::invalid_argument("Failed parsing - " + line);
-        }
         auto targetType = fl::stringToDtype(params[1]);
         return std::make_shared<PrecisionCast>(targetType);
     }

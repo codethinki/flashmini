@@ -25,9 +25,8 @@ std::unique_ptr<Module> Padding::clone() const {
 std::string Padding::prettyString() const {
     std::ostringstream ss;
     ss << "Padding (" << m_val << ", { ";
-    for(auto p : m_pad) {
+    for(auto p : m_pad)
         ss << "(" << p.first << ", " << p.second << "), ";
-    }
     ss << "})";
     return ss.str();
 }

@@ -15,23 +15,19 @@ TEST(HungarianTest, DiagnalAssignments) {
     int M = 4; // Rows
     int N = 4; // Columns
     std::vector<float> costsVec(N * N);
-    for(int r = 0; r < M; r++) {
-        for(int c = 0; c < N; c++) {
+    for(int r = 0; r < M; r++)
+        for(int c = 0; c < N; c++)
             costsVec[r * N + c] = (1 + r) * (1 + c);
-        }
-    }
 
     std::vector<int> expRowIdxs = {0, 1, 2, 3};
     std::vector<int> expColIdxs = {3, 2, 1, 0};
     std::vector<int> rowIdxs(N);
     std::vector<int> colIdxs(M);
     hungarian(costsVec.data(), rowIdxs.data(), colIdxs.data(), M, N);
-    for(int r = 0; r < M; r++) {
+    for(int r = 0; r < M; r++)
         EXPECT_EQ(rowIdxs[r], expRowIdxs[r]) << "Assignment differs at index " << r;
-    }
-    for(int c = 0; c < N; c++) {
+    for(int c = 0; c < N; c++)
         EXPECT_EQ(rowIdxs[c], expRowIdxs[c]) << "Assignment differs at index " << c;
-    }
 }
 
 TEST(HungarianTest, FullPipelineFromWiki) {
@@ -46,12 +42,10 @@ TEST(HungarianTest, FullPipelineFromWiki) {
     std::vector<int> rowIdxs(N);
     std::vector<int> colIdxs(M);
     hungarian(costsVec.data(), rowIdxs.data(), colIdxs.data(), M, N);
-    for(int r = 0; r < M; r++) {
+    for(int r = 0; r < M; r++)
         EXPECT_EQ(rowIdxs[r], expRowIdxs[r]) << "Assignment differs at index " << r;
-    }
-    for(int c = 0; c < N; c++) {
+    for(int c = 0; c < N; c++)
         EXPECT_EQ(rowIdxs[c], expRowIdxs[c]) << "Assignment differs at index " << c;
-    }
 }
 
 TEST(HungarianTest, FullPipelineSimple1) {
@@ -72,12 +66,10 @@ TEST(HungarianTest, FullPipelineSimple1) {
     std::vector<int> expAssignment = {0, 1, 0, 1, 0, 0, 0, 0, 1};
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
-    for(int c = 0; c < N; c++) {
-        for(int r = 0; r < M; r++) {
+    for(int c = 0; c < N; c++)
+        for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
             << "Assignment differs at row " << r << " and col " << c;
-        }
-    }
 }
 
 TEST(HungarianTest, FullPipelineSimple2) {
@@ -89,12 +81,10 @@ TEST(HungarianTest, FullPipelineSimple2) {
     std::vector<int> expAssignment = {0, 0, 1, 1, 0, 0, 0, 1, 0};
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
-    for(int c = 0; c < N; c++) {
-        for(int r = 0; r < M; r++) {
+    for(int c = 0; c < N; c++)
+        for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
             << "Assignment differs at row " << r << " and col " << c;
-        }
-    }
 }
 
 TEST(HungarianTest, FullPipelineSimple3) {
@@ -105,12 +95,10 @@ TEST(HungarianTest, FullPipelineSimple3) {
     std::vector<int> expAssignment = {0, 0, 1, 0, 1, 0, 1, 0, 0};
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
-    for(int c = 0; c < N; c++) {
-        for(int r = 0; r < M; r++) {
+    for(int c = 0; c < N; c++)
+        for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
             << "Assignment differs at row " << r << " and col " << c;
-        }
-    }
 }
 
 TEST(HungarianTest, FullPipelineSize6) {
@@ -125,12 +113,10 @@ TEST(HungarianTest, FullPipelineSize6) {
                                       0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0};
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
-    for(int c = 0; c < N; c++) {
-        for(int r = 0; r < M; r++) {
+    for(int c = 0; c < N; c++)
+        for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
             << "Assignment differs at row " << r << " and col " << c;
-        }
-    }
 }
 TEST(HungarianTest, 6x6Example2) {
     int M = 6; // Rows
@@ -144,12 +130,10 @@ TEST(HungarianTest, 6x6Example2) {
                                       0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0};
     std::vector<int> assignment(N * M);
     hungarian(costsVec.data(), assignment.data(), N, M);
-    for(int c = 0; c < N; c++) {
-        for(int r = 0; r < M; r++) {
+    for(int c = 0; c < N; c++)
+        for(int r = 0; r < M; r++)
             EXPECT_EQ(assignment[c * M + r], expAssignment[c * M + r])
             << "Assignment differs at row " << r << " and col " << c;
-        }
-    }
 }
 
 TEST(HungarianTest, NonSquare2) {

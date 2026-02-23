@@ -24,22 +24,20 @@ CoalescingReducer::~CoalescingReducer() {
 
 void CoalescingReducer::add(Variable& var) {
     // if this tensor would push the cache oversize, flush
-    if(currCacheSize_ + var.bytes() > cacheThresholdBytes_) {
+    if(currCacheSize_ + var.bytes() > cacheThresholdBytes_)
         flush();
-    }
 
     // check if the tensor is larger than the cache. If so, reduce immediately
     // and don't copy-coalesce
-    if(var.bytes() > cacheThresholdBytes_) {
+    if(var.bytes() > cacheThresholdBytes_)
         allReduce(var, scale_, async_);
-    } else {
+    else {
         // if async, evaluating the JIT on the value upfront is more efficient than
         // evaluating the JIT for each Variable in the cache after we flush it,
         // since it more effectively facilitates overlapping compuation between the
         // AF and distributed compute streams.
-        if(async_) {
+        if(async_)
             var.eval();
-        }
         // otherwise, add to cache
         cache_.push_back(var);
         currCacheSize_ += var.bytes();
@@ -58,9 +56,8 @@ void CoalescingReducer::flush() {
 }
 
 void CoalescingReducer::synchronize() {
-    if(async_ || contiguous_) {
+    if(async_ || contiguous_)
         syncDistributed();
-    }
 }
 
 } // namespace fl

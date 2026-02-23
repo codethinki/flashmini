@@ -331,10 +331,9 @@ TEST(TensorBinaryOpsTest, BinaryOperatorIncompatibleShapes) {
             << "dtype: " << type;
             // TODO ArrayFire needs software impl for fp16 modulo on CUDA backend;
             // bring this test back when supported.
-            if(type != dtype::f16) {
+            if(type != dtype::f16)
                 ASSERT_THROW((void) Values(lhs % rhs), std::invalid_argument)
                 << "dtype: " << type;
-            }
             // these operators are generally not well-defined for fps
             if(type != dtype::f16 && type != dtype::f32 && type != dtype::f64) {
                 ASSERT_THROW((void) Values(lhs | rhs), std::invalid_argument)
@@ -440,21 +439,20 @@ TEST(TensorBinaryOpsTest, broadcasting) {
             unsigned maxnDim = std::max(lhsShape.ndim(), rhsShape.ndim());
             Shape outShape{std::vector<Dim>(maxnDim)};
             for(unsigned i = 0; i < maxnDim; ++i) {
-                if(i > lhsShape.ndim() - 1) {
+                if(i > lhsShape.ndim() - 1)
                     outShape[i] = rhsShape[i];
-                } else if(i > rhsShape.ndim() - 1) {
+                else if(i > rhsShape.ndim() - 1)
                     outShape[i] = lhsShape[i];
-                } else if(lhsShape[i] == 1) {
+                else if(lhsShape[i] == 1)
                     outShape[i] = rhsShape[i];
-                } else if(rhsShape[i] == 1) {
+                else if(rhsShape[i] == 1)
                     outShape[i] = lhsShape[i];
-                } else if(lhsShape[i] == rhsShape[i]) {
+                else if(lhsShape[i] == rhsShape[i])
                     outShape[i] = lhsShape[i];
-                } else if(lhsShape[i] != rhsShape[i]) {
+                else if(lhsShape[i] != rhsShape[i])
                     throw std::runtime_error(
                         "computeBroadcastShape - cannot broadcast shape"
                     );
-                }
             }
             return outShape;
         };

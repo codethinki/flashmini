@@ -29,14 +29,12 @@ static void backward(
     const Tensor& trans,
     Tensor& workspace
 ) {
-    if(gradVar.type() != fl::dtype::f32) {
+    if(gradVar.type() != fl::dtype::f32)
         throw std::invalid_argument("FCC: grad must be float32");
-    }
-    if(inputs.size() != 2) {
+    if(inputs.size() != 2)
         throw std::invalid_argument(
             "FullConnectionCriterion backward expects two input args"
         );
-    }
 
     const auto& grad = gradVar.tensor();
     Tensor inputGrad({N, T, B}, fl::dtype::f32);
@@ -69,31 +67,28 @@ Variable FullConnectionCriterion::forward(
     const Variable& inputVar,
     const Variable& targetVar
 ) {
-    if(inputVar.ndim() != 3) {
+    if(inputVar.ndim() != 3)
         throw std::invalid_argument(
             "FullConnectionCriterion::forward: "
             "expects input with dimensions {N, T, B}"
         );
-    }
-    if(targetVar.ndim() != 2) {
+    if(targetVar.ndim() != 2)
         throw std::invalid_argument(
             "FullConnectionCriterion::forward: "
             "expects target with dimensions {B, L}"
         );
-    }
 
     const auto& transVar = param(0);
     int B = inputVar.dim(2);
     int T = inputVar.dim(1);
     int N = inputVar.dim(0);
 
-    if(N != transVar.dim(0)) {
+    if(N != transVar.dim(0))
         throw std::invalid_argument("FCC: input dim doesn't match N");
-    } else if(inputVar.type() != fl::dtype::f32) {
+    else if(inputVar.type() != fl::dtype::f32)
         throw std::invalid_argument("FCC: input must be float32");
-    } else if(targetVar.type() != fl::dtype::s32) {
+    else if(targetVar.type() != fl::dtype::s32)
         throw std::invalid_argument("FCC: target must be int32");
-    }
 
     const auto& input = inputVar.tensor();
     const auto& target = targetVar.tensor();

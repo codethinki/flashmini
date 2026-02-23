@@ -35,20 +35,18 @@ TriFilterbank::TriFilterbank(
     float dwarp = (maxwarpfreq - minwarpfreq) / (numfilters + 1);
 
     std::vector<float> f(numFilters_ + 2);
-    for(int i = 0; i < (numFilters_ + 2); ++i) {
+    for(int i = 0; i < (numFilters_ + 2); ++i)
         f[i] = warpedToHertzScale(i * dwarp + minwarpfreq, freqScale_)
             * (filterLen_ - 1) * 2.0 / samplingFreq_;
-    }
 
     float minH = 0.0;
 
-    for(size_t i = 0; i < filterLen_; ++i) {
+    for(size_t i = 0; i < filterLen_; ++i)
         for(size_t j = 0; j < numFilters_; ++j) {
             float hislope = (i - f[j]) / (f[j + 1] - f[j]);
             float loslope = (f[j + 2] - i) / (f[j + 2] - f[j + 1]);
             H_[i * numFilters_ + j] = std::max(std::min(hislope, loslope), minH);
         }
-    }
 }
 
 std::vector<float> TriFilterbank::apply(

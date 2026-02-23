@@ -135,9 +135,8 @@ public:
 
     std::vector<Variable> forward(const std::vector<Variable>& inputs) override {
         auto inSz = inputs.size();
-        if(inSz < 1 || inSz > 3) {
+        if(inSz < 1 || inSz > 3)
             throw std::invalid_argument("Invalid inputs size");
-        }
         return rnn->forward(inputs);
     }
 
@@ -183,9 +182,8 @@ private:
 
 int main(int argc, char** argv) {
     fl::init();
-    if(argc != 2) {
+    if(argc != 2)
         throw std::runtime_error("You must pass a data directory.");
-    }
 
     std::string data_dir = argv[1];
 
@@ -235,9 +233,8 @@ int main(int argc, char** argv) {
 
         Variable output, h, c;
 
-        if(e >= anneal_after_epoch) {
+        if(e >= anneal_after_epoch)
             opt.setLr(opt.getLr() / 2);
-        }
 
         for(auto& example : trainset) {
             std::tie(output, h, c) = model(noGrad(example[kInputIdx]), h, c);
@@ -281,15 +278,13 @@ const std::string Preprocessor::eos = "<eos>";
 
 Preprocessor::Preprocessor(std::string dataset_path) {
     std::ifstream file(dataset_path);
-    if(!file.is_open()) {
+    if(!file.is_open())
         throw std::runtime_error("[Preprocessor::Preprocessor] Can't find file.");
-    }
     int v = 0;
     std::string word;
     while(file >> word) {
-        if(word_to_int.find(word) == word_to_int.end()) {
+        if(word_to_int.find(word) == word_to_int.end())
             word_to_int[word] = v++;
-        }
     }
     word_to_int[eos] = v;
 }
@@ -302,9 +297,8 @@ LMDataset::LMDataset(
 ) : time_steps(time_steps) {
     std::vector<int> words;
     std::ifstream file(dataset_path);
-    if(!file.is_open()) {
+    if(!file.is_open())
         throw std::runtime_error("[LMDataset::LMDataset] Can't find file.");
-    }
 
     std::string line;
     while(std::getline(file, line)) {

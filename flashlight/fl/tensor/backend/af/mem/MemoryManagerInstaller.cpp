@@ -33,20 +33,18 @@ MemoryManagerAdapter* MemoryManagerInstaller::getImpl(
 MemoryManagerInstaller::MemoryManagerInstaller(
     std::shared_ptr<MemoryManagerAdapter> managerImpl
 ) : impl_(managerImpl) {
-    if(!impl_) {
+    if(!impl_)
         throw std::invalid_argument(
             "MemoryManagerInstaller::MemoryManagerInstaller - "
             "passed MemoryManagerAdapter is null"
         );
-    }
 
     af_memory_manager itf = impl_->getHandle();
-    if(!impl_->getHandle()) {
+    if(!impl_->getHandle())
         throw std::invalid_argument(
             "MemoryManagerInstaller::MemoryManagerInstaller - "
             "passed MemoryManagerAdapter has null handle"
         );
-    }
 
     // Set appropriate function pointers for each class method
     auto initializeFn = [](af_memory_manager manager) {

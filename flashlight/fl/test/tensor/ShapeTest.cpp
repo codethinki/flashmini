@@ -24,9 +24,8 @@ TEST(ShapeTest, Basic) {
 }
 
 TEST(ShapeTest, ManyDims) {
-    if(Shape::kMaxDims <= 4) {
+    if(Shape::kMaxDims <= 4)
         GTEST_SKIP() << "Max shape dimensions is <= 4";
-    }
     auto many = Shape({1, 2, 3, 4, 5, 6, 7});
     ASSERT_EQ(many.ndim(), 7);
     ASSERT_EQ(many.dim(5), 6);

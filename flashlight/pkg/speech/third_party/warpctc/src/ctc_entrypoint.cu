@@ -57,9 +57,8 @@ ctcStatus_t compute_ctc_loss(
         || workspace == nullptr
         || alphabet_size <= 0
         || minibatch <= 0
-    ) {
+    )
         return CTC_STATUS_INVALID_VALUE;
-    }
 
     if(options.loc == CTC_CPU) {
         CpuCTC < float > ctc(
@@ -70,7 +69,7 @@ ctcStatus_t compute_ctc_loss(
             options.blank_label
         );
 
-        if(gradients != NULL) {
+        if(gradients != NULL)
             return ctc.cost_and_grad(
                 activations,
                 gradients,
@@ -79,7 +78,7 @@ ctcStatus_t compute_ctc_loss(
                 label_lengths,
                 input_lengths
             );
-        } else {
+        else
             return ctc.score_forward(
                 activations,
                 costs,
@@ -87,7 +86,6 @@ ctcStatus_t compute_ctc_loss(
                 label_lengths,
                 input_lengths
             );
-        }
     } else if(options.loc == CTC_GPU) {
 #ifdef __CUDACC__
         GpuCTC < float > ctc(
@@ -98,7 +96,7 @@ ctcStatus_t compute_ctc_loss(
             options.blank_label
         );
 
-        if(gradients != NULL) {
+        if(gradients != NULL)
             return ctc.cost_and_grad(
                 activations,
                 gradients,
@@ -107,7 +105,7 @@ ctcStatus_t compute_ctc_loss(
                 label_lengths,
                 input_lengths
             );
-        } else {
+        else
             return ctc.score_forward(
                 activations,
                 costs,
@@ -115,14 +113,13 @@ ctcStatus_t compute_ctc_loss(
                 label_lengths,
                 input_lengths
             );
-        }
+
 #else
         std::cerr << "GPU execution requested, but not compiled with GPU support" << std::endl;
         return CTC_STATUS_EXECUTION_FAILED;
 #endif
-    } else {
+    } else
         return CTC_STATUS_INVALID_VALUE;
-    }
 }
 
 
@@ -141,9 +138,8 @@ ctcStatus_t get_workspace_size(
         || size_bytes == nullptr
         || alphabet_size <= 0
         || minibatch <= 0
-    ) {
+    )
         return CTC_STATUS_INVALID_VALUE;
-    }
 
     // This is the max of all S and T for all examples in the minibatch.
     int maxL = *std::max_element(label_lengths, label_lengths + minibatch);

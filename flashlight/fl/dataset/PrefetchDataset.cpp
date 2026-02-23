@@ -22,15 +22,13 @@ PrefetchDataset::PrefetchDataset(
     numThreads_(numThreads),
     prefetchSize_(prefetchSize),
     curIdx_(-1) {
-    if(!dataset_) {
+    if(!dataset_)
         throw std::invalid_argument("dataset to be prefetched is null");
-    }
     if(
         !(numThreads_ > 0 && prefetchSize_ > 0)
         && !(numThreads_ == 0 && prefetchSize_ == 0)
-    ) {
+    )
         throw std::invalid_argument("invalid numThreads or prefetchSize");
-    }
     if(numThreads_ > 0) {
         auto deviceId = fl::getDevice();
         threadPool_ = std::make_unique<ThreadPool>(
@@ -42,9 +40,8 @@ PrefetchDataset::PrefetchDataset(
 std::vector<Tensor> PrefetchDataset::get(int64_t idx) const {
     checkIndexBounds(idx);
 
-    if(numThreads_ == 0) {
+    if(numThreads_ == 0)
         return dataset_->get(idx);
-    }
 
     // remove from cache (if necessary)
     while(!prefetchCache_.empty() && idx != curIdx_) {
@@ -55,9 +52,8 @@ std::vector<Tensor> PrefetchDataset::get(int64_t idx) const {
     // add to cache (if necessary)
     while(prefetchCache_.size() < prefetchSize_) {
         auto fetchIdx = idx + prefetchCache_.size();
-        if(fetchIdx >= size()) {
+        if(fetchIdx >= size())
             break;
-        }
         prefetchCache_.emplace(
             threadPool_->enqueue(
                 [this, fetchIdx]() { return this->dataset_->get(fetchIdx); })

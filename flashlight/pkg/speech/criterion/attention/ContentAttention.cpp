@@ -28,27 +28,24 @@ std::pair<Variable, Variable> ContentAttention::forwardBase(
     const Variable& xEncodedSizes
 ) {
     int dim = xEncoded.dim(0);
-    if(dim != (1 + ((keyValue_) ? 1 : 0)) * state.dim(0)) {
+    if(dim != (1 + ((keyValue_) ? 1 : 0)) * state.dim(0))
         throw std::invalid_argument(
             "ContentAttention: Invalid dimension for content attention"
         );
-    }
     auto keys = keyValue_ ? xEncoded(fl::range(0, dim / 2)) : xEncoded;
     auto values = keyValue_ ? xEncoded(fl::range(dim / 2, dim)) : xEncoded;
     // [targetlen, seqlen, batchsize]
     auto innerProd = matmulTN(state, keys) / std::sqrt(state.dim(0));
     if(!logAttnWeight.isEmpty()) {
-        if(logAttnWeight.shape() != innerProd.shape()) {
+        if(logAttnWeight.shape() != innerProd.shape())
             throw std::invalid_argument(
                 "ContentAttention: logAttnWeight has wong dimentions"
             );
-        }
         innerProd = innerProd + logAttnWeight;
     }
     Tensor padMask;
-    if(!xEncodedSizes.isEmpty()) {
+    if(!xEncodedSizes.isEmpty())
         innerProd = maskAttention(innerProd, xEncodedSizes);
-    }
     // [targetlen, seqlen, batchsize]
     auto attention = softmax(innerProd, 1);
     // [hiddendim, targetlen, batchsize]
@@ -96,17 +93,15 @@ std::pair<Variable, Variable> NeuralContentAttention::forwardBase(
     // [targetlen, seqlen, batchsize]
     auto nnOut = moddims(module(0)->forward({hidden}).front(), {U, T, B});
     if(!logAttnWeight.isEmpty()) {
-        if(logAttnWeight.shape() != nnOut.shape()) {
+        if(logAttnWeight.shape() != nnOut.shape())
             throw std::invalid_argument(
                 "ContentAttention: logAttnWeight has wong dimentions"
             );
-        }
         nnOut = nnOut + logAttnWeight;
     }
 
-    if(!xEncodedSizes.isEmpty()) {
+    if(!xEncodedSizes.isEmpty())
         nnOut = maskAttention(nnOut, xEncodedSizes);
-    }
     // [targetlen, seqlen, batchsize]
     auto attention = softmax(nnOut, 1);
     // [hiddendim, targetlen, batchsize]

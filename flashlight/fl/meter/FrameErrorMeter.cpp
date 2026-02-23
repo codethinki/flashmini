@@ -22,14 +22,12 @@ void FrameErrorMeter::reset() {
 }
 
 void FrameErrorMeter::add(const Tensor& output, const Tensor& target) {
-    if(output.shape() != target.shape()) {
+    if(output.shape() != target.shape())
         throw std::invalid_argument("dimension mismatch in FrameErrorMeter");
-    }
-    if(target.ndim() != 1) {
+    if(target.ndim() != 1)
         throw std::invalid_argument(
             "output/target must be 1-dimensional for FrameErrorMeter"
         );
-    }
 
     sum_ += fl::countNonzero(output != target).scalar<unsigned>();
     n_ += target.dim(0);

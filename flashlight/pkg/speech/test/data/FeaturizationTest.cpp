@@ -27,14 +27,11 @@ using namespace fl::pkg::speech;
 namespace {
 template<typename T>
 bool compareVec(std::vector<T> A, std::vector<T> B, float precision = 1E-5) {
-    if(A.size() != B.size()) {
+    if(A.size() != B.size())
         return false;
-    }
-    for(std::size_t i = 0; i < A.size(); ++i) {
-        if(std::abs(A[i] - B[i]) > precision) {
+    for(std::size_t i = 0; i < A.size(); ++i)
+        if(std::abs(A[i] - B[i]) > precision)
             return false;
-        }
-    }
     return true;
 }
 
@@ -126,7 +123,7 @@ TEST(FeaturizationTest, Transpose) {
 TEST(FeaturizationTest, localNormalize) {
     auto afNormalize = [](const Tensor& in, int64_t lw, int64_t rw) {
             auto out = in;
-            for(int64_t b = 0; b < in.dim(3); ++b) {
+            for(int64_t b = 0; b < in.dim(3); ++b)
                 for(int64_t i = 0; i < in.dim(0); ++i) {
                     int64_t b_idx = (i - lw > 0) ? (i - lw) : 0;
                     int64_t e_idx = (in.dim(0) - 1 > i + rw) ? (i + rw) : (in.dim(0) - 1);
@@ -136,11 +133,9 @@ TEST(FeaturizationTest, localNormalize) {
                     auto stddev = fl::std(slice).scalar<float>();
 
                     out(i, fl::span, fl::span, b) -= mean;
-                    if(stddev > 0.0) {
+                    if(stddev > 0.0)
                         out(i, fl::span, fl::span, b) /= stddev;
-                    }
                 }
-            }
             return out;
         };
     auto arr = fl::rand({47, 67, 2, 10}); // FRAMES X FEAT X CHANNELS X BATCHSIZE
@@ -195,9 +190,8 @@ TEST(FeaturizationTest, TargetTknTestStandaloneSep) {
     std::vector<std::string> resT = {
         "ab", "cd", "ef", "||", "ab", "cd", "||", "t", "r", "||"};
     ASSERT_EQ(res.size(), resT.size());
-    for(int index = 0; index < res.size(); index++) {
+    for(int index = 0; index < res.size(); index++)
         ASSERT_EQ(res[index], resT[index]);
-    }
 
     auto res2 = wrd2Target(
         words,
@@ -213,9 +207,8 @@ TEST(FeaturizationTest, TargetTknTestStandaloneSep) {
     std::vector<std::string> resT2 = {
         "ab", "cd", "ef", "||", "ab", "cd", "||", "||", "t", "r"};
     ASSERT_EQ(res2.size(), resT2.size());
-    for(int index = 0; index < res2.size(); index++) {
+    for(int index = 0; index < res2.size(); index++)
         ASSERT_EQ(res2[index], resT2[index]);
-    }
 }
 
 TEST(FeaturizationTest, TargetTknTestInsideSep) {
@@ -249,9 +242,8 @@ TEST(FeaturizationTest, TargetTknTestInsideSep) {
     std::vector<std::string> resT = {
         "_", "a", "f", "f", "_hel", "lo", "_ma", "ma", "_", "a", "f"};
     ASSERT_EQ(res.size(), resT.size());
-    for(int index = 0; index < res.size(); index++) {
+    for(int index = 0; index < res.size(); index++)
         ASSERT_EQ(res[index], resT[index]);
-    }
 
     auto res2 = wrd2Target(
         words,
@@ -267,9 +259,8 @@ TEST(FeaturizationTest, TargetTknTestInsideSep) {
     std::vector<std::string> resT2 = {
         "a", "f", "f", "_", "_hel", "lo", "_ma", "ma", "_", "a", "f"};
     ASSERT_EQ(res.size(), resT2.size());
-    for(int index = 0; index < res2.size(); index++) {
+    for(int index = 0; index < res2.size(); index++)
         ASSERT_EQ(res2[index], resT2[index]);
-    }
 }
 
 TEST(FeaturizationTest, WrdToTarget) {
@@ -289,15 +280,11 @@ TEST(FeaturizationTest, WrdToTarget) {
     lexicon[kUnkToken] = {};
 
     Dictionary dict;
-    for(const auto& l : lexicon) {
-        for(const auto& p : l.second) {
-            for(const auto& c : p) {
-                if(!dict.contains(c)) {
+    for(const auto& l : lexicon)
+        for(const auto& p : l.second)
+            for(const auto& c : p)
+                if(!dict.contains(c))
                     dict.addEntry(c);
-                }
-            }
-        }
-    }
 
     // NOTE: word separator has no effect when fallback2Ltr is false
     std::vector<std::string> words = {"123", "456"};
@@ -349,9 +336,8 @@ TEST(FeaturizationTest, TargetToSingleLtr) {
     bool usewordpiece = true;
 
     Dictionary dict;
-    for(int i = 0; i < 10; ++i) {
+    for(int i = 0; i < 10; ++i)
         dict.addEntry(std::to_string(i), i);
-    }
     dict.addEntry("_", 10);
     dict.addEntry("23_", 230);
     dict.addEntry("456_", 4560);
@@ -388,10 +374,9 @@ TEST(FeaturizationTest, inputFeaturizer) {
         inputFeatures(featParams, FeatureType::MFSC, {-1, -1}, {});
     for(int size = 1; size < 10; ++size) {
         std::vector<float> input(size * samplerate * channels);
-        for(int j = 0; j < input.size(); ++j) {
+        for(int j = 0; j < input.size(); ++j)
             // channel 1 is same as channel 2
             input[j] = std::sin(2 * M_PI * (j / 2) / samplerate);
-        }
 
         int insize = size * samplerate;
         auto inArray =

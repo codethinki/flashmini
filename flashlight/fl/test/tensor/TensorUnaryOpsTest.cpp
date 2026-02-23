@@ -100,16 +100,12 @@ TEST(TensorUnaryOpsTest, sign) {
 TEST(TensorUnaryOpsTest, tril) {
     auto checkSquareTril =
         [](const Dim dim, const Tensor& res, const Tensor& in) {
-            for(int i = 0; i < dim; ++i) {
-                for(int j = i + 1; j < dim; ++j) {
+            for(int i = 0; i < dim; ++i)
+                for(int j = i + 1; j < dim; ++j)
                     ASSERT_EQ(res(i, j).scalar<float>(), 0.);
-                }
-            }
-            for(int i = 0; i < dim; ++i) {
-                for(int j = 0; j < i; ++j) {
+            for(int i = 0; i < dim; ++i)
+                for(int j = 0; j < i; ++j)
                     ASSERT_TRUE(allClose(res(i, j), in(i, j)));
-                }
-            }
         };
     Dim dim = 10;
     auto t = fl::rand({dim, dim});
@@ -121,28 +117,23 @@ TEST(TensorUnaryOpsTest, tril) {
     Dim dim2 = 3;
     auto t2 = fl::rand({dim2, dim2, dim2});
     auto out2 = fl::tril(t2);
-    for(unsigned i = 0; i < dim2; ++i) {
+    for(unsigned i = 0; i < dim2; ++i)
         checkSquareTril(
             dim2,
             out2(fl::span, fl::span, i),
             t2(fl::span, fl::span, i)
         );
-    }
 }
 
 TEST(TensorUnaryOpsTest, triu) {
     auto checkSquareTriu =
         [](const Dim dim, const Tensor& res, const Tensor& in) {
-            for(unsigned i = 0; i < dim; ++i) {
-                for(unsigned j = i + 1; j < dim; ++j) {
+            for(unsigned i = 0; i < dim; ++i)
+                for(unsigned j = i + 1; j < dim; ++j)
                     ASSERT_TRUE(allClose(res(i, j), in(i, j)));
-                }
-            }
-            for(unsigned i = 0; i < dim; ++i) {
-                for(unsigned j = 0; j < i; ++j) {
+            for(unsigned i = 0; i < dim; ++i)
+                for(unsigned j = 0; j < i; ++j)
                     ASSERT_EQ(res(i, j).scalar<float>(), 0.);
-                }
-            }
         };
 
     int dim = 10;
@@ -155,13 +146,12 @@ TEST(TensorUnaryOpsTest, triu) {
     int dim2 = 3;
     auto t2 = fl::rand({dim2, dim2, dim2});
     auto out2 = fl::triu(t2);
-    for(int i = 0; i < dim2; ++i) {
+    for(int i = 0; i < dim2; ++i)
         checkSquareTriu(
             dim2,
             out2(fl::span, fl::span, i),
             t2(fl::span, fl::span, i)
         );
-    }
 }
 
 TEST(TensorUnaryOpsTest, floor) {

@@ -101,9 +101,8 @@ Tensor colorEnhance(const Tensor& input, const float enhance) {
 Tensor autoContrast(const Tensor& input) {
     auto minPic = fl::amin(input);
     auto maxPic = fl::amax(input);
-    if(fl::all(minPic == maxPic).asScalar<bool>()) {
+    if(fl::all(minPic == maxPic).asScalar<bool>())
         return input;
-    }
 
     auto scale = fl::tile(255. / (maxPic - minPic), input.shape());
     minPic = fl::tile(minPic, input.shape());
@@ -150,9 +149,8 @@ Tensor equalize(const Tensor& input) {
 }
 
 Tensor posterize(const Tensor& input, const int bitsToKeep) {
-    if(bitsToKeep < 1 || bitsToKeep > 8) {
+    if(bitsToKeep < 1 || bitsToKeep > 8)
         throw std::invalid_argument("bitsToKeep needs to be in [1, 8]");
-    }
     uint8_t mask = ~((1 << (8 - bitsToKeep)) - 1);
     auto res = input.astype(fl::dtype::u8) && mask;
     return res.astype(input.type());
@@ -212,9 +210,8 @@ std::pair<Tensor, Tensor> mixupBatch(
     // in : W x H x C x B
     // target: B x 1
     auto targetOneHot = oneHot(target, numClasses, labelSmoothing);
-    if(lambda == 0) {
+    if(lambda == 0)
         return {input, targetOneHot};
-    }
 
     // mix input
     auto inputFlipped = fl::flip(input, 3);
@@ -239,9 +236,8 @@ std::pair<Tensor, Tensor> cutmixBatch(
     // in : W x H x C x B
     // target: B x 1
     auto targetOneHot = oneHot(target, numClasses, labelSmoothing);
-    if(lambda == 0) {
+    if(lambda == 0)
         return {input, targetOneHot};
-    }
 
     // mix input
     auto inputFlipped = fl::flip(input, 3);
@@ -280,9 +276,8 @@ ImageTransform resizeTransform(const uint64_t resize) {
 ImageTransform compose(std::vector<ImageTransform> transformfns) {
     return [transformfns](const Tensor& in) {
                Tensor out = in;
-               for(const auto& fn : transformfns) {
+               for(const auto& fn : transformfns)
                    out = fn(out);
-               }
                return out;
     };
 }
@@ -348,11 +343,10 @@ ImageTransform randomCropTransform(const int tw, const int th) {
                Tensor out = in;
                const uint64_t w = in.dim(0);
                const uint64_t h = in.dim(1);
-               if(th > h || tw > w) {
+               if(th > h || tw > w)
                    throw std::runtime_error(
                        "Target th and target width are great the image size"
                    );
-               }
                const int x = std::rand() % (w - tw + 1);
                const int y = std::rand() % (h - th + 1);
                return crop(in, x, y, tw, th);
@@ -383,9 +377,8 @@ ImageTransform randomEraseTransform(
     // follows: https://git.io/JY9R7
     return [p, areaRatioMin, areaRatioMax, edgeRatioMin, edgeRatioMax](
         const Tensor& in) {
-               if(p < randomFloat(0, 1)) {
+               if(p < randomFloat(0, 1))
                    return in;
-               }
 
                const float epsilon = 1e-7;
                const int w = in.dim(0);
@@ -399,9 +392,8 @@ ImageTransform randomEraseTransform(
                        std::exp(randomFloat(std::log(edgeRatioMin), std::log(edgeRatioMax)));
                    const int maskW = std::round(std::sqrt(s * r));
                    const int maskH = std::round(std::sqrt(s / r));
-                   if(maskW >= w || maskH >= h) {
+                   if(maskW >= w || maskH >= h)
                        continue;
-                   }
 
                    const int x = static_cast<int>(randomFloat(0, w - maskW - epsilon));
                    const int y = static_cast<int>(randomFloat(0, h - maskH - epsilon));
@@ -425,9 +417,8 @@ ImageTransform randomAugmentationDeitTransform(
     return [p, n, fillImg](const Tensor& in) {
                auto res = in;
                for(int i = 0; i < n; i++) {
-                   if(p < randomFloat(0, 1)) {
+                   if(p < randomFloat(0, 1))
                        continue;
-                   }
 
                    int mode = std::floor(randomFloat(0, 15 - 1e-5));
                    if(mode == 0) {
@@ -467,10 +458,10 @@ ImageTransform randomAugmentationDeitTransform(
                            1 + randomPerturbNegate<float>(baseEnhance, -0.03, 0.03);
 
                        res = colorEnhance(res, enhance);
-                   } else if(mode == 6) {
+                   } else if(mode == 6)
                        // auto contrast
                        res = autoContrast(res);
-                   } else if(mode == 7) {
+                   else if(mode == 7) {
                        // contrast
                        float baseEnhance = .8;
                        float enhance =
@@ -484,22 +475,22 @@ ImageTransform randomAugmentationDeitTransform(
                            1 + randomPerturbNegate<float>(baseEnhance, -0.03, 0.03);
 
                        res = brightnessEnhance(res, enhance);
-                   } else if(mode == 9) {
+                   } else if(mode == 9)
                        // invert
                        res = invert(res);
-                   } else if(mode == 10) {
+                   else if(mode == 10)
                        // solarize
                        res = solarize(res, 26.);
-                   } else if(mode == 11) {
+                   else if(mode == 11)
                        // solarize add
                        res = solarizeAdd(res, 128., 100.);
-                   } else if(mode == 12) {
+                   else if(mode == 12)
                        // equalize
                        res = equalize(res);
-                   } else if(mode == 13) {
+                   else if(mode == 13)
                        // posterize
                        res = posterize(res, 1);
-                   } else if(mode == 14) {
+                   else if(mode == 14) {
                        // sharpness
                        float baseEnhance = .5;
                        float enhance = randomPerturbNegate<float>(baseEnhance, -0.01, 0.01);

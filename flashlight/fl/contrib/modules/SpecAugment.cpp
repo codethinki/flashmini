@@ -29,28 +29,23 @@ SpecAugment::SpecAugment(
     timeMaskP_(tMaskP),
     numTimeMask_(nTMask),
     maskStrategy_(mStrategy) {
-    if(numFreqMask_ > 0 && freqMaskF_ <= 0) {
+    if(numFreqMask_ > 0 && freqMaskF_ <= 0)
         throw std::invalid_argument("invalid arguments for frequency masking.");
-    }
-    if(numTimeMask_ > 0 && timeMaskT_ <= 0) {
+    if(numTimeMask_ > 0 && timeMaskT_ <= 0)
         throw std::invalid_argument("invalid arguments for time masking.");
-    }
-    if(numTimeMask_ > 0 && (timeMaskP_ <= 0 || timeMaskP_ > 1.0)) {
+    if(numTimeMask_ > 0 && (timeMaskP_ <= 0 || timeMaskP_ > 1.0))
         throw std::invalid_argument("invalid arguments for time masking.");
-    }
 }
 
 Variable SpecAugment::forward(const Variable& input) {
-    if(input.isCalcGrad()) {
+    if(input.isCalcGrad())
         throw std::invalid_argument(
             "input gradient calculation is not supported for SpecAugment."
         );
-    }
 
     auto output = Variable(input.tensor(), false);
-    if(!train_) {
+    if(!train_)
         return output;
-    }
 
     auto& opArr = output.tensor();
 
@@ -59,9 +54,8 @@ Variable SpecAugment::forward(const Variable& input) {
         : 0.0;
 
     auto numFreqChans = input.dim(1); // number of frequency channels
-    if(numFreqChans < freqMaskF_) {
+    if(numFreqChans < freqMaskF_)
         throw std::runtime_error("Invalid input frequency channels");
-    }
     for(int i = 0; i < numFreqMask_; ++i) {
         auto f = generateRandomInt(0, freqMaskF_);
         auto f0 = generateRandomInt(0, numFreqChans - f);
@@ -71,13 +65,12 @@ Variable SpecAugment::forward(const Variable& input) {
     auto numTimeSteps = input.dim(0); // number of time steps
     // an upper bound on the time mask
     int T = std::min(timeMaskT_, static_cast<int>(numTimeSteps * timeMaskP_));
-    if(T > 0) {
+    if(T > 0)
         for(int i = 0; i < numTimeMask_; ++i) {
             auto t = generateRandomInt(0, T);
             auto t0 = generateRandomInt(0, numTimeSteps - t);
             opArr(fl::range(t0, t0 + t + 1)) = replaceVal;
         }
-    }
 
     return output;
 }

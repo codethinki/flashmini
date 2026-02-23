@@ -38,18 +38,16 @@ AdditiveNoise::AdditiveNoise(
 ) : conf_(config),
     rng_(seed) {
     std::ifstream listFile(conf_.listFilePath_);
-    if(!listFile) {
+    if(!listFile)
         throw std::runtime_error(
             "AdditiveNoise failed to open listFilePath_=" + conf_.listFilePath_
         );
-    }
     while(!listFile.eof()) {
         try {
             std::string filename;
             std::getline(listFile, filename);
-            if(!filename.empty()) {
+            if(!filename.empty())
                 noiseFiles_.push_back(filename);
-            }
         } catch(std::exception& ex) {
             throw std::runtime_error(
                 "AdditiveNoise failed to read listFilePath_=" + conf_.listFilePath_
@@ -60,15 +58,13 @@ AdditiveNoise::AdditiveNoise(
 }
 
 void AdditiveNoise::apply(std::vector<float>& signal) {
-    if(rng_.random() >= conf_.proba_) {
+    if(rng_.random() >= conf_.proba_)
         return;
-    }
     const float signalRms = rootMeanSquare(signal);
     const float snr = rng_.uniform(conf_.minSnr_, conf_.maxSnr_);
     const int nClips = rng_.randInt(conf_.nClipsMin_, conf_.nClipsMax_);
-    if(nClips == 0) {
+    if(nClips == 0)
         return;
-    }
     int augStart = rng_.randInt(0, signal.size() - 1);
     // overflow implies we start at the beginning again.
     int augEnd = augStart + conf_.ratio_ * signal.size();
@@ -78,23 +74,20 @@ void AdditiveNoise::apply(std::vector<float>& signal) {
         auto curNoiseFileIdx = rng_.randInt(0, noiseFiles_.size() - 1);
         auto curNoise = loadSound<float>(noiseFiles_[curNoiseFileIdx]);
         int shift = rng_.randInt(0, curNoise.size() - 1);
-        for(int j = augStart; j < augEnd; ++j) {
+        for(int j = augStart; j < augEnd; ++j)
             mixedNoise[j % mixedNoise.size()] +=
                 curNoise[(shift + j) % curNoise.size()];
-        }
     }
 
     const float noiseRms = rootMeanSquare(mixedNoise);
     if(noiseRms > 0) {
         // https://en.wikipedia.org/wiki/Signal-to-noise_ratio
         const float noiseMult = (signalRms / (noiseRms * std::pow(10, snr / 20.0)));
-        for(int i = 0; i < signal.size(); ++i) {
+        for(int i = 0; i < signal.size(); ++i)
             signal[i] += mixedNoise[i] * noiseMult;
-        }
-    } else {
+    } else
         FL_LOG(fl::LogLevel::WARNING)
         << "AdditiveNoise::apply() invalid noiseRms=" << noiseRms;
-    }
 }
 
 } // namespace fl

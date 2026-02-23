@@ -67,10 +67,9 @@ fl::Variable transformerMultiheadAttention(
 
     auto scores = matmulTN(q, k);
 
-    if(!keyPaddingMask.isEmpty()) {
+    if(!keyPaddingMask.isEmpty())
         scores = scores
             + tileAs(moddims(log(keyPaddingMask), {1, srcLen, 1, bsz}), scores);
-    }
 
     auto attn = dropout(softmax(scores, 1), pDropout);
     auto result = matmulNT(attn.astype(v.type()), v);
@@ -251,9 +250,8 @@ Variable TransformerBaseLayer::withPosEmbed(
     const Variable& input,
     const Variable& pos
 ) {
-    if(pos.isEmpty()) {
+    if(pos.isEmpty())
         return input;
-    }
     return input + pos;
 }
 
@@ -395,9 +393,8 @@ Variable TransformerDecoderLayer::withPosEmbed(
     const Variable& input,
     const Variable& pos
 ) {
-    if(pos.isEmpty()) {
+    if(pos.isEmpty())
         return input;
-    }
     return input + pos;
 }
 
@@ -456,9 +453,8 @@ TransformerDecoder::TransformerDecoder(
     float pDropout
 ) {
     // TODO add norm
-    for(int i = 0; i < layers; i++) {
+    for(int i = 0; i < layers; i++)
         add(TransformerDecoderLayer(modelDim, mlpDim, nHeads, pDropout));
-    }
     add(LayerNorm(std::vector<int>{0}, 1e-5, true, modelDim));
 }
 
@@ -497,9 +493,8 @@ TransformerEncoder::TransformerEncoder(
     int32_t layers,
     float pDropout
 ) {
-    for(int i = 0; i < layers; i++) {
+    for(int i = 0; i < layers; i++)
         add(TransformerEncoderLayer(modelDim, mlpDim, nHeads, pDropout));
-    }
 }
 
 std::vector<Variable> TransformerEncoder::forward(
@@ -507,9 +502,8 @@ std::vector<Variable> TransformerEncoder::forward(
 ) {
     std::vector<Variable> output = input;
     auto mods = modules();
-    for(int i = 0; i < mods.size(); i++) {
+    for(int i = 0; i < mods.size(); i++)
         output = mods[i]->forward(output);
-    }
     return output;
 }
 
@@ -577,12 +571,11 @@ std::vector<Variable> Transformer::forward(
     Variable queryEmbed,
     Variable posEmbed
 ) {
-    if(src.ndim() != 4) {
+    if(src.ndim() != 4)
         throw std::invalid_argument(
             "vision::Transformer::forward - "
             "expect src to be of shape (W, H, C, B)."
         );
-    }
     assert(src.dim(2) == queryEmbed.dim(0));
 
     int B = src.dim(3);

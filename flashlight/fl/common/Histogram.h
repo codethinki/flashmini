@@ -82,14 +82,11 @@ struct HistogramStats {
 
 template<typename T>
 bool isAdditionSafe(T a, T b) {
-    if(a > (std::numeric_limits<T>::max() - b)) {
+    if(a > (std::numeric_limits<T>::max() - b))
         return false;
-    }
-    if(std::is_signed<T>::value) {
-        if(a < 0 && b < 0 && (a < (std::numeric_limits<T>::min() - b))) {
+    if(std::is_signed<T>::value)
+        if(a < 0 && b < 0 && (a < (std::numeric_limits<T>::min() - b)))
             return false;
-        }
-    }
     return true;
 }
 
@@ -110,17 +107,15 @@ HistogramStats<T> FixedBucketSizeHistogram(
     T clipMinValueInclusive = std::numeric_limits<T>::min(),
     T clipMaxValueExclusive = std::numeric_limits<T>::max()
 ) {
-    if(!nBuckets) {
+    if(!nBuckets)
         throw std::invalid_argument(
             "FixedBucketSizeHistogram(nBuckets=0) nBuckets "
             "must be a positive integer"
         );
-    }
 
     HistogramStats<T> stats;
-    if(begin == end) {
+    if(begin == end)
         return stats;
-    }
 
     stats.min = std::numeric_limits<T>::max();
     stats.max = std::numeric_limits<T>::min();
@@ -129,15 +124,13 @@ HistogramStats<T> FixedBucketSizeHistogram(
     // Calculate min/max, sum, ands mean
     double simpleMovingAverage = 0.0;
     for(auto itr = begin; itr != end; ++itr) {
-        if((*itr < clipMinValueInclusive) || (*itr >= clipMaxValueExclusive)) {
+        if((*itr < clipMinValueInclusive) || (*itr >= clipMaxValueExclusive))
             continue;
-        }
         if(!stats.sumOverflow) {
-            if(isAdditionSafe(stats.sum, *itr)) {
+            if(isAdditionSafe(stats.sum, *itr))
                 stats.sum += *itr;
-            } else {
+            else
                 stats.sumOverflow = true;
-            }
         }
 
         stats.min = std::min(stats.min, *itr);
@@ -161,9 +154,8 @@ HistogramStats<T> FixedBucketSizeHistogram(
     // Calculate count per bucket
     stats.maxNumValuesPerBucket = 0;
     for(auto itr = begin; itr != end; ++itr) {
-        if(*itr < clipMinValueInclusive || *itr >= clipMaxValueExclusive) {
+        if(*itr < clipMinValueInclusive || *itr >= clipMaxValueExclusive)
             continue;
-        }
         double index =
             std::floor(static_cast<double>(*itr - stats.min) / bucketWidth);
         size_t intIndex = std::min(static_cast<size_t>(index), nBuckets - 1);
@@ -203,9 +195,8 @@ std::string HistogramBucket<T>::prettyString(
     fromatCountIntoStream(ss, count);
     ss << ": ";
     const double numTicks = static_cast<double>(count) / countPerTick;
-    for(int i = 0; i < std::round(numTicks); ++i) {
+    for(int i = 0; i < std::round(numTicks); ++i)
         ss << "*";
-    }
     return ss.str();
 };
 
@@ -222,11 +213,10 @@ std::string HistogramStats<T>::prettyString(
     ss << "] max_=[";
     fromatValuesIntoStream(ss, max);
     ss << "] sum=[";
-    if(sumOverflow) {
+    if(sumOverflow)
         ss << "overflow";
-    } else {
+    else
         fromatCountIntoStream(ss, sum);
-    }
     ss << "] mean=[";
     fromatValuesIntoStream(ss, mean);
     ss << "] numValues=[";

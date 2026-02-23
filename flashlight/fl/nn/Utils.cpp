@@ -18,9 +18,8 @@ namespace fl {
 
 int64_t numTotalParams(std::shared_ptr<fl::Module> module) {
     int64_t params = 0;
-    for(auto& p : module->params()) {
+    for(auto& p : module->params())
         params += p.elements();
-    }
     return params;
 }
 
@@ -29,16 +28,13 @@ bool allParamsClose(
     const Module& b,
     double absTolerance /* = 1e-5 */
 ) {
-    if(a.params().size() != b.params().size()) {
+    if(a.params().size() != b.params().size())
         return false;
-    }
     const auto aParams = a.params();
     const auto bParams = b.params();
-    for(int p = 0; p < aParams.size(); ++p) {
-        if(!allClose(aParams[p], bParams[p], absTolerance)) {
+    for(int p = 0; p < aParams.size(); ++p)
+        if(!allClose(aParams[p], bParams[p], absTolerance))
             return false;
-        }
-    }
     return true;
 }
 
@@ -89,11 +85,10 @@ namespace detail {
 int derivePadding(int inSz, int filterSz, int stride, int pad, int dilation) {
     if(pad == static_cast<int>(PaddingMode::SAME)) {
         int newPad;
-        if(inSz % stride == 0) {
+        if(inSz % stride == 0)
             newPad = (filterSz - 1) * dilation - stride + 1;
-        } else {
+        else
             newPad = (filterSz - 1) * dilation - (inSz % stride) + 1;
-        }
         newPad = (newPad + 1) / 2; // equal pad on both sides
         return std::max(newPad, 0);
     }
@@ -106,16 +101,13 @@ Tensor join(
     double padValue /* = 0.0 */,
     int batchDim /* = -1 */
 ) {
-    if(inputs.empty()) {
+    if(inputs.empty())
         return Tensor();
-    }
 
     Dim maxNumDims = 0;
-    for(const auto& in : inputs) {
-        if(in.ndim() > maxNumDims) {
+    for(const auto& in : inputs)
+        if(in.ndim() > maxNumDims)
             maxNumDims = in.ndim();
-        }
-    }
 
     // If the batch dim > the max number of dims, make those dims singleton
     int outNdims = std::max(batchDim + 1, static_cast<int>(maxNumDims));
@@ -128,37 +120,31 @@ Tensor join(
         isEmpty = isEmpty && in.isEmpty();
         for(int d = 0; d < in.ndim(); ++d) {
             maxDims[d] = std::max(maxDims[d], in.dim(d));
-            if(in.type() != type) {
+            if(in.type() != type)
                 throw std::invalid_argument(
                     "join: all arrays should of same type for join"
                 );
-            }
         }
     }
 
-    if(batchDim < 0) {
+    if(batchDim < 0)
         batchDim = maxDims.ndim() - 1;
-    }
-    if(batchDim < maxDims.ndim() && maxDims[batchDim] > 1) {
+    if(batchDim < maxDims.ndim() && maxDims[batchDim] > 1)
         throw std::invalid_argument(
             "join: no singleton dim available for batching"
         );
-    }
     maxDims[batchDim] = inputs.size();
-    if(isEmpty) {
+    if(isEmpty)
         return Tensor(maxDims, type);
-    }
     auto padSeq = fl::full(maxDims, padValue, type);
     std::vector<fl::Index> sel(
         std::max(maxNumDims, static_cast<long long>(batchDim + 1)), fl::span);
     for(int i = 0; i < inputs.size(); ++i) {
-        for(int d = 0; d < maxNumDims; ++d) {
+        for(int d = 0; d < maxNumDims; ++d)
             sel[d] = fl::range(inputs[i].dim(d));
-        }
         sel[batchDim] = fl::range(i, i + 1);
-        if(!inputs[i].isEmpty()) {
+        if(!inputs[i].isEmpty())
             padSeq(sel) = inputs[i];
-        }
     }
     return padSeq;
 }

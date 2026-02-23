@@ -42,19 +42,16 @@ bool backwardWithScaling(
     std::shared_ptr<fl::Reducer> reducer
 ) {
     auto scaledLoss = loss;
-    if(dynamicScaler) {
+    if(dynamicScaler)
         scaledLoss = dynamicScaler->scale(loss);
-    }
 
     scaledLoss.backward();
-    if(reducer) {
+    if(reducer)
         reducer->finalize();
-    }
 
     if(dynamicScaler) {
-        if(!dynamicScaler->unscale(params)) {
+        if(!dynamicScaler->unscale(params))
             return false;
-        }
         dynamicScaler->update();
     }
 

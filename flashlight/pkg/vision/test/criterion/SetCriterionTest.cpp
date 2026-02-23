@@ -21,12 +21,11 @@ std::unordered_map<std::string, float> getLossWeights() {
         {"lossCe", 1.f}, {"lossGiou", 1.f}, {"lossBbox", 1.f}};
 
     std::unordered_map<std::string, float> lossWeights;
-    for(int i = 0; i < 6; i++) {
+    for(int i = 0; i < 6; i++)
         for(const auto& l : lossWeightsBase) {
             std::string key = l.first + "_" + std::to_string(i);
             lossWeights[key] = l.second;
         }
-    }
     return lossWeights;
 }
 

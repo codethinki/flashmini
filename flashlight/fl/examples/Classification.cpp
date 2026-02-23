@@ -49,9 +49,8 @@ int main(int /* unused */, const char** /* unused */) {
     const Tensor& out_ = label;
     fl::Timer s;
     for(int i = 0; i < nepochs; i++) {
-        if(i == warmup_epochs) {
+        if(i == warmup_epochs)
             s = fl::Timer::start();
-        }
 
         /* Forward propagation */
         result = model(input(in_));

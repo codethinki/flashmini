@@ -53,17 +53,15 @@ namespace detail {
 
         // Pre- and post-incrementable.
         DatasetIterator& operator++() {
-            if(++idx_ >= dataset_->size()) {
+            if(++idx_ >= dataset_->size())
                 idx_ = -1;
-            }
             return *this;
         }
 
         DatasetIterator operator++(int) {
             DatasetIterator tmp(*this);
-            if(++idx_ >= dataset_->size()) {
+            if(++idx_ >= dataset_->size())
                 idx_ = -1;
-            }
             return tmp;
         }
 

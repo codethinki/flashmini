@@ -107,13 +107,11 @@ Variable Variable::astype(fl::dtype newType) const {
 }
 
 Variable& Variable::grad() const {
-    if(!sharedGrad_->calcGrad) {
+    if(!sharedGrad_->calcGrad)
         throw std::logic_error("gradient calculation disabled for this Variable");
-    }
 
-    if(!sharedGrad_->grad) {
+    if(!sharedGrad_->grad)
         throw std::logic_error("gradient not calculated yet for this Variable");
-    }
 
     return *sharedGrad_->grad;
 }
@@ -127,9 +125,8 @@ bool Variable::isCalcGrad() const {
 }
 
 bool Variable::isGradAvailable() const {
-    if(!sharedGrad_->calcGrad) {
+    if(!sharedGrad_->calcGrad)
         return false;
-    }
     return sharedGrad_->grad != nullptr;
 }
 
@@ -146,9 +143,8 @@ bool Variable::isContiguous() const {
 }
 
 Variable Variable::asContiguous() const {
-    if(!isEmpty() && !isContiguous()) {
+    if(!isEmpty() && !isContiguous())
         tensor() = tensor().asContiguousTensor();
-    }
     return *this;
 }
 
@@ -209,7 +205,7 @@ void Variable::addGrad(const Variable& childGrad) {
             << childGrad.shape() << std::endl;
             throw std::invalid_argument(ss.str());
         }
-        if(sharedGrad_->grad) {
+        if(sharedGrad_->grad)
             // Prevent increment of array refcount to avoid a copy
             // if getting a device pointer. See
             // https://git.io/fp9oM for more
@@ -217,12 +213,11 @@ void Variable::addGrad(const Variable& childGrad) {
                 sharedGrad_->grad->tensor() + childGrad.tensor(),
                 false
             );
-        } else {
+        else
             // Copy the childGrad Variable so as to share a reference
             // to the underlying childGrad.tensor() rather than copying
             // the tensor into a new variable
             sharedGrad_->grad = std::make_unique<Variable>(childGrad);
-        }
     }
 }
 
@@ -243,15 +238,13 @@ void Variable::applyGradHook() {
 
 void Variable::calcGradInputs(bool retainGraph) {
     if(sharedGrad_->gradFunc) {
-        if(!sharedGrad_->grad) {
+        if(!sharedGrad_->grad)
             throw std::logic_error("gradient was not propagated to this Variable");
-        }
 
         sharedGrad_->gradFunc(sharedGrad_->inputs, *sharedGrad_->grad);
     }
-    if(!retainGraph) {
+    if(!retainGraph)
         sharedGrad_->inputs.clear();
-    }
 }
 
 void Variable::backward(const Variable& grad, bool retainGraph) {
@@ -260,9 +253,8 @@ void Variable::backward(const Variable& grad, bool retainGraph) {
     for(auto iter = dag.rbegin(); iter != dag.rend(); iter++) {
         iter->calcGradInputs(retainGraph);
         iter->applyGradHook();
-        if(!retainGraph) {
+        if(!retainGraph)
             *iter = Variable();
-        }
     }
 }
 
@@ -288,12 +280,10 @@ Variable::DAG Variable::build() const {
     // Topological sort
     recurse = [&](const Variable& var) {
             auto id = var.sharedGrad_.get();
-            if(cache.find(id) != cache.end()) {
+            if(cache.find(id) != cache.end())
                 return;
-            }
-            for(const auto& input : var.getInputs()) {
+            for(const auto& input : var.getInputs())
                 recurse(input);
-            }
             cache.insert(id);
             dag.push_back(var);
         };

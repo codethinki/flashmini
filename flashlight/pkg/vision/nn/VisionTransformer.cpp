@@ -139,9 +139,8 @@ Variable VisionTransformer::selfAttention(const Variable& x) {
 }
 
 Variable VisionTransformer::dropPath(const Variable& x) {
-    if(!train_) {
+    if(!train_)
         return x;
-    }
 
     // https://git.io/JYOkq
     int C = x.dim(0);
@@ -159,19 +158,17 @@ Variable VisionTransformer::dropPath(const Variable& x) {
 std::vector<Variable> VisionTransformer::forward(
     const std::vector<Variable>& inputs
 ) {
-    if(inputs.size() != 1) {
+    if(inputs.size() != 1)
         throw std::runtime_error("VisionTransformer forward, !1 input Variables");
-    }
 
     auto x = inputs.front();
 
-    if(x.ndim() != 3) {
+    if(x.ndim() != 3)
         throw std::invalid_argument(
             "VisionTransformer::forward - "
             "expected input with 3 dimensions - got input with "
             + std::to_string(x.ndim())
         );
-    }
 
     x = x + dropPath(selfAttention((*norm1_)(x)));
     x = x + dropPath(mlp((*norm2_)(x)));

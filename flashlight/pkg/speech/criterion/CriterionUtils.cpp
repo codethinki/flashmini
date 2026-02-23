@@ -18,11 +18,9 @@ namespace fl::pkg::speech {
 
 int countRepeats(const int* labels, int len) {
     int r = 0;
-    for(int i = 1; i < len; ++i) {
-        if(labels[i] == labels[i - 1]) {
+    for(int i = 1; i < len; ++i)
+        if(labels[i] == labels[i - 1])
             ++r;
-        }
-    }
     return r;
 }
 
@@ -37,17 +35,16 @@ CriterionScaleMode getCriterionScaleMode(
     const std::string& onorm,
     bool sqnorm
 ) {
-    if(onorm == "none") {
+    if(onorm == "none")
         return CriterionScaleMode::NONE;
-    } else if(onorm == "input") {
+    else if(onorm == "input")
         return sqnorm ? CriterionScaleMode::INPUT_SZ_SQRT
                : CriterionScaleMode::INPUT_SZ;
-    } else if(onorm == "target") {
+    else if(onorm == "target")
         return sqnorm ? CriterionScaleMode::TARGET_SZ_SQRT
                : CriterionScaleMode::TARGET_SZ;
-    } else {
+    else
         throw std::invalid_argument("invalid onorm option");
-    }
 }
 
 Variable getLinearTarget(const Variable& targetVar, int T) {
@@ -63,14 +60,12 @@ Variable getLinearTarget(const Variable& targetVar, int T) {
         auto pNewTarget = newTarget.data() + b * T;
 
         int targetSize = std::min(T, fl::pkg::speech::getTargetSize(pTarget, L));
-        if(targetSize == 0) {
+        if(targetSize == 0)
             // hacky way to make ASG think L == 0.
             std::fill(pNewTarget, pNewTarget + T, -1);
-        } else {
-            for(int t = 0; t < T; ++t) {
+        else
+            for(int t = 0; t < T; ++t)
                 pNewTarget[t] = pTarget[t * targetSize / T];
-            }
-        }
     }
     return Variable(Tensor::fromVector({T, B}, newTarget), false);
 }
@@ -80,11 +75,10 @@ fl::Variable applySeq2SeqMask(
     const Tensor& targetClasses,
     int padValue
 ) {
-    if(input.shape() != targetClasses.shape()) {
+    if(input.shape() != targetClasses.shape())
         throw std::runtime_error(
             "applySeq2SeqMask: input and mask should have the same dimentions."
         );
-    }
     Tensor output = input.tensor();
     Tensor mask = targetClasses == padValue;
     output(mask) = 0.;

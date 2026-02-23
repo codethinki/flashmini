@@ -98,9 +98,8 @@ CocoDataset::CocoDataset(
     // Create vector of CocoDataSample which will be loaded into arrayfire arrays
     std::vector<CocoDataSample> data;
     std::ifstream ifs(list_file);
-    if(!ifs) {
+    if(!ifs)
         throw std::runtime_error("Could not open list file: " + list_file);
-    }
     // We use tabs a deliminators between the filepath and each bbox
     // We use spaced to separate the different fields of the bbox
     const std::string delim = "\t";
@@ -160,10 +159,10 @@ CocoDataset::CocoDataset(
     );
 
     const int maxSize = 1333;
-    if(val) {
+    if(val)
         ds =
             std::make_shared<TransformAllDataset>(ds, randomResize({800}, maxSize));
-    } else {
+    else {
         std::vector<int> scales = {
             480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800};
         TransformAllFunction trainTransform = compose(
@@ -203,9 +202,8 @@ CocoDataset::CocoDataset(
 }
 
 void CocoDataset::resample() {
-    if(shuffled_) {
+    if(shuffled_)
         shuffled_->resample();
-    }
 }
 int64_t CocoDataset::size() const {
     return batched_->size();

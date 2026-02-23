@@ -47,11 +47,10 @@ Transformer::Transformer(
     wf_(std::make_shared<Linear>(transformerInitLinear(headDim * nHeads, modelDim))),
     norm1_(std::make_shared<LayerNorm>(std::vector<int>({0, 3}))),
     norm2_(std::make_shared<LayerNorm>(std::vector<int>({0, 3}))) {
-    if(bptt > 0) {
+    if(bptt > 0)
         params_.push_back(
             uniform(2 * bptt - 1, headDim, -0.1, 0.1, fl::dtype::f32, true)
         );
-    }
 
     createLayers();
 }
@@ -128,14 +127,12 @@ Variable Transformer::selfAttention(const std::vector<Variable>& input) {
     auto v = transpose((*wv_)(concatenate(inputWithState, 1)), {1, 0, 2});
 
     Variable mask, posEmb;
-    if(bptt_ > 0) {
+    if(bptt_ > 0)
         posEmb =
             tile(params_[0].astype(encoderInput.type()), {1, 1, nHeads_ * bsz});
-    }
-    if(useMask_ && encoderInput.dim(1) > 1) {
+    if(useMask_ && encoderInput.dim(1) > 1)
         // mask future if we use the previous state (then n is previous time)
         mask = getMask(n, input.size() == 3);
-    }
 
     int offset = (input.size() == 2) ? 0 : n;
 
@@ -146,12 +143,11 @@ Variable Transformer::selfAttention(const std::vector<Variable>& input) {
         Shape newMaskShape = {encoderInput.dim(1), encoderInput.dim(2)};
         // TODO{fl::Tensor}{resize} - emulate the ArrayFire resize operation for
         // transformer pad mask
-        if(padMaskArr.elements() != newMaskShape.elements()) {
+        if(padMaskArr.elements() != newMaskShape.elements())
             throw std::runtime_error(
                 "Transformer::selfAttention - pad mask requires resize. "
                 "This behavior will be fixed in a future release "
             );
-        }
         padMaskArr = fl::reshape(padMaskArr, newMaskShape);
         padMask = fl::Variable(fl::log(padMaskArr), false);
     }
@@ -176,38 +172,34 @@ std::vector<Variable> Transformer::forward(const std::vector<Variable>& input) {
     // padMask should be empty if previous step is provided
     // padMask is expected to have "1" on the used positions and "0" on padded
     // positions
-    if(input.size() != 2) {
+    if(input.size() != 2)
         throw std::invalid_argument(
             "Invalid inputs for transformer block: there should be at least input and mask"
         );
-    }
     const auto& x = input.at(input.size() - 2);
-    if(x.ndim() != 3) {
+    if(x.ndim() != 3)
         throw std::invalid_argument(
             "Transformer::forward - input should be of 3 dimensions "
             "expects an input of size C x T x B - see documentation."
         );
-    }
 
     if(!input.back().isEmpty()) {
-        if(input.back().ndim() < 2) {
+        if(input.back().ndim() < 2)
             throw std::invalid_argument(
                 "Transformer::forward - invalid size for pad mask - "
                 "must have at least two dimensions"
             );
 
-        } else if(x.dim(2) != input.back().dim(1)) {
+        else if(x.dim(2) != input.back().dim(1))
             throw std::invalid_argument(
                 "Transformer::forward - invalid inputs for transformer:"
                 " input and mask batch sizes are different"
             );
-        }
     }
 
     float f = 1.0;
-    if(train_ && (fl::rand({1}).scalar<float>() < pLayerdrop_)) {
+    if(train_ && (fl::rand({1}).scalar<float>() < pLayerdrop_))
         f = 0.0;
-    }
     if(preLN_) {
         auto h = (f * (*norm1_)(selfAttention(input))).astype(x.type()) + x;
         return {f* (*norm2_)(mlp(h)).astype(h.type()) + h};

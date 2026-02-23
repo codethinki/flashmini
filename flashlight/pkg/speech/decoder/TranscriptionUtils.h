@@ -84,28 +84,22 @@ namespace pkg {
                 ) {
                     labels.pop_back();
                 }
-            } else {
+            } else
                 while(!labels.empty() && labels.back() == kTargetPadValue) {
                     labels.pop_back();
                 }
-            }
-            if(replabel > 0) {
+            if(replabel > 0)
                 labels = unpackReplabels(labels, dict, replabel);
-            }
             auto trimLabels = [&labels](int idx) {
-                    if(!labels.empty() && labels.back() == idx) {
+                    if(!labels.empty() && labels.back() == idx)
                         labels.pop_back();
-                    }
-                    if(!labels.empty() && labels.front() == idx) {
+                    if(!labels.empty() && labels.front() == idx)
                         labels.erase(labels.begin());
-                    }
                 };
-            if(dict.contains(kSilToken)) {
+            if(dict.contains(kSilToken))
                 trimLabels(dict.getIndex(kSilToken));
-            }
-            if(!surround.empty()) {
+            if(!surround.empty())
                 trimLabels(dict.getIndex(surround));
-            }
         };
     } // namespace speech
 } // namespace pkg

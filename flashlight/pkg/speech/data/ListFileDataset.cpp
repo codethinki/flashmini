@@ -32,22 +32,19 @@ ListFileDataset::ListFileDataset(
     wrdFeatFunc_(wrdFeatFunc),
     numRows_(0) {
     std::ifstream inFile(filename);
-    if(!inFile) {
+    if(!inFile)
         throw std::invalid_argument("Unable to open file -" + filename);
-    }
     std::string line;
     while(std::getline(inFile, line)) {
-        if(line.empty()) {
+        if(line.empty())
             continue;
-        }
         auto splits = splitOnWhitespace(line, true);
-        if(splits.size() < 3) {
+        if(splits.size() < 3)
             throw std::runtime_error(
                 "File " + filename
                 + " has invalid columns in line (expected 3 columns at least): "
                 + line
             );
-        }
 
         ids_.emplace_back(std::move(splits[kIdIdx]));
         inputs_.emplace_back(std::move(splits[kInIdx]));
@@ -73,19 +70,18 @@ std::vector<Tensor> ListFileDataset::get(const int64_t idx) const {
 
     auto audio = loadAudio(inputs_[idx]); // channels x time
     Tensor input;
-    if(inFeatFunc_) {
+    if(inFeatFunc_)
         input = inFeatFunc_(
             static_cast<void*>(audio.first.data()),
             audio.second,
             fl::dtype::f32
         );
-    } else {
+    else
         input = Tensor::fromBuffer(
             {audio.second},
             audio.first.data(),
             MemoryLocation::Host
         );
-    }
 
     Tensor target;
     if(tgtFeatFunc_) {
@@ -146,12 +142,10 @@ float ListFileDataset::getInputSize(const int64_t idx) const {
 
 int64_t ListFileDataset::getTargetSize(const int64_t idx) const {
     checkIndexBounds(idx);
-    if(targetSizesCache_[idx] >= 0) {
+    if(targetSizesCache_[idx] >= 0)
         return targetSizesCache_[idx];
-    }
-    if(!tgtFeatFunc_) {
+    if(!tgtFeatFunc_)
         return 0;
-    }
     std::vector<char> curTarget(targets_[idx].begin(), targets_[idx].end());
     auto tgtSize = tgtFeatFunc_(
         static_cast<void*>(curTarget.data()),

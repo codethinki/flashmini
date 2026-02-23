@@ -19,9 +19,8 @@ using namespace fl;
 TEST(TensorReductionTest, countNonzero) {
     std::vector<int> idxs = {0, 3, 4, 7, 24, 78};
     auto a = fl::full({10, 10}, 1, fl::dtype::u32);
-    for(const auto idx : idxs) {
+    for(const auto idx : idxs)
         a(idx / 10, idx % 10) = 0;
-    }
 
     ASSERT_TRUE(
         allClose(
@@ -31,10 +30,9 @@ TEST(TensorReductionTest, countNonzero) {
     );
 
     std::vector<unsigned> sizes(a.shape().dim(0));
-    for(unsigned i = 0; i < a.shape().dim(0); ++i) {
+    for(unsigned i = 0; i < a.shape().dim(0); ++i)
         sizes[i] =
             a.shape().dim(0) - fl::sum(a(fl::span, i) == 0, {0}).scalar<unsigned>();
-    }
     ASSERT_TRUE(allClose(Tensor::fromVector(sizes), Tensor::fromVector(sizes)));
 
     auto b = fl::full({2, 2, 2}, 1, fl::dtype::u32);
@@ -152,16 +150,14 @@ TEST(TensorReductionTest, min) {
     fl::min(values, indices, in, 0);
     ASSERT_EQ(indices.shape(), Shape({in.dim(1)}));
     ASSERT_TRUE(allClose(indices, Tensor::fromVector<unsigned>({3}, {0, 1, 0})));
-    for(unsigned i = 0; i < values.elements(); ++i) {
+    for(unsigned i = 0; i < values.elements(); ++i)
         ASSERT_TRUE(allClose(values.flat(i), in(fl::span, i)(indices(i))));
-    }
 
     fl::min(values, indices, in, 1);
     ASSERT_EQ(indices.shape(), Shape({in.dim(0)}));
     ASSERT_TRUE(allClose(indices, Tensor::fromVector<unsigned>({2}, {0, 1})));
-    for(unsigned i = 0; i < values.elements(); ++i) {
+    for(unsigned i = 0; i < values.elements(); ++i)
         ASSERT_TRUE(allClose(values.flat(i), in(i)(indices(i))));
-    }
 
     fl::min(values, indices, in, 0, /* keepDims = */ true);
     ASSERT_EQ(values.shape(), Shape({1, in.dim(1)}));
@@ -176,16 +172,14 @@ TEST(TensorReductionTest, max) {
     fl::max(values, indices, in, 0);
     ASSERT_EQ(indices.shape(), Shape({in.dim(1)}));
     ASSERT_TRUE(allClose(indices, Tensor::fromVector<unsigned>({3}, {1, 0, 1})));
-    for(unsigned i = 0; i < values.elements(); ++i) {
+    for(unsigned i = 0; i < values.elements(); ++i)
         ASSERT_TRUE(allClose(values.flat(i), in(fl::span, i)(indices(i))));
-    }
 
     fl::max(values, indices, in, 1);
     ASSERT_EQ(indices.shape(), Shape({in.dim(0)}));
     ASSERT_TRUE(allClose(indices, Tensor::fromVector<unsigned>({2}, {1, 2})));
-    for(unsigned i = 0; i < values.elements(); ++i) {
+    for(unsigned i = 0; i < values.elements(); ++i)
         ASSERT_TRUE(allClose(values.flat(i), in(i)(indices(i))));
-    }
 
     fl::max(values, indices, in, 0, /* keepDims = */ true);
     ASSERT_EQ(values.shape(), Shape({1, in.dim(1)}));
@@ -199,9 +193,8 @@ TEST(TensorReductionTest, cumsum) {
     auto a = fl::tile(fl::arange(1, max), {1, 2});
 
     auto ref = fl::arange(1, max);
-    for(int i = 1; i < max - 1; ++i) {
+    for(int i = 1; i < max - 1; ++i)
         ref += fl::concatenate({fl::full({i}, 0), fl::arange(1, max - i)});
-    }
 
     ASSERT_TRUE(allClose(fl::cumsum(a, 0), fl::tile(ref, {1, 2})));
     ASSERT_TRUE(

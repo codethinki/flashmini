@@ -30,14 +30,11 @@ WeightNorm& WeightNorm::operator=(const WeightNorm& other) {
 void WeightNorm::transformDims() {
     normDim_.clear();
     int vNumdims = module_->param(0).ndim();
-    if(dim_ < 0 || dim_ > vNumdims) {
+    if(dim_ < 0 || dim_ > vNumdims)
         throw std::invalid_argument("invalid dimension for WeightNorm");
-    }
-    for(int i = 0; i < vNumdims; i++) {
-        if(i != dim_) {
+    for(int i = 0; i < vNumdims; i++)
+        if(i != dim_)
             normDim_.push_back(i);
-        }
-    }
 }
 
 void WeightNorm::computeWeight() {
@@ -55,11 +52,10 @@ void WeightNorm::computeWeight() {
         nm = reorder(nm, {3, 0, 1, 2});
         nm = norm(nm, {1}, /* p = */ 2, /* keepDims = */ true);
         nm = reorder(nm, {1, 2, 3, 0});
-    } else {
+    } else
         throw std::invalid_argument(
             "Wrong dimension for Weight Norm: " + std::to_string(dim_)
         );
-    }
     auto wt = v * tileAs(g / nm, v);
     module_->setParams(wt, 0);
 }
@@ -72,28 +68,25 @@ void WeightNorm::initParams() {
     if(moduleParams.size() == 2) {
         auto& b = moduleParams[1];
         params_ = {v, g, b};
-    } else if(moduleParams.size() == 1) {
+    } else if(moduleParams.size() == 1)
         params_ = {v, g};
-    } else {
+    else
         throw std::invalid_argument("WeightNorm only supports Linear and Conv2D");
-    }
 }
 
 void WeightNorm::setParams(const Variable& var, int position) {
     Module::setParams(var, position);
     // it is necessary to copy all params to the parent module
     // due to copies stored in the parent module (not pointers)
-    if(position == 2) {
+    if(position == 2)
         module_->setParams(var, 1);
-    } else if(position <= 1) {
+    else if(position <= 1)
         computeWeight();
-    }
 }
 
 std::vector<Variable> WeightNorm::forward(const std::vector<Variable>& inputs) {
-    if(train_) {
+    if(train_)
         computeWeight();
-    }
     return module_->forward(inputs);
 }
 

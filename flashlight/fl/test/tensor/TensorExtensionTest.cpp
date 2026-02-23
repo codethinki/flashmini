@@ -57,9 +57,8 @@ TEST(TensorExtensionTest, TestExtension) {
     auto a = fl::rand({4, 5, 6});
 
     // TODO: this test only works with the ArrayFire backend - gate accordingly
-    if(Tensor().backendType() != TensorBackendType::ArrayFire) {
+    if(Tensor().backendType() != TensorBackendType::ArrayFire)
         GTEST_SKIP() << "Flashlight not built with ArrayFire backend.";
-    }
 
     // TODO: add a fixture to check with available backends
     ASSERT_TRUE(

@@ -33,15 +33,12 @@ bool allClose(
     const af::array& b,
     double absTolerance = 1e-5
 ) {
-    if(a.type() != b.type()) {
+    if(a.type() != b.type())
         return false;
-    }
-    if(a.dims() != b.dims()) {
+    if(a.dims() != b.dims())
         return false;
-    }
-    if(a.isempty() && b.isempty()) {
+    if(a.isempty() && b.isempty())
         return true;
-    }
     return af::max<double>(af::abs(a - b)) < absTolerance;
 }
 

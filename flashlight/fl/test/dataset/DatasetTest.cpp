@@ -217,11 +217,10 @@ TEST(DatasetTest, FileBlobDataset) {
                 std::vector<Tensor> sample;
                 for(int64_t j = 0; j < i % 4; j++) {
                     Tensor tensor;
-                    if(j % 2 == 0) {
+                    if(j % 2 == 0)
                         tensor = fl::rand({100, 3, 100});
-                    } else {
+                    else
                         tensor = fl::rand({100, 200});
-                    }
                     sample.push_back(tensor);
                 }
                 data.push_back(sample);
@@ -236,12 +235,11 @@ TEST(DatasetTest, FileBlobDataset) {
                 auto blobSample = blob.get(i);
                 auto datSample = data.at(i);
                 ASSERT_EQ(datSample.size(), blobSample.size());
-                for(int64_t j = 0; j < blobSample.size(); j++) {
+                for(int64_t j = 0; j < blobSample.size(); j++)
                     ASSERT_TRUE(
                         fl::norm(datSample.at(j).flatten() - blobSample.at(j).flatten())
                         .scalar<float>() <= 1e-05
                     );
-                }
             }
         };
 
@@ -272,27 +270,22 @@ TEST(DatasetTest, FileBlobDataset) {
         check(blob);
 
         // check hostTransform
-        for(auto& vec : data) {
-            if(!vec.empty()) {
+        for(auto& vec : data)
+            if(!vec.empty())
                 vec[0] += 1;
-            }
-        }
         blob.setHostTransform(
             0,
             [](void* ptr, fl::Shape size, fl::dtype /* type */) {
             float* ptrFl = (float*) ptr;
-            for(int64_t i = 0; i < size.elements(); i++) {
+            for(int64_t i = 0; i < size.elements(); i++)
                 ptrFl[i] += 1;
-            }
             return Tensor::fromBuffer(size, ptrFl, MemoryLocation::Host);
         }
-        );
+            );
         check(blob);
-        for(auto& vec : data) {
-            if(!vec.empty()) {
+        for(auto& vec : data)
+            if(!vec.empty())
                 vec[0] -= 1;
-            }
-        }
     }
 
     // check tensor dim constraints
@@ -322,15 +315,13 @@ TEST(DatasetTest, FileBlobDataset) {
             workers.emplace_back(
                 [i, blob, nperworker, device, &thdata]() {
                 fl::setDevice(device);
-                for(int j = 0; j < nperworker; j++) {
+                for(int j = 0; j < nperworker; j++)
                     thdata[i * nperworker + j] = blob->get(i * nperworker + j);
-                }
             }
             );
         }
-        for(int i = 0; i < nworker; i++) {
+        for(int i = 0; i < nworker; i++)
             workers[i].join();
-        }
         ASSERT_EQ(data.size(), thdata.size());
         for(int64_t i = 0; i < data.size(); i++) {
             auto thdataSample = thdata.at(i);
@@ -349,9 +340,8 @@ TEST(DatasetTest, FileBlobDataset) {
     // multi-threaded write
     {
         // add an index
-        for(int i = 0; i < data.size(); i++) {
+        for(int i = 0; i < data.size(); i++)
             data[i].push_back(fl::full({1}, i, fl::dtype::f32));
-        }
         {
             auto blob = std::make_shared<FileBlobDataset>(
                 fs::temp_directory_path() / "data.blob",
@@ -362,19 +352,16 @@ TEST(DatasetTest, FileBlobDataset) {
             const int nworker = 10;
             int nperworker = data.size() / nworker;
             auto device = fl::getDevice();
-            for(int i = 0; i < nworker; i++) {
+            for(int i = 0; i < nworker; i++)
                 workers.emplace_back(
                     [i, blob, nperworker, device, &data]() {
                     fl::setDevice(device);
-                    for(int j = 0; j < nperworker; j++) {
+                    for(int j = 0; j < nperworker; j++)
                         blob->add(data[i * nperworker + j]);
-                    }
                 }
                 );
-            }
-            for(int i = 0; i < nworker; i++) {
+            for(int i = 0; i < nworker; i++)
                 workers[i].join();
-            }
             blob->writeIndex();
         }
         {
@@ -408,11 +395,10 @@ TEST(DatasetTest, MemoryBlobDataset) {
                 std::vector<Tensor> sample;
                 for(int64_t j = 0; j < i % 4; j++) {
                     Tensor tensor;
-                    if(j % 2 == 0) {
+                    if(j % 2 == 0)
                         tensor = fl::rand({100, 3, 100});
-                    } else {
+                    else
                         tensor = fl::rand({100, 200});
-                    }
                     sample.push_back(tensor);
                 }
                 data.push_back(sample);
@@ -427,12 +413,11 @@ TEST(DatasetTest, MemoryBlobDataset) {
                 auto blobSample = blob.get(i);
                 auto datSample = data.at(i);
                 ASSERT_EQ(datSample.size(), blobSample.size());
-                for(int64_t j = 0; j < blobSample.size(); j++) {
+                for(int64_t j = 0; j < blobSample.size(); j++)
                     ASSERT_TRUE(
                         fl::norm(datSample.at(j).flatten() - blobSample.at(j).flatten())
                         .scalar<float>() <= 1e-05
                     );
-                }
             }
         };
 
@@ -462,21 +447,18 @@ TEST(DatasetTest, MemoryBlobDataset) {
         check(blob);
 
         // check hostTransform
-        for(auto& vec : data) {
-            if(!vec.empty()) {
+        for(auto& vec : data)
+            if(!vec.empty())
                 vec[0] += 1;
-            }
-        }
         blob.setHostTransform(
             0,
             [](void* ptr, fl::Shape size, fl::dtype /* type */) {
             float* ptrFl = (float*) ptr;
-            for(int64_t i = 0; i < size.elements(); i++) {
+            for(int64_t i = 0; i < size.elements(); i++)
                 ptrFl[i] += 1;
-            }
             return Tensor::fromBuffer(size, ptrFl, MemoryLocation::Host);
         }
-        );
+            );
         check(blob);
     }
 
@@ -491,15 +473,13 @@ TEST(DatasetTest, MemoryBlobDataset) {
             workers.emplace_back(
                 [i, &blob, nperworker, device, &thdata]() {
                 fl::setDevice(device);
-                for(int j = 0; j < nperworker; j++) {
+                for(int j = 0; j < nperworker; j++)
                     thdata[i * nperworker + j] = blob.get(i * nperworker + j);
-                }
             }
             );
         }
-        for(int i = 0; i < nworker; i++) {
+        for(int i = 0; i < nworker; i++)
             workers[i].join();
-        }
         ASSERT_EQ(data.size(), thdata.size());
         for(int64_t i = 0; i < data.size(); i++) {
             auto thdataSample = thdata.at(i);
@@ -519,27 +499,23 @@ TEST(DatasetTest, MemoryBlobDataset) {
     {
         MemoryBlobDataset wblob;
         // add an index
-        for(int i = 0; i < data.size(); i++) {
+        for(int i = 0; i < data.size(); i++)
             data[i].push_back(fl::full({1}, i, fl::dtype::f32));
-        }
         {
             std::vector<std::thread> workers;
             const int nworker = 10;
             int nperworker = data.size() / nworker;
             auto device = fl::getDevice();
-            for(int i = 0; i < nworker; i++) {
+            for(int i = 0; i < nworker; i++)
                 workers.emplace_back(
                     [i, &wblob, nperworker, device, &data]() {
                     fl::setDevice(device);
-                    for(int j = 0; j < nperworker; j++) {
+                    for(int j = 0; j < nperworker; j++)
                         wblob.add(data[i * nperworker + j]);
-                    }
                 }
                 );
-            }
-            for(int i = 0; i < nworker; i++) {
+            for(int i = 0; i < nworker; i++)
                 workers[i].join();
-            }
             wblob.writeIndex();
         }
         {
@@ -580,9 +556,8 @@ TEST(DatasetTest, PrefetchDatasetCorrectness) {
         auto sample1 = transformDs->get(i);
         auto sample2 = prefetchDs->get(i);
         ASSERT_EQ(sample1.size(), sample2.size());
-        for(int j = 0; j < sample1.size(); ++j) {
+        for(int j = 0; j < sample1.size(); ++j)
             ASSERT_TRUE(allClose(sample1[j], sample2[j]));
-        }
     }
 }
 
@@ -602,9 +577,8 @@ TEST(DatasetTest, DISABLED_PrefetchDatasetPerformance) {
     );
 
     auto start = std::chrono::high_resolution_clock::now();
-    for(auto& sample : *transformDs) {
+    for(auto& sample : *transformDs)
         (void) sample;
-    }
     auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - start
     );
@@ -615,9 +589,8 @@ TEST(DatasetTest, DISABLED_PrefetchDatasetPerformance) {
         std::make_shared<PrefetchDataset>(transformDs, numthreads, numthreads);
 
     start = std::chrono::high_resolution_clock::now();
-    for(auto& sample : *prefetchDs) {
+    for(auto& sample : *prefetchDs)
         (void) sample;
-    }
     dur = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - start
     );

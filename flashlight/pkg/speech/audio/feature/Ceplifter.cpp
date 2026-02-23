@@ -18,9 +18,8 @@ Ceplifter::Ceplifter(int numfilters, int lifterparam) : numFilters_(numfilters),
                                                         lifterParam_(lifterparam),
                                                         coefs_(numFilters_) {
     std::iota(coefs_.begin(), coefs_.end(), 0.0);
-    for(auto& c : coefs_) {
+    for(auto& c : coefs_)
         c = 1.0 + 0.5 * lifterParam_ * std::sin(M_PI * c / lifterParam_);
-    }
 }
 
 std::vector<float> Ceplifter::apply(const std::vector<float>& input) const {
@@ -30,17 +29,15 @@ std::vector<float> Ceplifter::apply(const std::vector<float>& input) const {
 }
 
 void Ceplifter::applyInPlace(std::vector<float>& input) const {
-    if(input.size() % numFilters_ != 0) {
+    if(input.size() % numFilters_ != 0)
         throw std::invalid_argument(
             "Ceplifter: input size is not divisible by numFilters"
         );
-    }
     size_t n = 0;
     for(auto& in : input) {
         in *= coefs_[n++];
-        if(n == numFilters_) {
+        if(n == numFilters_)
             n = 0;
-        }
     }
 }
 } // namespace fl

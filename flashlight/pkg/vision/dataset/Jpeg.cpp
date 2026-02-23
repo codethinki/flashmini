@@ -38,9 +38,8 @@ Tensor loadJpeg(const std::string& fp, int desiredNumberOfChannels /* = 3 */) {
         stbi_image_free(img);
         // Then reorder to W X H X C
         return fl::transpose(result, {1, 2, 0});
-    } else {
+    } else
         throw std::invalid_argument("Could not load from filepath" + fp);
-    }
 }
 
 std::shared_ptr<Dataset> jpegLoader(std::vector<std::string> fps) {

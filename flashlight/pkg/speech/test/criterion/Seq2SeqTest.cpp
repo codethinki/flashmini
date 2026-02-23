@@ -18,9 +18,8 @@ using namespace fl;
 using namespace fl::pkg::speech;
 
 TEST(Seq2SeqTest, Seq2Seq) {
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "RNN gradient computation not supported for CPU backend";
-    }
     int nclass = 40;
     int hiddendim = 256;
     int batchsize = 2;
@@ -140,9 +139,8 @@ TEST(Seq2SeqTest, Seq2SeqBeamSearchViterbi) {
     auto viterbipath = seq2seq.viterbiPath(input);
     auto beampath = seq2seq.beamPath(input, Tensor(), 1);
     ASSERT_EQ(beampath.size(), viterbipath.elements());
-    for(int idx = 0; idx < beampath.size(); idx++) {
+    for(int idx = 0; idx < beampath.size(); idx++)
         ASSERT_EQ(beampath[idx], viterbipath(idx).scalar<int>());
-    }
 }
 
 TEST(Seq2SeqTest, Seq2SeqMedianWindow) {
@@ -166,9 +164,8 @@ TEST(Seq2SeqTest, Seq2SeqMedianWindow) {
     auto viterbipath = seq2seq.viterbiPath(input);
     auto beampath = seq2seq.beamPath(input, Tensor(), 1);
     ASSERT_EQ(beampath.size(), viterbipath.elements());
-    for(int idx = 0; idx < beampath.size(); idx++) {
+    for(int idx = 0; idx < beampath.size(); idx++)
         ASSERT_EQ(beampath[idx], viterbipath(idx).scalar<int>());
-    }
 }
 
 TEST(Seq2SeqTest, Seq2SeqStepWindow) {
@@ -192,9 +189,8 @@ TEST(Seq2SeqTest, Seq2SeqStepWindow) {
     auto viterbipath = seq2seq.viterbiPath(input);
     auto beampath = seq2seq.beamPath(input, Tensor(), 1);
     ASSERT_EQ(beampath.size(), viterbipath.elements());
-    for(int idx = 0; idx < beampath.size(); idx++) {
+    for(int idx = 0; idx < beampath.size(); idx++)
         ASSERT_EQ(beampath[idx], viterbipath(idx).scalar<int>());
-    }
 }
 
 TEST(Seq2SeqTest, Seq2SeqStepWindowVectorized) {
@@ -294,9 +290,8 @@ TEST(Seq2SeqTest, Seq2SeqMixedAttn) {
 TEST(Seq2SeqTest, Serialization) {
     char* user = getenv("USER");
     std::string userstr = "unknown";
-    if(user != nullptr) {
+    if(user != nullptr)
         userstr = std::string(user);
-    }
     const fs::path path = fs::temp_directory_path() / "test.mdl";
 
     int N = 5, H = 8, B = 1, T = 10, U = 5, maxoutputlen = 100, nAttnRound = 2;
@@ -409,10 +404,9 @@ TEST(Seq2SeqTest, BatchedDecoderStep) {
             ys.push_back(y);
 
             inStates[i].alpha = noGrad(fl::randn({1, T, 1}, fl::dtype::f32));
-            for(int j = 0; j < nAttnRound; j++) {
+            for(int j = 0; j < nAttnRound; j++)
                 inStates[i].hidden[j] =
                     noGrad(fl::randn({H, 1, nRnnLayer}, fl::dtype::f32));
-            }
             inStates[i].summary = noGrad(fl::randn({H, 1, 1}, fl::dtype::f32));
             inStatePtrs[i] = &inStates[i];
 
@@ -437,11 +431,9 @@ TEST(Seq2SeqTest, BatchedDecoderStep) {
             seq2seq.decodeBatchStep(input, ys, inStatePtrs);
 
         // Check
-        for(int i = 0; i < B; i++) {
-            for(int j = 0; j < N; j++) {
+        for(int i = 0; i < B; i++)
+            for(int j = 0; j < N; j++)
                 ASSERT_NEAR(single_scores[i][j], batched_scores[i][j], 1e-5);
-            }
-        }
     }
 }
 

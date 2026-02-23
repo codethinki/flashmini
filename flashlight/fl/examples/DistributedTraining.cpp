@@ -75,9 +75,8 @@ int main() {
 
     // Start training
 
-    if(isMaster) {
+    if(isMaster)
         std::cout << "[Multi-layer Perceptron] Started..." << std::endl;
-    }
     const int nEpochs = 100;
     for(int e = 1; e <= nEpochs; ++e) {
         meter.reset();
@@ -104,13 +103,11 @@ int main() {
         auto mseArr = Tensor::fromBuffer({1}, mse.data(), MemoryLocation::Host);
 
         fl::allReduce(mseArr);
-        if(isMaster) {
+        if(isMaster)
             std::cout << "Epoch: " << e << " Mean Squared Error: "
             << mseArr.scalar<double>() / worldSize << std::endl;
-        }
     }
-    if(isMaster) {
+    if(isMaster)
         std::cout << "[Multi-layer Perceptron] Done!" << std::endl;
-    }
     return 0;
 }

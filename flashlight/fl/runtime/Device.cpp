@@ -27,18 +27,16 @@ const std::unordered_set<std::shared_ptr<Stream>>& Device::getStreams() const {
 }
 
 void Device::addStream(std::shared_ptr<Stream> stream) {
-    if(&stream->device() != this) {
+    if(&stream->device() != this)
         throw std::runtime_error(
             "[Device::addStream] Must add stream to owner device"
         );
-    }
     streams_.insert(stream);
 }
 
 void Device::sync() const {
-    for(const auto& stream : streams_) {
+    for(const auto& stream : streams_)
         stream->sync();
-    }
 }
 
 void Device::addSetActiveCallback(std::function<void(int)> callback) {
@@ -47,9 +45,8 @@ void Device::addSetActiveCallback(std::function<void(int)> callback) {
 
 void Device::setActive() const {
     setActiveImpl();
-    for(auto& callback : setActiveCallbacks_) {
+    for(auto& callback : setActiveCallbacks_)
         callback(nativeId());
-    }
 }
 
 int X64Device::nativeId() const {

@@ -16,15 +16,13 @@ namespace fl {
 
 TensorDataset::TensorDataset(const std::vector<Tensor>& dataTensors) : dataTensors_(dataTensors),
                                                                        size_(0) {
-    if(dataTensors_.empty()) {
+    if(dataTensors_.empty())
         throw std::invalid_argument("no tensors passed to TensorDataset");
-    }
 
     for(const auto& tensor : dataTensors_) {
         auto ndims = tensor.ndim();
-        if(ndims == 0) {
+        if(ndims == 0)
             throw std::invalid_argument("tensor for TensorDataset can't be empty");
-        }
 
         auto lastdim = ndims - 1;
         int64_t cursz = tensor.dim(lastdim);

@@ -21,9 +21,8 @@
 using namespace fl;
 
 TEST(Distributed, AllReduce) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         GTEST_SKIP() << "Distributed initialization failed or not enabled.";
-    }
 
     auto rank = getWorldRank();
     auto size = getWorldSize();
@@ -37,9 +36,8 @@ TEST(Distributed, AllReduce) {
 }
 
 TEST(Distributed, InlineReducer) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         GTEST_SKIP() << "Distributed initialization failed or not enabled.";
-    }
 
     auto rank = getWorldRank();
     auto size = getWorldSize();
@@ -57,9 +55,8 @@ TEST(Distributed, InlineReducer) {
 }
 
 TEST(Distributed, AllReduceAsync) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         GTEST_SKIP() << "Distributed initialization failed or not enabled.";
-    }
 
     auto rank = getWorldRank();
     auto size = getWorldSize();
@@ -76,9 +73,8 @@ TEST(Distributed, AllReduceAsync) {
 }
 
 TEST(Distributed, AllReduceSetAsync) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         GTEST_SKIP() << "Distributed initialization failed or not enabled.";
-    }
 
     auto rank = getWorldRank();
     auto size = getWorldSize();
@@ -88,29 +84,25 @@ TEST(Distributed, AllReduceSetAsync) {
 
     unsigned vSize = (1 << 20);
     std::vector<Variable> vars;
-    for(size_t i = 0; i < 5; ++i) {
+    for(size_t i = 0; i < 5; ++i)
         vars.emplace_back(fl::full({vSize}, rank + 1, dtype::f32), false);
-    }
 
     allReduceMultiple(vars, 2.0, async, contiguous);
     syncDistributed();
 
     float expected_val = size * (size + 1.0);
-    for(const auto& var : vars) {
+    for(const auto& var : vars)
         ASSERT_TRUE(fl::all(var.tensor() == expected_val).scalar<char>());
-    }
 
     // Exceed the size of the contiguous buffer without caching, and trigger a
     // contiguous sync with a tensor that is too large
-    for(size_t i = 0; i < 25; ++i) {
+    for(size_t i = 0; i < 25; ++i)
         vars.emplace_back(fl::full({vSize}, rank, dtype::f32), false);
-    }
-    if(size > 1) {
+    if(size > 1)
         ASSERT_THROW(
             allReduceMultiple(vars, 2.0, /*async=*/ true, /*contiguous=*/ true),
             std::runtime_error
         );
-    }
 }
 
 TEST(Distributed, Barrier) {
@@ -136,12 +128,11 @@ TEST(Distributed, Barrier) {
     // Delete files
     std::error_code errorCode;
     const bool status = fs::remove(file, errorCode);
-    if(!status) {
+    if(!status)
         throw std::runtime_error(
             "Barrier test cannot delete file: " + std::string(file)
             + " error: " + errorCode.message()
         );
-    }
     barrier();
     for(int i = 0; i < size; i++) {
         auto checkingFile =
@@ -151,9 +142,8 @@ TEST(Distributed, Barrier) {
 }
 
 TEST(Distributed, CoalescingReducer) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         GTEST_SKIP() << "Distributed initialization failed or not enabled.";
-    }
 
     auto rank = getWorldRank();
     auto size = getWorldSize();
@@ -166,15 +156,13 @@ TEST(Distributed, CoalescingReducer) {
 
     unsigned vSize = (1 << 20);
     std::vector<Variable> vars;
-    for(size_t i = 0; i < 1000; ++i) {
+    for(size_t i = 0; i < 1000; ++i)
         vars.emplace_back(fl::full({vSize}, rank + 1, dtype::f32), false);
-    }
 
     for(size_t i = 0; i < vars.size(); ++i) {
         s->add(vars[i]);
-        if((i + 1) % 10 == 0) {
+        if((i + 1) % 10 == 0)
             s->finalize();
-        }
     }
 
     float expected_val = size * (size + 1.0);

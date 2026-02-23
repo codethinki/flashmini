@@ -35,9 +35,8 @@ namespace pkg {
             int L,
             const std::shared_ptr<Context>& ctx
         ) {
-            if(gradVar.type() != fl::dtype::f32) {
+            if(gradVar.type() != fl::dtype::f32)
                 throw std::invalid_argument("FAC: grad must be float32");
-            }
 
             auto gradVec = gradVar.tensor().toHostVector<float>();
             std::vector<float> inputGradVec(B * T * N);
@@ -73,19 +72,18 @@ namespace pkg {
             int N = inputVar.dim(0);
             int L = targetVar.dim(0);
 
-            if(N != transVar.dim(0)) {
+            if(N != transVar.dim(0))
                 throw std::invalid_argument(
                     "ForceAlignmentCriterion(cpu)::forward: input dim doesn't match N"
                 );
-            } else if(inputVar.type() != fl::dtype::f32) {
+            else if(inputVar.type() != fl::dtype::f32)
                 throw std::invalid_argument(
                     "ForceAlignmentCriterion(cpu)::forward: input must be float32"
                 );
-            } else if(targetVar.type() != fl::dtype::s32) {
+            else if(targetVar.type() != fl::dtype::s32)
                 throw std::invalid_argument(
                     "ForceAlignmentCriterion(cpu)::forward: target must be int32"
                 );
-            }
 
             const auto& targetSize = getTargetSizeArray(targetVar.tensor(), T);
             auto ctx = std::make_shared<Context>();
@@ -129,13 +127,12 @@ namespace pkg {
             int B = input.dim(2); // Batchsize
             int L = target.dim(0); // Target length
 
-            if(N != trans.dim(0)) {
+            if(N != trans.dim(0))
                 throw std::invalid_argument("FAC: input dim doesn't match N:");
-            } else if(input.type() != fl::dtype::f32) {
+            else if(input.type() != fl::dtype::f32)
                 throw std::invalid_argument("FAC: input must be float32");
-            } else if(target.type() != fl::dtype::s32) {
+            else if(target.type() != fl::dtype::s32)
                 throw std::invalid_argument("FAC: target must be int32");
-            }
             const Tensor targetSize = getTargetSizeArray(target, T);
             std::shared_ptr<Context> ctx = std::make_shared<Context>();
             std::vector<float> inputVec = input.toHostVector<float>();

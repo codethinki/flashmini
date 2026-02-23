@@ -19,15 +19,13 @@ MemoryManagerAdapter::MemoryManagerAdapter(
     std::ostream* logStream
 ) : deviceInterface(itf),
     logStream_(logStream) {
-    if(!itf) {
+    if(!itf)
         throw std::invalid_argument(
             "MemoryManagerAdapter::MemoryManagerAdapter - "
             "memory manager device interface is null"
         );
-    }
-    if(logStream_) {
+    if(logStream_)
         loggingEnabled_ = true;
-    }
 
     // Create handle and set payload to point to this instance
     AF_CHECK(af_create_memory_manager(&interface_));
@@ -59,12 +57,11 @@ void MemoryManagerAdapter::setLoggingEnabled(bool log) {
 }
 
 void MemoryManagerAdapter::setLogFlushInterval(size_t interval) {
-    if(interval < 1) {
+    if(interval < 1)
         throw std::invalid_argument(
             "MemoryManagerAdapter::setLogFlushInterval - "
             "flush interval must be great than zero."
         );
-    }
     logFlushInterval_ = interval;
 }
 

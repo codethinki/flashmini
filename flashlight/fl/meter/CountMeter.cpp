@@ -15,9 +15,8 @@ namespace fl {
 CountMeter::CountMeter(int num) : counts_(num, 0) {}
 
 void CountMeter::add(int id, int64_t val) {
-    if(!(id >= 0 && id < counts_.size())) {
+    if(!(id >= 0 && id < counts_.size()))
         throw std::out_of_range("invalid id to update count for");
-    }
     counts_[id] += val;
 }
 

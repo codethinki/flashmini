@@ -34,9 +34,8 @@ namespace pkg {
             int N,
             const std::shared_ptr<Context>& ctx
         ) {
-            if(gradVar.type() != fl::dtype::f32) {
+            if(gradVar.type() != fl::dtype::f32)
                 throw std::invalid_argument("FCC: grad must be float32");
-            }
 
             auto gradVec = gradVar.tensor().toHostVector<float>();
             std::vector<float> inputGradVec(B * T * N);
@@ -69,13 +68,12 @@ namespace pkg {
             int T = inputVar.dim(1);
             int N = inputVar.dim(0);
 
-            if(N != transVar.dim(0)) {
+            if(N != transVar.dim(0))
                 throw std::invalid_argument("FCC: input dim doesn't match N");
-            } else if(inputVar.type() != fl::dtype::f32) {
+            else if(inputVar.type() != fl::dtype::f32)
                 throw std::invalid_argument("FCC: input must be float32");
-            } else if(targetVar.type() != fl::dtype::s32) {
+            else if(targetVar.type() != fl::dtype::s32)
                 throw std::invalid_argument("FCC: target must be int32");
-            }
 
             const auto& targetSize = getTargetSizeArray(targetVar.tensor(), T);
             auto ctx = std::make_shared<Context>();

@@ -61,9 +61,8 @@ namespace detail {
         for(int i = 0; i < dout.elements(); ++i) {
             dout.tensor().flat(i) = 1; // element in 1D view
             input.zeroGrad();
-            for(auto* var : zeroGradientVariables) {
+            for(auto* var : zeroGradientVariables)
                 var->zeroGrad();
-            }
             auto out = func(input);
             out.backward(dout);
 

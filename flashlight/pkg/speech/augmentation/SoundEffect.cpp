@@ -16,9 +16,8 @@ namespace fl::pkg::speech::sfx {
 std::string SoundEffectChain::prettyString() const {
     std::stringstream ss;
     ss << '{' << std::endl;
-    for(const std::shared_ptr<SoundEffect>& sfx : soundEffects_) {
+    for(const std::shared_ptr<SoundEffect>& sfx : soundEffects_)
         ss << "{" << sfx->prettyString() << '}' << std::endl;
-    }
     ss << '}';
     return ss.str();
 }
@@ -28,9 +27,8 @@ void SoundEffectChain::add(std::shared_ptr<SoundEffect> SoundEffect) {
 }
 
 void SoundEffectChain::apply(std::vector<float>& sound) {
-    for(std::shared_ptr<SoundEffect>& effect : soundEffects_) {
+    for(std::shared_ptr<SoundEffect>& effect : soundEffects_)
         effect->apply(sound);
-    }
 }
 
 bool SoundEffectChain::empty() {
@@ -41,16 +39,14 @@ Normalize::Normalize(bool onlyIfTooHigh) : onlyIfTooHigh_(onlyIfTooHigh) {}
 
 void Normalize::apply(std::vector<float>& sound) {
     float maxAbs = 0.0f;
-    for(float i : sound) {
+    for(float i : sound)
         maxAbs = std::fmax(maxAbs, std::fabs(i));
-    }
-    if(!onlyIfTooHigh_ || maxAbs > 1.0f) {
+    if(!onlyIfTooHigh_ || maxAbs > 1.0f)
         std::transform(
             sound.begin(),
             sound.end(),
             sound.begin(),
             [maxAbs](float amp) -> float { return amp / maxAbs; });
-    }
 }
 
 std::string Normalize::prettyString() const {

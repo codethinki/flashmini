@@ -135,15 +135,14 @@ namespace detail {
  * Needs to be explicitly inlined due to a bug with DNNL.
  */
     inline dnnl::memory::data_type dnnlMapToType(const fl::dtype t) {
-        if(t == fl::dtype::f16) {
+        if(t == fl::dtype::f16)
             return dnnl::memory::data_type::f16;
-        } else if(t == fl::dtype::f32) {
+        else if(t == fl::dtype::f32)
             return dnnl::memory::data_type::f32;
-        } else if(t == fl::dtype::f64) {
+        else if(t == fl::dtype::f64)
             throw std::invalid_argument("float64 is not supported by DNNL");
-        } else {
+        else
             throw std::invalid_argument("data type not supported with DNNL");
-        }
     }
 
 } // namespace detail

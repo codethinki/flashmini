@@ -65,9 +65,8 @@ TEST(MfccTest, htkCompareTest) {
     // HTK keeps C0 at last position. adjust accordingly.
     auto featcopy(feat);
     for(int f = 0; f < numframes; ++f) {
-        for(int i = 1; i < 39; ++i) {
+        for(int i = 1; i < 39; ++i)
             feat[f * 39 + i - 1] = feat[f * 39 + i];
-        }
         feat[f * 39 + 12] = featcopy[f * 39 + 0];
         feat[f * 39 + 25] = featcopy[f * 39 + 13];
         feat[f * 39 + 38] = featcopy[f * 39 + 26];
@@ -76,9 +75,8 @@ TEST(MfccTest, htkCompareTest) {
     for(int i = 0; i < feat.size(); ++i) {
         auto curdiff = std::abs(feat[i] - htkfeat[i]);
         sum += curdiff;
-        if(max < curdiff) {
+        if(max < curdiff)
             max = curdiff;
-        }
     }
     std::cerr << "| Max diff across all dimensions " << max << "\n"; // 0.325853
 
@@ -98,9 +96,9 @@ TEST(MfccTest, BatchingTest) {
     std::vector<bool> usePow = {true, false};
 
     int numTrials = 3;
-    for(auto e : energies) {
-        for(auto r : rawEnergies) {
-            for(auto z : zMeans) {
+    for(auto e : energies)
+        for(auto r : rawEnergies)
+            for(auto z : zMeans)
                 for(auto p : usePow) {
                     featparams.useEnergy = e;
                     featparams.rawEnergy = r;
@@ -118,15 +116,11 @@ TEST(MfccTest, BatchingTest) {
                             std::copy(input.begin(), input.begin() + curSz, curInput.begin());
                             auto curOutput = mfcc.apply(curInput);
                             ASSERT_GT(curOutput.size(), 0);
-                            for(int j = 0; j < curOutput.size(); ++j) {
+                            for(int j = 0; j < curOutput.size(); ++j)
                                 ASSERT_NEAR(curOutput[j], output[j], 1E-4);
-                            }
                         }
                     }
                 }
-            }
-        }
-    }
 }
 
 TEST(MfccTest, BatchingTest2) {
@@ -140,9 +134,9 @@ TEST(MfccTest, BatchingTest2) {
     std::vector<bool> zMeans = {true, false};
     std::vector<bool> usePow = {true, false};
 
-    for(auto e : energies) {
-        for(auto r : rawEnergies) {
-            for(auto z : zMeans) {
+    for(auto e : energies)
+        for(auto r : rawEnergies)
+            for(auto z : zMeans)
                 for(auto p : usePow) {
                     featparams.useEnergy = e;
                     featparams.rawEnergy = r;
@@ -164,14 +158,10 @@ TEST(MfccTest, BatchingTest2) {
                         );
                         auto curOutput = mfcc.apply(curInput);
                         ASSERT_EQ(curOutput.size(), perBatchOutSz);
-                        for(int j = 0; j < curOutput.size(); ++j) {
+                        for(int j = 0; j < curOutput.size(); ++j)
                             ASSERT_NEAR(curOutput[j], output[j + i * perBatchOutSz], 1E-4);
-                        }
                     }
                 }
-            }
-        }
-    }
 }
 
 TEST(MfccTest, EmptyTest) {
@@ -195,9 +185,8 @@ TEST(MfccTest, ZeroInputTest) {
     Mfsc mfcc(params);
     auto input = std::vector<float>(10000, 0.0);
     auto output = mfcc.apply(input);
-    for(auto o : output) {
+    for(auto o : output)
         ASSERT_NEAR(o, 0.0, 1E-4);
-    }
 }
 
 int main(int argc, char** argv) {

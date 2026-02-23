@@ -52,28 +52,25 @@ typename std::invoke_result<Fn, Args...>::type retryWithBackoff(
     Fn&& f,
     Args&&... args
 ) {
-    if(!(initial.count() >= 0.0)) {
+    if(!(initial.count() >= 0.0))
         throw std::invalid_argument("retryWithBackoff: bad initial");
-    } else if(!(factor >= 0.0)) {
+    else if(!(factor >= 0.0))
         throw std::invalid_argument("retryWithBackoff: bad factor");
-    } else if(maxIters <= 0) {
+    else if(maxIters <= 0)
         throw std::invalid_argument("retryWithBackoff: bad maxIters");
-    }
     auto sleepSecs = initial.count();
     for(int64_t i = 0; i < maxIters; ++i) {
         try {
             return f(std::forward<Args>(args)...);
         } catch(...) {
-            if(i >= maxIters - 1) {
+            if(i >= maxIters - 1)
                 throw;
-            }
         }
-        if(sleepSecs > 0.0) {
+        if(sleepSecs > 0.0)
             /* sleep override */
             std::this_thread::sleep_for(
                 std::chrono::duration<double>(std::min(1e7, sleepSecs))
             );
-        }
         sleepSecs *= factor;
     }
     throw std::logic_error("retryWithBackoff: hit unreachable");

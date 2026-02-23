@@ -36,18 +36,15 @@ int main(int argc, char** argv) {
         + "--config=[path to config file]"
     );
 
-    if(argc <= 1) {
+    if(argc <= 1)
         LOG(FATAL) << gflags::ProgramUsage();
-    }
 
     gflags::ParseCommandLineFlags(&argc, &argv, false);
 
-    if(FLAGS_config.empty()) {
+    if(FLAGS_config.empty())
         LOG(FATAL) << "flag --config must point to sound effect config file";
-    }
-    if(FLAGS_input.empty()) {
+    if(FLAGS_input.empty())
         LOG(FATAL) << "flag --input must point to input file";
-    }
 
     auto sound = loadSound<float>(FLAGS_input);
     auto info = loadSoundInfo(FLAGS_input);

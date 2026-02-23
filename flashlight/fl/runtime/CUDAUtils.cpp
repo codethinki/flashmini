@@ -24,9 +24,8 @@ std::unordered_map<int, const std::unique_ptr<Device>> createCUDADevices() {
     std::unordered_map<int, const std::unique_ptr<Device>> idToDevice;
     int numCudaDevices = 0;
     FL_CUDA_CHECK(cudaGetDeviceCount(&numCudaDevices));
-    for(auto id = 0; id < numCudaDevices; id++) {
+    for(auto id = 0; id < numCudaDevices; id++)
         idToDevice.emplace(id, std::make_unique<CUDADevice>(id));
-    }
     return idToDevice;
 }
 

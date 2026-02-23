@@ -36,14 +36,13 @@ namespace {
         // LBR GRU requires switch the given the r, u, o gate order from cuDNN to u,
         // r, o as required by oneDNN (this from empirical verification)
         int weightsSize = d1 * d2;
-        if(weights.elements() != weightsSize * 3) {
+        if(weights.elements() != weightsSize * 3)
             throw std::invalid_argument(
                 "RNN reorderLbrGruWeights given invalid weights tensor or dims - "
                 "weights of size "
                 + std::to_string(weights.elements()) + " which should be exactly "
                 + std::to_string(weightsSize * 3)
             );
-        }
         return fl::concatenate(
             0,
             weights.flat(fl::range(weightsSize, 2 * weightsSize)),
@@ -231,10 +230,9 @@ namespace {
 
         if(firstLayerDifferent) {
             out.bias1L = bias.flat(fl::range(biasSize / numLayers));
-            if(numLayers > 1) {
+            if(numLayers > 1)
                 // bias for the second --> last layer
                 bias = bias.flat(fl::range(biasSize / numLayers, fl::end));
-            }
         }
         out.bias = bias;
 
@@ -305,9 +303,8 @@ namespace {
         auto y = Tensor({outSize, batchSize, seqLength}, input.type());
         auto hy = Tensor({hiddenSize, batchSize, totalLayers}, input.type());
         Tensor cy;
-        if(mode == RnnMode::LSTM) {
+        if(mode == RnnMode::LSTM)
             cy = Tensor(hy.shape(), input.type());
-        }
 
         // Memory for forward
         auto tnc = dnnl::memory::format_tag::tnc;
@@ -318,13 +315,12 @@ namespace {
             input.asContiguousTensor(), {inputDims}, tnc);
         const detail::DnnlMemoryWrapper outputMemInit(y, {outputDims}, tnc);
         detail::DnnlMemoryWrapper hiddenInMemInit;
-        if(!hiddenState.isEmpty()) {
+        if(!hiddenState.isEmpty())
             hiddenInMemInit = detail::DnnlMemoryWrapper(
                 hiddenState.asContiguousTensor(),
                 {hDims},
                 ldnc
             );
-        }
         const detail::DnnlMemoryWrapper hiddenOutMemInit(hy, {hDims}, ldnc);
         const detail::DnnlMemoryWrapper weightsInputMemRawInit(
             weightsInput.asContiguousTensor(), {weightsInputDims}, ldgoi);
@@ -408,13 +404,12 @@ namespace {
             // which determines whether or not it's ok to return empty
             // descriptors if the array is empty
             detail::DnnlMemoryWrapper cellInMemInit;
-            if(!cellState.isEmpty()) {
+            if(!cellState.isEmpty())
                 cellInMemInit = detail::DnnlMemoryWrapper(
                     cellState.asContiguousTensor(),
                     {cDims},
                     ldnc
                 );
-            }
             // output cell state
             detail::DnnlMemoryWrapper cellOutMemInit(cy, cDims, ldnc);
 
@@ -480,12 +475,10 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::rnn(
     const float dropout,
     std::shared_ptr<detail::AutogradPayload> autogradPayload
 ) {
-    if(dropout > 0.0) {
+    if(dropout > 0.0)
         throw std::invalid_argument("onednn RNN: dropout > 0.0 unsupported");
-    }
-    if(bidirectional) {
+    if(bidirectional)
         throw std::invalid_argument("onednn RNN: bidirectional not yet supported");
-    }
 
     const bool train = (autogradPayload != nullptr);
 
@@ -540,7 +533,7 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::rnn(
     // that output as the input for layers [2, L]. Since the input size dim 0
     // is now the hidden size, the primitive can fuse computation for
     // arbitrarily-many layers.
-    if(input.dim(0) == hiddenSize || numLayers == 1) {
+    if(input.dim(0) == hiddenSize || numLayers == 1)
         // Input and hidden size are the same, or we only have one layer, which
         // means we can call the impl as is and parse weights "normally"
         result = rnnImpl(
@@ -560,7 +553,7 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::rnn(
             kind,
             dropout
         );
-    } else {
+    else {
         // We require more than one layer with different input and hidden states -
         // see the above. Seek to the first layer's hidden/cell state, weights, and
         // bias

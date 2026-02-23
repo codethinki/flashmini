@@ -41,33 +41,27 @@ RawWavSpecAugment::RawWavSpecAugment(
     rawWavHighFreqHz_(highFreqHz),
     rawWavSampleRate_(sampleRate),
     maxKernelSize_(maxKernelSize) {
-    if(numFreqMask_ > 0 && freqMaskF_ <= 0) {
+    if(numFreqMask_ > 0 && freqMaskF_ <= 0)
         throw std::invalid_argument("invalid arguments for frequency masking.");
-    }
-    if(numTimeMask_ > 0 && timeMaskT_ <= 0) {
+    if(numTimeMask_ > 0 && timeMaskT_ <= 0)
         throw std::invalid_argument("invalid arguments for time masking.");
-    }
-    if(numTimeMask_ > 0 && (timeMaskP_ <= 0 || timeMaskP_ > 1.0)) {
+    if(numTimeMask_ > 0 && (timeMaskP_ <= 0 || timeMaskP_ > 1.0))
         throw std::invalid_argument("invalid arguments for time masking.");
-    }
     if(
         rawWavLowFreqHz_ < 0 || rawWavHighFreqHz_ < 0
         || rawWavLowFreqHz_ >= rawWavHighFreqHz_
-    ) {
+    )
         throw std::invalid_argument(
             "invalid arguments for raw Wav high and low frequencies."
         );
-    }
-    if(rawWavNMels_ <= 0) {
+    if(rawWavNMels_ <= 0)
         throw std::invalid_argument("invalid arguments for raw Wav nMels.");
-    }
     precomputeFilters();
 }
 
 void RawWavSpecAugment::precomputeFilters() {
-    if(!lowPassFilters_.empty()) {
+    if(!lowPassFilters_.empty())
         return;
-    }
     auto mel2hz = [](float mel) {
             return 700.0 * (std::pow(10, (mel / 2595.0)) - 1.0);
         };
@@ -84,9 +78,8 @@ void RawWavSpecAugment::precomputeFilters() {
     for(int index = 0; index <= rawWavNMels_; index++) {
         cutoff_.push_back(mel2hz(currentMel) / rawWavSampleRate_);
         currentMel += delta;
-        if(index > 0) {
+        if(index > 0)
             transBandKhz[index] = cutoff_[index - 1] / 4.;
-        }
     }
     transBandKhz[0] = transBandKhz[1];
     ignoredLowPassFilters_ = 0;
@@ -123,35 +116,30 @@ void RawWavSpecAugment::precomputeFilters() {
         filter->eval();
         lowPassFilters_.push_back(filter);
     }
-    if(ignoredLowPassFilters_ >= lowPassFilters_.size()) {
+    if(ignoredLowPassFilters_ >= lowPassFilters_.size())
         throw std::invalid_argument(
             "All low pass filters are ignored, too huge kernel for all frequencies"
         );
-    }
 }
 
 Variable RawWavSpecAugment::forward(const Variable& input) {
-    if(input.isCalcGrad()) {
+    if(input.isCalcGrad())
         throw std::invalid_argument(
             "input gradient calculation is not supported for RawWavSpecAugment."
         );
-    }
-    if(lowPassFilters_.empty()) {
+    if(lowPassFilters_.empty())
         throw std::invalid_argument("invalid RawWavSpecAugment, filters are empty");
-    }
 
     fl::Variable inputCast = detail::adjustInputType(input, "RawWavSpecAugment");
     auto output = Variable(inputCast.tensor(), false);
-    if(!train_) {
+    if(!train_)
         return output;
-    }
 
-    if(input.ndim() != 3) {
+    if(input.ndim() != 3)
         throw std::invalid_argument(
             "RawWavSpecAugment::forward - invalid input shape: "
             "input is expected to be T x C x B"
         );
-    }
 
     // input is expected T x C x B (mostly C=1)
     const Shape& inShape = inputCast.shape();
@@ -177,13 +165,12 @@ Variable RawWavSpecAugment::forward(const Variable& input) {
     auto numTimeSteps = inputCast.dim(0); // number of time steps
     // an upper bound on the time mask
     int T = std::min(timeMaskT_, static_cast<int>(numTimeSteps * timeMaskP_));
-    if(T > 0) {
+    if(T > 0)
         for(int i = 0; i < numTimeMask_; ++i) {
             auto t = generateRandomInt(0, T);
             auto t0 = generateRandomInt(0, numTimeSteps - t);
             opArr(fl::range(t0, t0 + t + 1)) = replaceVal;
         }
-    }
     return output;
 }
 

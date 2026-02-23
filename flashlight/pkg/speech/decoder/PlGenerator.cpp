@@ -69,29 +69,25 @@ PlGenerator::PlGenerator(
     auto plEpochVec = lib::split(',', plEpoch, true);
     auto plRatioVec = lib::split(',', plRatio, true);
 
-    if(plEpochVec.size() != plRatioVec.size()) {
+    if(plEpochVec.size() != plRatioVec.size())
         throw std::invalid_argument(
             "[PlGenerator] Size mismatch between pl_epoch and pl_ratio."
         );
-    }
 
     plEpochs_.resize(plEpochVec.size());
-    for(int i = 0; i < plEpochVec.size(); i++) {
+    for(int i = 0; i < plEpochVec.size(); i++)
         plEpochs_[i] = stoi(plEpochVec[i]);
-    }
 
     for(int i = 0; i < plEpochVec.size(); i++) {
         auto ratio = stof(plRatioVec[i]);
-        if(ratio < 0 || ratio > 1) {
+        if(ratio < 0 || ratio > 1)
             throw std::invalid_argument(
                 "[PlGenerator] The value of pl_ratio should be in [0, 1]."
             );
-        }
-        if(i > 0 && plEpochs_[i] <= plEpochs_[i - 1]) {
+        if(i > 0 && plEpochs_[i] <= plEpochs_[i - 1])
             throw std::invalid_argument(
                 "[PlGenerator] Elements in pl_epoch should be in ascendant order."
             );
-        }
         plUpdateMap_[plEpochs_[i]] = ratio;
     }
 
@@ -109,18 +105,16 @@ PlGenerator::PlGenerator(
         allListDs.emplace_back(curListDs);
     }
     if(!allListDs.empty()) {
-        if(isMaster_) {
+        if(isMaster_)
             fs::create_directory(plDir_);
-        }
         fullUnsupDs_ = std::make_shared<fl::ConcatDataset>(allListDs);
     }
 }
 
 std::string PlGenerator::reloadPl(int curEpoch) const {
     int lastPlEpoch = findLastPlEpoch(curEpoch);
-    if(lastPlEpoch < 0) {
+    if(lastPlEpoch < 0)
         return "";
-    }
 
     fs::path plDir = plDir_ / (kPlSubdirPrefix + std::to_string(lastPlEpoch));
 
@@ -147,12 +141,10 @@ std::string PlGenerator::regeneratePl(
     const std::shared_ptr<SequenceCriterion> criterion,
     const bool usePlugin /* = false */
 ) const {
-    if(plUpdateMap_.find(curEpoch) == plUpdateMap_.end()) {
+    if(plUpdateMap_.find(curEpoch) == plUpdateMap_.end())
         return "";
-    }
-    if(!fullUnsupDs_) {
+    if(!fullUnsupDs_)
         throw std::runtime_error("No unlabeled data is provided");
-    }
 
     logMaster(
         "[PlGenerator] Regenerating PL at epoch " + std::to_string(curEpoch)
@@ -166,11 +158,10 @@ std::string PlGenerator::regeneratePl(
         // Pass. Allowing attempts from all processes to create the folder.
     }
 
-    if(!fs::is_directory(plDir)) {
+    if(!fs::is_directory(plDir))
         throw std::runtime_error(
             "[PlGenerator] Failed to create " + plDir.string()
         );
-    }
 
     /* 1. select data */
     // shuffle
@@ -202,9 +193,8 @@ std::string PlGenerator::regeneratePl(
     std::ofstream plStream(newPlFile);
     for(auto& sample : *selectedDs) {
         auto duration = sample[kDurationIdx].scalar<float>();
-        if(duration < minInputSize_ || duration > maxInputSize_) {
+        if(duration < minInputSize_ || duration > maxInputSize_)
             continue;
-        }
 
         std::vector<std::string> words;
         if(useExistingPl_ && seedModelWER_ < currentModelWER_) {
@@ -212,27 +202,25 @@ std::string PlGenerator::regeneratePl(
             words = tokenToWord_(tokenTarget, tokenDict_, false);
         } else {
             fl::Variable rawEmission;
-            if(usePlugin) {
+            if(usePlugin)
                 rawEmission = ntwrk
                     ->forward(
                         {fl::input(sample[kInputIdx]),
                          fl::noGrad(sample[kDurationIdx])}
                     )
                     .front();
-            } else {
+            else
                 rawEmission = fl::pkg::runtime::forwardSequentialModuleWithPadMask(
                     fl::input(sample[kInputIdx]),
                     ntwrk,
                     sample[kDurationIdx]
                 );
-            }
             auto tokenPrediction =
                 criterion->viterbiPath(rawEmission.tensor()).toHostVector<int>();
             words = tokenToWord_(tokenPrediction, tokenDict_, true);
         }
-        if(words.size() < minTargetSize_ || words.size() > maxTargetSize_) {
+        if(words.size() < minTargetSize_ || words.size() > maxTargetSize_)
             continue;
-        }
 
         auto sampleId = readSampleIds(sample[kSampleIdx]).front();
         auto inputPath = readSampleIds(sample[kPathIdx]).front();
@@ -260,12 +248,10 @@ std::shared_ptr<fl::Dataset> PlGenerator::createTrainSet(
     int maxDurationPerBatch /* = 0 */
 ) const {
     std::vector<fs::path> files;
-    for(const auto& file : lib::split(",", trainLists, true)) {
+    for(const auto& file : lib::split(",", trainLists, true))
         files.emplace_back(trainDir / file);
-    }
-    for(int i = 0; i < worldSize_; i++) {
+    for(int i = 0; i < worldSize_; i++)
         files.emplace_back(trainUnsupDir / (std::to_string(i) + ".lst"));
-    }
 
     return createDataset(
         files,
@@ -290,18 +276,16 @@ void PlGenerator::setModelWER(const float& wer) {
 int PlGenerator::findLastPlEpoch(int curEpoch) const {
     int lastPlEpoch = -1;
     for(const auto& i : plEpochs_) {
-        if(i > curEpoch) {
+        if(i > curEpoch)
             break;
-        }
         lastPlEpoch = i;
     }
     return lastPlEpoch;
 }
 
 void PlGenerator::logMaster(const std::string& message) const {
-    if(worldRank_ != 0) {
+    if(worldRank_ != 0)
         return;
-    }
     std::cerr << message << std::endl;
 }
 

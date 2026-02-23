@@ -20,9 +20,8 @@ FileBlobDataset::FileBlobDataset(
         | std::ios_base::binary;
     {
         std::ofstream fs(name_, (truncate ? mode_ | std::ios_base::trunc : mode_));
-        if(!fs.is_open()) {
+        if(!fs.is_open())
             throw std::runtime_error("could not open file " + name.string());
-        }
     }
     readIndex();
 }
@@ -51,22 +50,18 @@ std::shared_ptr<std::fstream> FileBlobDataset::getStream() const {
             while(i != std::end(allFileHandles_)) {
                 auto ptr = i->lock();
                 if(ptr) {
-                    if(threadFileHandles == ptr) {
+                    if(threadFileHandles == ptr)
                         match = true;
-                    }
                     ++i;
-                } else {
+                } else
                     i = allFileHandles_.erase(i);
-                }
             }
-            if(!match) {
+            if(!match)
                 allFileHandles_.push_back(threadFileHandles);
-            }
         }
         return fs;
-    } else {
+    } else
         return keyval->second;
-    }
 }
 
 int64_t FileBlobDataset::writeData(
@@ -103,9 +98,8 @@ FileBlobDataset::~FileBlobDataset() {
     std::lock_guard<std::mutex> lock(afhmutex_);
     for(auto& weakFileHandles : allFileHandles_) {
         auto fileHandles = weakFileHandles.lock();
-        if(fileHandles) {
+        if(fileHandles)
             fileHandles->erase(reinterpret_cast<uintptr_t>(this));
-        }
     }
 }
 

@@ -125,14 +125,12 @@ std::vector<fl::Variable> ViT::forward(
     // Positional embedding
     auto posEmb = tile(params_[1], {1, 1, B}).astype(output.type());
     output = output + posEmb;
-    if(train_) {
+    if(train_)
         output = dropout(output, pDropout_);
-    }
 
     // Transformers
-    for(int i = 0; i < nLayers_; ++i) {
+    for(int i = 0; i < nLayers_; ++i)
         output = transformers_[i]->forward({output}).front();
-    }
 
     // Linear
     output = ln_->forward(output); // C x T x B
@@ -146,9 +144,8 @@ std::string ViT::prettyString() const {
     std::ostringstream ss;
     ss << "ViT (" << nClasses_ << " classes) with " << nLayers_
     << " Transformers:\n";
-    for(const auto& transformers : transformers_) {
+    for(const auto& transformers : transformers_)
         ss << transformers->prettyString() << "\n";
-    }
     return ss.str();
 }
 

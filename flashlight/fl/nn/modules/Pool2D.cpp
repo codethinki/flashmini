@@ -49,9 +49,8 @@ Variable Pool2D::forward(const Variable& input) {
         /* dilation= */ 1
     );
 
-    if(!(px >= 0 && py >= 0)) {
+    if(!(px >= 0 && py >= 0))
         throw std::invalid_argument("invalid padding for Pool2D");
-    }
 
     return pool2d(input, xFilter_, yFilter_, xStride_, yStride_, px, py, mode_);
 }
@@ -76,17 +75,15 @@ std::string Pool2D::prettyString() const {
     }
     ss << " (" << xFilter_ << "x" << yFilter_ << ", " << xStride_ << ","
     << yStride_ << ", ";
-    if(xPad_ == static_cast<int>(PaddingMode::SAME)) {
+    if(xPad_ == static_cast<int>(PaddingMode::SAME))
         ss << "SAME";
-    } else {
+    else
         ss << xPad_;
-    }
     ss << ",";
-    if(yPad_ == static_cast<int>(PaddingMode::SAME)) {
+    if(yPad_ == static_cast<int>(PaddingMode::SAME))
         ss << "SAME";
-    } else {
+    else
         ss << yPad_;
-    }
     ss << ")";
     return ss.str();
 }

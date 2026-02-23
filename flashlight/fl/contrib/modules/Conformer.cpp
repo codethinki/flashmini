@@ -101,9 +101,8 @@ Conformer::Conformer(
         true,
         modelDim
         )) {
-    if(posEmbContextSize_ > 0) {
+    if(posEmbContextSize_ > 0)
         params_.push_back(uniform(2 * posEmbContextSize_ - 1, headDim, -0.1, 0.1));
-    }
     createLayers();
 }
 
@@ -189,9 +188,8 @@ Variable Conformer::mhsa(const Variable& input, const Variable& inputPadMask) {
     auto v = transpose((*wv_)(normedInput), {1, 0, 2});
 
     Variable mask, posEmb;
-    if(posEmbContextSize_ > 0) {
+    if(posEmbContextSize_ > 0)
         posEmb = tile(params_[0].astype(input.type()), {1, 1, nHeads_ * bsz});
-    }
 
     fl::Variable padMask;
     // TODO{fl::Tensor}{resize} - emulate the ArrayFire resize operation for
@@ -199,12 +197,11 @@ Variable Conformer::mhsa(const Variable& input, const Variable& inputPadMask) {
     if(!inputPadMask.isEmpty()) {
         auto padMaskArr = inputPadMask.tensor();
         Shape newMaskShape = {input.dim(1), input.dim(2)};
-        if(padMaskArr.elements() != newMaskShape.elements()) {
+        if(padMaskArr.elements() != newMaskShape.elements())
             throw std::runtime_error(
                 "Transformer::selfAttention - pad mask requires resize. "
                 "This behavior will be fixed in a future release "
             );
-        }
         padMaskArr = fl::reshape(padMaskArr, newMaskShape);
         padMask = fl::Variable(fl::log(padMaskArr), false);
     }
@@ -241,27 +238,24 @@ Variable Conformer::conv(const Variable& _input) {
 }
 
 std::vector<Variable> Conformer::forward(const std::vector<Variable>& input) {
-    if(input.size() != 2) {
+    if(input.size() != 2)
         throw std::invalid_argument(
             "Invalid inputs for conformer block: there should be input "
             "and paddding mask (can be empty Variable)"
         );
-    }
 
     auto x = input[0];
 
-    if(x.ndim() != 3) {
+    if(x.ndim() != 3)
         throw std::invalid_argument(
             "Conformer::forward - input should be of 3 dimensions "
             "expects an input of size C x T x B - see documentation."
         );
-    }
 
     float pDropout = train_ ? pDropout_ : 0.0;
     float f = 1.0;
-    if(train_ && (fl::rand({1}).scalar<float>() < pLayerDropout_)) {
+    if(train_ && (fl::rand({1}).scalar<float>() < pLayerDropout_))
         f = 0.0;
-    }
     // apply first feed-forward module
     auto ffn1 = dropout(
         (*w12_)(

@@ -54,18 +54,17 @@ namespace {
     }
 
     void setCudnnRnnMathType(const Tensor& input, const RNNDescriptor& rnnDesc) {
-        if(input.type() == fl::dtype::f16) {
+        if(input.type() == fl::dtype::f16)
             CUDNN_CHECK_ERR(
                 cudnnSetRNNMatrixMathType(
                     rnnDesc.descriptor,
                     CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
                 )
             );
-        } else {
+        else
             CUDNN_CHECK_ERR(
                 cudnnSetRNNMatrixMathType(rnnDesc.descriptor, CUDNN_DEFAULT_MATH)
             );
-        }
     }
 
     struct CudnnRnnAutogradPayload : public detail::AutogradPayloadData {
@@ -90,9 +89,8 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::rnn(
 
     bool train = (autogradPayload != nullptr);
     auto payload = std::make_shared<CudnnRnnAutogradPayload>();
-    if(train) {
+    if(train)
         autogradPayload->data = payload;
-    }
 
     Tensor x = input.asContiguousTensor();
     Tensor hiddenState = hiddenStateIn.asContiguousTensor();
@@ -123,18 +121,16 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::rnn(
         if(
             !(hxHiddenSize == hiddenSize && hxBatchSize == batchSize
             && hxTotalLayers == totalLayers)
-        ) {
+        )
             throw std::invalid_argument("invalid hidden state dims for RNN");
-        }
     }
 
     if(
         !cellState.isEmpty()
         && !(mode == RnnMode::LSTM && cellState.dim(0) == hiddenSize
         && cellState.dim(1) == batchSize && cellState.dim(2) == totalLayers)
-    ) {
+    )
         throw std::invalid_argument("invalid cell state dims for RNN");
-    }
 
     Shape hDims = {1, hiddenSize, batchSize, totalLayers};
     TensorDescriptor hxDesc(x.type(), hDims);
@@ -153,11 +149,10 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::rnn(
             cudnnMapToType(weights.type())
         )
     );
-    if(paramSize != weights.bytes()) {
+    if(paramSize != weights.bytes())
         throw std::invalid_argument(
             "invalid # of parameters or wrong input shape for RNN"
         );
-    }
     FilterDescriptor wDesc(weights);
 
     Tensor y({outSize, batchSize, seqLength}, input.type());
@@ -167,9 +162,8 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::rnn(
     TensorDescriptor hyDesc(x.type(), hDims);
 
     Tensor cy;
-    if(mode == RnnMode::LSTM) {
+    if(mode == RnnMode::LSTM)
         cy = Tensor(hy.shape(), x.type());
-    }
 
     TensorDescriptor cyDesc(x.type(), hDims);
 
@@ -250,11 +244,10 @@ std::tuple<Tensor, Tensor, Tensor, Tensor> CudnnAutogradExtension::rnnBackward(
     const float dropProb,
     std::shared_ptr<detail::AutogradPayload> autogradPayload
 ) {
-    if(!autogradPayload) {
+    if(!autogradPayload)
         throw std::invalid_argument(
             "CudnnAutogradExtension::rnnBackward given null detail::AutogradPayload"
         );
-    }
     auto payload =
         std::static_pointer_cast<CudnnRnnAutogradPayload>(autogradPayload->data);
 
@@ -301,9 +294,8 @@ std::tuple<Tensor, Tensor, Tensor, Tensor> CudnnAutogradExtension::rnnBackward(
     Tensor workspace({static_cast<long long>(workspaceSize)}, fl::dtype::b8);
 
     auto& dy = gradData->dy;
-    if(dy.isEmpty()) {
+    if(dy.isEmpty())
         dy = fl::full(y.shape(), 0.0, y.type());
-    }
     auto& dhy = gradData->dhy;
     auto& dcy = gradData->dcy;
 
@@ -367,18 +359,17 @@ std::tuple<Tensor, Tensor, Tensor, Tensor> CudnnAutogradExtension::rnnBackward(
         );
     }
 
-    if(input.type() == fl::dtype::f16) {
+    if(input.type() == fl::dtype::f16)
         CUDNN_CHECK_ERR(
             cudnnSetRNNMatrixMathType(
                 rnnDesc.descriptor,
                 CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
             )
         );
-    } else {
+    else
         CUDNN_CHECK_ERR(
             cudnnSetRNNMatrixMathType(rnnDesc.descriptor, CUDNN_DEFAULT_MATH)
         );
-    }
     TensorDescriptorArray xDescs(
         seqLength, x.type(), {1, 1, inputSize, batchSize});
     Tensor dw = fl::full(weights.shape(), 0, weights.type());

@@ -17,9 +17,8 @@ RandomNumberGenerator::RandomNumberGenerator(int seed /* = 0 */) : randomEngine_
                                                                    gaussianDist_(0, 1) {}
 
 int RandomNumberGenerator::randInt(int minVal, int maxVal) {
-    if(minVal > maxVal) {
+    if(minVal > maxVal)
         std::swap(minVal, maxVal);
-    }
     return randomEngine_() % (maxVal - minVal + 1) + minVal;
 }
 
@@ -37,9 +36,8 @@ float RandomNumberGenerator::gaussian(float mean, float sigma) {
 
 float rootMeanSquare(const std::vector<float>& signal) {
     float sumSquares = 0;
-    for(int i = 0; i < signal.size(); ++i) {
+    for(int i = 0; i < signal.size(); ++i)
         sumSquares += signal[i] * signal[i];
-    }
     return std::sqrt(sumSquares / signal.size());
 }
 
@@ -58,9 +56,8 @@ std::vector<float> genTestSinWave(size_t numSamples, size_t freq, size_t sampleR
         static_cast<float>(sampleRate) / static_cast<float>(freq);
     const float ratio = (2 * M_PI) / waveLenSamples;
 
-    for(size_t i = 0; i < numSamples; ++i) {
+    for(size_t i = 0; i < numSamples; ++i)
         output.at(i) = amplitude * std::sin(static_cast<float>(i) * ratio);
-    }
     return output;
 }
 

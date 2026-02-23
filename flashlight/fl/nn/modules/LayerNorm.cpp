@@ -33,11 +33,9 @@ LayerNorm::LayerNorm(
 ) : epsilon_(eps),
     affine_(affine),
     axisSize_(axisSize) {
-    for(int d = 0; d < kLnExpectedNumDims; ++d) {
-        if(std::find(axis.begin(), axis.end(), d) == axis.end()) {
+    for(int d = 0; d < kLnExpectedNumDims; ++d)
+        if(std::find(axis.begin(), axis.end(), d) == axis.end())
             axisComplement_.push_back(d);
-        }
-    }
     initialize();
 }
 
@@ -48,16 +46,14 @@ Variable LayerNorm::forward(const Variable& _input) {
     // TODO: this is pretty ugly -- eventually fix this up if it can be avoided
     if(input.ndim() < kLnExpectedNumDims) {
         std::vector<Dim> s = _input.shape().get();
-        for(unsigned i = s.size(); i < kLnExpectedNumDims; ++i) {
+        for(unsigned i = s.size(); i < kLnExpectedNumDims; ++i)
             s.push_back(1);
-        }
         input = moddims(_input, Shape(s));
-    } else if(input.ndim() > kLnExpectedNumDims) {
+    } else if(input.ndim() > kLnExpectedNumDims)
         throw std::invalid_argument(
             "LayerNorm::forward - input must be "
             + std::to_string(kLnExpectedNumDims) + " or fewer dimensions."
         );
-    }
 
     Variable dummyInMean, dummyInVar;
 
@@ -70,18 +66,16 @@ Variable LayerNorm::forward(const Variable& _input) {
     auto minAxis =
         *std::min_element(axisComplement_.begin(), axisComplement_.end());
     bool axesContinuous = (axisComplement_.size() == (maxAxis - minAxis + 1));
-    if(axesContinuous) {
+    if(axesContinuous)
         inNormAxes = axisComplement_;
-    } else {
+    else {
         int i = 0;
-        for(int d = 0; d < input.ndim(); ++d) {
+        for(int d = 0; d < input.ndim(); ++d)
             if(
                 std::find(axisComplement_.begin(), axisComplement_.end(), d)
                 == axisComplement_.end()
-            ) {
+            )
                 reorderDims[i++] = d;
-            }
-        }
         for(auto n : axisComplement_) {
             inNormAxes.push_back(i);
             reorderDims[i++] = n;
@@ -104,14 +98,12 @@ Variable LayerNorm::forward(const Variable& _input) {
 
     if(!axesContinuous) {
         std::vector<std::pair<size_t, Dim>> restoreDims;
-        for(size_t i = 0; i < reorderDims.ndim(); ++i) {
+        for(size_t i = 0; i < reorderDims.ndim(); ++i)
             restoreDims.emplace_back(reorderDims[i], i);
-        }
         std::sort(restoreDims.begin(), restoreDims.end());
         Shape restoreDimsShape(std::vector<Dim>(restoreDims.size()));
-        for(size_t i = 0; i < restoreDims.size(); ++i) {
+        for(size_t i = 0; i < restoreDims.size(); ++i)
             restoreDimsShape[i] = restoreDims[i].second;
-        }
         output = reorder(output, restoreDimsShape);
     }
 
@@ -120,14 +112,12 @@ Variable LayerNorm::forward(const Variable& _input) {
         Variable bias = params_[1].astype(output.type());
         if(axisSize_ != kLnVariableAxisSize) {
             Shape affineDims = input.shape();
-            for(int ax : axisComplement_) {
+            for(int ax : axisComplement_)
                 affineDims[ax] = 1;
-            }
-            if(affineDims.elements() != axisSize_) {
+            if(affineDims.elements() != axisSize_)
                 throw std::invalid_argument(
                     "[LayerNorm] Input size along the norm axis doesn't with axisSize."
                 );
-            }
             weight = moddims(params_[0].astype(output.type()), affineDims);
             bias = moddims(params_[1].astype(output.type()), affineDims);
         }
@@ -154,14 +144,12 @@ std::string LayerNorm::prettyString() const {
     std::ostringstream ss;
     ss << "LayerNorm";
     ss << " ( axis : { ";
-    for(int d = 0; d < axisComplement_.size(); ++d) {
+    for(int d = 0; d < axisComplement_.size(); ++d)
         if(
             std::find(axisComplement_.begin(), axisComplement_.end(), d)
             == axisComplement_.end()
-        ) {
+        )
             ss << d << " ";
-        }
-    }
     ss << "} , size : " << axisSize_ << ")";
     return ss.str();
 }

@@ -42,9 +42,8 @@ NovogradOptimizer::NovogradOptimizer(
 
 void NovogradOptimizer::step() {
     for(size_t i = 0; i < parameters_.size(); i++) {
-        if(!parameters_[i].isGradAvailable()) {
+        if(!parameters_[i].isGradAvailable())
             continue;
-        }
 
         const Tensor& grad = parameters_[i].grad().tensor();
         Tensor& data = parameters_[i].tensor();
@@ -69,9 +68,8 @@ std::string NovogradOptimizer::prettyString() const {
     std::ostringstream ss;
     ss << "Novograd";
 
-    if(wd_ != 0) {
+    if(wd_ != 0)
         ss << " (weight decay=" << wd_ << ")";
-    }
 
     return ss.str();
 }

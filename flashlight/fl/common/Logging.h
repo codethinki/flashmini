@@ -150,9 +150,8 @@ public:
     // Prints t to stdout along with context and sensible font color.
     template<typename T>
     Logging && print(T & t) {
-        if(level_ <= Logging::maxLoggingLevel_) {
+        if(level_ <= Logging::maxLoggingLevel_)
             stringStream_ << t;
-        }
         return std::move(*this);
     }
 
@@ -178,9 +177,8 @@ public:
     // Prints t to stdout along with logging level and context.
     template<typename T>
     VerboseLogging && print(T & t) {
-        if(level_ <= VerboseLogging::maxLoggingLevel_) {
+        if(level_ <= VerboseLogging::maxLoggingLevel_)
             stringStream_ << t;
-        }
         return std::move(*this);
     }
 

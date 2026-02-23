@@ -37,17 +37,15 @@ SGDOptimizer::SGDOptimizer(
 
 void SGDOptimizer::step() {
     for(size_t i = 0; i < parameters_.size(); i++) {
-        if(!parameters_[i].isGradAvailable()) {
+        if(!parameters_[i].isGradAvailable())
             continue;
-        }
 
         Tensor& grad = parameters_[i].grad().tensor();
         Tensor& data = parameters_[i].tensor();
 
-        if(wd_ != 0) {
+        if(wd_ != 0)
             // Weight decay term
             grad = grad + wd_ * data;
-        }
 
         if(mu_ != 0) {
             Tensor& velocity = velocities_[i];
@@ -55,12 +53,11 @@ void SGDOptimizer::step() {
             // Regular momentum
             velocity = mu_ * velocity + grad;
             fl::eval(velocity);
-            if(useNesterov_) {
+            if(useNesterov_)
                 // Update for nesterov momentum
                 grad += velocity * mu_;
-            } else {
+            else
                 grad = velocity;
-            }
         }
         data = data - lr_ * grad;
         fl::eval(data);
@@ -71,14 +68,12 @@ std::string SGDOptimizer::prettyString() const {
     std::ostringstream ss;
     ss << "SGD";
 
-    if(wd_ != 0) {
+    if(wd_ != 0)
         ss << " (weight decay=" << wd_ << ")";
-    }
-    if(useNesterov_ && mu_ != 0) {
+    if(useNesterov_ && mu_ != 0)
         ss << " (Nesterov momentum=" << mu_ << ")";
-    } else if(mu_ != 0) {
+    else if(mu_ != 0)
         ss << " (momentum=" << mu_ << ")";
-    }
 
     return ss.str();
 }

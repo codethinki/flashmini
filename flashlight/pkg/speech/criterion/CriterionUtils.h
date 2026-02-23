@@ -24,29 +24,23 @@ namespace pkg {
 
         template<class T>
         inline T logSumExp(T logA, T logB) {
-            if(logA < logB) {
+            if(logA < logB)
                 std::swap(logA, logB);
-            }
-            if(logB == -std::numeric_limits<T>::infinity()) {
+            if(logB == -std::numeric_limits<T>::infinity())
                 return logA;
-            }
             return logA + std::log1p(std::exp(logB - logA));
         }
 
         template<class T>
         inline T logSumExp(T logA, T logB, T logC) {
-            if(logA < logB) {
+            if(logA < logB)
                 std::swap(logA, logB);
-            }
-            if(logA < logC) {
+            if(logA < logC)
                 std::swap(logA, logC);
-            }
-            if(logB < logC) {
+            if(logB < logC)
                 std::swap(logB, logC);
-            }
-            if(logC == -std::numeric_limits<T>::infinity()) {
+            if(logC == -std::numeric_limits<T>::infinity())
                 return logSumExp(logA, logB);
-            }
             return logA + std::log1p(std::exp(logB - logA) + std::exp(logC - logA));
         }
 

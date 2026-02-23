@@ -94,16 +94,14 @@ Conv2D::Conv2D(
     yDilation_(dy),
     bias_(true),
     groups_(groups) {
-    if(b.dim(2) != w.dim(3)) {
+    if(b.dim(2) != w.dim(3))
         throw std::invalid_argument(
             "output channel dimension mismatch between Conv2D weight and bias"
         );
-    }
-    if(b.elements() != b.dim(2)) {
+    if(b.elements() != b.dim(2))
         throw std::invalid_argument(
             "only 3rd dimension of Conv2D bias may be non-singleton"
         );
-    }
 }
 
 Conv2D::Conv2D(const Conv2D& other) : UnaryModule(other.copyParams()),
@@ -143,11 +141,10 @@ Conv2D& Conv2D::operator=(const Conv2D& other) {
 Variable Conv2D::forward(const Variable& input) {
     auto px = derivePadding(input.dim(0), xFilter_, xStride_, xPad_, xDilation_);
     auto py = derivePadding(input.dim(1), yFilter_, yStride_, yPad_, yDilation_);
-    if(!(px >= 0 && py >= 0)) {
+    if(!(px >= 0 && py >= 0))
         throw std::invalid_argument("invalid padding for Conv2D");
-    }
 
-    if(bias_) {
+    if(bias_)
         return conv2d(
             input,
             params_[0].astype(input.type()),
@@ -161,7 +158,7 @@ Variable Conv2D::forward(const Variable& input) {
             groups_,
             benchmarks_
         );
-    } else {
+    else
         return conv2d(
             input,
             params_[0].astype(input.type()),
@@ -174,7 +171,6 @@ Variable Conv2D::forward(const Variable& input) {
             groups_,
             benchmarks_
         );
-    }
 }
 
 void Conv2D::initialize() {
@@ -190,9 +186,8 @@ void Conv2D::initialize() {
         auto bs =
             uniform(Shape({1, 1, nOut_, 1}), -bound, bound, fl::dtype::f32, true);
         params_ = {wt, bs};
-    } else {
+    } else
         params_ = {wt};
-    }
 
     benchmarks_ = std::make_shared<detail::ConvBenchmarks>();
 }
@@ -206,25 +201,22 @@ std::string Conv2D::prettyString() const {
     ss << "Conv2D";
     ss << " (" << nIn_ << "->" << nOut_ << ", " << xFilter_ << "x" << yFilter_
     << ", " << xStride_ << "," << yStride_ << ", ";
-    if(xPad_ == static_cast<int>(PaddingMode::SAME)) {
+    if(xPad_ == static_cast<int>(PaddingMode::SAME))
         ss << "SAME";
-    } else {
+    else
         ss << xPad_;
-    }
     ss << ",";
-    if(yPad_ == static_cast<int>(PaddingMode::SAME)) {
+    if(yPad_ == static_cast<int>(PaddingMode::SAME))
         ss << "SAME";
-    } else {
+    else
         ss << yPad_;
-    }
     ss << ", " << xDilation_ << ", " << yDilation_;
     ss << ")";
 
-    if(bias_) {
+    if(bias_)
         ss << " (with bias)";
-    } else {
+    else
         ss << " (without bias)";
-    }
     return ss.str();
 }
 

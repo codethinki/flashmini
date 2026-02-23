@@ -161,9 +161,8 @@ namespace lib {
             int64_t numFrames(int64_t inSize) const {
                 auto frameSize = numFrameSizeSamples();
                 auto frameStride = numFrameStrideSamples();
-                if(frameStride <= 0 || inSize < frameSize) {
+                if(frameStride <= 0 || inSize < frameSize)
                     return 0;
-                }
                 return 1 + std::floor((inSize - frameSize) * 1.0 / frameStride);
             }
         };

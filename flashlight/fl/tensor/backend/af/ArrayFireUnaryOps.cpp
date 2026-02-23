@@ -97,11 +97,10 @@ Tensor ArrayFireBackend::roll(
     const int shift,
     const unsigned axis
 ) {
-    if(axis > AF_MAX_DIMS) {
+    if(axis > AF_MAX_DIMS)
         throw std::invalid_argument(
             "ArrayFireBackend::roll - given axis > 3 - unsupported"
         );
-    }
     std::vector<Dim> shifts(AF_MAX_DIMS, 0);
     shifts[axis] = shift;
     return toTensor<ArrayFireTensor>(

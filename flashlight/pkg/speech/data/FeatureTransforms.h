@@ -93,17 +93,14 @@ namespace pkg {
             int64_t inCol,
             int64_t inBatch = 1
         ) {
-            if(in.size() != inRow * inCol * inBatch) {
+            if(in.size() != inRow * inCol * inBatch)
                 throw std::invalid_argument("Invalid input size");
-            }
             std::vector<T> out(in.size());
             for(size_t b = 0; b < inBatch; ++b) {
                 int64_t start = b * inRow * inCol;
-                for(size_t c = 0; c < inCol; ++c) {
-                    for(size_t r = 0; r < inRow; ++r) {
+                for(size_t c = 0; c < inCol; ++c)
+                    for(size_t r = 0; r < inRow; ++r)
                         out[start + c * inRow + r] = in[start + r * inCol + c];
-                    }
-                }
             }
             return out;
         }
@@ -117,9 +114,8 @@ namespace pkg {
             int64_t batchSz = 1,
             double threshold = 0.0
         ) {
-            if(in.empty()) {
+            if(in.empty())
                 return {};
-            }
             int64_t perBatchSz = in.size() / batchSz;
             int64_t perFrameSz = perBatchSz / frameSz;
             auto out(in);
@@ -150,9 +146,8 @@ namespace pkg {
                 curFrame = 0;
                 for(auto i = b * perBatchSz; i < (b + 1) * perBatchSz; ++i) {
                     out[i] -= sum[curFrame];
-                    if(sum2[curFrame] > threshold) {
+                    if(sum2[curFrame] > threshold)
                         out[i] /= sum2[curFrame];
-                    }
                     curFrame = (curFrame + 1) % frameSz;
                 }
             }
@@ -165,9 +160,8 @@ namespace pkg {
             int64_t batchSz = 1,
             double threshold = 0.0
         ) {
-            if(in.empty()) {
+            if(in.empty())
                 return {};
-            }
             auto out(in);
             int64_t perBatchSz = out.size() / batchSz;
             for(size_t b = 0; b < batchSz; ++b) {
@@ -181,7 +175,7 @@ namespace pkg {
                     [mean](T x) { return x - mean; });
                 T sq_sum = std::inner_product(start, start + perBatchSz, start, 0.0);
                 T stddev = std::sqrt(sq_sum / perBatchSz);
-                if(stddev > threshold) {
+                if(stddev > threshold)
                     std::transform(
                         start,
                         start + perBatchSz,
@@ -190,7 +184,6 @@ namespace pkg {
                             return x / stddev;
                         }
                     );
-                }
             }
             return out;
         }

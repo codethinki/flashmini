@@ -36,9 +36,8 @@ TEST(OptimTest, GradNorm) {
 }
 
 TEST(OptimTest, GradNormF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     std::vector<Variable> parameters;
     for(int i = 0; i < 5; i++) {
@@ -83,16 +82,14 @@ TEST(SerializationTest, OptimizerSerialize) {
     std::shared_ptr<FirstOrderOptimizer> opt2;
     load(path, parameters2, opt2);
 
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 5; i++)
         parameters2[i].addGrad(Variable(parameters[i].grad().tensor(), false));
-    }
 
     opt->step();
     opt2->step();
 
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 5; i++)
         ASSERT_TRUE(allClose(parameters[i].tensor(), parameters2[i].tensor()));
-    }
 
     opt = std::make_shared<NovogradOptimizer>(parameters, 0.01f);
     opt->step();
@@ -104,16 +101,14 @@ TEST(SerializationTest, OptimizerSerialize) {
     );
     load(path, parameters2, opt2);
 
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 5; i++)
         parameters2[i].addGrad(Variable(parameters[i].grad().tensor(), false));
-    }
 
     opt->step();
     opt2->step();
 
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 5; i++)
         ASSERT_TRUE(allClose(parameters[i].tensor(), parameters2[i].tensor()));
-    }
 }
 
 int main(int argc, char** argv) {

@@ -176,9 +176,8 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
 
             int repeat_counter = 0;
 
-            for(int i = 1; i < L; ++i) {
+            for(int i = 1; i < L; ++i)
                 repeat_counter += (label_ptr[i] == label_ptr[i - 1]);
-            }
 
             repeats[j % cpu_buffer_size] = repeat_counter;
             const bool valid_label = ((L + repeat_counter) <= local_T);
@@ -198,9 +197,8 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
             cudaMemcpyHostToDevice,
             stream_
         );
-        if(cuda_status != cudaSuccess) {
+        if(cuda_status != cudaSuccess)
             return CTC_STATUS_MEMOPS_FAILED;
-        }
 
 
         cuda_status = cudaMemcpyAsync(
@@ -210,9 +208,8 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
             cudaMemcpyHostToDevice,
             stream_
         );
-        if(cuda_status != cudaSuccess) {
+        if(cuda_status != cudaSuccess)
             return CTC_STATUS_MEMOPS_FAILED;
-        }
     }
 
     S_ = 2 * S_ + 1;
@@ -233,9 +230,8 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
         cudaMemcpyHostToDevice,
         stream_
     );
-    if(cuda_status != cudaSuccess) {
+    if(cuda_status != cudaSuccess)
         return CTC_STATUS_MEMOPS_FAILED;
-    }
 
     label_sizes_ =
         reinterpret_cast<int*>(static_cast<char*>(gpu_workspace_)
@@ -248,9 +244,8 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
         cudaMemcpyHostToDevice,
         stream_
     );
-    if(cuda_status != cudaSuccess) {
+    if(cuda_status != cudaSuccess)
         return CTC_STATUS_MEMOPS_FAILED;
-    }
 
     labels_without_blanks_ =
         reinterpret_cast<int*>(static_cast<char*>(gpu_workspace_)
@@ -263,9 +258,8 @@ ctcStatus_t GpuCTC<ProbT>::setup_gpu_metadata(
         cudaMemcpyHostToDevice,
         stream_
     );
-    if(cuda_status != cudaSuccess) {
+    if(cuda_status != cudaSuccess)
         return CTC_STATUS_MEMOPS_FAILED;
-    }
 
     labels_with_blanks_ =
         reinterpret_cast<int*>(static_cast<char*>(gpu_workspace_)
@@ -307,13 +301,12 @@ ctcStatus_t GpuCTC<ProbT>::launch_alpha_beta_kernels(
     // away
     const int stride = minibatch_;
 
-    if(compute_alpha) {
+    if(compute_alpha)
         compute_alpha_kernel<ProbT, NT, VT><< < grid_size, NT, 0, stream_ >>
         > (probs, label_sizes_, utt_length_,
             repeats_, labels_without_blanks_, label_offsets_,
             labels_with_blanks_, alphas_, nll_forward_,
             stride, out_dim_, S_, T_, blank_label_);
-    }
 
 
     if(compute_beta) {
@@ -326,9 +319,8 @@ ctcStatus_t GpuCTC<ProbT>::launch_alpha_beta_kernels(
     }
 
     cudaError_t err = cudaGetLastError();
-    if(err != cudaSuccess) {
+    if(err != cudaSuccess)
         return CTC_STATUS_EXECUTION_FAILED;
-    }
 
     return CTC_STATUS_SUCCESS;
 }
@@ -343,9 +335,8 @@ ctcStatus_t GpuCTC<ProbT>::create_metadata_and_choose_config(
 
     // Setup the metadata for GPU
     ctcStatus_t status = setup_gpu_metadata(flat_labels, label_lengths, input_lengths);
-    if(status != CTC_STATUS_SUCCESS) {
+    if(status != CTC_STATUS_SUCCESS)
         return status;
-    }
 
     constexpr int num_configs = 12;
 
@@ -357,16 +348,14 @@ ctcStatus_t GpuCTC<ProbT>::create_metadata_and_choose_config(
     best_config = 0;
 
     for(int i = 0; i < num_configs; ++i) {
-        if((config_NT[i] * config_VT[i]) >= S_) {
+        if((config_NT[i] * config_VT[i]) >= S_)
             break;
-        } else {
+        else
             best_config++;
-        }
     }
 
-    if(best_config >= num_configs) {
+    if(best_config >= num_configs)
         return CTC_STATUS_LABEL_LENGTH_TOO_LARGE;
-    }
 
     return CTC_STATUS_SUCCESS;
 }
@@ -410,9 +399,8 @@ ctcStatus_t GpuCTC<ProbT>::compute_log_probs(const ProbT* const activations) {
             cudaMemcpyDeviceToDevice,
             stream_
         );
-    if(cuda_status != cudaSuccess) {
+    if(cuda_status != cudaSuccess)
         return CTC_STATUS_MEMOPS_FAILED;
-    }
 
     // Numerically stable SM
     ctcStatus_t ctc_status =
@@ -424,9 +412,8 @@ ctcStatus_t GpuCTC<ProbT>::compute_log_probs(const ProbT* const activations) {
             1,
             stream_
         );
-    if(ctc_status != CTC_STATUS_SUCCESS) {
+    if(ctc_status != CTC_STATUS_SUCCESS)
         return ctc_status;
-    }
 
     // Kernel launch to subtract maximum
     const int NT = 128;
@@ -449,9 +436,8 @@ ctcStatus_t GpuCTC<ProbT>::compute_log_probs(const ProbT* const activations) {
             1,
             stream_
         );
-    if(ctc_status != CTC_STATUS_SUCCESS) {
+    if(ctc_status != CTC_STATUS_SUCCESS)
         return ctc_status;
-    }
 
     // Kernel launch to calculate probabilities
     compute_log_probs_kernel<ProbT, VT><< < grid_size, NT, 0, stream_ >>
@@ -480,14 +466,12 @@ ctcStatus_t GpuCTC<ProbT>::compute_cost_and_score(
         input_lengths,
         best_config
     );
-    if(status != CTC_STATUS_SUCCESS) {
+    if(status != CTC_STATUS_SUCCESS)
         return status;
-    }
 
     status = compute_log_probs(activations);
-    if(status != CTC_STATUS_SUCCESS) {
+    if(status != CTC_STATUS_SUCCESS)
         return status;
-    }
 
     status = launch_gpu_kernels(
         probs_,
@@ -497,9 +481,8 @@ ctcStatus_t GpuCTC<ProbT>::compute_cost_and_score(
         compute_betas_and_grad
     );
 
-    if(status != CTC_STATUS_SUCCESS) {
+    if(status != CTC_STATUS_SUCCESS)
         return status;
-    }
 
     cudaError_t cuda_status_mem, cuda_status_sync;
     cuda_status_mem = cudaMemcpyAsync(
@@ -510,9 +493,8 @@ ctcStatus_t GpuCTC<ProbT>::compute_cost_and_score(
         stream_
     );
     cuda_status_sync = cudaStreamSynchronize(stream_);
-    if(cuda_status_mem != cudaSuccess || cuda_status_sync != cudaSuccess) {
+    if(cuda_status_mem != cudaSuccess || cuda_status_sync != cudaSuccess)
         return CTC_STATUS_MEMOPS_FAILED;
-    }
 
     return CTC_STATUS_SUCCESS;
 }
@@ -532,9 +514,8 @@ ctcStatus_t GpuCTC<ProbT>::cost_and_grad(
         || costs == nullptr
         || label_lengths == nullptr
         || input_lengths == nullptr
-    ) {
+    )
         return CTC_STATUS_INVALID_VALUE;
-    }
 
     return compute_cost_and_score(
         activations,
@@ -561,9 +542,8 @@ ctcStatus_t GpuCTC<ProbT>::score_forward(
         || costs == nullptr
         || label_lengths == nullptr
         || input_lengths == nullptr
-    ) {
+    )
         return CTC_STATUS_INVALID_VALUE;
-    }
 
     return compute_cost_and_score(
         activations,

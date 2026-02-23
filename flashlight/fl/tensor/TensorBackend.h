@@ -310,9 +310,8 @@ Tensor toTensorType(Tensor&& in) {
     // Fast path - backend is the same
     // TODO: make fl::TensorBackendType a static constexpr on the class as well so
     // as to not need to instantiate a backend to check the type
-    if(in.backendType() == T().backendType()) {
+    if(in.backendType() == T().backendType())
         return std::move(in);
-    }
 
     // As per impl requirements, Tensor::device() should return a pointer to host
     // memory if the tensor resides on the host.

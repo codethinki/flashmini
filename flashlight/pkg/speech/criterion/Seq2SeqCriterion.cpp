@@ -20,9 +20,8 @@ namespace fl::pkg::speech {
 
 namespace detail {
     Seq2SeqState concatState(std::vector<Seq2SeqState>& stateVec) {
-        if(stateVec.empty()) {
+        if(stateVec.empty())
             throw std::runtime_error("Empty stateVec");
-        }
 
         int nAttnRound = stateVec[0].hidden.size();
         Seq2SeqState newState(nAttnRound);
@@ -34,22 +33,19 @@ namespace detail {
         std::vector<std::vector<Variable>> hiddenVec(nAttnRound);
         std::vector<Variable> summaryVec;
         for(auto& state : stateVec) {
-            if(state.step != newState.step) {
+            if(state.step != newState.step)
                 throw std::runtime_error("step unmatched");
-            } else if(state.isValid != newState.isValid) {
+            else if(state.isValid != newState.isValid)
                 throw std::runtime_error("isValid unmatched");
-            }
             alphaVec.push_back(state.alpha);
-            for(int i = 0; i < nAttnRound; i++) {
+            for(int i = 0; i < nAttnRound; i++)
                 hiddenVec[i].push_back(state.hidden[i]);
-            }
             summaryVec.push_back(state.summary);
         }
 
         newState.alpha = concatenate(alphaVec, 2);
-        for(int i = 0; i < nAttnRound; i++) {
+        for(int i = 0; i < nAttnRound; i++)
             newState.hidden[i] = concatenate(hiddenVec[i], 1);
-        }
         newState.summary = concatenate(summaryVec, 2);
         return newState;
     }
@@ -64,10 +60,9 @@ namespace detail {
             state.alpha(fl::span, fl::span, fl::range(batchIdx, batchIdx + 1));
         newState.summary =
             state.summary(fl::span, fl::span, fl::range(batchIdx, batchIdx + 1));
-        for(int i = 0; i < nAttnRound; i++) {
+        for(int i = 0; i < nAttnRound; i++)
             newState.hidden[i] =
                 state.hidden[i](fl::span, fl::range(batchIdx, batchIdx + 1));
-        }
         return newState;
     }
 } // namespace detail
@@ -105,7 +100,7 @@ Seq2SeqCriterion::Seq2SeqCriterion(
     add(std::make_shared<Embedding>(hiddenDim, nClass_));
 
     // 2. RNN
-    for(int i = 0; i < nAttnRound_; i++) {
+    for(int i = 0; i < nAttnRound_; i++)
         add(
             std::make_shared<RNN>(
                 hiddenDim,
@@ -116,7 +111,6 @@ Seq2SeqCriterion::Seq2SeqCriterion(
                 dropOut
             )
         );
-    }
 
     // 3. Linear
     add(std::make_shared<Linear>(hiddenDim, nClass_));
@@ -124,9 +118,8 @@ Seq2SeqCriterion::Seq2SeqCriterion(
     // backward compatibility.
 
     // 4. Attention
-    for(int i = 0; i < nAttnRound_; i++) {
+    for(int i = 0; i < nAttnRound_; i++)
         add(attentions[i]);
-    }
 
     // 5. Initial hidden state
     params_.push_back(fl::uniform(Shape{hiddenDim}, -1e-1, 1e-1));
@@ -151,11 +144,10 @@ std::unique_ptr<Module> Seq2SeqCriterion::clone() const {
 std::vector<Variable> Seq2SeqCriterion::forward(
     const std::vector<Variable>& inputs
 ) {
-    if(inputs.size() < 2 || (inputs.size() > 4)) {
+    if(inputs.size() < 2 || (inputs.size() > 4))
         throw std::invalid_argument(
             "Invalid inputs size; Seq2Seq criterion takes input, target, inputSizes [optional]"
         );
-    }
     const auto& input = inputs[0];
     const auto& target = inputs[1];
     const auto& inputSizes =
@@ -164,12 +156,11 @@ std::vector<Variable> Seq2SeqCriterion::forward(
         inputs.size() == 3 ? Tensor() : inputs[3].tensor(); // 1 x B
 
     Variable out, alpha;
-    if(useSequentialDecoder_) {
+    if(useSequentialDecoder_)
         std::tie(out, alpha) = decoder(input, target, inputSizes, targetSizes);
-    } else {
+    else
         std::tie(out, alpha) =
             vectorizedDecoder(input, target, inputSizes, targetSizes);
-    }
 
     out = logSoftmax(out, 0); // C x U x B
 
@@ -197,12 +188,11 @@ std::pair<Variable, Variable> Seq2SeqCriterion::vectorizedDecoder(
     const Tensor& inputSizes,
     const Tensor& targetSizes
 ) {
-    if(target.ndim() != 2) {
+    if(target.ndim() != 2)
         throw std::invalid_argument(
             "Seq2SeqCriterion::vectorizedDecoder: "
             "target expects to be shape {U, B}"
         );
-    }
     int U = target.dim(0);
     int B = target.dim(1);
     int T = input.dim(1);
@@ -213,11 +203,11 @@ std::pair<Variable, Variable> Seq2SeqCriterion::vectorizedDecoder(
         // Slice off eos
         auto y = target(fl::range(0, U - 1), fl::span);
         if(train_) {
-            if(samplingStrategy_ == fl::pkg::speech::kModelSampling) {
+            if(samplingStrategy_ == fl::pkg::speech::kModelSampling)
                 throw std::logic_error(
                     "vectorizedDecoder does not support model sampling"
                 );
-            } else if(samplingStrategy_ == fl::pkg::speech::kRandSampling) {
+            else if(samplingStrategy_ == fl::pkg::speech::kRandSampling) {
                 auto mask = Variable(
                     (fl::rand(y.shape()) * 100 <= pctTeacherForcing_).astype(y.type()),
                     false
@@ -242,10 +232,9 @@ std::pair<Variable, Variable> Seq2SeqCriterion::vectorizedDecoder(
         hy = fl::transpose(hy, {0, 2, 1}); // H x B x U ->  H x U x B
 
         Variable windowWeight;
-        if(window_ && (!train_ || trainWithWindow_)) {
+        if(window_ && (!train_ || trainWithWindow_))
             windowWeight =
                 window_->computeVectorizedWindow(U, T, B, inputSizes, targetSizes);
-        }
 
         std::tie(alpha, summaries) = attention(i)->forward(
             hy,
@@ -278,9 +267,9 @@ std::pair<Variable, Variable> Seq2SeqCriterion::decoder(
         std::tie(ox, state) =
             decodeStep(input, y, state, inputSizes, targetSizes, U);
 
-        if(!train_) {
+        if(!train_)
             y = target(fl::range(u, u + 1), fl::span);
-        } else if(samplingStrategy_ == fl::pkg::speech::kGumbelSampling) {
+        else if(samplingStrategy_ == fl::pkg::speech::kGumbelSampling) {
             double eps = 1e-7;
             auto gb = -log(-log((1 - 2 * eps) * fl::rand(ox.shape()) + eps));
             ox = logSoftmax((ox + Variable(gb, false)) / gumbelTemperature_, 0);
@@ -288,20 +277,19 @@ std::pair<Variable, Variable> Seq2SeqCriterion::decoder(
         } else if(
             fl::all(fl::rand({1}) * 100 <= fl::full({1}, pctTeacherForcing_))
             .asScalar<bool>()
-        ) {
+        )
             y = target(fl::range(u, u + 1), fl::span);
-        } else if(samplingStrategy_ == fl::pkg::speech::kModelSampling) {
+        else if(samplingStrategy_ == fl::pkg::speech::kModelSampling) {
             Tensor maxIdx, maxValues;
             fl::max(maxValues, maxIdx, ox.tensor(), 0);
             y = Variable(maxIdx, false);
-        } else if(samplingStrategy_ == fl::pkg::speech::kRandSampling) {
+        } else if(samplingStrategy_ == fl::pkg::speech::kRandSampling)
             y = Variable(
                 (fl::rand({1, target.dim(1)}) * (nClass_ - 1)).astype(fl::dtype::s32),
                 false
             );
-        } else {
+        else
             throw std::invalid_argument("Invalid sampling strategy");
-        }
 
         outvec.push_back(ox);
         alphaVec.push_back(state.alpha);
@@ -346,23 +334,19 @@ std::pair<Tensor, Variable> Seq2SeqCriterion::viterbiPathBase(
         );
         fl::max(maxValues, maxIdx, ox.tensor(), 0);
         pred = maxIdx.asScalar<int>();
-        if(saveAttn) {
+        if(saveAttn)
             alphaVec.push_back(state.alpha);
-        }
 
-        if(pred == eos_) {
+        if(pred == eos_)
             break;
-        }
         y = constant(pred, {1}, fl::dtype::s32, false);
         maxPath.push_back(pred);
     }
-    if(saveAttn) {
+    if(saveAttn)
         alpha = concatenate(alphaVec, 0);
-    }
 
-    if(wasTrain) {
+    if(wasTrain)
         train();
-    }
     Tensor vPath = maxPath.empty() ? Tensor() : Tensor::fromVector(maxPath);
     return std::make_pair(vPath, alpha);
 }
@@ -405,9 +389,8 @@ std::vector<Seq2SeqCriterion::CandidateHypo> Seq2SeqCriterion::beamSearch(
         std::vector<float> prevScoreVec;
         for(auto& hypo : beam) {
             Variable y;
-            if(!hypo.path.empty()) {
+            if(!hypo.path.empty())
                 y = constant(hypo.path.back(), {1}, fl::dtype::s32, false);
-            }
             prevYVec.push_back(y);
             prevStateVec.push_back(hypo.state);
             prevScoreVec.push_back(hypo.score);
@@ -468,16 +451,14 @@ std::vector<Seq2SeqCriterion::CandidateHypo> Seq2SeqCriterion::beamSearch(
                     path_,
                     detail::selectState(state, hypIdx)
                 );
-            } else if(clsIdx != eos_) {
+            } else if(clsIdx != eos_)
                 newBeam.emplace_back(
                     scoreVec[indices[j]],
                     path_,
                     detail::selectState(state, hypIdx)
                 );
-            }
-            if(newBeam.size() >= beamSize) {
+            if(newBeam.size() >= beamSize)
                 break;
-            }
         }
         beam.resize(newBeam.size());
         beam = std::move(newBeam);
@@ -494,15 +475,13 @@ std::vector<Seq2SeqCriterion::CandidateHypo> Seq2SeqCriterion::beamSearch(
             // if lowest score in complete is better than best future hypo
             // then its not possible for any future hypothesis to replace existing
             // hypothesises in complete.
-            if(complete.back().score > beam[0].score) {
+            if(complete.back().score > beam[0].score)
                 break;
-            }
         }
     }
 
-    if(wasTrain) {
+    if(wasTrain)
         train();
-    }
 
     return complete.empty() ? beam : complete;
 }
@@ -515,25 +494,22 @@ std::pair<Variable, Seq2SeqState> Seq2SeqCriterion::decodeStep(
     const Tensor& targetSizes,
     const int maxDecoderSteps
 ) const {
-    if(xEncoded.ndim() != 3) {
+    if(xEncoded.ndim() != 3)
         throw std::invalid_argument(
             "Seq2SeqCriterion::decodeStep: "
             "expected xEncoded to have at least three dimensions"
         );
-    }
 
     Variable hy;
-    if(y.isEmpty()) {
+    if(y.isEmpty())
         hy = tile(startEmbedding(), {1, 1, static_cast<int>(xEncoded.dim(2))});
-    } else if(train_ && samplingStrategy_ == fl::pkg::speech::kGumbelSampling) {
+    else if(train_ && samplingStrategy_ == fl::pkg::speech::kGumbelSampling)
         hy = linear(y, embedding()->param(0));
-    } else {
+    else
         hy = embedding()->forward(y);
-    }
 
-    if(inputFeeding_ && !y.isEmpty()) {
+    if(inputFeeding_ && !y.isEmpty())
         hy = hy + moddims(inState.summary, hy.shape());
-    }
     hy = moddims(hy, {hy.dim(0), -1}); // H x B
 
     Seq2SeqState outState(nAttnRound_);
@@ -552,7 +528,7 @@ std::pair<Variable, Seq2SeqState> Seq2SeqCriterion::decodeStep(
         // size)
         int batchsize =
             y.isEmpty() ? xEncoded.dim(2) : (y.ndim() < 2 ? 1 : y.dim(1));
-        if(window_ && (!train_ || trainWithWindow_)) {
+        if(window_ && (!train_ || trainWithWindow_))
             // TODO fix for softpretrain where target size is used
             // for now force to xEncoded.dim(1)
             windowWeight = window_->computeWindow(
@@ -564,7 +540,6 @@ std::pair<Variable, Seq2SeqState> Seq2SeqCriterion::decodeStep(
                 inputSizes,
                 targetSizes
             );
-        }
         std::tie(outState.alpha, summaries) = attention(i)->forward(
             hy,
             xEncoded,
@@ -593,13 +568,12 @@ std::pair<std::vector<std::vector<float>>, std::vector<Seq2SeqStatePtr>> Seq2Seq
 
     // Batch Ys
     for(int i = 0; i < batchSize; i++) {
-        if(ys[i].isEmpty()) {
+        if(ys[i].isEmpty())
             ys[i] = startEmbedding();
-        } else {
+        else {
             ys[i] = embedding()->forward(ys[i]);
-            if(inputFeeding_) {
+            if(inputFeeding_)
                 ys[i] = ys[i] + moddims(inStates[i]->summary, ys[i].shape());
-            }
         }
         ys[i] = moddims(ys[i], {ys[i].dim(0), -1});
     }
@@ -614,29 +588,26 @@ std::pair<std::vector<std::vector<float>>, std::vector<Seq2SeqStatePtr>> Seq2Seq
 
     for(int n = 0; n < nAttnRound_; n++) {
         /* (1) RNN forward */
-        if(inStates[0]->hidden[n].isEmpty()) {
+        if(inStates[0]->hidden[n].isEmpty())
             std::tie(yBatched, outStateBatched) =
                 decodeRNN(n)->forward(yBatched, Variable());
-        } else {
-            for(int i = 0; i < batchSize; i++) {
+        else {
+            for(int i = 0; i < batchSize; i++)
                 statesVector[i] = inStates[i]->hidden[n];
-            }
             Variable inStateHiddenBatched =
                 concatenate(statesVector, 1).asContiguous();
             std::tie(yBatched, outStateBatched) =
                 decodeRNN(n)->forward(yBatched, inStateHiddenBatched);
         }
 
-        for(int i = 0; i < batchSize; i++) {
+        for(int i = 0; i < batchSize; i++)
             outstates[i]->hidden[n] = outStateBatched(fl::span, fl::range(i, i + 1));
-        }
 
         /* (2) Attention forward */
-        if(window_ && (!train_ || trainWithWindow_)) {
+        if(window_ && (!train_ || trainWithWindow_))
             throw std::runtime_error(
                 "Batched decoding does not support models with window"
             );
-        }
 
         Variable summaries, alphaBatched;
         // NB:
@@ -665,11 +636,10 @@ std::pair<std::vector<std::vector<float>>, std::vector<Seq2SeqStatePtr>> Seq2Seq
     auto outBatched = linearOut()->forward(yBatched);
     outBatched = logSoftmax(outBatched / smoothingTemperature, 0);
     std::vector<std::vector<float>> out(batchSize);
-    for(int i = 0; i < batchSize; i++) {
+    for(int i = 0; i < batchSize; i++)
         out[i] = outBatched(fl::span, fl::range(i, i + 1))
             .tensor()
             .toHostVector<float>();
-    }
 
     return std::make_pair(out, outstates);
 }
@@ -680,20 +650,19 @@ void Seq2SeqCriterion::setUseSequentialDecoder() {
         (pctTeacherForcing_ < 100
         && samplingStrategy_ == fl::pkg::speech::kModelSampling)
         || samplingStrategy_ == fl::pkg::speech::kGumbelSampling || inputFeeding_
-    ) {
+    )
         useSequentialDecoder_ = true;
-    } else if(
+    else if(
         std::dynamic_pointer_cast<SimpleLocationAttention>(attention(0))
         || std::dynamic_pointer_cast<LocationAttention>(attention(0))
         || std::dynamic_pointer_cast<NeuralLocationAttention>(attention(0))
-    ) {
+    )
         useSequentialDecoder_ = true;
-    } else if(
+    else if(
         window_ && trainWithWindow_
         && std::dynamic_pointer_cast<MedianWindow>(window_)
-    ) {
+    )
         useSequentialDecoder_ = true;
-    }
 }
 
 std::string Seq2SeqCriterion::prettyString() const {
@@ -725,12 +694,11 @@ EmittingModelUpdateFunc buildSeq2SeqRnnUpdateFunction(
             const std::vector<int>& /* prevHypBeamIdxs */,
             const std::vector<EmittingModelStatePtr>& rawPrevStates,
             int& t) {
-            if(t == 0) {
+            if(t == 0)
                 buf->input = fl::Variable(
                     Tensor::fromBuffer({N, T}, emissions, MemoryLocation::Host),
                     false
                 );
-            }
             int batchSize = rawY.size();
             buf->prevStates.resize(0);
             buf->ys.resize(0);
@@ -740,11 +708,10 @@ EmittingModelUpdateFunc buildSeq2SeqRnnUpdateFunction(
                 Seq2SeqState* prevState =
                     static_cast<Seq2SeqState*>(rawPrevStates[i].get());
                 fl::Variable y;
-                if(t > 0) {
+                if(t > 0)
                     y = fl::constant(rawY[i], {1}, fl::dtype::s32, false);
-                } else {
+                else
                     prevState = &buf->dummyState;
-                }
                 buf->ys.push_back(y);
                 buf->prevStates.push_back(prevState);
             }
@@ -764,11 +731,10 @@ EmittingModelUpdateFunc buildSeq2SeqRnnUpdateFunction(
             // Cast back to void*
             std::vector<EmittingModelStatePtr> out;
             for(auto& os : outStates) {
-                if(os->isValid) {
+                if(os->isValid)
                     out.push_back(os);
-                } else {
+                else
                     out.push_back(nullptr);
-                }
             }
             return std::make_pair(amScores, out);
         };

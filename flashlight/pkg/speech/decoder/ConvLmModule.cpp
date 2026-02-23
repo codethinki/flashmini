@@ -24,32 +24,28 @@ GetConvLmScoreFunc buildGetConvLmScoreFunction(
         int sampleSize = -1,
         int batchSize = 1) {
             sampleSize = sampleSize > 0 ? sampleSize : inputs.size();
-            if(sampleSize * batchSize > inputs.size()) {
+            if(sampleSize * batchSize > inputs.size())
                 throw std::invalid_argument(
                     "[ConvLM] Incorrect sample size (" + std::to_string(sampleSize)
                     + ") or batch size (" + std::to_string(batchSize) + ")."
                 );
-            }
             Tensor inputData = Tensor::fromVector({sampleSize, batchSize}, inputs);
             fl::Variable output = network->forward({fl::input(inputData)})[0];
 
-            if(fl::countNonzero(fl::isnan(output.tensor())).asScalar<int>() != 0) {
+            if(fl::countNonzero(fl::isnan(output.tensor())).asScalar<int>() != 0)
                 throw std::runtime_error("[ConvLM] Encountered NaNs in propagation");
-            }
             int32_t C = output.dim(0), T = output.dim(1), B = output.dim(2);
-            if(B != batchSize) {
+            if(B != batchSize)
                 throw std::logic_error(
                     "[ConvLM]: incorrect predictions: batch should be "
                     + std::to_string(batchSize) + " but it is " + std::to_string(B)
                 );
-            }
-            if(batchSize != static_cast<int>(lastTokenPositions.size())) {
+            if(batchSize != static_cast<int>(lastTokenPositions.size()))
                 throw std::logic_error(
                     "[ConvLM]: incorrect postions for accessing: size should be "
                     + std::to_string(batchSize) + " but it is "
                     + std::to_string(lastTokenPositions.size())
                 );
-            }
             // output (c, t, b)
             // set global indices: offset by channel
             Tensor globalIndices = fl::iota({C, 1}, {1, B}, fl::dtype::s32);

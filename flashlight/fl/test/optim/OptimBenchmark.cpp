@@ -22,17 +22,15 @@ using namespace fl;
 
 double timeit(std::function<void()> fn) {
     // warmup
-    for(int i = 0; i < 10; ++i) {
+    for(int i = 0; i < 10; ++i)
         fn();
-    }
     fl::sync();
 
     int num_iters = 100;
     fl::sync();
     auto start = fl::Timer::start();
-    for(int i = 0; i < num_iters; i++) {
+    for(int i = 0; i < num_iters; i++)
         fn();
-    }
     fl::sync();
     return fl::Timer::stop(start) / num_iters;
 }

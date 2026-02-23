@@ -29,21 +29,18 @@ fs::path dataDir = "";
 Dictionary createDictionary(const std::string& path) {
     Dictionary dictionary;
     std::ifstream stream(path);
-    if(!stream) {
+    if(!stream)
         throw std::runtime_error("createDictionary - invalid path");
-    }
 
     std::string line;
     while(std::getline(stream, line)) {
-        if(line.empty()) {
+        if(line.empty())
             continue;
-        }
         auto tkns = splitOnWhitespace(line, true);
         dictionary.addEntry(tkns.front());
     }
-    if(!dictionary.isContiguous()) {
+    if(!dictionary.isContiguous())
         throw std::runtime_error("Invalid dictionary_ format - not contiguous");
-    }
     dictionary.setDefaultIndex(dictionary.getIndex(fl::lib::text::kUnkToken));
     return dictionary;
 }

@@ -29,26 +29,23 @@ auto letterToTarget = [](void* data, Shape dims, fl::dtype /* unused */) {
         std::string transcript(
             static_cast<char*>(data), static_cast<char*>(data) + dims.elements());
         std::vector<int> tgt;
-        for(auto c : transcript) {
+        for(auto c : transcript)
             tgt.push_back(static_cast<int>(c));
-        }
         return Tensor::fromVector(tgt);
     };
 } // namespace
 
 TEST(ListFileDatasetTest, LoadData) {
     const fs::path dataPath = loadPath / "data.lst";
-    if(!fs::exists(dataPath)) {
+    if(!fs::exists(dataPath))
         throw std::runtime_error(
             "ListFileDatasetTest, LoadData - can't open test data.lst"
         );
-    }
     std::vector<std::string> data;
     {
         std::ifstream in(dataPath);
-        for(std::string s; std::getline(in, s);) {
+        for(std::string s; std::getline(in, s);)
             data.emplace_back(s);
-        }
     }
 
     const fs::path rootPath = fs::temp_directory_path() / "data.lst";

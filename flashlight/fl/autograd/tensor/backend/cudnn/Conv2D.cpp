@@ -63,7 +63,7 @@ namespace {
     ) {
         T reserved;
         bool algoFound = false;
-        for(const auto& algoPerf : algoPerfs) {
+        for(const auto& algoPerf : algoPerfs)
             if(
                 algoPerf.status == CUDNN_STATUS_SUCCESS
                 && algoPerf.memory < kWorkspaceSizeLimitBytes
@@ -71,19 +71,17 @@ namespace {
                 if(
                     !(arithmeticPrecision == fl::dtype::f16)
                     || (preferredAlgos.find(algoPerf.algo) != preferredAlgos.end())
-                ) {
+                )
                     return algoPerf;
-                } else if(!algoFound) {
+                else if(!algoFound) {
                     reserved = algoPerf;
                     algoFound = true;
                 }
             }
-        }
-        if(algoFound) {
+        if(algoFound)
             return reserved;
-        } else {
+        else
             throw std::runtime_error("Error while finding cuDNN Conv Algorithm.");
-        }
     }
 
     cudnnConvolutionFwdAlgoPerf_t getFwdAlgo(
@@ -171,26 +169,23 @@ namespace {
         if(
             arithmeticPrecision != fl::dtype::f16
             && bestAlgo.algo == CUDNN_CONVOLUTION_BWD_DATA_ALGO_1
-        ) {
+        )
             isAlgoBlacklisted = true;
-        }
+
 #endif
 #if CUDNN_VERSION < 7500
         if(
             isStrided
             && (bestAlgo.algo == CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT_TILING
             || bestAlgo.algo == CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT)
-        ) {
+        )
             isAlgoBlacklisted = true;
-        }
+
 #endif
-        if(isAlgoBlacklisted) {
-            for(const auto& algoPerf : bwdDataAlgoPerfs) {
-                if(algoPerf.algo == kBwdDataDefaultAlgo) {
+        if(isAlgoBlacklisted)
+            for(const auto& algoPerf : bwdDataAlgoPerfs)
+                if(algoPerf.algo == kBwdDataDefaultAlgo)
                     return algoPerf;
-                }
-            }
-        }
         return bestAlgo;
     }
 
@@ -238,17 +233,14 @@ namespace {
         if(
             arithmeticPrecision != fl::dtype::f16
             && bestAlgo.algo == CUDNN_CONVOLUTION_BWD_FILTER_ALGO_1
-        ) {
+        )
             isAlgoBlacklisted = true;
-        }
+
 #endif
-        if(isAlgoBlacklisted) {
-            for(const auto& algoPerf : bwdFilterAlgoPerfs) {
-                if(algoPerf.algo == kBwdFilterDefaultAlgo) {
+        if(isAlgoBlacklisted)
+            for(const auto& algoPerf : bwdFilterAlgoPerfs)
+                if(algoPerf.algo == kBwdFilterDefaultAlgo)
                     return algoPerf;
-                }
-            }
-        }
         return bestAlgo;
     }
 
@@ -276,18 +268,17 @@ namespace {
     }
 
     void setDefaultMathType(ConvDescriptor& cDesc, const Tensor& input) {
-        if(input.type() == fl::dtype::f16) {
+        if(input.type() == fl::dtype::f16)
             CUDNN_CHECK_ERR(
                 cudnnSetConvolutionMathType(
                     cDesc.descriptor,
                     CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
                 )
             );
-        } else {
+        else
             CUDNN_CHECK_ERR(
                 cudnnSetConvolutionMathType(cDesc.descriptor, CUDNN_DEFAULT_MATH)
             );
-        }
     }
 
 } // namespace
@@ -305,31 +296,29 @@ Tensor CudnnAutogradExtension::conv2d(
     const int groups,
     std::shared_ptr<detail::AutogradPayload>
 ) {
-    if(input.ndim() != 4) {
+    if(input.ndim() != 4)
         throw std::invalid_argument(
             "conv2d: expects input tensor to be 4 dimensions: "
             "in WHCN ordering. Given tensor has "
             + std::to_string(input.ndim()) + " dimensions."
         );
-    }
 
     auto hasBias = bias.elements() > 0;
 
     auto inDesc = TensorDescriptor(input);
     auto wtDesc = FilterDescriptor(weights);
     auto convDesc = ConvDescriptor(input.type(), px, py, sx, sy, dx, dy, groups);
-    if(input.type() == fl::dtype::f16) {
+    if(input.type() == fl::dtype::f16)
         CUDNN_CHECK_ERR(
             cudnnSetConvolutionMathType(
                 convDesc.descriptor,
                 CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
             )
         );
-    } else {
+    else
         CUDNN_CHECK_ERR(
             cudnnSetConvolutionMathType(convDesc.descriptor, CUDNN_DEFAULT_MATH)
         );
-    }
 
     std::array<int, 4> odims;
     CUDNN_CHECK_ERR(
@@ -472,12 +461,11 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
             FilterDescriptor& wDesc,
             ConvDescriptor& cDesc,
             TensorDescriptor& oDesc) -> Tensor {
-            if(dataGradBenchmark && DynamicBenchmark::getBenchmarkMode()) {
+            if(dataGradBenchmark && DynamicBenchmark::getBenchmarkMode())
                 setCudnnConvMathType(
                     cDesc,
                     dataGradBenchmark->getOptions<DynamicBenchmarkOptions<KernelMode>>()
                 );
-            }
 
             DevicePtr wPtr(wtTensor);
             // ensure cudnn compute stream waits on stream of weight tensor
@@ -608,7 +596,7 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
                 }
             );
 
-        } else {
+        } else
             dataGradBenchmark->audit(
                 [&dataGradOut,
                 &convolutionBackwardData,
@@ -630,9 +618,8 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
                     );
                 }
             );
-        }
 
-    } else {
+    } else
         // No benchmarking - proceed normally
         dataGradOut = convolutionBackwardData(
             input,
@@ -643,7 +630,6 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
             cDesc,
             oDesc
         );
-    }
 
     return dataGradOut;
 }
@@ -693,13 +679,12 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
             FilterDescriptor& wDesc,
             ConvDescriptor& cDesc,
             TensorDescriptor& oDesc) -> Tensor {
-            if(filterGradBenchmark && DynamicBenchmark::getBenchmarkMode()) {
+            if(filterGradBenchmark && DynamicBenchmark::getBenchmarkMode())
                 setCudnnConvMathType(
                     cDesc,
                     filterGradBenchmark
                     ->getOptions<DynamicBenchmarkOptions<KernelMode>>()
                 );
-            }
 
             DevicePtr iPtr(inTensor);
             // ensure cudnn compute stream waits on stream of input tensor
@@ -828,7 +813,7 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                 }
             );
 
-        } else {
+        } else
             filterGradBenchmark->audit(
                 [&filterGradOut,
                 &convolutionBackwardFilter,
@@ -850,9 +835,8 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                     );
                 }
             );
-        }
 
-    } else {
+    } else
         filterGradOut = convolutionBackwardFilter(
             input,
             weight,
@@ -862,7 +846,6 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
             cDesc,
             oDesc
         );
-    }
 
     auto convolutionBackwardBias = [&hndl, &cudnnStream, oneg, zerog](
         const Tensor& bsTensor,
@@ -931,7 +914,7 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                         convolutionBackwardBias(biasF32, gradOutputF32, oDescF32);
                     }
                 );
-            } else {
+            } else
                 // Grad output and bias types are already the same, so perform the
                 // computation using whatever input type is given
                 biasGradBenchmark->audit(
@@ -943,11 +926,9 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                         biasGradOut = convolutionBackwardBias(bias, gradOutput, oDesc);
                     }
                 );
-            }
-        } else {
+        } else
             // No benchmark; proceed normally
             biasGradOut = convolutionBackwardBias(bias, gradOutput, oDesc);
-        }
     }
 
     return {filterGradOut, biasGradOut};

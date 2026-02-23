@@ -134,9 +134,8 @@ TEST(AutogradUnaryOpsTest, Softmax) {
 }
 
 TEST_F(AutogradTestF16, SoftmaxF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto in = Variable(fl::rand({3, 5, 1}, fl::dtype::f16), true);
     auto funcSm = [&](Variable& input) { return softmax(input, 0); };
@@ -152,9 +151,8 @@ TEST(AutogradUnaryOpsTest, LogSoftmax) {
 }
 
 TEST_F(AutogradTestF16, LogSoftmaxF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto in = Variable(fl::rand({3, 5, 1}, fl::dtype::f16), true);
     auto funcLsm = [&](Variable& input) { return logSoftmax(input, 0); };

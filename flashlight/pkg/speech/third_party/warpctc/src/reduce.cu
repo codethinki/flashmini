@@ -44,9 +44,8 @@ template < int NT, typename T, typename Rop
         T shuff;
         for(int offset = warp_size / 2; offset > 0; offset /= 2) {
             shuff = __shfl_down_sync(0xffffffff, x, offset);
-            if(tid + offset < count && tid < offset) {
+            if(tid + offset < count && tid < offset)
                 x = g(x, shuff);
-            }
         }
         return x;
     }
@@ -71,9 +70,8 @@ template < int NT, typename Iop, typename Rop, typename T
     T curr;
 
     // Each block works on a column
-    if(idx < num_rows) {
+    if(idx < num_rows)
         curr = f(input[idx + col * num_rows]);
-    }
     idx += NT;
 
 
@@ -86,9 +84,8 @@ template < int NT, typename Iop, typename Rop, typename T
     curr = R::reduce(tid, curr, storage, num_rows, g);
 
     // Store result in out
-    if(tid == 0) {
+    if(tid == 0)
         output[col] = curr;
-    }
 }
 
 template < int NT, typename Iop, typename Rop, typename T
@@ -122,9 +119,8 @@ template < int NT, typename Iop, typename Rop, typename T
     // Reduce
     if(threadIdx.y == 0 && row < num_rows) {
 #pragma unroll
-        for(int i = 1; i < warps_per_block && i < num_cols; ++i) {
+        for(int i = 1; i < warps_per_block && i < num_cols; ++i)
             curr = g(curr, s[i + threadIdx.x * warps_per_block]);
-        }
         output[row] = curr;
     }
 }
@@ -175,9 +171,8 @@ template < typename T, typename Iof, typename Rof
     ReduceHelper::impl(f, g, input, output, rows, cols, axis, stream);
     cudaStreamSynchronize(stream);
     cudaError_t err = cudaGetLastError();
-    if(err != cudaSuccess) {
+    if(err != cudaSuccess)
         return CTC_STATUS_EXECUTION_FAILED;
-    }
 
     return CTC_STATUS_SUCCESS;
 }

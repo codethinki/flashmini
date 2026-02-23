@@ -91,9 +91,8 @@ Tensor OneDnnAutogradExtension::pool2d(
 ) {
     const bool train = (autogradPayload != nullptr);
     auto payload = std::make_shared<OneDnnPool2DPayload>();
-    if(train) {
+    if(train)
         autogradPayload->data = payload;
-    }
 
     // inputX x inputY x channels x batch
     auto ix = input.dim(kWIdx);
@@ -154,9 +153,8 @@ Tensor OneDnnAutogradExtension::pool2d(
         inputDesc
     );
     payload->outputMemory = outputMemInit.getMemory();
-    if(outputMemInit.getMemory().get_desc() != outputDesc) {
+    if(outputMemInit.getMemory().get_desc() != outputDesc)
         payload->outputMemory = memory(outputDesc, dnnlEngine);
-    }
     // Workspace and layer (only training mode requires a workspace)
     std::shared_ptr<pooling_forward> pooling;
     std::unordered_map<int, dnnl::memory> fwdPoolingArgs;
@@ -166,9 +164,8 @@ Tensor OneDnnAutogradExtension::pool2d(
         payload->workspace = memory(primDesc.workspace_desc(), dnnlEngine);
         pooling = std::make_shared<pooling_forward>(primDesc);
         fwdPoolingArgs[DNNL_ARG_WORKSPACE] = payload->workspace;
-    } else {
+    } else
         pooling = std::make_shared<pooling_forward>(primDesc);
-    }
     network.push_back(*pooling);
     fwdArgs.push_back(fwdPoolingArgs);
 
@@ -200,11 +197,10 @@ Tensor OneDnnAutogradExtension::pool2dBackward(
     const PoolingMode mode,
     std::shared_ptr<detail::AutogradPayload> autogradPayload
 ) {
-    if(!autogradPayload) {
+    if(!autogradPayload)
         throw std::invalid_argument(
             "OneDnnAutogradExtension::pool2dBackward given null detail::AutogradPayload"
         );
-    }
     auto payload =
         std::static_pointer_cast<OneDnnPool2DPayload>(autogradPayload->data);
 

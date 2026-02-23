@@ -80,9 +80,8 @@ TEST(AutogradConv2DTest, Convolve) {
 }
 
 TEST_F(AutogradTestF16, ConvolveF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     const float scaleFactor = 10.0; // scale the input to prevent grad underflow
     auto in =

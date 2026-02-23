@@ -140,11 +140,10 @@ namespace lib {
         if(
             std::getline(is, str, '(') && str == "~Beta" && is >> a
             && is.get() == ',' && is >> b && is.get() == ')'
-        ) {
+        )
             beta = beta_distribution<RealType>(a, b);
-        } else {
+        else
             is.setstate(std::ios::failbit);
-        }
         return is;
     }
 

@@ -17,7 +17,7 @@ void initDistributed(
     int maxDevicesPerNode,
     const std::string& rndvFilepath
 ) {
-    if(rndvFilepath.empty()) {
+    if(rndvFilepath.empty())
         distributedInit(
             fl::DistributedInit::MPI,
             -1, // unused for MPI
@@ -25,7 +25,7 @@ void initDistributed(
             {{fl::DistributedConstants::kMaxDevicePerNode,
                 std::to_string(maxDevicesPerNode)}}
         );
-    } else {
+    else
         distributedInit(
             fl::DistributedInit::FILE_SYSTEM,
             worldRank,
@@ -34,7 +34,6 @@ void initDistributed(
                 std::to_string(maxDevicesPerNode)},
                 {fl::DistributedConstants::kFilePath, rndvFilepath}}
         );
-    }
 }
 
 Tensor allreduceGet(fl::AverageValueMeter& mtr) {
@@ -68,9 +67,8 @@ Tensor allreduceGet(fl::TopKMeter& mtr) {
 void allreduceSet(fl::AverageValueMeter& mtr, Tensor& val) {
     mtr.reset();
     auto valVec = val.toHostVector<double>();
-    if(valVec[2] != 0) {
+    if(valVec[2] != 0)
         valVec[0] /= valVec[2];
-    }
     mtr.add(valVec[0], valVec[2]);
 }
 
@@ -88,9 +86,8 @@ void allreduceSet(fl::EditDistanceMeter& mtr, Tensor& val) {
 void allreduceSet(fl::CountMeter& mtr, Tensor& val) {
     mtr.reset();
     auto valVec = val.toHostVector<long long>();
-    for(size_t i = 0; i < valVec.size(); ++i) {
+    for(size_t i = 0; i < valVec.size(); ++i)
         mtr.add(i, valVec[i]);
-    }
 }
 
 void allreduceSet(fl::TimeMeter& mtr, Tensor& val) {

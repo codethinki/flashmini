@@ -38,12 +38,10 @@ ConvFrozenBatchNormActivation::ConvFrozenBatchNormActivation(
     const auto pad = PaddingMode::SAME;
     const bool bias = !bn;
     add(fl::Conv2D(inC, outC, kw, kh, sx, sy, pad, pad, 1, 1, bias));
-    if(bn) {
+    if(bn)
         add(fl::FrozenBatchNorm(2, outC));
-    }
-    if(act) {
+    if(act)
         add(fl::ReLU());
-    }
 }
 
 ResNetBlockFrozenBatchNorm::ResNetBlockFrozenBatchNorm() = default;
@@ -120,11 +118,10 @@ std::vector<fl::Variable> ResNetBottleneckBlockFrozenBatchNorm::forward(
     out = bn3->forward(out);
 
     std::vector<fl::Variable> shortcut;
-    if(modules().size() > 9) {
+    if(modules().size() > 9)
         shortcut = module(9)->forward(inputs);
-    } else {
+    else
         shortcut = inputs;
-    }
     return relu3->forward({out[0] + shortcut[0]});
 }
 
@@ -152,11 +149,10 @@ std::vector<fl::Variable> ResNetBlockFrozenBatchNorm::forward(
     out = bn2->forward(out);
 
     std::vector<fl::Variable> shortcut;
-    if(modules().size() > 6) {
+    if(modules().size() > 6)
         shortcut = module(6)->forward(inputs);
-    } else {
+    else
         shortcut = inputs;
-    }
     return relu2->forward({out[0] + shortcut[0]});
 }
 
@@ -176,9 +172,8 @@ ResNetBottleneckStageFrozenBatchNorm::ResNetBottleneckStageFrozenBatchNorm(
     add(ResNetBottleneckBlockFrozenBatchNorm(inC, outC, stride));
     const int expansionFactor = 4;
     const int inPlanes = outC * expansionFactor;
-    for(int i = 1; i < numBlocks; i++) {
+    for(int i = 1; i < numBlocks; i++)
         add(ResNetBottleneckBlockFrozenBatchNorm(inPlanes, outC));
-    }
 };
 
 ResNetBottleneckStageFrozenBatchNorm::ResNetBottleneckStageFrozenBatchNorm() =
@@ -193,9 +188,8 @@ ResNetStageFrozenBatchNorm::ResNetStageFrozenBatchNorm(
     const int stride
 ) {
     add(ResNetBlockFrozenBatchNorm(inC, outC, stride));
-    for(int i = 1; i < numBlocks; i++) {
+    for(int i = 1; i < numBlocks; i++)
         add(ResNetBlockFrozenBatchNorm(outC, outC));
-    }
 }
 
 } // namespace fl

@@ -22,9 +22,8 @@ namespace pkg {
         std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
             const std::vector<Variable>& inputs
         ) {
-            if(inputs.size() != 2) {
+            if(inputs.size() != 2)
                 throw std::invalid_argument("Invalid inputs size");
-            }
             const auto& input = inputs[0];
             const auto& target = inputs[1];
             validate(input, target);
@@ -93,46 +92,42 @@ namespace pkg {
 
                     // base case
                     alphas[0] = (start == 0) ? inputVec[N - 1] : NEG_INFINITY_FLT;
-                    if(S != 1) {
+                    if(S != 1)
                         alphas[1] = inputVec[targetVec[0]];
-                    }
                     for(int64_t t = 1; t < T; ++t) {
                         // At each time frame t, only few states can be reached depending
                         // on the labels, their ordering and the current time frame.
                         if(T - t <= L + R) {
-                            if(start & 1 && targetVec[start / 2] != targetVec[start / 2 + 1]) {
+                            if(start & 1 && targetVec[start / 2] != targetVec[start / 2 + 1])
                                 ++start;
-                            }
                             ++start;
                         }
                         if(t <= L + R) {
                             if(
                                 end % 2 == 0 && end < 2 * L
                                 && (targetVec[end / 2 - 1] != targetVec[end / 2])
-                            ) {
+                            )
                                 ++end;
-                            }
                             ++end;
                         }
                         // Use dynamic programming to recursively compute alphas
                         for(int64_t s = start; s < end; ++s) {
                             int64_t ts = t * S + s;
                             int64_t curLabel = t * N + ((s & 1) ? targetVec[s / 2] : N - 1);
-                            if(s == 0) {
+                            if(s == 0)
                                 alphas[ts] = alphas[ts - S];
-                            } else if(
+                            else if(
                                 (s % 2 == 0) || s == 1
                                 || targetVec[s / 2] == targetVec[s / 2 - 1]
-                            ) {
+                            )
                                 alphas[ts] =
                                     fl::pkg::speech::logSumExp(alphas[ts - S], alphas[ts - S - 1]);
-                            } else {
+                            else
                                 alphas[ts] = fl::pkg::speech::logSumExp(
                                     alphas[ts - S],
                                     alphas[ts - S - 1],
                                     alphas[ts - S - 2]
                                 );
-                            }
                             alphas[ts] += inputVec[curLabel];
                         }
                     }
@@ -180,9 +175,9 @@ namespace pkg {
                         std::vector<float> dAlphas(T * S, 0.0);
 
                         // Compute dAlphas for the last timeframe
-                        if(S == 1) {
+                        if(S == 1)
                             dAlphas[T * S - 1] = -1.0;
-                        } else {
+                        else
                             fl::pkg::speech::dLogSumExp(
                                 alphas[T * S - 2],
                                 alphas[T * S - 1],
@@ -190,7 +185,6 @@ namespace pkg {
                                 dAlphas[T * S - 1],
                                 -1.0
                             );
-                        }
                         float gradScale = batchOutGrad[b] * batchScales[b];
 
                         for(int64_t t = T - 1; t >= 0; --t) {
@@ -200,18 +194,16 @@ namespace pkg {
                                 if(
                                     start & 1 && start > 1
                                     && targetVec[start / 2] != targetVec[start / 2 - 1]
-                                ) {
+                                )
                                     --start;
-                                }
                                 --start;
                             }
                             if(t < L + R) {
                                 if(
                                     end % 2 == 0
                                     && (targetVec[end / 2 - 1] != targetVec[end / 2 - 2])
-                                ) {
+                                )
                                     --end;
-                                }
                                 --end;
                             }
                             // Compute grad and dAlphas for (t-1)th frame using chain rule
@@ -219,15 +211,14 @@ namespace pkg {
                                 int64_t ts = t * S + s;
                                 int64_t curLabel = t * N + ((s & 1) ? targetVec[s / 2] : N - 1);
                                 grad[curLabel] += dAlphas[ts] * gradScale;
-                                if(t == 0) {
+                                if(t == 0)
                                     continue;
-                                }
-                                if(s == 0) {
+                                if(s == 0)
                                     dAlphas[ts - S] += dAlphas[ts];
-                                } else if(
+                                else if(
                                     (s % 2 == 0) || s == 1
                                     || targetVec[s / 2] == targetVec[s / 2 - 1]
-                                ) {
+                                )
                                     fl::pkg::speech::dLogSumExp(
                                         alphas[ts - S],
                                         alphas[ts - S - 1],
@@ -235,7 +226,7 @@ namespace pkg {
                                         dAlphas[ts - S - 1],
                                         dAlphas[ts]
                                     );
-                                } else {
+                                else
                                     fl::pkg::speech::dLogSumExp(
                                         alphas[ts - S],
                                         alphas[ts - S - 1],
@@ -245,7 +236,6 @@ namespace pkg {
                                         dAlphas[ts - S - 2],
                                         dAlphas[ts]
                                     );
-                                }
                             }
                         }
                     }

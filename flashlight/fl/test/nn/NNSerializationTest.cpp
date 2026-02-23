@@ -41,9 +41,8 @@ auto filesizebytes = []() -> std::uintmax_t {
 
 auto paramsizebytes = [](const std::vector<Variable>& parameters) {
         int64_t paramsize = 0;
-        for(const auto& param : parameters) {
+        for(const auto& param : parameters)
             paramsize += (param.elements() * fl::getTypeSize(param.type()));
-        }
         return paramsize;
     };
 
@@ -144,9 +143,8 @@ TEST(NNSerializationTest, BaseModule) {
 }
 
 TEST(NNSerializationTest, PrecisionCast) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half precision not available on this device";
-    }
 
     auto in = input(fl::rand({8, 8}));
     auto precisionCast = std::make_shared<PrecisionCast>(fl::dtype::f16);
@@ -343,9 +341,8 @@ TEST(NNSerializationTest, ContainerBackward) {
     auto in = input(fl::rand({10, 10}));
     auto output = seq2->forward({in}).front();
     output.backward();
-    for(auto& p : seq2->params()) {
+    for(auto& p : seq2->params())
         ASSERT_TRUE(p.isGradAvailable());
-    }
 }
 
 TEST(NNSerializationTest, ContainerWithParams) {

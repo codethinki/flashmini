@@ -59,9 +59,8 @@ namespace detail {
             af::array res = input;
 
             const double delta = 1e-2;
-            if(!fillImg.isempty()) {
+            if(!fillImg.isempty())
                 res = res + delta;
-            }
 
             // Call the transform
             res = transformFunc(res, std::forward<Args>(args)...);
@@ -171,16 +170,14 @@ Tensor ArrayFireVisionExtension::translate(
 ) {
     // If no output dims specified, AF expects 2D 0's which to discard OOB data
     Shape outputDims = outputDimsIn;
-    if(outputDimsIn.ndim() == 0) {
+    if(outputDimsIn.ndim() == 0)
         outputDims = Shape({0, 0});
-    }
 
-    if(translation.ndim() != 2 || outputDims.ndim() != 2) {
+    if(translation.ndim() != 2 || outputDims.ndim() != 2)
         throw std::invalid_argument(
             "ArrayFireVisionExtension::shear - "
             "only 2D skews shapes and empty or 2D output shapes are supported"
         );
-    }
 
     return toTensor<ArrayFireTensor>(
         detail::addFillTensor(
@@ -205,16 +202,14 @@ Tensor ArrayFireVisionExtension::translate(
 ) {
     // If no output dims specified, AF expects 2D 0's which to discard OOB data
     Shape outputDims = outputDimsIn;
-    if(outputDimsIn.ndim() == 0) {
+    if(outputDimsIn.ndim() == 0)
         outputDims = Shape({0, 0});
-    }
 
-    if(translation.ndim() != 2 || outputDims.ndim() != 2) {
+    if(translation.ndim() != 2 || outputDims.ndim() != 2)
         throw std::invalid_argument(
             "ArrayFireVisionExtension::shear - "
             "only 2D skews shapes and empty or 2D output shapes are supported"
         );
-    }
 
     af::dim4 _translations = detail::flToAfDims(translation);
     af::dim4 _outputDims = detail::flToAfInterpType(mode);
@@ -239,16 +234,14 @@ Tensor ArrayFireVisionExtension::shear(
 ) {
     // If no output dims specified, AF expects 2D 0's which to discard OOB data
     Shape outputDims = outputDimsIn;
-    if(outputDimsIn.ndim() == 0) {
+    if(outputDimsIn.ndim() == 0)
         outputDims = Shape({0, 0});
-    }
 
-    if(skews.size() != 2 || outputDims.ndim() != 2) {
+    if(skews.size() != 2 || outputDims.ndim() != 2)
         throw std::invalid_argument(
             "ArrayFireVisionExtension::shear - "
             "only 2D skews shapes and empty or 2D output shapes are supported"
         );
-    }
 
     af::dim4 _outputDims = detail::flToAfDims(outputDims);
 
@@ -276,16 +269,14 @@ Tensor ArrayFireVisionExtension::shear(
 ) {
     // If no output dims specified, AF expects 2D 0's which to discard OOB data
     Shape outputDims = outputDimsIn;
-    if(outputDimsIn.ndim() == 0) {
+    if(outputDimsIn.ndim() == 0)
         outputDims = Shape({0, 0});
-    }
 
-    if(skews.size() != 2 || outputDims.ndim() != 2) {
+    if(skews.size() != 2 || outputDims.ndim() != 2)
         throw std::invalid_argument(
             "ArrayFireVisionExtension::shear - "
             "only 2D skews shapes and empty or 2D output shapes are supported"
         );
-    }
 
     return toTensor<ArrayFireTensor>(
         af::skew(

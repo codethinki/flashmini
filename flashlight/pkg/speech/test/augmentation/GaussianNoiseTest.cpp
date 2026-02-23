@@ -23,9 +23,8 @@ TEST(GaussianNoise, SnrCheck) {
     for(int r = 0; r < numTrys; ++r) {
         RandomNumberGenerator rng(r);
         std::vector<float> signal(numSamples);
-        for(auto& i : signal) {
+        for(auto& i : signal)
             i = rng.random();
-        }
 
         GaussianNoise::Config cfg;
         cfg.minSnr_ = 8;
@@ -35,9 +34,8 @@ TEST(GaussianNoise, SnrCheck) {
         sfx.apply(signal);
         ASSERT_EQ(signal.size(), originalSignal.size());
         std::vector<float> noise(signal.size());
-        for(int i = 0; i < noise.size(); ++i) {
+        for(int i = 0; i < noise.size(); ++i)
             noise[i] = signal[i] - originalSignal[i];
-        }
         ASSERT_LE(signalToNoiseRatio(originalSignal, noise), cfg.maxSnr_ + tolerance);
         ASSERT_GE(signalToNoiseRatio(originalSignal, noise), cfg.minSnr_ - tolerance);
     }

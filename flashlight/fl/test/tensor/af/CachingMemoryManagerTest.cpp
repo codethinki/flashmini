@@ -62,9 +62,8 @@ TEST_F(CachingMemoryManagerTest, DevicePtr) {
     // The CPU backend in AF allocates a buffer for empty arrays - see
     // https://github.com/arrayfire/arrayfire/issues/3058. When this is fixed,
     // this can be relaxed.
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "ArrayFire CPU backend allocates buffers for empty arrays";
-    }
 
     // Empty array
     auto arr1 = af::array(0, 0, 0, 0, af::dtype::f32);
@@ -107,11 +106,9 @@ TEST_F(CachingMemoryManagerTest, IndexedDevice) {
     std::vector<float> in2(in.elements());
     in.host(in2.data());
 
-    for(int y = 0; y < nyo; y++) {
-        for(int x = 0; x < nxo; x++) {
+    for(int y = 0; y < nyo; y++)
+        for(int x = 0; x < nxo; x++)
             ASSERT_EQ(in1[(offy + y) * nx + offx + x], in2[y * nxo + x]);
-        }
-    }
 }
 
 TEST_F(CachingMemoryManagerTest, LargeNumberOfAllocs) {
@@ -136,9 +133,8 @@ TEST_F(CachingMemoryManagerTest, OOM) {
     // depending on the drivers, afopencl does not seem to guarantee to send an
     // OOM signal. https://github.com/arrayfire/arrayfire/issues/2650 At the
     // moment, skipping afopencl.
-    if(b == AF_BACKEND_OPENCL) {
+    if(b == AF_BACKEND_OPENCL)
         GTEST_SKIP() << "Can't run test with the ArrayFire OpenCL backend";
-    }
     af::array a;
     // N^3 tensor means about 3PB: expected to OOM on today's cuda GPU.
     const unsigned N = 99999;
@@ -158,10 +154,9 @@ void testFragmentation(
 ) {
     af::Backend b = af::getActiveBackend();
 
-    if(b != AF_BACKEND_CUDA) {
+    if(b != AF_BACKEND_CUDA)
         GTEST_SKIP()
         << "CachingMemoryManager fragmentation tests require CUDA backend";
-    }
 
     const auto mms = deviceInterface_->getMaxMemorySize(0);
     const auto maxNumf32 = mms / sizeof(float); // AF f32 is supposed to be 32b
@@ -179,13 +174,12 @@ void testFragmentation(
     try {
         a3 = af::array(.5f * maxNumf32);
     } catch(af::exception& ex) {
-        if(expectOOM) {
+        if(expectOOM)
             ASSERT_EQ(ex.err(), AF_ERR_NO_MEM);
-        } else {
+        else
             EXPECT_TRUE(false)
             << "CachingMemoryManagerTest fragmentaiton not supposed to throw: "
             << ex.what();
-        }
     }
 }
 

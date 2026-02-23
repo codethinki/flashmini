@@ -112,9 +112,8 @@ public:
      */
     template<typename T>
     void add(std::shared_ptr<T> module) {
-        if(!module) {
+        if(!module)
             throw std::invalid_argument("can't add null Module to Container");
-        }
         for(int i = 0; i < module->numParamTensors(); i++) {
             childParamIdx_[params_.size()] = std::make_tuple(static_cast<int>(modules_.size()), i);
             params_.push_back(module->param(i));

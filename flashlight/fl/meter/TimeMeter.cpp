@@ -32,16 +32,14 @@ double TimeMeter::value() const {
             std::chrono::system_clock::now() - start_;
         val += duration.count();
     }
-    if(useUnit_) {
+    if(useUnit_)
         val = (curN_ > 0) ? (val / curN_) : 0.0;
-    }
     return val;
 }
 
 void TimeMeter::stop() {
-    if(isStopped_) {
+    if(isStopped_)
         return;
-    }
     std::chrono::duration<double> duration =
         std::chrono::system_clock::now() - start_;
     curValue_ += duration.count();
@@ -49,9 +47,8 @@ void TimeMeter::stop() {
 }
 
 void TimeMeter::resume() {
-    if(!isStopped_) {
+    if(!isStopped_)
         return;
-    }
     start_ = std::chrono::system_clock::now();
     isStopped_ = false;
 }

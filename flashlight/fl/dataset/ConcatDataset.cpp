@@ -15,9 +15,8 @@ ConcatDataset::ConcatDataset(
     const std::vector<std::shared_ptr<const Dataset>>& datasets
 ) : datasets_(datasets),
     size_(0) {
-    if(datasets.empty()) {
+    if(datasets.empty())
         throw std::invalid_argument("cannot concat 0 datasets");
-    }
     cumulativedatasetsizes_.emplace_back(0);
     for(const auto& dataset : datasets_) {
         size_ += dataset->size();

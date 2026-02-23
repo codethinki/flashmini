@@ -94,23 +94,20 @@ af_topk_function flToAfTopKSortMode(SortMode sortMode) {
 }
 
 af::dim4 flToAfDims(const Shape& shape) {
-    if(shape.ndim() > 4) {
+    if(shape.ndim() > 4)
         throw std::invalid_argument(
             "flToAfDims: ArrayFire shapes can't be more than 4 dimensions"
         );
-    }
 
     af::dim4 out(1, 1, 1, 1);
-    for(size_t i = 0; i < shape.ndim(); ++i) {
+    for(size_t i = 0; i < shape.ndim(); ++i)
         out.dims[i] = shape.dim(i);
-    }
     return out;
 }
 
 void afToFlDims(const af::dim4& d, const unsigned numDims, Shape& s) {
-    if(numDims > AF_MAX_DIMS) {
+    if(numDims > AF_MAX_DIMS)
         throw std::invalid_argument("afToFlDims - numDims > AF_MAX_DIMS");
-    }
 
     auto& storage = s.get();
 
@@ -129,9 +126,8 @@ void afToFlDims(const af::dim4& d, const unsigned numDims, Shape& s) {
     }
 
     storage.resize(numDims);
-    for(unsigned i = 0; i < numDims; ++i) {
+    for(unsigned i = 0; i < numDims; ++i)
         s[i] = d[i];
-    }
 }
 
 Shape afToFlDims(const af::dim4& d, const unsigned numDims) {
@@ -147,11 +143,10 @@ af::seq flRangeToAfSeq(const fl::range& range) {
     // There could be have other empty sequence representations, e.g., (0, -1)
     // for axis with 1 element. In those cases, AF will throw internally --
     // we can't throw here because these cases  axis-size dependent.
-    if(optEnd.has_value() && optEnd.value() == start) {
+    if(optEnd.has_value() && optEnd.value() == start)
         throw std::runtime_error(
             "flRangeToAfSeq: AF seq can't represent empty sequence"
         );
-    }
     return af::seq(start, end, range.stride());
 }
 
@@ -173,20 +168,18 @@ af::index flToAfIndex(const fl::Index& idx) {
 }
 
 af::dim4 condenseDims(const af::dim4& dims) {
-    if(dims.elements() == 0) {
+    if(dims.elements() == 0)
         return af::dim4(0);
-    }
 
     // Find the condensed shape
     af::dim4 newDims(1, 1, 1, 1);
     unsigned newDimIdx = 0;
-    for(unsigned i = 0; i < AF_MAX_DIMS; ++i) {
+    for(unsigned i = 0; i < AF_MAX_DIMS; ++i)
         if(dims[i] != 1) {
             // found a non-1 dim size - populate newDims
             newDims[newDimIdx] = dims[i];
             newDimIdx++;
         }
-    }
     return newDims;
 }
 
@@ -197,13 +190,11 @@ af::array condenseIndices(
     const bool isFlat /* = false */
 ) {
     // Fast path - return the Array as is if keepDims - don't consolidate
-    if(keepDims) {
+    if(keepDims)
         return arr;
-    }
     // Fast path - Array has zero elements or a dim of size zero
-    if(arr.elements() == 0) {
+    if(arr.elements() == 0)
         return arr;
-    }
 
     const af::dim4& dims = arr.dims();
     af::dim4 newDims(1, 1, 1, 1);
@@ -226,11 +217,10 @@ af::array condenseIndices(
     }
 
     // Only change dims if condensing is possible
-    if(newDims != arr.dims()) {
+    if(newDims != arr.dims())
         return af::moddims(arr, newDims);
-    } else {
+    else
         return arr;
-    }
 }
 
 af_source flToAfLocation(Location location) {
@@ -258,9 +248,8 @@ af::array fromFlData(
     af_source loc = detail::flToAfLocation(memoryLocation);
 
     // No or null buffer
-    if(!ptr) {
+    if(!ptr)
         return af::array(dims, afType);
-    }
 
     using af::dtype;
     switch(afType) {

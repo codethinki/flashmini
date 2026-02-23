@@ -33,20 +33,18 @@ void FileStore::set(const std::string& key, const std::vector<char>& data) {
         // using an API that fails if the file exists (not provided by STL). If
         // created successfully, rename the temp file as below.
         std::ifstream ifs(path);
-        if(ifs.is_open()) {
+        if(ifs.is_open())
             throw std::runtime_error(
                 "FileStore set: file already exists: " + path.string()
             );
-        }
     }
 
     {
         std::ofstream ofs(tmp, std::ios::out | std::ios::trunc);
-        if(!ofs.is_open()) {
+        if(!ofs.is_open())
             throw std::runtime_error(
                 "FileStore set: file create failed: " + tmp.string()
             );
-        }
         ofs.write(data.data(), data.size());
     }
 
@@ -62,17 +60,15 @@ std::vector<char> FileStore::get(const std::string& key) {
     wait(key);
 
     std::ifstream ifs(path, std::ios::in);
-    if(!ifs) {
+    if(!ifs)
         throw std::runtime_error(
             "FileStore get: file open failed: " + path.string()
         );
-    }
 
     ifs.seekg(0, std::ios::end);
     size_t n = ifs.tellg();
-    if(n == 0) {
+    if(n == 0)
         throw std::runtime_error("FileStore get: file is empty: " + path.string());
-    }
     result.resize(n);
     ifs.seekg(0);
     ifs.read(result.data(), n);
@@ -97,9 +93,8 @@ void FileStore::wait(const std::string& key) {
         const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - start
         );
-        if(elapsed > FileStore::kDefaultTimeout) {
+        if(elapsed > FileStore::kDefaultTimeout)
             throw std::runtime_error("FileStore timed out for key: " + key);
-        }
         /* sleep override */
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }

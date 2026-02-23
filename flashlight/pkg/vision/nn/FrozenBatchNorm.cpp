@@ -59,9 +59,8 @@ void FrozenBatchNorm::setRunningVar(const fl::Variable& x) {
 }
 
 void FrozenBatchNorm::train() {
-    for(auto& param : params_) {
+    for(auto& param : params_)
         param.setCalcGrad(false);
-    }
     runningVar_.setCalcGrad(false);
     runningMean_.setCalcGrad(false);
     train_ = false;
@@ -71,9 +70,8 @@ std::string FrozenBatchNorm::prettyString() const {
     std::ostringstream ss;
     ss << "FrozenBatchNorm";
     ss << " ( axis : { ";
-    for(auto x : featAxis_) {
+    for(auto x : featAxis_)
         ss << x << " ";
-    }
     ss << "}, size : " << featSize_ << " )";
     return ss.str();
 }

@@ -63,9 +63,8 @@ std::pair<Tensor, Tensor> HungarianMatcher::matchBatch(
     const Tensor& targetClasses
 ) const {
     // Kind of a hack...
-    if(targetClasses.isEmpty()) {
+    if(targetClasses.isEmpty())
         return {fl::fromScalar(0), fl::fromScalar(0)};
-    }
 
     // Create an M X N cost matrix where M is the number of targets and N is the
     // number of preds

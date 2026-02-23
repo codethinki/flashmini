@@ -53,9 +53,8 @@ TEST(IndexTest, Type) {
 
 TEST(IndexTest, ArrayFireMaxIndex) {
     auto t = fl::full({2, 3, 4, 5}, 6.);
-    if(t.backendType() != TensorBackendType::ArrayFire) {
+    if(t.backendType() != TensorBackendType::ArrayFire)
         GTEST_SKIP() << "Default Tensor type isn't ArrayFire";
-    }
     ASSERT_THROW(t(1, 2, 3, 4, 5), std::invalid_argument);
 }
 
@@ -172,34 +171,29 @@ TEST(IndexTest, IndexInPlaceOps) {
 
 TEST(IndexTest, flat) {
     auto m = fl::rand({4, 6});
-    for(unsigned i = 0; i < m.elements(); ++i) {
+    for(unsigned i = 0; i < m.elements(); ++i)
         ASSERT_TRUE(allClose(m.flat(i), m(i % 4, i / 4)));
-    }
 
     auto n = fl::rand({4, 6, 8});
-    for(unsigned i = 0; i < n.elements(); ++i) {
+    for(unsigned i = 0; i < n.elements(); ++i)
         ASSERT_TRUE(allClose(n.flat(i), n(i % 4, (i / 4) % 6, (i / (4 * 6)) % 8)));
-    }
 
     auto a = fl::full({5, 6, 7, 8}, 9.);
     std::vector<int> testIndices = {0, 1, 4, 11, 62, 104, 288};
-    for(const int i : testIndices) {
+    for(const int i : testIndices)
         ASSERT_EQ(a.flat(i).scalar<float>(), 9.);
-    }
 
     a.flat(8) = 5.;
     ASSERT_EQ(a.flat(8).scalar<float>(), 5.);
 
-    for(const int i : testIndices) {
+    for(const int i : testIndices)
         a.flat(i) = i + 1;
-    }
-    for(const int i : testIndices) {
+    for(const int i : testIndices)
         ASSERT_EQ(
             a(i % 5, (i / 5) % 6, (i / (5 * 6)) % 7, (i / (5 * 6 * 7)) % 8)
             .scalar<float>(),
             i + 1
         );
-    }
 
     // Tensor assignment
     a.flat(32) = fl::full({1}, 7.4);
@@ -214,13 +208,12 @@ TEST(IndexTest, flat) {
         ASSERT_EQ(ref.shape(), Shape({(Dim) indexer.elements()}));
     a.flat(indexer) -= 10;
     ASSERT_TRUE(allClose(a.flat(indexer), ref - 10));
-    for(const int i : testIndices) {
+    for(const int i : testIndices)
         ASSERT_EQ(
             a(i % 5, (i / 5) % 6, (i / (5 * 6)) % 7, (i / (5 * 6 * 7)) % 8)
             .scalar<float>(),
             i + 1 - 10
         );
-    }
 
     // Range flat assignment
     auto rA = fl::rand({6});
@@ -238,14 +231,12 @@ TEST(IndexTest, TensorIndex) {
     std::vector<int> idxs = {0, 1, 4, 9, 11, 13, 16, 91};
     unsigned size = idxs.size();
     auto indices = fl::full({size}, 0);
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size; ++i)
         indices(i) = idxs[i];
-    }
     auto a = fl::rand({100});
     auto indexed = a(indices);
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size; ++i)
         ASSERT_TRUE(allClose(indexed(i), a(idxs[i])));
-    }
 
     a(indices) = 5.;
     ASSERT_TRUE(allClose(a(indices), fl::full({size}, 5.)));

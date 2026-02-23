@@ -56,15 +56,13 @@ public:
         const unsigned elSize
     ) override {
         size_t size = elSize;
-        for(unsigned i = 0; i < ndims; ++i) {
+        for(unsigned i = 0; i < ndims; ++i)
             size *= dims[i];
-        }
         void* ptr = nullptr;
 
         if(size > 0) {
-            if(lockedBytes >= maxBytes || totalBytes >= maxBuffers) {
+            if(lockedBytes >= maxBytes || totalBytes >= maxBuffers)
                 signalMemoryCleanup();
-            }
 
             ptr = this->deviceInterface->nativeAlloc(size);
             lockedPtrToSizeMap[ptr] = size;
@@ -81,21 +79,18 @@ public:
     }
 
     size_t allocated(void* ptr) override {
-        if(lockedPtrToSizeMap.find(ptr) == lockedPtrToSizeMap.end()) {
+        if(lockedPtrToSizeMap.find(ptr) == lockedPtrToSizeMap.end())
             return 0;
-        } else {
+        else
             return lockedPtrToSizeMap[ptr];
-        }
     }
 
     void unlock(void* ptr, bool userLock) override {
-        if(!ptr) {
+        if(!ptr)
             return;
-        }
 
-        if(lockedPtrToSizeMap.find(ptr) == lockedPtrToSizeMap.end()) {
+        if(lockedPtrToSizeMap.find(ptr) == lockedPtrToSizeMap.end())
             return;
-        }
 
         // For testing, treat user-allocated and AF-allocated memory identically
         if(locked.find(ptr) != locked.end()) {
@@ -107,17 +102,15 @@ public:
     void signalMemoryCleanup() override {
         // Free unlocked memory
         std::vector<void*> freed;
-        for(auto& entry : lockedPtrToSizeMap) {
+        for(auto& entry : lockedPtrToSizeMap)
             if(!isUserLocked(entry.first)) {
                 void* ptr = entry.first;
                 this->deviceInterface->nativeFree(ptr);
                 totalBytes -= lockedPtrToSizeMap[entry.first];
                 freed.push_back(entry.first);
             }
-        }
-        for(auto ptr : freed) {
+        for(auto ptr : freed)
             lockedPtrToSizeMap.erase(ptr);
-        }
     }
 
     void printInfo(
@@ -145,11 +138,10 @@ public:
     }
 
     float getMemoryPressure() override {
-        if(lockedBytes > maxBytes || totalBuffers > maxBuffers) {
+        if(lockedBytes > maxBytes || totalBuffers > maxBuffers)
             return 1.0;
-        } else {
+        else
             return 0.0;
-        }
     }
 
     bool jitTreeExceedsMemoryPressure(size_t bytes) override {
@@ -325,9 +317,8 @@ TEST(MemoryFramework, AdapterInstallerDeviceInterfaceTest) {
     // The CPU backend in AF allocates a buffer for empty arrays - see
     // https://github.com/arrayfire/arrayfire/issues/3058. When this is fixed,
     // this can be relaxed/this test will pass
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "ArrayFire CPU backend allocates buffers for empty arrays";
-    }
 
     std::stringstream logStream;
     std::stringstream mockLogStream;

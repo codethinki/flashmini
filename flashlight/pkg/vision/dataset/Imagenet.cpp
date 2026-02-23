@@ -25,9 +25,8 @@ std::vector<std::string> fileGlob(const std::string& pattern) {
     glob_t result;
     glob(pattern.c_str(), GLOB_TILDE, nullptr, &result);
     std::vector<std::string> ret;
-    for(unsigned int i = 0; i < result.gl_pathc; ++i) {
+    for(unsigned int i = 0; i < result.gl_pathc; ++i)
         ret.emplace_back(result.gl_pathv[i]);
-    }
     globfree(&result);
     return ret;
 }
@@ -41,31 +40,27 @@ std::unordered_map<std::string, uint64_t> getImagenetLabels(
     std::unordered_map<std::string, uint64_t> labels;
     std::vector<std::string> lines;
     std::ifstream inFile(labelFile);
-    if(!inFile) {
+    if(!inFile)
         throw std::invalid_argument(
             "fl::pkg::vision::getImagenetLabels given invalid labelFile path"
         );
-    }
-    for(std::string str; std::getline(inFile, str);) {
+    for(std::string str; std::getline(inFile, str);)
         lines.emplace_back(str);
-    }
 
-    if(lines.empty()) {
+    if(lines.empty())
         throw std::runtime_error(
             "In function imagenetLabels:  No lines in file:" + labelFile.string()
         );
-    }
     for(int i = 0; i < lines.size(); i++) {
         std::string line = lines[i];
         auto it = line.find(',');
         if(it != std::string::npos) {
             std::string label = line.substr(0, it);
             labels[label] = i;
-        } else {
+        } else
             throw std::runtime_error(
                 "In function imagenetLabels: Invalid label format for line: " + line
             );
-        }
     }
     return labels;
 }
@@ -77,11 +72,10 @@ std::shared_ptr<Dataset> imagenetDataset(
 ) {
     std::vector<std::string> filepaths = fileGlob(imgDir.string() + "/**/*.JPEG");
 
-    if(filepaths.empty()) {
+    if(filepaths.empty())
         throw std::runtime_error(
             "No images were found in imagenet directory: " + imgDir.string()
         );
-    }
 
     // Create image dataset
     std::shared_ptr<Dataset> imageDataset =
@@ -92,11 +86,10 @@ std::shared_ptr<Dataset> imagenetDataset(
     auto getLabelIdxs = [&labelMap](const std::string& s) -> uint64_t {
             std::string parentPath = s.substr(0, s.rfind('/'));
             std::string label = parentPath.substr(parentPath.rfind('/') + 1);
-            if(labelMap.find(label) != labelMap.end()) {
+            if(labelMap.find(label) != labelMap.end())
                 return labelMap.at(label);
-            } else {
+            else
                 throw std::runtime_error("Label: " + label + " not found in label map");
-            }
             return labelMap.at(label);
         };
 

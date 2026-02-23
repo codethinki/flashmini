@@ -76,26 +76,22 @@ fl::Dataset::DataTransformFunction inputFeatures(
 
     return [featSz, spectralFeature, localNormCtx, sfxConf, sfxCounter](
         void* data, Shape dims, fl::dtype type) {
-               if(type != fl::dtype::f32) {
+               if(type != fl::dtype::f32)
                    throw std::invalid_argument("Invalid input type");
-               }
-               if(dims.ndim() != 2) {
+               if(dims.ndim() != 2)
                    throw std::invalid_argument(
                        "'inputFeatures': Invalid input dims . Expected 2d array - Channels x T"
                    );
-               }
                auto channels = dims[0];
                std::vector<float> input(dims.elements());
                std::copy_n(static_cast<const float*>(data), input.size(), input.data());
-               if(channels > 1) {
+               if(channels > 1)
                    input = transpose2d(input, dims[1], channels);
-               }
                if(!sfxConf.empty() && sfxCounter->decrementAndCheck()) {
-                   if(channels > 1) {
+                   if(channels > 1)
                        throw std::invalid_argument(
                            "'inputFeatures': Invalid input dims. sound effect supports a single channel audio"
                        );
-                   }
                    thread_local auto seed = getSfxSeed();
                    thread_local std::shared_ptr<sfx::SoundEffect> sfx =
                        sfx::createSoundEffect(sfxConf, seed);
@@ -103,9 +99,9 @@ fl::Dataset::DataTransformFunction inputFeatures(
                }
 
                std::vector<float> output;
-               if(spectralFeature) {
+               if(spectralFeature)
                    output = spectralFeature->batchApply(input, channels);
-               } else {
+               else {
                    // use raw audio
                    output = input; // T X CHANNELS (Col Major)
                }
@@ -114,12 +110,11 @@ fl::Dataset::DataTransformFunction inputFeatures(
                // Before: FEAT X FRAMES X CHANNELS  (Col Major)
                output = transpose2d(output, T, featSz, channels);
                // After: FRAMES X FEAT X CHANNELS  (Col Major)
-               if(localNormCtx.first > 0 || localNormCtx.second > 0) {
+               if(localNormCtx.first > 0 || localNormCtx.second > 0)
                    output =
                        localNormalize(output, localNormCtx.first, localNormCtx.second, T);
-               } else {
+               else
                    output = normalize(output);
-               }
                return Tensor::fromBuffer(
                    {static_cast<long long>(T), featSz, channels},
                    output.data(),
@@ -154,27 +149,22 @@ fl::Dataset::DataTransformFunction targetFeatures(
                    // add surround token at the beginning and end of target
                    // only if begin/end tokens are not surround
                    auto idx = tokenDict.getIndex(config.surround_);
-                   if(tgtVec.empty() || tgtVec.back() != idx) {
+                   if(tgtVec.empty() || tgtVec.back() != idx)
                        tgtVec.emplace_back(idx);
-                   }
                    if(tgtVec.size() > 1 && tgtVec.front() != idx) {
                        tgtVec.emplace_back(idx);
                        std::rotate(tgtVec.begin(), tgtVec.end() - 1, tgtVec.end());
                    }
                }
-               if(config.replabel_ > 0) {
+               if(config.replabel_ > 0)
                    tgtVec = packReplabels(tgtVec, tokenDict, config.replabel_);
-               }
-               if(config.criterion_ == kAsgCriterion) {
+               if(config.criterion_ == kAsgCriterion)
                    dedup(tgtVec);
-               }
-               if(config.eosToken_) {
+               if(config.eosToken_)
                    tgtVec.emplace_back(tokenDict.getIndex(kEosToken));
-               }
-               if(tgtVec.empty()) {
+               if(tgtVec.empty())
                    // support empty target
                    return Tensor(fl::dtype::s32);
-               }
                return Tensor::fromVector(tgtVec);
     };
 }
@@ -185,10 +175,9 @@ fl::Dataset::DataTransformFunction wordFeatures(const Dictionary& wrdDict) {
                    static_cast<char*>(data), static_cast<char*>(data) + dims.elements());
                auto words = splitOnWhitespace(transcript, true);
                auto wrdVec = wrdDict.mapEntriesToIndices(words);
-               if(wrdVec.empty()) {
+               if(wrdVec.empty())
                    // support empty target
                    return Tensor(fl::dtype::s32);
-               }
                return Tensor::fromVector(wrdVec);
     };
 }

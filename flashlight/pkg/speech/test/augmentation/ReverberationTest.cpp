@@ -88,9 +88,8 @@ TEST(ReverbEcho, SinWaveReverb) {
 
     // Extract the noise and compare with input that is the source of that noise.
     std::vector<float> noise(firstReverbIdx);
-    for(int k = firstReverbIdx; k < signal.size(); ++k) {
+    for(int k = firstReverbIdx; k < signal.size(); ++k)
         noise[k - firstReverbIdx] = signal[k] - input[k];
-    }
     // Because we use very long rt60 and we use multiple repeasts, the reverb sum
     // can get to very high values. We normalize by mean of the abs diffs.
     float noiseSum = 0;

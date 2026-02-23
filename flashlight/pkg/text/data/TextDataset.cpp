@@ -50,9 +50,8 @@ TextDataset::TextDataset(
 
         while(reader.hasNextLine()) {
             const auto currentEosPosition = data_.size() - 1;
-            if(!sentenceRanges.empty()) {
+            if(!sentenceRanges.empty())
                 sentenceRanges.back().second = currentEosPosition;
-            }
 
             const auto tokens = tokenizer.tokenize(reader.getLine());
             const auto indices = dictionary.mapEntriesToIndices(tokens);
@@ -65,18 +64,16 @@ TextDataset::TextDataset(
             data_.insert(data_.end(), indices.begin(), indices.end());
             data_.push_back(eos);
         }
-        if(!sentenceRanges.empty()) {
+        if(!sentenceRanges.empty())
             sentenceRanges.back().second = data_.size() - 1;
-        }
     }
     const int64_t nTokens = data_.size();
 
     /* 2. Batchify */
-    if(batchSize <= 0) {
+    if(batchSize <= 0)
         throw std::invalid_argument(
             "[TextDataset] BatchSize needs to be positive."
         );
-    }
 
     if(sampleBreakMode == "none") {
         // Sentences are split into equal size (=`tokensPerSample`)
@@ -100,7 +97,7 @@ TextDataset::TextDataset(
         // Sentences with length > `tokensPerSample` are skipped;
         // Total tokens per batch <= `batchSize` * `tokensPerSample`
 
-        if(useDynamicBatching) {
+        if(useDynamicBatching)
             // sorting samples by length in ascending order
             std::sort(
                 sentenceRanges.begin(),
@@ -110,7 +107,6 @@ TextDataset::TextDataset(
                     return p1.second - p1.first < p2.second - p2.first;
                 }
             );
-        }
 
         std::vector<SamplePosition> batch;
         for(int64_t i = 0; i < sentenceRanges.size(); ++i) {
@@ -120,25 +116,22 @@ TextDataset::TextDataset(
             batch.emplace_back(SamplePosition{startPoint, endPoint});
 
             bool isFull;
-            if(useDynamicBatching) {
+            if(useDynamicBatching)
                 isFull = sampleSize * (batch.size() + 1) > batchSize * tokensPerSample;
-            } else {
+            else
                 isFull = batch.size() == batchSize;
-            }
             if(isFull) {
                 batches_.push_back(std::move(batch));
                 batch = std::vector<SamplePosition>();
             }
         }
-        if(!batch.empty()) {
+        if(!batch.empty())
             batches_.push_back(std::move(batch));
-        }
-    } else {
+    } else
         throw std::invalid_argument(
             "Invalid sampleBreakMode: should be none or eos, but it is given "
             + sampleBreakMode
         );
-    }
 
     FL_LOG(LogLevel::INFO) << "[TextDataset] (" << reader.getRank() << "/"
     << reader.getTotalReaders() << ") Loaded " << nTokens
@@ -153,9 +146,8 @@ int64_t TextDataset::size() const {
 std::vector<Tensor> TextDataset::get(const int64_t idx) const {
     const auto& batch = batches_[idx % size()];
     int64_t maxLength = 0;
-    for(const auto& pos : batch) {
+    for(const auto& pos : batch)
         maxLength = std::max<int64_t>(maxLength, pos.last - pos.first + 1);
-    }
     std::vector<int> buffer(batch.size() * maxLength, pad_);
     for(int64_t i = 0; i < batch.size(); ++i) {
         const auto& pos = batch[i];
@@ -174,9 +166,8 @@ std::vector<Tensor> TextDataset::get(const int64_t idx) const {
 void TextDataset::shuffle(uint64_t seed) {
     std::mt19937_64 rng(seed);
     // Deterministic method across compilers.
-    for(uint64_t i = size() - 1; i >= 1; --i) {
+    for(uint64_t i = size() - 1; i >= 1; --i)
         std::swap(batches_[i], batches_[rng() % (i + 1)]);
-    }
 }
 
 } // namespace fl

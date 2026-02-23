@@ -31,9 +31,8 @@ int main() {
     auto wRank = getWorldRank();
     auto wSize = getWorldSize();
 
-    if(wRank == 0) {
+    if(wRank == 0)
         std::cout << "Running allreduce on " << wSize << " machines" << std::endl;
-    }
 
     const int kNumIters = 10000;
     std::vector<int64_t> sizes = {1, 2, 5};
@@ -52,19 +51,17 @@ int main() {
                 times[i] = fl::Timer::stop(start);
             }
             auto timesAf = Tensor::fromVector({kNumIters}, times);
-            if(wRank == 0) {
+            if(wRank == 0)
                 std::cout << "Size: " << size
                 << " ; avg: " << fl::mean(timesAf).asScalar<double>() * 1000
                 << "ms ; p50: "
                 << fl::median(timesAf).asScalar<double>() * 1000 << "ms"
                 << std::endl;
-            }
             curMaxSize = std::max(curMaxSize, size);
             size *= multiplier;
         }
-        if(curMaxSize >= maxSize) {
+        if(curMaxSize >= maxSize)
             break;
-        }
     }
     return 0;
 }

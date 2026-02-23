@@ -28,9 +28,8 @@ namespace pkg {
                 scaleMode_(scalemode),
                 fac_(ForceAlignmentCriterion(N, scalemode)),
                 fcc_(FullConnectionCriterion(N, scalemode)) {
-                if(N_ <= 0) {
+                if(N_ <= 0)
                     throw std::invalid_argument("ASG: N is zero or negative.");
-                }
                 fl::Variable transition(transdiag * fl::identity(N_), true);
                 params_ = {transition};
                 syncTransitions();
@@ -45,9 +44,8 @@ namespace pkg {
             std::vector<fl::Variable> forward(
                 const std::vector<fl::Variable>& inputs
             ) override {
-                if(inputs.size() != 2) {
+                if(inputs.size() != 2)
                     throw std::invalid_argument("Invalid inputs size");
-                }
                 return {
                     fcc_.forward(inputs[0], inputs[1])
                     - fac_.forward(inputs[0], inputs[1])};

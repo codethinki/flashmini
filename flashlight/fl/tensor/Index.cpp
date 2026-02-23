@@ -33,9 +33,8 @@ const std::optional<Dim>& range::end() const {
 }
 
 Dim range::endVal() const {
-    if(end_.has_value()) {
+    if(end_.has_value())
         return end_.value();
-    }
     throw std::runtime_error("[range::endVal] end is end_t");
 }
 

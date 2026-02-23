@@ -43,12 +43,10 @@ void ReverbEcho::applyReverb(
             // Add jitter noise for the delay
             float jitter = 1 + rng_.uniform(-conf_.jitter_, conf_.jitter_);
             size_t delay = 1 + int(jitter * firstDelay * conf_.sampleRate_);
-            if(delay > length - 1) {
+            if(delay > length - 1)
                 break;
-            }
-            for(int j = 0; j < length - delay - 1; ++j) {
+            for(int j = 0; j < length - delay - 1; ++j)
                 reverb[delay + j] += echo[j] * frac;
-            }
 
             // Add jitter noise for the attenuation
             jitter = 1 + rng_.uniform(-conf_.jitter_, conf_.jitter_);
@@ -57,15 +55,13 @@ void ReverbEcho::applyReverb(
             frac *= attenuation;
         }
     }
-    for(int i = 0; i < length; ++i) {
+    for(int i = 0; i < length; ++i)
         source[i] += reverb[i];
-    }
 }
 
 void ReverbEcho::apply(std::vector<float>& sound) {
-    if(rng_.random() >= conf_.proba_) {
+    if(rng_.random() >= conf_.proba_)
         return;
-    }
     // Sample characteristics for the reverb
     float initial = rng_.uniform(conf_.initialMin_, conf_.initialMax_);
     float firstDelay = rng_.uniform(conf_.firstDelayMin_, conf_.firstDelayMax_);

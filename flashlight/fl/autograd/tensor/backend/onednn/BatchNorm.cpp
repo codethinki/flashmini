@@ -31,9 +31,8 @@ namespace {
 
     int getNfeatures(const Shape& inputShape, const std::vector<int>& axes) {
         int nfeatures = 1;
-        for(auto ax : axes) {
+        for(auto ax : axes)
             nfeatures *= inputShape.dim(ax);
-        }
         return nfeatures;
     }
 
@@ -44,18 +43,17 @@ namespace {
         const int nfeatures
     ) {
         Shape inDescDims;
-        if(minAxis == 0) {
+        if(minAxis == 0)
             inDescDims = Shape(
                 {1,
                  1,
                  nfeatures,
                  static_cast<long long>(input.elements() / nfeatures)}
             );
-        } else {
+        else {
             int batchsz = 1;
-            for(int i = maxAxis + 1; i < input.ndim(); ++i) {
+            for(int i = maxAxis + 1; i < input.ndim(); ++i)
                 batchsz *= input.dim(i);
-            }
             inDescDims = Shape(
                 {1,
                  static_cast<long long>(input.elements() / (nfeatures * batchsz)),
@@ -102,36 +100,30 @@ Tensor OneDnnAutogradExtension::batchnorm(
     const double epsilon,
     std::shared_ptr<detail::AutogradPayload> autogradPayload
 ) {
-    if(momentum != 0.) {
+    if(momentum != 0.)
         throw std::runtime_error("OneDNN batchnorm op doesn't support momentum.");
-    }
-    if(input.type() == fl::dtype::f16) {
+    if(input.type() == fl::dtype::f16)
         throw std::runtime_error("OneDNN batchnorm op - f16 inputs not supported.");
-    }
 
     auto payload = std::make_shared<OneDnnBatchNormPayload>();
-    if(train && autogradPayload) {
+    if(train && autogradPayload)
         autogradPayload->data = payload;
-    }
 
     auto output = Tensor(input.shape(), input.type());
     int nfeatures = getNfeatures(input.shape(), axes);
 
-    if(runningVar.isEmpty()) {
+    if(runningVar.isEmpty())
         runningVar = fl::full({nfeatures}, 1., input.type());
-    }
 
-    if(runningMean.isEmpty()) {
+    if(runningMean.isEmpty())
         runningMean = fl::full({nfeatures}, 0., input.type());
-    }
 
     // Check if axes are valid
     auto maxAxis = *std::max_element(axes.begin(), axes.end());
     auto minAxis = *std::min_element(axes.begin(), axes.end());
     bool axesContinuous = (axes.size() == (maxAxis - minAxis + 1));
-    if(!axesContinuous) {
+    if(!axesContinuous)
         throw std::invalid_argument("axis array should be continuous");
-    }
 
     auto& dnnlEngine = detail::DnnlEngine::getInstance().getEngine();
 
@@ -215,11 +207,10 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::batchnormBackward(
     const float epsilon,
     std::shared_ptr<detail::AutogradPayload> autogradPayload
 ) {
-    if(!autogradPayload) {
+    if(!autogradPayload)
         throw std::invalid_argument(
             "OneDnnAutogradExtension::pool2dBackward given null detail::AutogradPayload"
         );
-    }
     auto payload =
         std::static_pointer_cast<OneDnnBatchNormPayload>(autogradPayload->data);
 
@@ -228,9 +219,8 @@ std::tuple<Tensor, Tensor, Tensor> OneDnnAutogradExtension::batchnormBackward(
     auto maxAxis = *std::max_element(axes.begin(), axes.end());
     auto minAxis = *std::min_element(axes.begin(), axes.end());
     const bool axesContinuous = (axes.size() == (maxAxis - minAxis + 1));
-    if(!axesContinuous) {
+    if(!axesContinuous)
         throw std::invalid_argument("axis array should be continuous");
-    }
 
     const int nfeatures = getNfeatures(input.shape(), axes);
     auto inputOutputDims = getInputOutputDims(minAxis, maxAxis, input, nfeatures);

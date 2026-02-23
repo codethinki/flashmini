@@ -39,30 +39,27 @@ namespace {
     constexpr double kMB = static_cast<double>(1UL << 20);
 
     size_t roundSize(size_t size) {
-        if(size < kMinBlockSize) {
+        if(size < kMinBlockSize)
             return kMinBlockSize;
-        } else {
+        else
             return kMinBlockSize * ((size + kMinBlockSize - 1) / kMinBlockSize);
-        }
     }
 
     size_t getAllocationSize(size_t size) {
-        if(size <= kSmallSize) {
+        if(size <= kSmallSize)
             return kSmallBuffer;
-        } else if(size < kMinLargeAlloc) {
+        else if(size < kMinLargeAlloc)
             return kLargeBuffer;
-        } else {
+        else
             return kRoundLarge * ((size + kRoundLarge - 1) / kRoundLarge);
-        }
     }
 
     static bool BlockComparator(
         const CachingMemoryManager::Block* a,
         const CachingMemoryManager::Block* b
     ) {
-        if(a->size_ != b->size_) {
+        if(a->size_ != b->size_)
             return a->size_ < b->size_;
-        }
         return (uintptr_t) a->ptr_ < (uintptr_t) b->ptr_;
     }
 
@@ -110,12 +107,11 @@ CachingMemoryManager::CachingMemoryManager(
         getEnvAsBytesFromFloatMb(kMemRecyclingSize, recyclingSizeLimit_);
     splitSizeLimit_ = getEnvAsBytesFromFloatMb(kMemSplitSize, splitSizeLimit_);
 
-    for(int i = 0; i < numDevices; ++i) {
+    for(int i = 0; i < numDevices; ++i)
         deviceMemInfos_.emplace(
             i,
             std::make_unique<CachingMemoryManager::DeviceMemoryInfo>(i)
         );
-    }
 }
 
 void CachingMemoryManager::initialize() {}
@@ -133,9 +129,8 @@ void CachingMemoryManager::shutdown() {
 }
 
 void CachingMemoryManager::addMemoryManagement(int device) {
-    if(deviceMemInfos_.find(device) != deviceMemInfos_.end()) {
+    if(deviceMemInfos_.find(device) != deviceMemInfos_.end())
         return;
-    }
     deviceMemInfos_.emplace(
         device,
         std::make_unique<CachingMemoryManager::DeviceMemoryInfo>(device)
@@ -143,9 +138,8 @@ void CachingMemoryManager::addMemoryManagement(int device) {
 }
 
 void CachingMemoryManager::removeMemoryManagement(int device) {
-    if(deviceMemInfos_.find(device) == deviceMemInfos_.end()) {
+    if(deviceMemInfos_.find(device) == deviceMemInfos_.end())
         return;
-    }
     deviceMemInfos_.erase(device);
 }
 
@@ -158,12 +152,10 @@ void* CachingMemoryManager::alloc(
     auto& memoryInfo = getDeviceMemoryInfo();
     std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
     size_t size = elementSize;
-    for(unsigned i = 0; i < ndims; ++i) {
+    for(unsigned i = 0; i < ndims; ++i)
         size *= dims[i];
-    }
-    if(size == 0) {
+    if(size == 0)
         return nullptr;
-    }
     size = roundSize(size);
     const bool isSmallAlloc = (size <= kSmallSize);
     CachingMemoryManager::Block searchKey(size);
@@ -203,9 +195,8 @@ void* CachingMemoryManager::alloc(
         remaining = block;
         block = new Block(size, block->ptr_);
         block->prev_ = remaining->prev_;
-        if(block->prev_) {
+        if(block->prev_)
             block->prev_->next_ = block;
-        }
         block->next_ = remaining;
 
         remaining->prev_ = block;
@@ -222,22 +213,19 @@ void* CachingMemoryManager::alloc(
 }
 
 size_t CachingMemoryManager::allocated(void* ptr) {
-    if(!ptr) {
+    if(!ptr)
         return 0;
-    }
     auto& memoryInfo = getDeviceMemoryInfo();
     std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
     auto it = memoryInfo.allocatedBlocks_.find(ptr);
-    if(it == memoryInfo.allocatedBlocks_.end()) {
+    if(it == memoryInfo.allocatedBlocks_.end())
         return 0;
-    }
     return (it->second)->size_;
 }
 
 void CachingMemoryManager::unlock(void* ptr, bool userUnlock) {
-    if(!ptr) {
+    if(!ptr)
         return;
-    }
     auto& memoryInfo = getDeviceMemoryInfo();
     std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
     auto it = memoryInfo.allocatedBlocks_.find(ptr);
@@ -249,24 +237,21 @@ void CachingMemoryManager::unlock(void* ptr, bool userUnlock) {
     }
 
     CachingMemoryManager::Block* block = it->second;
-    if(userUnlock) {
+    if(userUnlock)
         block->userLock_ = false;
-    } else {
+    else
         block->managerLock_ = false;
-    }
 
     // Return early if either one is locked
-    if(block->inUse()) {
+    if(block->inUse())
         return;
-    }
     memoryInfo.allocatedBlocks_.erase(it);
     freeBlock(block);
 }
 
 void CachingMemoryManager::freeBlock(CachingMemoryManager::Block* block) {
-    if(block->inUse()) {
+    if(block->inUse())
         throw std::runtime_error("trying to free a block which is in use");
-    }
     auto& memoryInfo = getDeviceMemoryInfo();
     std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
 
@@ -286,20 +271,17 @@ void CachingMemoryManager::tryMergeBlocks(
     CachingMemoryManager::Block* src,
     BlockSet& pool
 ) {
-    if(!src || src->inUse()) {
+    if(!src || src->inUse())
         return;
-    }
     if(dst->prev_ == src) {
         dst->ptr_ = src->ptr_;
         dst->prev_ = src->prev_;
-        if(dst->prev_) {
+        if(dst->prev_)
             dst->prev_->next_ = dst;
-        }
     } else {
         dst->next_ = src->next_;
-        if(dst->next_) {
+        if(dst->next_)
             dst->next_->prev_ = dst;
-        }
     }
     dst->size_ += src->size_;
     pool.erase(src);
@@ -357,9 +339,8 @@ void CachingMemoryManager::freeBlocks(
             ++it;
             blocks.erase(cur);
             delete block;
-        } else {
+        } else
             ++it;
-        }
     }
 }
 
@@ -412,9 +393,8 @@ void CachingMemoryManager::printInfo(
 }
 
 void CachingMemoryManager::userLock(const void* ptr) {
-    if(!ptr) {
+    if(!ptr)
         return;
-    }
     auto& memoryInfo = getDeviceMemoryInfo();
     std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
 
@@ -425,9 +405,8 @@ void CachingMemoryManager::userLock(const void* ptr) {
         block->managerLock_ = false;
         block->userLock_ = true;
         memoryInfo.allocatedBlocks_[block->ptr_] = block;
-    } else {
+    } else
         it->second->userLock_ = true;
-    }
 }
 
 void CachingMemoryManager::userUnlock(const void* ptr) {
@@ -435,26 +414,22 @@ void CachingMemoryManager::userUnlock(const void* ptr) {
 }
 
 bool CachingMemoryManager::isUserLocked(const void* ptr) {
-    if(!ptr) {
+    if(!ptr)
         return false;
-    }
     auto& memoryInfo = getDeviceMemoryInfo();
     std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
     auto it = memoryInfo.allocatedBlocks_.find(const_cast<void*>(ptr));
-    if(it == memoryInfo.allocatedBlocks_.end()) {
+    if(it == memoryInfo.allocatedBlocks_.end())
         return false;
-    }
     return it->second->userLock_;
 }
 
 CachingMemoryManager::DeviceMemoryInfo& CachingMemoryManager::getDeviceMemoryInfo(int device /* = -1*/) {
-    if(device == -1) {
+    if(device == -1)
         device = this->deviceInterface->getActiveDeviceId();
-    }
     auto it = deviceMemInfos_.find(device);
-    if(it == deviceMemInfos_.end() || !it->second) {
+    if(it == deviceMemInfos_.end() || !it->second)
         throw std::runtime_error("meminfo for the device doesn't exist");
-    }
     return *(it->second);
 }
 } // namespace fl

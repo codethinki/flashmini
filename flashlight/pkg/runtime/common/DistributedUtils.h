@@ -46,9 +46,8 @@ namespace pkg {
  */
         template<typename T>
         void syncMeter(T& mtr) {
-            if(!fl::isDistributedInit()) {
+            if(!fl::isDistributedInit())
                 return;
-            }
             Tensor arr = allreduceGet(mtr);
             fl::allReduce(arr);
             allreduceSet(mtr, arr);

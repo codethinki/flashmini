@@ -47,12 +47,11 @@ public:
      */
     template<typename T>
     const T& impl() const {
-        if(T::type != type()) {
+        if(T::type != type())
             throw std::invalid_argument(
                 "[fl::Stream::impl] "
                 "specified stream type doesn't match actual stream type."
             );
-        }
         return *(static_cast<const T*>(this));
     }
 

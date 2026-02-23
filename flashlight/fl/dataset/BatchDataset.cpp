@@ -22,12 +22,10 @@ BatchDataset::BatchDataset(
     batchSize_(batchsize),
     batchPolicy_(policy),
     batchFns_(batchfns) {
-    if(!dataset_) {
+    if(!dataset_)
         throw std::invalid_argument("dataset to be batched is null");
-    }
-    if(batchSize_ <= 0) {
+    if(batchSize_ <= 0)
         throw std::invalid_argument("invalid batch size");
-    }
     preBatchSize_ = dataset_->size();
     switch(batchPolicy_) {
         case BatchDatasetPolicy::INCLUDE_LAST:
@@ -37,11 +35,10 @@ BatchDataset::BatchDataset(
             size_ = std::floor(static_cast<double>(preBatchSize_) / batchSize_);
             break;
         case BatchDatasetPolicy::DIVISIBLE_ONLY:
-            if(size_ % batchSize_ != 0) {
+            if(size_ % batchSize_ != 0)
                 throw std::invalid_argument(
                     "dataset is not evenly divisible into batches"
                 );
-            }
             size_ = std::ceil(static_cast<double>(preBatchSize_) / batchSize_);
             break;
         default:
@@ -56,12 +53,10 @@ BatchDataset::BatchDataset(
 ) : dataset_(dataset),
     cumSumBatchSize_(batchSizes),
     batchFns_(batchfns) {
-    if(!dataset_) {
+    if(!dataset_)
         throw std::invalid_argument("dataset to be batched is null");
-    }
-    if(cumSumBatchSize_.empty()) {
+    if(cumSumBatchSize_.empty())
         throw std::invalid_argument("batch size vector should not be empty");
-    }
     std::partial_sum(
         cumSumBatchSize_.begin(),
         cumSumBatchSize_.end(),

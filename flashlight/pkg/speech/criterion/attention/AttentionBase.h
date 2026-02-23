@@ -22,11 +22,10 @@ namespace pkg {
             AttentionBase() {}
 
             std::vector<Variable> forward(const std::vector<Variable>& inputs) override {
-                if(inputs.size() != 3 && inputs.size() != 4 && inputs.size() != 5) {
+                if(inputs.size() != 3 && inputs.size() != 4 && inputs.size() != 5)
                     throw std::invalid_argument(
                         "Attention encoder-decoder: Invalid inputs size, should be 3, 4, or 5 arguments"
                     );
-                }
 
                 auto logAttnWeight = inputs.size() == 4 ? inputs[3] : Variable();
                 auto xEncodedSizes = inputs.size() == 5 ? inputs[4] : Variable();

@@ -24,9 +24,8 @@ namespace {
 const fs::path kPath = fs::temp_directory_path() / "test.mdl";
 
 bool afEqual(const fl::Variable& a, const fl::Variable& b) {
-    if(a.isCalcGrad() != b.isCalcGrad()) {
+    if(a.isCalcGrad() != b.isCalcGrad())
         return false;
-    }
     return allClose(a.tensor(), b.tensor(), 1E-7);
 }
 
@@ -68,13 +67,12 @@ TEST(RuntimeTest, LoadAndSave) {
 TEST(RuntimeTest, TestCleanFilepath) {
     auto s = cleanFilepath("timit/train.\\mymodel");
     std::string sep(1, fs::path::preferred_separator);
-    if(sep == "/") {
+    if(sep == "/")
         ASSERT_EQ(s, "timit#train.\\mymodel");
-    } else if(sep == "\\") {
+    else if(sep == "\\")
         ASSERT_EQ(s, "timit/train.#mymodel");
-    } else {
+    else
         GTEST_SKIP() << "System uses a different separator";
-    }
 }
 
 TEST(RuntimeTest, SpeechStatMeter) {

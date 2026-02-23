@@ -86,9 +86,8 @@ struct CudnnDropoutStruct {
 namespace fl {
 
 void cudnnCheckErr(cudnnStatus_t status) {
-    if(status == CUDNN_STATUS_SUCCESS) {
+    if(status == CUDNN_STATUS_SUCCESS)
         return;
-    }
     const char* err = cudnnGetErrorString(status);
     switch(status) {
         case CUDNN_STATUS_BAD_PARAM:
@@ -146,15 +145,13 @@ TensorDescriptor::TensorDescriptor(const fl::dtype type, const Shape& flDims) {
     std::array<int, 4> dims = {1, 1, 1, 1};
     // We want, if dims exist:
     // {flDims[3], flDims[2], flDims[1], flDims[0]};
-    for(unsigned i = 0; i < flDims.ndim(); ++i) {
+    for(unsigned i = 0; i < flDims.ndim(); ++i)
         dims[3 - i] = flDims[i];
-    }
 
     // Sets strides so array is contiguous row-major for cudnn
     std::vector<int> r_strides = {1};
-    for(auto it = dims.rbegin(); it != dims.rend() - 1; ++it) {
+    for(auto it = dims.rbegin(); it != dims.rend() - 1; ++it)
         r_strides.push_back(r_strides.back() * (*it));
-    }
     std::vector<int> strides(r_strides.rbegin(), r_strides.rend());
 
     CUDNN_CHECK_ERR(
@@ -178,15 +175,13 @@ TensorDescriptor::TensorDescriptor(const Tensor& input) {
     // reverse the dims (column -> row major) and cast to int type
     std::array<int, 4> strides = {1, 1, 1, 1};
     // {flStrides[3], flStrides[2], flStrides[1], flStrides[0]};
-    for(unsigned i = 0; i < flStrides.ndim(); ++i) {
+    for(unsigned i = 0; i < flStrides.ndim(); ++i)
         strides[3 - i] = flStrides[i];
-    }
 
     std::array<int, 4> dims = {1, 1, 1, 1};
     // {flDims[3], flDims[2], flDims[1], flDims[0]};
-    for(unsigned i = 0; i < flDims.ndim(); ++i) {
+    for(unsigned i = 0; i < flDims.ndim(); ++i)
         dims[3 - i] = flDims[i];
-    }
 
     CUDNN_CHECK_ERR(
         cudnnSetTensorNdDescriptor(
@@ -258,9 +253,8 @@ FilterDescriptor::FilterDescriptor(const Tensor& input) {
     std::array<int, 4> dims = {1, 1, 1, 1};
     // We want, if dims exist:
     // {flDims[3], flDims[2], flDims[1], flDims[0]};
-    for(unsigned i = 0; i < flDims.ndim(); ++i) {
+    for(unsigned i = 0; i < flDims.ndim(); ++i)
         dims[3 - i] = flDims[i];
-    }
 
     CUDNN_CHECK_ERR(
         cudnnSetFilterNdDescriptor(

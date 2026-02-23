@@ -71,22 +71,21 @@ void serialize(Archive& ar, TimeStretch::Config& conf) {
 template<class Archive>
 void serialize(Archive& ar, SoundEffectConfig& conf) {
     ar(cereal::make_nvp("type", conf.type_));
-    if(conf.type_ == kAdditiveNoise) {
+    if(conf.type_ == kAdditiveNoise)
         ar(cereal::make_nvp("additiveNoiseConfig", conf.additiveNoiseConfig_));
-    } else if(conf.type_ == kAmplify) {
+    else if(conf.type_ == kAmplify)
         ar(cereal::make_nvp("amplifyConfig", conf.amplifyConfig_));
-    } else if(conf.type_ == kNormalize) {
+    else if(conf.type_ == kNormalize)
         ar(
             cereal::make_nvp(
                 "normalizeOnlyIfTooHigh",
                 conf.normalizeOnlyIfTooHigh_
             )
         );
-    } else if(conf.type_ == kReverbEcho) {
+    else if(conf.type_ == kReverbEcho)
         ar(cereal::make_nvp("reverbEchoConfig", conf.reverbEchoConfig_));
-    } else if(conf.type_ == kTimeStretch) {
+    else if(conf.type_ == kTimeStretch)
         ar(cereal::make_nvp("timeStretchConfig", conf.timeStretchConfig_));
-    }
 }
 
 } // namespace cereal
@@ -134,25 +133,24 @@ std::shared_ptr<SoundEffect> createSoundEffect(
 ) {
     auto sfxChain = std::make_shared<SoundEffectChain>();
     for(const SoundEffectConfig& conf : sfxConfigs) {
-        if(conf.type_ == kAdditiveNoise) {
+        if(conf.type_ == kAdditiveNoise)
             sfxChain->add(
                 std::make_shared<AdditiveNoise>(conf.additiveNoiseConfig_, seed)
             );
-        } else if(conf.type_ == kAmplify) {
+        else if(conf.type_ == kAmplify)
             sfxChain->add(std::make_shared<Amplify>(conf.amplifyConfig_));
-        } else if(conf.type_ == kClampAmplitude) {
+        else if(conf.type_ == kClampAmplitude)
             sfxChain->add(std::make_shared<ClampAmplitude>());
-        } else if(conf.type_ == kNormalize) {
+        else if(conf.type_ == kNormalize)
             sfxChain->add(std::make_shared<Normalize>(conf.normalizeOnlyIfTooHigh_));
-        } else if(conf.type_ == kReverbEcho) {
+        else if(conf.type_ == kReverbEcho)
             sfxChain->add(std::make_shared<ReverbEcho>(conf.reverbEchoConfig_, seed));
-        } else if(conf.type_ == kTimeStretch) {
+        else if(conf.type_ == kTimeStretch)
             sfxChain->add(
                 std::make_shared<TimeStretch>(conf.timeStretchConfig_, seed)
             );
-        } else {
+        else
             LOG(FATAL) << "Invalid sound effect config type=" << conf.type_;
-        }
     }
     return sfxChain;
 }

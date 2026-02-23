@@ -74,9 +74,8 @@ const std::string& dtypeToString(dtype type) {
 }
 
 fl::dtype stringToDtype(const std::string& string) {
-    if(kStringToType.find(string) != kStringToType.end()) {
+    if(kStringToType.find(string) != kStringToType.end())
         return kStringToType.at(string);
-    }
     throw std::invalid_argument("stringToDtype: Invalid input type: " + string);
 }
 

@@ -27,22 +27,19 @@ bool f16Supported() {
 }
 
 size_t divRoundUp(size_t numerator, size_t denominator) {
-    if(!numerator) {
+    if(!numerator)
         return 0;
-    }
-    if(!denominator) {
+    if(!denominator)
         throw std::invalid_argument(
             std::string("divRoundUp() zero denominator error")
         );
-    }
     return (numerator + denominator - 1) / denominator;
 }
 
 namespace {
     std::string prettyStringMemorySizeUnits(size_t size) {
-        if(size == SIZE_MAX) {
+        if(size == SIZE_MAX)
             return "SIZE_MAX";
-        }
         std::stringstream ss;
 
         bool isFirst = true;
@@ -63,9 +60,8 @@ namespace {
                 unit = "KB";
             }
             if(size > 0) {
-                if(!isFirst) {
+                if(!isFirst)
                     ss << '+';
-                }
                 isFirst = false;
                 size_t nUnits = size >> shift;
                 ss << nUnits << unit;
@@ -77,9 +73,8 @@ namespace {
     }
 
     std::string prettyStringCountUnits(size_t count) {
-        if(count == SIZE_MAX) {
+        if(count == SIZE_MAX)
             return "SIZE_MAX";
-        }
         std::stringstream ss;
 
         bool isFirst = true;
@@ -100,9 +95,8 @@ namespace {
                 unit = "k";
             }
             if(count > 0) {
-                if(!isFirst) {
+                if(!isFirst)
                     ss << '+';
-                }
                 isFirst = false;
                 size_t nUnits = count / magnitude;
                 ss << nUnits << unit;
@@ -115,28 +109,24 @@ namespace {
 } // namespace
 
 std::string prettyStringMemorySize(size_t size) {
-    if(size == SIZE_MAX) {
+    if(size == SIZE_MAX)
         return "SIZE_MAX";
-    }
     std::stringstream ss;
     ss << size;
-    if(size >= (1UL << 13)) {
+    if(size >= (1UL << 13))
         ss << '(' << prettyStringMemorySizeUnits(size) << ')';
-    }
 
     return ss.str();
 }
 
 std::string prettyStringCount(size_t count) {
-    if(count == SIZE_MAX) {
+    if(count == SIZE_MAX)
         return "SIZE_MAX";
-    }
     std::stringstream ss;
     ss << count;
 
-    if(count >= 1e3) { // >= 10 thousand
+    if(count >= 1e3) // >= 10 thousand
         ss << '(' << prettyStringCountUnits(count) << ')';
-    }
     return ss.str();
 }
 

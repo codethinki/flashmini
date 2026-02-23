@@ -20,9 +20,8 @@ using fl::detail::AutogradTestF16;
 TEST(AutogradReductionTest, Sum) {
     for(const bool keepDims : {false, true}) {
         Shape s = {6};
-        if(keepDims) {
+        if(keepDims)
             s = {6, 1};
-        }
 
         auto x = Variable(fl::rand(s), true);
         auto y = Variable(fl::rand({6, 3}), true);
@@ -113,7 +112,7 @@ TEST(AutogradReductionTest, Mean) {
 
 TEST(AutogradReductionTest, Variance) {
     std::vector<bool> biased = {true, false};
-    for(auto b : biased) {
+    for(auto b : biased)
         for(const bool keepDims : {false, true}) {
             auto x = Variable(fl::rand({5, 6, 7, 8}, fl::dtype::f64), true);
 
@@ -134,7 +133,6 @@ TEST(AutogradReductionTest, Variance) {
                 };
             ASSERT_TRUE(fl::detail::jacobianTestImpl(funcVar, x, 1E-5, 1E-5));
         }
-    }
 }
 
 TEST(AutogradReductionTest, Norm) {

@@ -27,12 +27,11 @@ void ShuffleDataset::resample() {
     // en.cppreference.com/w/cpp/algorithm/random_shuffle#Possible_implementation
     using distr_t = std::uniform_int_distribution<unsigned int>;
     distr_t D;
-    for(int i = n - 1; i > 0; --i) {
+    for(int i = n - 1; i > 0; --i)
         std::swap(
             resampleVec_[i],
             resampleVec_[D(rng_, distr_t::param_type(0, i))]
         );
-    }
 }
 
 void ShuffleDataset::setSeed(int seed) {

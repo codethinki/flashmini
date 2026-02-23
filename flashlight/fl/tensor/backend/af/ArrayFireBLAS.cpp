@@ -21,9 +21,8 @@ Tensor ArrayFireBackend::matmul(
     MatrixProperty rhsProp
 ) {
     unsigned numDims = std::max(lhs.ndim(), rhs.ndim());
-    if((lhs.ndim() == 1 || rhs.ndim() == 1) && numDims > 1) {
+    if((lhs.ndim() == 1 || rhs.ndim() == 1) && numDims > 1)
         numDims -= 1;
-    }
 
     af::array lhsArray = toArray(lhs);
     af::array rhsArray = toArray(rhs);
@@ -38,12 +37,10 @@ Tensor ArrayFireBackend::matmul(
         rhsProp = MatrixProperty::None;
         numDims = 1;
     } else {
-        if(rhs.ndim() == 1) {
+        if(rhs.ndim() == 1)
             rhsArray = af::moddims(toArray(rhs), {rhs.dim(0), 1});
-        }
-        if(lhs.ndim() == 1) {
+        if(lhs.ndim() == 1)
             lhsArray = af::moddims(toArray(lhs), {1, lhs.dim(0)});
-        }
     }
 
     auto arr = af::matmul(
@@ -53,9 +50,8 @@ Tensor ArrayFireBackend::matmul(
         detail::flToAfMatrixProperty(rhsProp)
     );
 
-    if(lhs.ndim() == 1 && rhs.ndim() == 2) {
+    if(lhs.ndim() == 1 && rhs.ndim() == 2)
         arr = af::moddims(arr, arr.dims(1));
-    }
 
     return toTensor<ArrayFireTensor>(std::move(arr), numDims);
 }

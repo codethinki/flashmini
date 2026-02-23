@@ -60,9 +60,8 @@ namespace detail {
     T adjustInputType(const T& in, const char* funcname) {
         OptimLevel optimLevel = OptimMode::get().getOptimLevel();
         // Fastpath - DEFAULT mode never casts tensors
-        if(optimLevel == OptimLevel::DEFAULT) {
+        if(optimLevel == OptimLevel::DEFAULT)
             return in;
-        }
 
         T res;
         auto& funcs = kOptimLevelTypeExclusionMappings.find(optimLevel)->second;
@@ -70,16 +69,15 @@ namespace detail {
         if(
             funcs.find(std::string(funcname)) == funcs.end()
             && optimLevel != OptimLevel::DEFAULT
-        ) {
+        )
             // Not in the excluded list - cast to f16
             res = in.astype(fl::dtype::f16);
-        } else {
+        else {
             // Upcast to f32 only if we have an f16 input - otherwise, leave as is
-            if(in.type() == fl::dtype::f16) {
+            if(in.type() == fl::dtype::f16)
                 res = in.astype(fl::dtype::f32);
-            } else {
+            else
                 res = in;
-            }
         }
 
         return res;

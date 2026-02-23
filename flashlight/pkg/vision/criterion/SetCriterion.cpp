@@ -22,11 +22,10 @@ using namespace fl;
 
 Tensor span(const Shape& inDims, const int index) {
     Shape dims(std::vector<Dim>(std::max(inDims.ndim(), index + 1), 1));
-    if(index > inDims.ndim() - 1) {
+    if(index > inDims.ndim() - 1)
         dims[index] = 1;
-    } else {
+    else
         dims[index] = inDims[index];
-    }
     return fl::iota(dims);
 }
 
@@ -36,20 +35,17 @@ Shape calcStrides(const Shape& dims) {
 
 Shape calcOutDims(const std::vector<Tensor>& coords) {
     unsigned maxNdim = 0;
-    for(const auto& coord : coords) {
-        if(coord.ndim() > maxNdim) {
+    for(const auto& coord : coords)
+        if(coord.ndim() > maxNdim)
             maxNdim = coord.ndim();
-        }
-    }
 
     Shape oDims(std::vector<Dim>(maxNdim, 1));
 
     for(const auto& coord : coords) {
         auto iDims = coord.shape();
         for(int i = 0; i < coord.ndim(); i++) {
-            if(iDims[i] > 1 && oDims[i] == 1) {
+            if(iDims[i] > 1 && oDims[i] == 1)
                 oDims[i] = iDims[i];
-            }
             assert(iDims[i] == 1 || iDims[i] == oDims[i]);
         }
     }
@@ -69,9 +65,8 @@ Tensor applyStrides(const std::vector<Tensor>& coords, const Shape& strides) {
 
 std::vector<Tensor> spanIfEmpty(const std::vector<Tensor>& coords, Shape dims) {
     std::vector<Tensor> result(coords.size());
-    for(int i = 0; i < coords.size(); i++) {
+    for(int i = 0; i < coords.size(); i++)
         result[i] = (coords[i].isEmpty()) ? span(dims, i) : coords[i];
-    }
     return result;
 }
 
@@ -187,9 +182,8 @@ SetCriterion::LossDict SetCriterion::forward(
             [](int curr, const Variable& label) { return curr + label.dim(1); });
 
         Tensor numBoxesArray = fl::fromScalar(numBoxes, fl::dtype::s32);
-        if(isDistributedInit()) {
+        if(isDistributedInit())
             allReduce(numBoxesArray);
-        }
         numBoxes = numBoxesArray.scalar<int>();
         numBoxes = std::max(numBoxes / fl::getWorldSize(), 1);
 
@@ -209,12 +203,10 @@ SetCriterion::LossDict SetCriterion::forward(
             indices,
             numBoxes
         );
-        for(std::pair<std::string, Variable> l : labelLoss) {
+        for(std::pair<std::string, Variable> l : labelLoss)
             losses[l.first + "_" + std::to_string(i)] = l.second;
-        }
-        for(std::pair<std::string, Variable> l : bboxLoss) {
+        for(std::pair<std::string, Variable> l : bboxLoss)
             losses[l.first + "_" + std::to_string(i)] = l.second;
-        }
     }
     return losses;
 }
@@ -228,11 +220,10 @@ SetCriterion::LossDict SetCriterion::lossBoxes(
     const int numBoxes
 ) {
     auto srcIdx = this->getSrcPermutationIdx(indices);
-    if(srcIdx.first.isEmpty()) {
+    if(srcIdx.first.isEmpty())
         return {
             {"lossGiou", fl::Variable(fl::fromScalar(0, predBoxes.type()), false)},
             {"lossBbox", fl::Variable(fl::fromScalar(0, predBoxes.type()), false)}};
-    }
     auto colIdxs = fl::reshape(srcIdx.second, {1, srcIdx.second.dim(0)});
     auto batchIdxs = fl::reshape(srcIdx.first, {1, srcIdx.first.dim(0)});
 
@@ -243,9 +234,8 @@ SetCriterion::LossDict SetCriterion::lossBoxes(
     for(const auto& idx : indices) {
         auto targetIdxs = idx.first;
         auto reordered = targetBoxes[i](fl::span, targetIdxs);
-        if(!reordered.isEmpty()) {
+        if(!reordered.isEmpty())
             permuted.emplace_back(reordered);
-        }
         i += 1;
     }
     auto tgtBoxes = fl::concatenate(permuted, 1);

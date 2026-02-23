@@ -82,9 +82,8 @@ public:
 
 protected:
     void checkIndexBounds(int64_t idx) const {
-        if(!(idx >= 0 && idx < size())) {
+        if(!(idx >= 0 && idx < size()))
             throw std::out_of_range("Dataset idx out of range");
-        }
     }
 };
 

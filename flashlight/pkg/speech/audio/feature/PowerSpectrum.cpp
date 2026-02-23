@@ -47,9 +47,8 @@ PowerSpectrum::PowerSpectrum(const FeatureParams& params) : featParams_(params),
 
 std::vector<float> PowerSpectrum::apply(const std::vector<float>& input) {
     auto frames = frameSignal(input, featParams_);
-    if(frames.empty()) {
+    if(frames.empty())
         return {};
-    }
     return powSpectrumImpl(frames);
 }
 
@@ -59,10 +58,9 @@ std::vector<float> PowerSpectrum::powSpectrumImpl(std::vector<float>& frames) {
     int nFft = featParams_.nFft();
     int K = featParams_.filterFreqResponseLen();
 
-    if(featParams_.ditherVal != 0.0) {
+    if(featParams_.ditherVal != 0.0)
         frames = dither_.apply(frames);
-    }
-    if(featParams_.zeroMeanFrame) {
+    if(featParams_.zeroMeanFrame)
         for(size_t f = 0; f < nFrames; ++f) {
             auto begin = frames.data() + f * nSamples;
             float mean = std::accumulate(begin, begin + nSamples, 0.0);
@@ -73,10 +71,8 @@ std::vector<float> PowerSpectrum::powSpectrumImpl(std::vector<float>& frames) {
                 begin,
                 [mean](float x) { return x - mean; });
         }
-    }
-    if(featParams_.preemCoef != 0) {
+    if(featParams_.preemCoef != 0)
         preEmphasis_.applyInPlace(frames);
-    }
     windowing_.applyInPlace(frames);
     std::vector<float> dft(K * nFrames);
     for(size_t f = 0; f < nFrames; ++f) {
@@ -93,12 +89,11 @@ std::vector<float> PowerSpectrum::powSpectrumImpl(std::vector<float>& frames) {
                 outFftBuf_[2 * i + 1] = -outFftBuf_[2 * nFft - 2 * i + 1];
             }
 
-            for(size_t i = 0; i < K; ++i) {
+            for(size_t i = 0; i < K; ++i)
                 dft[f * K + i] = std::sqrt(
                     outFftBuf_[2 * i] * outFftBuf_[2 * i]
                     + outFftBuf_[2 * i + 1] * outFftBuf_[2 * i + 1]
                 );
-            }
         }
     }
     return dft;
@@ -108,13 +103,12 @@ std::vector<float> PowerSpectrum::batchApply(
     const std::vector<float>& input,
     int batchSz
 ) {
-    if(batchSz <= 0) {
+    if(batchSz <= 0)
         throw std::invalid_argument("PowerSpectrum: negative batchSz");
-    } else if(input.size() % batchSz != 0) {
+    else if(input.size() % batchSz != 0)
         throw std::invalid_argument(
             "PowerSpectrum: input size is not divisible by batchSz"
         );
-    }
     int N = input.size() / batchSz;
     int outputSz = outputSize(N);
     std::vector<float> feat(outputSz * batchSz);
@@ -124,9 +118,8 @@ std::vector<float> PowerSpectrum::batchApply(
         auto start = input.begin() + b * N;
         std::vector<float> inputBuf(start, start + N);
         auto curFeat = apply(inputBuf);
-        if(outputSz != curFeat.size()) {
+        if(outputSz != curFeat.size())
             throw std::logic_error("PowerSpectrum: apply() returned wrong size");
-        }
         std::copy(
             curFeat.begin(),
             curFeat.end(),
@@ -145,17 +138,16 @@ int PowerSpectrum::outputSize(int inputSz) {
 }
 
 void PowerSpectrum::validatePowSpecParams() const {
-    if(featParams_.samplingFreq <= 0) {
+    if(featParams_.samplingFreq <= 0)
         throw std::invalid_argument("PowerSpectrum: samplingFreq is negative");
-    } else if(featParams_.frameSizeMs <= 0) {
+    else if(featParams_.frameSizeMs <= 0)
         throw std::invalid_argument("PowerSpectrum: frameSizeMs is negative");
-    } else if(featParams_.frameStrideMs <= 0) {
+    else if(featParams_.frameStrideMs <= 0)
         throw std::invalid_argument("PowerSpectrum: frameStrideMs is negative");
-    } else if(featParams_.numFrameSizeSamples() <= 0) {
+    else if(featParams_.numFrameSizeSamples() <= 0)
         throw std::invalid_argument("PowerSpectrum: frameSizeMs is too low");
-    } else if(featParams_.numFrameStrideSamples() <= 0) {
+    else if(featParams_.numFrameStrideSamples() <= 0)
         throw std::invalid_argument("PowerSpectrum: frameStrideMs is too low");
-    }
 }
 
 PowerSpectrum::~PowerSpectrum() {

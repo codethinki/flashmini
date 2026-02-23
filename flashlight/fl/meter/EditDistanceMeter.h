@@ -130,9 +130,8 @@ private:
         size_t len2
     ) const {
         std::vector<ErrorState> column(len1 + 1);
-        for(int i = 0; i <= len1; ++i) {
+        for(int i = 0; i <= len1; ++i)
             column[i].nins = i;
-        }
 
         auto curin2 = in2begin;
         for(int x = 1; x <= len2; x++) {
@@ -150,18 +149,17 @@ private:
                 if(
                     std::distance(possibilities.begin(), min_it)
                     == 0
-                ) { // deletion error
+                ) // deletion error
                     ++column[y].ndel;
-                } else if(
+                else if(
                     std::distance(possibilities.begin(), min_it) == 1) { // insertion
                     // error
                     column[y] = column[y - 1];
                     ++column[y].nins;
                 } else {
                     column[y] = lastdiagonal;
-                    if(*curin1 != *curin2) { // substitution error
+                    if(*curin1 != *curin2) // substitution error
                         ++column[y].nsub;
-                    }
                 }
 
                 lastdiagonal = olddiagonal;

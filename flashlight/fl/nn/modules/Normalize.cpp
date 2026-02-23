@@ -32,9 +32,8 @@ std::string Normalize::prettyString() const {
     std::ostringstream ss;
     ss << "Normalize";
     ss << " ( axis : { ";
-    for(auto d : axes_) {
+    for(auto d : axes_)
         ss << d << " ";
-    }
     ss << "} , p : " << p_;
     ss << ", eps : " << eps_;
     ss << ", value : " << value_;

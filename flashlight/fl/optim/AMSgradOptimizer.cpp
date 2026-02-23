@@ -47,16 +47,14 @@ AMSgradOptimizer::AMSgradOptimizer(
 
 void AMSgradOptimizer::step() {
     for(size_t i = 0; i < parameters_.size(); i++) {
-        if(!parameters_[i].isGradAvailable()) {
+        if(!parameters_[i].isGradAvailable())
             continue;
-        }
 
         const Tensor& grad = parameters_[i].grad().tensor();
         Tensor& data = parameters_[i].tensor();
 
-        if(wd_ != 0) {
+        if(wd_ != 0)
             data = data - wd_ * data;
-        }
 
         Tensor& biasedFirst = biasedFirst_[i];
         Tensor& biasedSecond = biasedSecond_[i];
@@ -79,9 +77,8 @@ std::string AMSgradOptimizer::prettyString() const {
     std::ostringstream ss;
     ss << "AMSgrad from ";
 
-    if(wd_ != 0) {
+    if(wd_ != 0)
         ss << " (weight decay=" << wd_ << ")";
-    }
 
     return ss.str();
 }

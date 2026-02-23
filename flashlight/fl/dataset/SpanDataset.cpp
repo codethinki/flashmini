@@ -17,11 +17,10 @@ SpanDataset::SpanDataset(
 ) : dataset_(dataset),
     offset_(offset) {
     size_ = (length < 0) ? (dataset_->size() - offset_) : length;
-    if(size_ + offset_ > dataset_->size()) {
+    if(size_ + offset_ > dataset_->size())
         throw std::out_of_range(
             "Dataset length out of range (larger than underlying dataset)"
         );
-    }
 }
 
 std::vector<Tensor> SpanDataset::get(const int64_t idx) const {

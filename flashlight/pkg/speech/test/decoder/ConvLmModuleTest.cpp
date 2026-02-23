@@ -69,9 +69,8 @@ TEST(ConvLmModuleTest, GCNN14BCrossEntropy) {
 TEST(ConvLmModuleTest, SerializationGCNN14BAdaptiveSoftmax) {
     char* user = getenv("USER");
     std::string userstr = "unknown";
-    if(user != nullptr) {
+    if(user != nullptr)
         userstr = std::string(user);
-    }
     const fs::path path = fs::temp_directory_path() / "test.mdl";
     const fs::path archfile = archDir / "gcnn_14B_lm_arch_as.txt";
 

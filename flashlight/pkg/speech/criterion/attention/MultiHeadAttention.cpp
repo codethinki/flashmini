@@ -23,9 +23,8 @@ MultiHeadContentAttention::MultiHeadContentAttention(
 ) : numHeads_(numHeads),
     keyValue_(keyValue),
     splitInput_(splitInput) {
-    if(splitInput && dim % numHeads != 0) {
+    if(splitInput && dim % numHeads != 0)
         throw std::invalid_argument("Invalid dimensions");
-    }
 
     if(!splitInput) {
         add(Linear(dim, dim)); // query
@@ -48,21 +47,19 @@ std::pair<Variable, Variable> MultiHeadContentAttention::forwardBase(
     const Variable& logAttnWeight,
     const Variable& xEncodedSizes
 ) {
-    if(state.ndim() != 3) {
+    if(state.ndim() != 3)
         throw std::invalid_argument(
             "MultiHeadContentAttention::forwardBase: "
             "state input must be of shape {H, U, B}"
         );
-    }
     int hEncode = xEncoded.dim(0);
     int T = xEncoded.dim(1);
     int hState = state.dim(0);
     int U = state.dim(1);
     int B = state.dim(2);
     auto hiddenDim = hState / numHeads_;
-    if(hEncode != (1 + keyValue_) * hState) {
+    if(hEncode != (1 + keyValue_) * hState)
         throw std::invalid_argument("Invalid input encoder dimension");
-    }
 
     auto xEncodedKey = keyValue_
         ? xEncoded(fl::arange(0, hEncode / 2), fl::span, fl::span)
@@ -88,20 +85,18 @@ std::pair<Variable, Variable> MultiHeadContentAttention::forwardBase(
 
     if(!logAttnWeight.isEmpty()) {
         auto tiledLogAttnWeight = tile(logAttnWeight, {1, 1, numHeads_});
-        if(tiledLogAttnWeight.shape() != innerProd.shape()) {
+        if(tiledLogAttnWeight.shape() != innerProd.shape())
             throw std::invalid_argument(
                 "MultiHeadContentAttention: logAttnWeight has wong dimentions"
             );
-        }
         innerProd = innerProd + tiledLogAttnWeight;
     }
 
-    if(!xEncodedSizes.isEmpty()) {
+    if(!xEncodedSizes.isEmpty())
         innerProd = maskAttention(
             innerProd,
             moddims(tile(xEncodedSizes, {numHeads_, 1}), {1, B * numHeads_})
         );
-    }
 
     // [U, T, B * numHeads_]
     auto attention = softmax(innerProd, 1);

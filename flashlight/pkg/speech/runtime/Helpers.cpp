@@ -64,13 +64,12 @@ std::string serializeGflags(const std::string& separator /* = "\n" */) {
     gflags::GetAllFlags(&allFlags);
     std::string currVal;
     auto& deprecatedFlags = detail::getDeprecatedFlags();
-    for(auto itr = allFlags.begin(); itr != allFlags.end(); ++itr) {
+    for(auto itr = allFlags.begin(); itr != allFlags.end(); ++itr)
         // Check if the flag is deprecated - if so, skip it
         if(deprecatedFlags.find(itr->name) == deprecatedFlags.end()) {
             gflags::GetCommandLineOption(itr->name.c_str(), &currVal);
             serialized << "--" << itr->name << "=" << currVal << separator;
         }
-    }
     return serialized.str();
 }
 
@@ -78,11 +77,9 @@ std::unordered_set<int64_t> getTrainEvalIds(int64_t dsSize, double pctTrainEval,
     std::mt19937_64 rng(seed);
     std::bernoulli_distribution dist(pctTrainEval / 100.0);
     std::unordered_set<int64_t> result;
-    for(int64_t i = 0; i < dsSize; ++i) {
-        if(dist(rng)) {
+    for(int64_t i = 0; i < dsSize; ++i)
+        if(dist(rng))
             result.insert(i);
-        }
-    }
     return result;
 }
 
@@ -121,20 +118,18 @@ std::shared_ptr<fl::Dataset> createDataset(
             LOG(FATAL) << "EverstoreDataset not supported: "
             << "build with -DFL_BUILD_FB_DEPENDENCIES";
 #endif
-        } else {
+        } else
             curListDs = std::make_shared<ListFileDataset>(
                 rootDir / path,
                 inputTransform,
                 targetTransform,
                 wordTransform
             );
-        }
 
         allListDs.emplace_back(curListDs);
         sizes.reserve(sizes.size() + curListDs->size());
-        for(int64_t i = 0; i < curListDs->size(); ++i) {
+        for(int64_t i = 0; i < curListDs->size(); ++i)
             sizes.push_back(curListDs->getInputSize(i));
-        }
     }
 
     // Order Dataset
@@ -219,11 +214,10 @@ std::shared_ptr<fl::Dataset> createDataset(
             fl::BatchDatasetPolicy::INCLUDE_LAST,
             batchFns
         );
-    } else {
+    } else
         throw std::runtime_error(
             "Unsupported batching strategy '" + batchingStrategy + "'"
         );
-    }
 }
 
 std::shared_ptr<fl::Dataset> loadPrefetchDataset(
@@ -232,16 +226,14 @@ std::shared_ptr<fl::Dataset> loadPrefetchDataset(
     bool shuffle,
     int shuffleSeed /*= 0 */
 ) {
-    if(shuffle) {
+    if(shuffle)
         dataset = std::make_shared<fl::ShuffleDataset>(dataset, shuffleSeed);
-    }
-    if(prefetchThreads > 0) {
+    if(prefetchThreads > 0)
         dataset = std::make_shared<fl::PrefetchDataset>(
             dataset,
             prefetchThreads,
             prefetchThreads /* prefetch size */
         );
-    }
     return dataset;
 }
 
@@ -253,11 +245,10 @@ std::vector<std::pair<std::string, std::string>> parseValidSets(
     for(const auto& s : validSets) {
         // assume the format is tag:filepath
         auto ts = fl::lib::splitOnAnyOf(":", s);
-        if(ts.size() == 1) {
+        if(ts.size() == 1)
             validTagSets.emplace_back(s, s);
-        } else {
+        else
             validTagSets.emplace_back(ts[0], ts[1]);
-        }
     }
     return validTagSets;
 }

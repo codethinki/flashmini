@@ -116,9 +116,8 @@ namespace detail {
 } // namespace detail
 
 void allReduce(Tensor& arr, bool async /* = false */) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         throw std::runtime_error("distributed environment not initialized");
-    }
     ncclDataType_t type = detail::getNcclTypeForArray(arr);
     DevicePtr tensorPtr(arr);
     detail::allReduceCuda(
@@ -137,16 +136,14 @@ void allReduceMultiple(
     bool contiguous /* = false */
 ) {
     // Fast paths
-    if(arrs.empty()) {
+    if(arrs.empty())
         return;
-    }
 
     if(!contiguous) {
         // Use nccl groups to do everything in a single kernel launch
         NCCLCHECK(ncclGroupStart());
-        for(auto& arr : arrs) {
+        for(auto& arr : arrs)
             allReduce(*arr, async);
-        }
         NCCLCHECK(ncclGroupEnd());
         return;
     }
@@ -154,14 +151,12 @@ void allReduceMultiple(
     // We can only do a contiguous set reduction if all arrays in the set are of
     // the same type, else fail
     ncclDataType_t ncclType = detail::getNcclTypeForArray(*arrs[0]);
-    for(auto& arr : arrs) {
-        if(detail::getNcclTypeForArray(*arr) != ncclType) {
+    for(auto& arr : arrs)
+        if(detail::getNcclTypeForArray(*arr) != ncclType)
             throw std::runtime_error(
                 "Cannot perform contiguous set allReduce on a set of tensors "
                 "of different types"
             );
-        }
-    }
     // Size of each element in each tensor in bytes
     size_t typeSize = fl::getTypeSize(arrs[0]->type());
 
@@ -178,11 +173,10 @@ void allReduceMultiple(
     // coalescing cache to the same size, if we're using contiguous sync, it
     // should never be larger since we flush if adding an additional buffer would
     // exceed the max cache size
-    if(totalEls * typeSize > DistributedConstants::kCoalesceCacheSize) {
+    if(totalEls * typeSize > DistributedConstants::kCoalesceCacheSize)
         throw std::runtime_error(
             "Total coalesce buffer size is larger than existing buffer size"
         );
-    }
 
     auto& ncclContext = detail::NcclContext::getInstance();
     const auto& workerStream = ncclContext.getWorkerStream();
@@ -220,11 +214,10 @@ void allReduceMultiple(
 
     // Block the worker stream's copy operations on allReduce operations that are
     // currently enqueued in the reduction stream
-    if(async) {
+    if(async)
         workerStream.relativeSync(ncclContext.getReductionStream());
-    } else {
+    else
         relativeSync(workerStream, constTensors);
-    }
 
     // Enqueue operations in the stream to copy back to each respective array from
     // the coalesce buffer
@@ -253,25 +246,22 @@ void syncDistributed() {
     const auto& activeCudaDevice = manager.getActiveDevice(DeviceType::CUDA);
     const auto& workerStream = ncclContext.getWorkerStream();
     const auto& reductionStream = ncclContext.getReductionStream();
-    for(const auto& stream : activeCudaDevice.getStreams()) {
+    for(const auto& stream : activeCudaDevice.getStreams())
         if(stream.get() != &workerStream && stream.get() != &reductionStream) {
             stream->relativeSync(workerStream);
             stream->relativeSync(reductionStream);
         }
-    }
 }
 
 int getWorldRank() {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         return 0;
-    }
     return detail::NcclContext::getInstance().getWorldRank();
 }
 
 int getWorldSize() {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         return 1;
-    }
     return detail::NcclContext::getInstance().getWorldSize();
 }
 
@@ -296,39 +286,35 @@ void distributedInit(
         );
         detail::DistributedInfo::getInstance().initMethod_ =
             DistributedInit::FILE_SYSTEM;
-    } else {
+    } else
         throw std::runtime_error(
             "unsupported distributed init method for NCCL backend"
         );
-    }
     detail::DistributedInfo::getInstance().isInitialized_ = true;
     detail::DistributedInfo::getInstance().backend_ = DistributedBackend::NCCL;
-    if(getWorldRank() == 0) {
+    if(getWorldRank() == 0)
         std::cout << "Initialized NCCL " << NCCL_MAJOR << "." << NCCL_MINOR << "."
         << NCCL_PATCH << " successfully!\n";
-    }
 }
 
 namespace detail {
 
     void ncclCheck(ncclResult_t r) {
-        if(r == ncclSuccess) {
+        if(r == ncclSuccess)
             return;
-        }
         const char* err = ncclGetErrorString(r);
-        if(r == ncclInvalidArgument) {
+        if(r == ncclInvalidArgument)
             throw std::invalid_argument(err);
-        } else if(r == ncclInvalidUsage) {
+        else if(r == ncclInvalidUsage)
             throw std::logic_error(err);
-        } else {
+        else
             throw std::runtime_error(err);
-        }
     }
 
     void mpiCheck(int ec) {
-        if(ec == MPI_SUCCESS) {
+        if(ec == MPI_SUCCESS)
             return;
-        } else {
+        else {
             char buf[MPI_MAX_ERROR_STRING];
             int resultlen;
             MPI_Error_string(ec, buf, &resultlen);
@@ -346,22 +332,20 @@ namespace detail {
     ) {
         const CUDAStream* syncStream;
         auto& ncclContext = detail::NcclContext::getInstance();
-        if(async) {
+        if(async)
             syncStream = &ncclContext.getReductionStream();
-        } else {
+        else
             syncStream = bufferStream;
-        }
 
         // Synchronize with whatever CUDA stream is performing operations needed
         // pre-reduction. If we're in contiguous mode, we need the reduction stream to
         // wait for the copy in the worker stream to complete. If we're not in
         // CUDA stream.
-        if(contiguous) {
+        if(contiguous)
             // block future reduction stream ops on the copy-worker stream
             syncStream->relativeSync(ncclContext.getWorkerStream());
-        } else if(async) {
+        else if(async)
             syncStream->relativeSync(*bufferStream);
-        }
         // don't synchronize streams if not async and not contiguous - the AF CUDA
         // stream does everything
 
@@ -451,11 +435,10 @@ namespace detail {
                 maxDevicePerNode == params.end()
                 || !isNonNegativeInteger(maxDevicePerNode->second)
                 || std::stoi(maxDevicePerNode->second) == 0
-            ) {
+            )
                 throw std::invalid_argument(
                     "invalid MaxDevicePerNode for NCCL initWithMPI"
                 );
-            }
 
             ncclUniqueId id;
 
@@ -463,9 +446,8 @@ namespace detail {
             fl::setDevice(worldRank_ % std::stoi(maxDevicePerNode->second));
 
             // get NCCL unique ID at rank 0 and broadcast it to all others
-            if(worldRank_ == 0) {
+            if(worldRank_ == 0)
                 ncclGetUniqueId(&id);
-            }
             MPICHECK(MPI_Bcast((void*) &id, sizeof(id), MPI_BYTE, 0, MPI_COMM_WORLD));
 
             // initializing NCCL
@@ -482,14 +464,12 @@ namespace detail {
             auto filePath = params.find(DistributedConstants::kFilePath);
             auto maxDevicePerNode = params.find(DistributedConstants::kMaxDevicePerNode);
 
-            if(filePath == params.end() || filePath->second.empty()) {
+            if(filePath == params.end() || filePath->second.empty())
                 throw std::invalid_argument("invalid FilePath for NCCL initWithFileSystem");
-            }
-            if(maxDevicePerNode == params.end()) {
+            if(maxDevicePerNode == params.end())
                 throw std::invalid_argument(
                     "invalid MaxDevicePerNode for NCCL initWithFileSystem"
                 );
-            }
 
             worldRank_ = worldRank;
             worldSize_ = worldSize;
@@ -499,9 +479,8 @@ namespace detail {
             fl::setDevice(worldRank_ % std::stoi(maxDevicePerNode->second));
 
             // get NCCL unique ID at rank 0 and broadcast it to all others
-            if(worldRank_ == 0) {
+            if(worldRank_ == 0)
                 ncclGetUniqueId(&id);
-            }
 
             auto fs = FileStore(filePath->second);
             if(worldRank_ == 0) {
@@ -518,9 +497,8 @@ namespace detail {
             NCCLCHECK(ncclCommInitRank(&comm_, worldSize_, id, worldRank_));
 
             // Remove the temporary file created for initialization
-            if(worldRank_ == 0) {
+            if(worldRank_ == 0)
                 fs.clear(kNcclKey);
-            }
 
             createCudaResources();
         }
@@ -537,15 +515,14 @@ namespace detail {
 // default, as driver shutdown will clean up this memory anyways.
 #ifdef CUDA_CONTIGUOUS_BUFFER_FREE_ON_SHUTDOWN
             // Free the coalesce buffer if it was allocated
-            if(coalesceBuffer_ != nullptr) {
+            if(coalesceBuffer_ != nullptr)
                 FL_CUDA_CHECK(cudaFree(coalesceBuffer_));
-            }
+
 #endif
 
-            if(DistributedInfo::getInstance().initMethod_ == DistributedInit::MPI) {
+            if(DistributedInfo::getInstance().initMethod_ == DistributedInit::MPI)
                 // finalizing MPI
                 MPICHECK(MPI_Finalize());
-            }
         }
     } // namespace
 } // namespace detail

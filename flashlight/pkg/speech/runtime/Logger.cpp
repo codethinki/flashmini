@@ -72,12 +72,11 @@ std::string getLogString(
             format("%5.2f", v.second.wrdEdit.errorRate()[0])
         );
         auto vDecoderIter = validDecoderWer.find(v.first);
-        if(vDecoderIter != validDecoderWer.end()) {
+        if(vDecoderIter != validDecoderWer.end())
             insertItem(
                 v.first + "-WER-decoded",
                 format("%5.2f", vDecoderIter->second)
             );
-        }
     }
     auto stats = meters.stats.value();
     auto numsamples = std::max<int64_t>(stats[4], 1);
@@ -87,11 +86,10 @@ std::string getLogString(
     auto tsztotal = stats[1];
     auto tszmax = stats[3];
     auto iszAvrFrames = isztotal / numsamples;
-    if(FLAGS_features_type != kFeaturesRaw) {
+    if(FLAGS_features_type != kFeaturesRaw)
         iszAvrFrames = iszAvrFrames / FLAGS_framestridems;
-    } else {
+    else
         iszAvrFrames = iszAvrFrames / 1000 * FLAGS_samplerate;
-    }
     insertItem("avg-isz", format("%03d", iszAvrFrames));
     insertItem("avg-tsz", format("%03d", tsztotal / numsamples));
     insertItem("max-tsz", format("%03d", tszmax));
@@ -114,9 +112,8 @@ void appendToLog(std::ofstream& logfile, const std::string& logstr) {
     auto write = [&]() {
             logfile.clear(); // reset flags
             logfile << logstr << std::endl;
-            if(!logfile) {
+            if(!logfile)
                 throw std::runtime_error("appending to log failed");
-            }
         };
     retryWithBackoff(std::chrono::seconds(1), 1.0, 6, write);
 }

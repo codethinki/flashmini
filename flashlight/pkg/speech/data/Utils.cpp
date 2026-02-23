@@ -33,38 +33,33 @@ std::vector<std::string> wrd2Target(
             lit->second.size() > 1
             && targetSamplePct
             > static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX)
-        ) {
+        )
             return lit->second[std::rand() % lit->second.size()];
-        } else {
+        else
             return lit->second[0];
-        }
     }
 
     std::vector<std::string> word2tokens;
     if(fallback2LtrWordSepLeft || fallback2LtrWordSepRight) {
-        if(fallback2LtrWordSepLeft && !wordSeparator.empty()) {
+        if(fallback2LtrWordSepLeft && !wordSeparator.empty())
             // add word separator at the beginning of fallback word
             word2tokens.push_back(wordSeparator);
-        }
         auto tokens = splitWrd(word);
         for(const auto& tkn : tokens) {
-            if(dict.contains(tkn)) {
+            if(dict.contains(tkn))
                 word2tokens.push_back(tkn);
-            } else if(!skipUnk) {
+            else if(!skipUnk)
                 throw std::invalid_argument(
                     "Unknown token '" + tkn
                     + "' when falling back to letter target for the unknown word: "
                     + word
                 );
-            }
         }
-        if(fallback2LtrWordSepRight && !wordSeparator.empty()) {
+        if(fallback2LtrWordSepRight && !wordSeparator.empty())
             // add word separator at the end of fallback word
             word2tokens.push_back(wordSeparator);
-        }
-    } else if(!skipUnk) {
+    } else if(!skipUnk)
         throw std::invalid_argument("Unknown word in the lexicon: " + word);
-    }
     return word2tokens;
 }
 
@@ -91,9 +86,8 @@ std::vector<std::string> wrd2Target(
             skipUnk
         );
 
-        if(w2tokens.empty()) {
+        if(w2tokens.empty())
             continue;
-        }
         res.insert(res.end(), w2tokens.begin(), w2tokens.end());
     }
     return res;
@@ -104,23 +98,22 @@ std::pair<int, FeatureType> getFeatureType(
     int channels,
     const fl::lib::audio::FeatureParams& featParams
 ) {
-    if(featuresType == kFeaturesPow) {
+    if(featuresType == kFeaturesPow)
         return std::make_pair(
             featParams.powSpecFeatSz(),
             FeatureType::POW_SPECTRUM
         );
-    } else if(featuresType == kFeaturesMFSC) {
+    else if(featuresType == kFeaturesMFSC)
         return std::make_pair(featParams.mfscFeatSz(), FeatureType::MFSC);
-    } else if(featuresType == kFeaturesMFSC) {
+    else if(featuresType == kFeaturesMFSC)
         return std::make_pair(featParams.mfccFeatSz(), FeatureType::MFCC);
-    } else if(featuresType == kFeaturesRaw) {
+    else if(featuresType == kFeaturesRaw)
         return std::make_pair(channels, FeatureType::NONE);
-    } else {
+    else
         throw std::runtime_error(
             "Unsupported feature type for audio preprocessing '" + featuresType
             + "'"
         );
-    }
 }
 
 } // namespace fl

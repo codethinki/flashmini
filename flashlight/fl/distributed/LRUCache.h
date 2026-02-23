@@ -39,9 +39,8 @@ namespace detail {
                     map_.erase(dq_.back());
                     dq_.pop_back();
                 }
-            } else {
+            } else
                 dq_.erase(map_[k].first);
-            }
 
             dq_.push_front(k);
             map_[k] = std::make_pair(dq_.begin(), std::move(v));
@@ -49,9 +48,9 @@ namespace detail {
         }
 
         inline V* get(K const& k) {
-            if(map_.find(k) == map_.end()) {
+            if(map_.find(k) == map_.end())
                 return nullptr;
-            } else {
+            else {
                 // Move list node to front
                 auto& it = map_[k].first;
                 dq_.splice(dq_.begin(), dq_, it);

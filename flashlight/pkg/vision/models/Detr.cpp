@@ -93,12 +93,11 @@ Detr::Detr(
 
 std::vector<Variable> Detr::forward(const std::vector<Variable>& input) {
     // input: {input, mask}
-    if(input.size() != 2) {
+    if(input.size() != 2)
         throw std::invalid_argument(
             "Detr takes 2 Variables as input but gets "
             + std::to_string(input.size())
         );
-    }
     auto feature = forwardBackbone(input.front());
     return forwardTransformer({feature, input[1]});
 }
@@ -153,9 +152,8 @@ std::vector<fl::Variable> Detr::paramsWithoutBackbone() {
     childParams.push_back(bboxEmbed_->params());
     childParams.push_back(queryEmbed_->params());
     childParams.push_back(inputProj_->params());
-    for(auto params : childParams) {
+    for(auto params : childParams)
         results.insert(results.end(), params.begin(), params.end());
-    }
     return results;
 }
 

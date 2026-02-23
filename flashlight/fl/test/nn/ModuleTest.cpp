@@ -35,9 +35,8 @@ public:
     void copy(const ContainerTestClass& other) {
         auto orphanParamIdxMap = other.getOrphanedParamsIdxMap();
         for(int i = -1; i < static_cast<int>(other.modules_.size()); ++i) {
-            if(i >= 0) {
+            if(i >= 0)
                 add(other.modules_[i]->clone());
-            }
             auto [paramIter, pEnd] = orphanParamIdxMap.equal_range(i);
             for(; paramIter != pEnd; ++paramIter) {
                 const auto& param = other.params_[paramIter->second];
@@ -144,9 +143,8 @@ TEST(ModuleTest, LinearFwd) {
 }
 
 TEST_F(ModuleTestF16, LinearFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     int n_in = 2, n_out = 3, x = 4, batchsize = 2;
     auto wtVar =
@@ -256,9 +254,8 @@ TEST(ModuleTest, GLUFwd) {
 }
 
 TEST_F(ModuleTestF16, GLUFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto inVar = Variable(
         Tensor::fromVector<float>({3, 2}, {0.8, 0.2, 0.2, 0.1, 0.5, 0.3})
@@ -338,9 +335,8 @@ TEST(ModuleTest, LogSoftmaxFwd) {
 }
 
 TEST_F(ModuleTestF16, LogSoftmaxFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto inVar = Variable(
         Tensor::fromVector<float>({3, 2}, {0.8, 0.2, 0.2, 0.1, 0.5, 0.3})
@@ -405,9 +401,8 @@ TEST(ModuleTest, ConvolutionFwd) {
 }
 
 TEST_F(ModuleTestF16, ConvolutionFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     // test batching
     auto conv = Conv2D(30, 50, 9, 7, 2, 3, 3, 2, 1, 1, true, 1);
@@ -469,9 +464,8 @@ TEST(ModuleTest, PoolingFwd) {
 }
 
 TEST_F(ModuleTestF16, PoolingFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     // test batching
     auto pool = Pool2D(9, 7, 1, 1, PaddingMode::SAME, PaddingMode::SAME);
@@ -504,12 +498,10 @@ TEST(ModuleTest, RNNFwd) {
     );
     unsigned n_params = 51;
     auto w = Variable(fl::rand({1, 1, n_params}, fl::dtype::f32), true);
-    for(int i = 0; i < in.elements(); ++i) {
+    for(int i = 0; i < in.elements(); ++i)
         in.tensor().flat(i) = (i + 1) * 0.01;
-    }
-    for(int i = 0; i < w.elements(); ++i) {
+    for(int i = 0; i < w.elements(); ++i)
         w.tensor().flat(i) = (i + 1) * 0.01;
-    }
     auto rnn = RNN(input_size, hidden_size, num_layers, mode);
     rnn.setParams(w, 0);
 
@@ -555,12 +547,10 @@ TEST(ModuleTest, LSTMFwd) {
     unsigned n_params = 920;
     auto w = Variable(fl::rand({1, 1, n_params}, fl::dtype::f32), true);
 
-    for(int i = 0; i < in.elements(); ++i) {
+    for(int i = 0; i < in.elements(); ++i)
         in.tensor().flat(i) = (i + 1) * 0.001;
-    }
-    for(int i = 0; i < w.elements(); ++i) {
+    for(int i = 0; i < w.elements(); ++i)
         w.tensor().flat(i) = (i + 1) * 0.001;
-    }
 
     auto rnn = RNN(input_size, hidden_size, num_layers, mode);
     rnn.setParams(w, 0);
@@ -596,12 +586,10 @@ TEST(ModuleTest, GRUFwd) {
     unsigned n_params = 690;
     auto w = Variable(fl::rand({1, 1, n_params}, fl::dtype::f32), true);
 
-    for(int i = 0; i < in.elements(); ++i) {
+    for(int i = 0; i < in.elements(); ++i)
         in.tensor().flat(i) = (i + 1) * 0.001;
-    }
-    for(int i = 0; i < w.elements(); ++i) {
+    for(int i = 0; i < w.elements(); ++i)
         w.tensor().flat(i) = (i + 1) * 0.001;
-    }
 
     auto rnn = RNN(input_size, hidden_size, num_layers, mode);
     rnn.setParams(w, 0);
@@ -623,9 +611,8 @@ TEST(ModuleTest, GRUFwd) {
 }
 
 TEST_F(ModuleTestF16, RNNFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto mode = RnnMode::RELU;
     int num_layers = 2;
@@ -640,12 +627,10 @@ TEST_F(ModuleTestF16, RNNFwdF16) {
     );
     unsigned n_params = 51;
     auto w = Variable(fl::rand({1, 1, n_params}, fl::dtype::f16), true);
-    for(int i = 0; i < in.elements(); ++i) {
+    for(int i = 0; i < in.elements(); ++i)
         in.tensor().flat(i) = (i + 1) * 0.01;
-    }
-    for(int i = 0; i < w.elements(); ++i) {
+    for(int i = 0; i < w.elements(); ++i)
         w.tensor().flat(i) = (i + 1) * 0.01;
-    }
     auto rnn = RNN(input_size, hidden_size, num_layers, mode);
     rnn.setParams(w, 0);
 
@@ -706,9 +691,8 @@ TEST(ModuleTest, DropoutFwd) {
 }
 
 TEST_F(ModuleTestF16, DropoutFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto module = Dropout(0.5);
     // Train Mode
@@ -799,9 +783,8 @@ TEST(ModuleTest, LayerNormFwd) {
 }
 
 TEST_F(ModuleTestF16, LayerNormFwdF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     double eps = 5E-2;
     std::vector<int> feat_axes = {3};
@@ -863,9 +846,8 @@ TEST(ModuleTest, TransformFwd) {
 }
 
 TEST(ModuleTest, PrecisionCastFwd) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half precision not available on this device";
-    }
 
     auto in = Variable(fl::full({3, 3}, 1.0), true);
     auto precisionCast = PrecisionCast(fl::dtype::f16);

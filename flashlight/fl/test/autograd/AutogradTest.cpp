@@ -32,9 +32,8 @@ TEST(AutogradTest, OperatorParenthesis) {
 }
 
 TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto f16 = Variable(fl::rand({2, 2}, fl::dtype::f16), true);
     auto f32 = Variable(fl::rand({2, 2}, fl::dtype::f32), true);
@@ -192,9 +191,8 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
 }
 
 TEST(AutogradTest, CastingAsDifferentGradTypes) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto f32 = Variable(fl::rand({5, 5}), true);
     auto f16 = Variable(fl::rand({5, 5}, fl::dtype::f16), true);
@@ -207,9 +205,8 @@ TEST(AutogradTest, CastingAsDifferentGradTypes) {
 }
 
 TEST(AutogradTest, CastingAs) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto var = Variable(fl::rand({5, 5}), true);
     auto varF16 = var.astype(fl::dtype::f16);
@@ -219,9 +216,8 @@ TEST(AutogradTest, CastingAs) {
 }
 
 TEST(AutogradTest, CastingAsBackward) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto a = Variable(fl::rand({4, 4}, fl::dtype::f16), true);
     auto b = Variable(fl::rand({4, 4}, fl::dtype::f16), false);
@@ -234,9 +230,8 @@ TEST(AutogradTest, CastingAsBackward) {
 }
 
 TEST(AutogradTest, CastingAsGrad) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     // compare to f32 case
     auto x = Variable(fl::full({5}, 2.0), true);
@@ -361,9 +356,8 @@ TEST(AutogradTest, TileAs) {
 }
 
 TEST_F(AutogradTestF16, TileAsF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     auto x = Variable(fl::rand({5}, fl::dtype::f16), true);
     auto y = Variable(fl::rand({5, 2}, fl::dtype::f16), true);
@@ -441,9 +435,8 @@ TEST(AutogradTest, Pooling) {
 }
 
 TEST_F(AutogradTestF16, PoolingF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     const float inputScale = 2.0; // scale the input to prevent grad underflow
     auto in = Variable(inputScale * fl::rand({3, 3, 1, 1}, fl::dtype::f16), true);
@@ -470,10 +463,9 @@ TEST(AutogradTest, Embedding) {
 
 TEST(AutogradTest, GetAdvancedIndex) {
     // TODO: remove me
-    if(!FL_BACKEND_CUDA) {
+    if(!FL_BACKEND_CUDA)
         GTEST_SKIP()
         << "Advanced indexing operator unsupported for non-CUDA backends";
-    }
     std::vector<fl::dtype> validIndexTypes = {
         fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64};
     for(const auto& dtype : validIndexTypes) {
@@ -500,13 +492,11 @@ TEST(AutogradTest, GetAdvancedIndex) {
 
 TEST(AutogradTest, GetAdvancedIndexF16) {
     // TODO: remove me
-    if(!FL_BACKEND_CUDA) {
+    if(!FL_BACKEND_CUDA)
         GTEST_SKIP()
         << "Advanced indexing operator unsupported for non-CUDA backends";
-    }
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
     std::vector<fl::dtype> validIndexTypes = {
         fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64};
     for(const auto& dtype : validIndexTypes) {

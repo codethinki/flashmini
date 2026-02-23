@@ -32,11 +32,10 @@ std::pair<Variable, Variable> SimpleLocationAttention::forwardBase(
     const Variable& xEncodedSizes
 ) {
     int U = state.dim(1);
-    if(U > 1) {
+    if(U > 1)
         throw std::invalid_argument(
             prettyString() + " only works on single step forward"
         );
-    }
 
     int T = xEncoded.dim(1);
     int B = xEncoded.dim(2);
@@ -53,16 +52,14 @@ std::pair<Variable, Variable> SimpleLocationAttention::forwardBase(
     }
 
     if(!logAttnWeight.isEmpty()) {
-        if(logAttnWeight.shape() != innerProd.shape()) {
+        if(logAttnWeight.shape() != innerProd.shape())
             throw std::invalid_argument(
                 "SimpleLocationAttention: logAttnWeight has wong dimentions"
             );
-        }
         innerProd = innerProd + logAttnWeight;
     }
-    if(!xEncodedSizes.isEmpty()) {
+    if(!xEncodedSizes.isEmpty())
         innerProd = maskAttention(innerProd, xEncodedSizes);
-    }
     // [1, seqlen, batchsize]
     auto attention = softmax(innerProd, 1);
     // [hiddendim, 1, batchsize]
@@ -96,11 +93,10 @@ std::pair<Variable, Variable> LocationAttention::forwardBase(
     const Variable& xEncodedSizes
 ) {
     int U = state.dim(1);
-    if(U > 1) {
+    if(U > 1)
         throw std::invalid_argument(
             prettyString() + " only works on single step forward"
         );
-    }
 
     int H = xEncoded.dim(0);
     int T = xEncoded.dim(1);
@@ -117,16 +113,14 @@ std::pair<Variable, Variable> LocationAttention::forwardBase(
     }
 
     if(!logAttnWeight.isEmpty()) {
-        if(logAttnWeight.shape() != innerProd.shape()) {
+        if(logAttnWeight.shape() != innerProd.shape())
             throw std::invalid_argument(
                 "LocationAttention: logAttnWeight has wong dimentions"
             );
-        }
         innerProd = innerProd + logAttnWeight;
     }
-    if(!xEncodedSizes.isEmpty()) {
+    if(!xEncodedSizes.isEmpty())
         innerProd = maskAttention(innerProd, xEncodedSizes);
-    }
     // [1, seqlen, batchsize]
     auto attention = softmax(innerProd, 1);
     // [hiddendim, 1, batchsize]
@@ -169,11 +163,10 @@ std::pair<Variable, Variable> NeuralLocationAttention::forwardBase(
     const Variable& xEncodedSizes
 ) {
     int U = state.dim(1);
-    if(U > 1) {
+    if(U > 1)
         throw std::invalid_argument(
             prettyString() + " only works on single step forward"
         );
-    }
 
     int T = xEncoded.dim(1);
     int B = xEncoded.dim(2);
@@ -194,17 +187,15 @@ std::pair<Variable, Variable> NeuralLocationAttention::forwardBase(
     auto nnOut = module(4)->forward({hidden}).front();
 
     if(!logAttnWeight.isEmpty()) {
-        if(logAttnWeight.shape() != nnOut.shape()) {
+        if(logAttnWeight.shape() != nnOut.shape())
             throw std::invalid_argument(
                 "NeuralLocationAttention: logAttnWeight has wong dimentions"
             );
-        }
         nnOut = nnOut + logAttnWeight;
     }
 
-    if(!xEncodedSizes.isEmpty()) {
+    if(!xEncodedSizes.isEmpty())
         nnOut = maskAttention(nnOut, xEncodedSizes);
-    }
     // [1, seqlen, batchsize]
     auto attention = softmax(nnOut, 1);
     // [hiddendim, 1, batchsize]

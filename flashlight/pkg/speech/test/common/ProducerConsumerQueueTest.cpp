@@ -23,9 +23,8 @@ TEST(ProducerConsumerQueueTest, SingleThread) {
     ProducerConsumerQueue<int> queue(10);
 
     // Producing
-    for(int i = 1; i <= 5; i++) {
+    for(int i = 1; i <= 5; i++)
         queue.add(i);
-    }
     queue.finishAdding();
 
     // Consuming
@@ -49,9 +48,8 @@ TEST(ProducerConsumerQueueTest, MultiThreads) {
 
     // Define producer and consumers
     auto produce = [nProducer, &queue](int tid) {
-            for(int i = tid; i < nElements; i += nProducer) {
+            for(int i = tid; i < nElements; i += nProducer)
                 queue.add(i);
-            }
         };
 
     auto consume = [&consumerResults, &queue](int tid) {
@@ -63,29 +61,24 @@ TEST(ProducerConsumerQueueTest, MultiThreads) {
 
     // Run Test
     std::vector<std::future<void>> producerFutures(nConsumer);
-    for(int i = 0; i < nProducer; i++) {
+    for(int i = 0; i < nProducer; i++)
         producerFutures[i] = std::async(std::launch::async, produce, i);
-    }
 
     std::vector<std::future<void>> consumerFutures(nConsumer);
-    for(int i = 0; i < nConsumer; i++) {
+    for(int i = 0; i < nConsumer; i++)
         consumerFutures[i] = std::async(std::launch::async, consume, i);
-    }
 
-    for(int i = 0; i < nConsumer; i++) {
+    for(int i = 0; i < nConsumer; i++)
         producerFutures[i].wait();
-    }
     queue.finishAdding();
 
-    for(int i = 0; i < nConsumer; i++) {
+    for(int i = 0; i < nConsumer; i++)
         consumerFutures[i].wait();
-    }
 
     // Check
     int predictSum = 0;
-    for(const auto& element : consumerResults) {
+    for(const auto& element : consumerResults)
         predictSum += element;
-    }
     ASSERT_EQ(predictSum, targetSum);
 }
 

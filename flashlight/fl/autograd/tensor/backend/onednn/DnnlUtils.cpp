@@ -127,28 +127,24 @@ void executeNetwork(
     std::vector<dnnl::primitive>& net,
     std::vector<std::unordered_map<int, dnnl::memory>>& netArgs
 ) {
-    if(net.size() != netArgs.size()) {
+    if(net.size() != netArgs.size())
         throw std::invalid_argument(
             "executeNetwork - given different size nets and netArgs"
         );
-    }
     // TODO{fl::Tensor}{macros} -- improve this to work with other backend interop
     // If on the CPU backend, there isn't a AF computation stream that facilitates
     // enforcing that inputs to computation are ready; we're required to wait
     // until all AF operations are done
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         fl::sync();
-    }
 
-    for(size_t i = 0; i < net.size(); ++i) {
+    for(size_t i = 0; i < net.size(); ++i)
         net.at(i).execute(DnnlStream::getInstance().getStream(), netArgs.at(i));
-    }
 
     // TODO{fl::Tensor}{macros} -- improve this to work with other backend interop
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         // Block the executing thread until the work is complete
         DnnlStream::getInstance().getStream().wait();
-    }
 }
 
 dnnl::algorithm dnnlMapToPoolingMode(const PoolingMode mode) {

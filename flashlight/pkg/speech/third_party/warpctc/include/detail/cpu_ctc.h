@@ -30,11 +30,11 @@ public:
         workspace_(workspace) {
 #if defined(CTC_DISABLE_OMP) || defined(APPLE)
 #else
-        if(num_threads > 0) {
+        if(num_threads > 0)
             omp_set_num_threads(num_threads);
-        } else {
+        else
             num_threads_ = omp_get_max_threads();
-        }
+
 #endif
     };
 
@@ -212,13 +212,12 @@ void CpuCTC<ProbT>::softmax(
     const int* const input_lengths
 ) {
 #pragma omp parallel for
-    for(int mb = 0; mb < minibatch_; ++mb) {
+    for(int mb = 0; mb < minibatch_; ++mb)
         for(int c = 0; c < input_lengths[mb]; ++c) {
             int col_offset = (mb + minibatch_ * c) * alphabet_size_;
             ProbT max_activation = -std::numeric_limits<ProbT>::infinity();
-            for(int r = 0; r < alphabet_size_; ++r) {
+            for(int r = 0; r < alphabet_size_; ++r)
                 max_activation = std::max(max_activation, activations[r + col_offset]);
-            }
 
             ProbT denom = ProbT(0.);
             for(int r = 0; r < alphabet_size_; ++r) {
@@ -226,11 +225,9 @@ void CpuCTC<ProbT>::softmax(
                 denom += probs[r + col_offset];
             }
 
-            for(int r = 0; r < alphabet_size_; ++r) {
+            for(int r = 0; r < alphabet_size_; ++r)
                 probs[r + col_offset] /= denom;
-            }
         }
-    }
 }
 
 template<typename ProbT>
@@ -281,9 +278,8 @@ std::tuple<ProbT, bool> CpuCTC<ProbT>::cost_and_grad_kernel(
     );
 
     ProbT diff = std::abs(llForward - llBackward);
-    if(diff > ctc_helper::threshold) {
+    if(diff > ctc_helper::threshold)
         over_threshold = true;
-    }
 
     return std::make_tuple(-llForward, over_threshold);
 }
@@ -304,18 +300,15 @@ ProbT CpuCTC<ProbT>::compute_alphas(
     int start = (((S / 2) + repeats - T) < 0) ? 0 : 1,
         end = S > 1 ? 2 : 1;
 
-    for(int i = start; i < end; ++i) {
+    for(int i = start; i < end; ++i)
         alphas[i] = std::log(probs[labels[i]]);
-    }
 
     for(int t = 1; t < T; ++t) {
         int remain = (S / 2) + repeats - (T - t);
-        if(remain >= 0) {
+        if(remain >= 0)
             start += s_inc[remain];
-        }
-        if(t <= (S / 2) + repeats) {
+        if(t <= (S / 2) + repeats)
             end += e_inc[t - 1];
-        }
         int startloop = start;
         int idx1 = t * S, idx2 = (t - 1) * S, idx3 = t * (alphabet_size_ * minibatch_);
 
@@ -328,18 +321,16 @@ ProbT CpuCTC<ProbT>::compute_alphas(
             ProbT prev_sum = ctc_helper::log_plus<ProbT>()(alphas[i + idx2], alphas[(i - 1) + idx2]);
 
             // Skip two if not on blank and not on repeat.
-            if(labels[i] != blank_label_ && i != 1 && labels[i] != labels[i - 2]) {
+            if(labels[i] != blank_label_ && i != 1 && labels[i] != labels[i - 2])
                 prev_sum = ctc_helper::log_plus<ProbT>()(prev_sum, alphas[(i - 2) + idx2]);
-            }
 
             alphas[i + idx1] = prev_sum + std::log(probs[labels[i] + idx3]);
         }
     }
 
     ProbT loglike = ctc_helper::neg_inf<ProbT>();
-    for(int i = start; i < end; ++i) {
+    for(int i = start; i < end; ++i)
         loglike = ctc_helper::log_plus<ProbT>()(loglike, alphas[i + (T - 1) * S]);
-    }
 
     return loglike;
 }
@@ -389,25 +380,22 @@ ProbT CpuCTC<ProbT>::compute_betas_and_grad(
         if(
             output[i] == 0.0 || output[i] == ctc_helper::neg_inf<ProbT>()
             || probs[idx3] == 0.0
-        ) {
+        )
             grad[idx3] = probs[idx3];
-        } else {
+        else
             grad[idx3] = probs[idx3] - std::exp(
                 output[i]
                 - std::log(probs[idx3]) - log_partition
             );
-        }
     }
 
     // loop from the second to last column all the way to the left
     for(int t = T - 2; t >= 0; --t) {
         int remain = (S / 2) + repeats - (T - t);
-        if(remain >= -1) {
+        if(remain >= -1)
             start -= s_inc[remain + 1];
-        }
-        if(t < (S / 2) + repeats) {
+        if(t < (S / 2) + repeats)
             end -= e_inc[t];
-        }
 
         int endloop = end == S ? end - 1 : end;
         int idx1 = t * S, idx3 = t * (alphabet_size_ * minibatch_);
@@ -417,9 +405,8 @@ ProbT CpuCTC<ProbT>::compute_betas_and_grad(
         for(int i = start; i < endloop; ++i) {
             ProbT next_sum = ctc_helper::log_plus<ProbT>()(betas[i], betas[(i + 1)]);
             // Skip two if not on blank and not on repeat.
-            if(labels[i] != blank_label_ && i != (S - 2) && labels[i] != labels[i + 2]) {
+            if(labels[i] != blank_label_ && i != (S - 2) && labels[i] != labels[i + 2])
                 next_sum = ctc_helper::log_plus<ProbT>()(next_sum, betas[(i + 2)]);
-            }
             betas[i] = next_sum + std::log(probs[labels[i] + idx3]);
 
             // compute alpha * beta in log space
@@ -445,22 +432,20 @@ ProbT CpuCTC<ProbT>::compute_betas_and_grad(
             if(
                 output[i] == 0.0 || output[i] == ctc_helper::neg_inf<ProbT>()
                 || probs[idx3] == 0.0
-            ) {
+            )
                 grad[idx3] = probs[idx3];
-            } else {
+            else
                 grad[idx3] = probs[idx3] - std::exp(
                     output[i]
                     - std::log(probs[idx3]) - log_partition
                 );
-            }
             ++idx3;
         }
     }
 
     ProbT loglike = ctc_helper::neg_inf<ProbT>();
-    for(int i = start; i < end; ++i) {
+    for(int i = start; i < end; ++i)
         loglike = ctc_helper::log_plus<ProbT>()(loglike, betas[i]);
-    }
 
     return loglike;
 }
@@ -481,9 +466,8 @@ ctcStatus_t CpuCTC<ProbT>::cost_and_grad(
         || flat_labels == nullptr
         || label_lengths == nullptr
         || input_lengths == nullptr
-    ) {
+    )
         return CTC_STATUS_INVALID_VALUE;
-    }
 
     ProbT* probs = static_cast<ProbT*>(workspace_);
 
@@ -547,9 +531,8 @@ ctcStatus_t CpuCTC<ProbT>::score_forward(
         || flat_labels == nullptr
         || label_lengths == nullptr
         || input_lengths == nullptr
-    ) {
+    )
         return CTC_STATUS_INVALID_VALUE;
-    }
 
     ProbT* probs = static_cast<ProbT*>(workspace_);
 
@@ -588,9 +571,9 @@ ctcStatus_t CpuCTC<ProbT>::score_forward(
             flat_labels + std::accumulate(label_lengths, label_lengths + mb, 0));
 
 
-        if(L + ctcm.repeats > T) {
+        if(L + ctcm.repeats > T)
             costs[mb] = ProbT(0);
-        } else {
+        else
             costs[mb] = -compute_alphas(
                 probs + mb * alphabet_size_,
                 ctcm.repeats,
@@ -601,7 +584,6 @@ ctcStatus_t CpuCTC<ProbT>::score_forward(
                 ctcm.labels_w_blanks,
                 ctcm.alphas
             );
-        }
 
     }
 

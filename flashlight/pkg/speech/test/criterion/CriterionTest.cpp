@@ -73,9 +73,8 @@ TEST(CriterionTest, CTCEmptyTarget) {
     // Subtle - related to memory manager initialization. Will be fixed in a
     // future version of ArrayFire after which time this can be removed. The test
     // passes/works properly in isolation.
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "Skipping test for CPU backend";
-    }
 
     // Non-empty input, Empty target, batchsize > 0
     auto input = Variable(Tensor({3, 2, 5}), true);
@@ -138,9 +137,8 @@ TEST(CriterionTest, Batching) {
         auto t = fl::abs(fl::rand({L, B}, fl::dtype::s32)) % (N - 2);
         for(int i = 0; i < B; ++i) {
             int r = rand() % L;
-            if(r > 0) {
+            if(r > 0)
                 t(fl::range(r, fl::end), i) = -1;
-            }
         }
         auto tgt = Variable(t.astype(fl::dtype::s32), false);
         auto l = ConnectionistTemporalClassificationCriterion(
@@ -157,9 +155,8 @@ TEST(CriterionTest, Batching) {
         auto t = fl::abs(fl::rand({L, B}, fl::dtype::s32)) % (N - 2);
         for(int i = 0; i < B; ++i) {
             int r = rand() % L;
-            if(r > 0) {
+            if(r > 0)
                 t(fl::range(r, fl::end), i) = -1;
-            }
         }
         auto tgt = Variable(t.astype(fl::dtype::s32), false);
         auto l = ConnectionistTemporalClassificationCriterion(
@@ -262,9 +259,8 @@ TEST(CriterionTest, ViterbiPath) {
     // Test case: 1
     auto in = fl::rand({4, 5, 1}); // All values < 1
     std::array<int, 5> expectedpath1 = {3, 2, 0, 2, 2};
-    for(int j = 0; j < 5; ++j) {
+    for(int j = 0; j < 5; ++j)
         in(expectedpath1[j], j) = 2;
-    }
     ConnectionistTemporalClassificationCriterion ctc;
     auto vpath1Arr = ctc.viterbiPath(in);
     Tensor expPath1Arr = Tensor::fromArray({5, 1}, expectedpath1);
@@ -720,9 +716,8 @@ TEST(CriterionTest, ASGBatching) {
     auto t = fl::abs(fl::rand({L, B}, fl::dtype::s32)) % (N - 2);
     for(int i = 0; i < B; ++i) {
         int r = std::rand() % L;
-        if(r > 0) {
+        if(r > 0)
             t(fl::range(r, fl::end), i) = -1;
-        }
     }
     auto tgt = Variable(t.astype(fl::dtype::s32), false);
     auto l = AutoSegmentationCriterion(N, CriterionScaleMode::TARGET_SZ);
@@ -809,9 +804,8 @@ TEST(CriterionTest, ASGCompareLua) {
     auto loss = asg({inputAf, targetAf}).front();
     std::vector<float> lossHost(B);
     loss.host(lossHost.data());
-    for(int i = 0; i < B; i++) {
+    for(int i = 0; i < B; i++)
         ASSERT_NEAR(lossHost[i], expectedLoss[i], 1e-3);
-    }
 
     loss.backward();
     auto inputGrad = inputAf.grad().tensor();
@@ -896,9 +890,8 @@ TEST(CriterionTest, LinSegCompareLua) {
     auto loss = linseg({inputAf, targetAf}).front();
     std::vector<float> lossHost(B);
     loss.host(lossHost.data());
-    for(int i = 0; i < B; i++) {
+    for(int i = 0; i < B; i++)
         ASSERT_NEAR(lossHost[i], expectedLoss[i], 1e-3);
-    }
 
     loss.backward();
     auto inputGrad = inputAf.grad().tensor();
@@ -910,9 +903,8 @@ TEST(CriterionTest, LinSegCompareLua) {
 TEST(CriterionTest, AsgSerialization) {
     char* user = getenv("USER");
     std::string userstr = "unknown";
-    if(user != nullptr) {
+    if(user != nullptr)
         userstr = std::string(user);
-    }
     const fs::path path = fs::temp_directory_path() / "test.mdl";
     int N = 500;
 

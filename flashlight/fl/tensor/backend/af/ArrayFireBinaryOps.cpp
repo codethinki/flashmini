@@ -19,14 +19,12 @@ namespace {
         unsigned nDim = std::max(lhs.ndim(), rhs.ndim());
 
         for(unsigned i = 0; i < nDim; ++i) {
-            if(i + 1 > lhs.ndim() || i + 1 > rhs.ndim()) {
+            if(i + 1 > lhs.ndim() || i + 1 > rhs.ndim())
                 // One Shape has more dimensions than the other - will broadcast to the
                 // smaller tensor
                 continue;
-            }
-            if(lhs[i] != rhs[i] && lhs[i] != 1 && rhs[i] != 1) {
+            if(lhs[i] != rhs[i] && lhs[i] != 1 && rhs[i] != 1)
                 return false;
-            }
         }
         return true;
     }
@@ -44,19 +42,18 @@ namespace {
         if(
             lhs.shape() == rhs.shape()
             || (lhs.elements() <= 1 && rhs.elements() <= 1)
-        ) {
+        )
             return toTensor<ArrayFireTensor>(
                 func(toArray(lhs), toArray(rhs)),
                 lhs.ndim()
             );
-        }
 
-        if(canBroadcast(lhs.shape(), rhs.shape())) {
+        if(canBroadcast(lhs.shape(), rhs.shape()))
             return toTensor<ArrayFireTensor>(
                 af::batchFunc(toArray(lhs), toArray(rhs), func),
                 std::max(lhs.ndim(), rhs.ndim())
             );
-        } else {
+        else {
             std::stringstream ss;
             ss << "doBinaryOpOrBroadcast: cannot perform operation "
             "or broadcasting with tensors of shapes "

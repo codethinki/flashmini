@@ -19,46 +19,40 @@ Module::Module() = default;
 Module::Module(const std::vector<Variable>& params) : params_(params.begin(), params.end()) {}
 
 Variable Module::param(int position) const {
-    if(!(position >= 0 && position < params_.size())) {
+    if(!(position >= 0 && position < params_.size()))
         throw std::out_of_range("Module param index out of range");
-    }
     return params_[position];
 }
 
 void Module::setParams(const Variable& var, int position) {
-    if(!(position >= 0 && position < params_.size())) {
+    if(!(position >= 0 && position < params_.size()))
         throw std::out_of_range("Module param index out of range");
-    }
     params_[position] = var;
 }
 
 std::vector<Variable> Module::copyParams() const {
     std::vector<Variable> params;
     params.reserve(params_.size());
-    for(const auto& param : params_) {
+    for(const auto& param : params_)
         params.emplace_back(param.copy());
-    }
     return params;
 }
 
 void Module::train() {
     train_ = true;
-    for(auto& param : params_) {
+    for(auto& param : params_)
         param.setCalcGrad(true);
-    }
 }
 
 void Module::zeroGrad() {
-    for(auto& param : params_) {
+    for(auto& param : params_)
         param.zeroGrad();
-    }
 }
 
 void Module::eval() {
     train_ = false;
-    for(auto& param : params_) {
+    for(auto& param : params_)
         param.setCalcGrad(false);
-    }
 }
 
 std::vector<Variable> Module::params() const {
@@ -80,9 +74,8 @@ UnaryModule::UnaryModule(const std::vector<Variable>& params) : Module(params) {
 std::vector<Variable> UnaryModule::forward(
     const std::vector<Variable>& inputs
 ) {
-    if(inputs.size() != 1) {
+    if(inputs.size() != 1)
         throw std::invalid_argument("UnaryModule expects only one input");
-    }
     return {forward(inputs[0])};
 }
 
@@ -97,9 +90,8 @@ BinaryModule::BinaryModule(const std::vector<Variable>& params) : Module(params)
 std::vector<Variable> BinaryModule::forward(
     const std::vector<Variable>& inputs
 ) {
-    if(inputs.size() != 2) {
+    if(inputs.size() != 2)
         throw std::invalid_argument("BinaryModule expects two inputs");
-    }
     return {forward(inputs[0], inputs[1])};
 }
 

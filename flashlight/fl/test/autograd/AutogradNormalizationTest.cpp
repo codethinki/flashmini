@@ -104,9 +104,8 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputMultipleAxis) {
     auto input = Variable(fl::rand({13, 13, 4, 16}), false);
 
     auto nfeatures = 1;
-    for(auto ax : featAxes) {
+    for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
-    }
     auto runningMean = Variable(fl::rand({nfeatures}, input.type()), false);
     auto runningVar = Variable(fl::rand({nfeatures}, input.type()), false);
     auto weight = Variable(fl::rand({nfeatures}, input.type()), false);
@@ -203,9 +202,8 @@ TEST(AutogradNormalizationTest, BatchNormTrainModeOutputMultipleAxis) {
     auto input = Variable(fl::rand({13, 13, 4, 8}), true);
 
     auto nfeatures = 1;
-    for(auto ax : featAxes) {
+    for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
-    }
     auto weight = Variable(fl::rand({nfeatures}), true);
     auto bias = Variable(fl::rand({nfeatures}), true);
     auto runningMean = Variable(fl::rand({nfeatures}), false);
@@ -305,9 +303,8 @@ TEST(AutogradNormalizationTest, BatchNormJacobian) {
 }
 
 TEST_F(AutogradTestF16, BatchNormJacobianF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     // Jacobian Test with trainMode = true;
 
@@ -372,9 +369,8 @@ TEST(AutogradNormalizationTest, BatchNormJacobianMultipleAxes) {
     std::vector<int> featAxes = {0, 1, 2};
     auto input = Variable(fl::rand({4, 4, 3, 4}, fl::dtype::f32), true);
     auto nfeatures = 1;
-    for(auto ax : featAxes) {
+    for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
-    }
     auto runningMean = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto runningVar = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
@@ -427,17 +423,15 @@ TEST(AutogradNormalizationTest, BatchNormJacobianMultipleAxes) {
 }
 
 TEST_F(AutogradTestF16, BatchNormJacobianMultipleAxesF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     // Jacobian Test with trainMode = true;
     std::vector<int> featAxes = {0, 1, 2};
     auto input = Variable(fl::rand({2, 2, 2, 1}, fl::dtype::f16), true);
     auto nfeatures = 1;
-    for(auto ax : featAxes) {
+    for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
-    }
     auto runningMean = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto runningVar = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
@@ -503,9 +497,8 @@ TEST(AutogradNormalizationTest, LayerNormJacobian) {
     std::vector<int> featAxes = {0, 1, 2, 3};
     auto input = Variable(fl::rand({7, 7, 3, 10}), true);
     auto nfeatures = 1;
-    for(auto ax : featAxes) {
+    for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
-    }
     auto runningMean = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto runningVar = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);
@@ -529,18 +522,16 @@ TEST(AutogradNormalizationTest, LayerNormJacobian) {
 }
 
 TEST_F(AutogradTestF16, LayerNormJacobianF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     std::vector<int> featAxes = {0, 1, 2, 3};
     const float inputScale = 4.0; // scale the input to prevent grad underflow
     auto input =
         Variable(inputScale * fl::rand({2, 2, 2, 4}, fl::dtype::f16), true);
     auto nfeatures = 1;
-    for(auto ax : featAxes) {
+    for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
-    }
     auto runningMean = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto runningVar = Variable(fl::rand({nfeatures}, fl::dtype::f32), false);
     auto weight = Variable(fl::rand({nfeatures}, fl::dtype::f32), true);

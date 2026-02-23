@@ -30,9 +30,8 @@ TEST(FixedBucketSizeHistogram, NormalDistribution) {
     std::normal_distribution<double> distribution(mean, stddev);
 
     std::vector<size_t> data(nValues);
-    for(int i = 0; i < nValues; ++i) {
+    for(int i = 0; i < nValues; ++i)
         data[i] = distribution(generator);
-    }
 
     HistogramStats<size_t> hist =
         FixedBucketSizeHistogram<size_t>(data.begin(), data.end(), nBuckes);
@@ -57,9 +56,8 @@ TEST(FixedBucketSizeHistogram, NormalDistribution) {
 
     // Verify bounds span the range.
     EXPECT_EQ(hist.buckets[0].startInclusive, hist.min);
-    for(int i = 0; i < (nBuckes - 1); ++i) {
+    for(int i = 0; i < (nBuckes - 1); ++i)
         EXPECT_EQ(hist.buckets[i + 1].startInclusive, hist.buckets[i].endExclusive);
-    }
     EXPECT_EQ(hist.buckets[nBuckes - 1].endExclusive, hist.max);
 
     std::cout << hist.prettyString() << std::endl;
@@ -81,9 +79,8 @@ TEST(FixedBucketSizeHistogram, ExponentialDistribution) {
     std::exponential_distribution<double> distribution(0.1);
 
     std::vector<int> data(nValues);
-    for(int i = 0; i < nValues; ++i) {
+    for(int i = 0; i < nValues; ++i)
         data[i] = distribution(generator) * multiplier;
-    }
 
     HistogramStats<int> hist =
         FixedBucketSizeHistogram<int>(data.begin(), data.end(), nBuckes);
@@ -97,15 +94,13 @@ TEST(FixedBucketSizeHistogram, ExponentialDistribution) {
     EXPECT_GT(hist.maxNumValuesPerBucket, nValues / nBuckes);
 
     // Verify exponential distribution.
-    for(int i = 0; i < (nBuckes - 1); ++i) {
+    for(int i = 0; i < (nBuckes - 1); ++i)
         EXPECT_GT(hist.buckets[i].count, hist.buckets[i + 1].count);
-    }
 
     // Verify bounds span the range.
     EXPECT_EQ(hist.buckets[0].startInclusive, hist.min);
-    for(int i = 0; i < (nBuckes - 1); ++i) {
+    for(int i = 0; i < (nBuckes - 1); ++i)
         EXPECT_EQ(hist.buckets[i + 1].startInclusive, hist.buckets[i].endExclusive);
-    }
     EXPECT_GE(hist.buckets[nBuckes - 1].endExclusive, hist.max);
 
     std::cout << hist.prettyString() << std::endl;

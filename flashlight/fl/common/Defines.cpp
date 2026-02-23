@@ -28,12 +28,11 @@ OptimMode& OptimMode::get() {
 
 OptimLevel OptimMode::toOptimLevel(const std::string& in) {
     auto l = kStringToOptimLevel.find(in);
-    if(l == kStringToOptimLevel.end()) {
+    if(l == kStringToOptimLevel.end())
         throw std::invalid_argument(
             "OptimMode::toOptimLevel - no matching "
             "optim level for given string."
         );
-    }
     return l->second;
 }
 

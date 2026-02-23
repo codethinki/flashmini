@@ -30,18 +30,16 @@ AdagradOptimizer::AdagradOptimizer(
 
 void AdagradOptimizer::step() {
     for(size_t i = 0; i < parameters_.size(); i++) {
-        if(!parameters_[i].isGradAvailable()) {
+        if(!parameters_[i].isGradAvailable())
             continue;
-        }
 
         const Tensor& grad = parameters_[i].grad().tensor();
         Tensor& data = parameters_[i].tensor();
         Tensor& variance = variance_[i];
 
-        if(wd_ != 0) {
+        if(wd_ != 0)
             // Weight decay term
             data = data - wd_ * data;
-        }
 
         variance = variance + grad * grad;
         fl::eval(variance);
@@ -54,9 +52,8 @@ std::string AdagradOptimizer::prettyString() const {
     std::ostringstream ss;
     ss << "Adagrad";
 
-    if(eps_ != 0) {
+    if(eps_ != 0)
         ss << " (epsilon=" << eps_ << ")";
-    }
 
     return ss.str();
 }

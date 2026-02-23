@@ -50,29 +50,23 @@ std::vector<ModulePtr> Container::modules() const {
 void Container::train() {
     train_ = true;
 
-    for(int i = 0; i < params_.size(); ++i) {
-        if(childParamIdx_.find(i) == childParamIdx_.end()) {
+    for(int i = 0; i < params_.size(); ++i)
+        if(childParamIdx_.find(i) == childParamIdx_.end())
             params_[i].setCalcGrad(true);
-        }
-    }
 
-    for(auto& module : modules_) {
+    for(auto& module : modules_)
         module->train();
-    }
 }
 
 void Container::eval() {
     train_ = false;
 
-    for(int i = 0; i < params_.size(); ++i) {
-        if(childParamIdx_.find(i) == childParamIdx_.end()) {
+    for(int i = 0; i < params_.size(); ++i)
+        if(childParamIdx_.find(i) == childParamIdx_.end())
             params_[i].setCalcGrad(false);
-        }
-    }
 
-    for(auto& module : modules_) {
+    for(auto& module : modules_)
         module->eval();
-    }
 }
 
 void Container::setParams(const Variable& var, int position) {
@@ -88,13 +82,11 @@ void Container::setParams(const Variable& var, int position) {
 std::string Container::prettyString() const {
     std::ostringstream ss;
     ss << " [input";
-    for(int i = 0; i < modules_.size(); ++i) {
+    for(int i = 0; i < modules_.size(); ++i)
         ss << " -> (" << i << ")";
-    }
     ss << " -> output]";
-    for(int i = 0; i < modules_.size(); ++i) {
+    for(int i = 0; i < modules_.size(); ++i)
         ss << "\n\t(" << i << "): " << modules_[i]->prettyString();
-    }
     return ss.str();
 }
 
@@ -102,20 +94,17 @@ Sequential::Sequential() = default;
 
 std::vector<Variable> Sequential::forward(const std::vector<Variable>& input) {
     auto output = input;
-    for(auto& module : modules_) {
+    for(auto& module : modules_)
         output = module->forward(output);
-    }
     return output;
 }
 
 Variable Sequential::forward(const Variable& input) {
     std::vector<Variable> output = {input};
-    for(auto& module : modules_) {
+    for(auto& module : modules_)
         output = module->forward(output);
-    }
-    if(output.size() != 1) {
+    if(output.size() != 1)
         throw std::invalid_argument("Module output size is not 1");
-    }
     return output.front();
 }
 
@@ -127,13 +116,11 @@ std::string Sequential::prettyString() const {
     std::ostringstream ss;
     ss << "Sequential";
     ss << " [input";
-    for(int i = 0; i < modules_.size(); ++i) {
+    for(int i = 0; i < modules_.size(); ++i)
         ss << " -> (" << i << ")";
-    }
     ss << " -> output]";
-    for(int i = 0; i < modules_.size(); ++i) {
+    for(int i = 0; i < modules_.size(); ++i)
         ss << "\n\t(" << i << "): " << modules_[i]->prettyString();
-    }
     return ss.str();
 }
 

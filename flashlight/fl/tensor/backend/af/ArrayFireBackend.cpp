@@ -44,9 +44,8 @@ namespace {
         std::unordered_map<int, std::shared_ptr<const Stream>>& afIdToStream
     ) {
         auto iter = afIdToStream.find(afId);
-        if(iter != afIdToStream.end()) {
+        if(iter != afIdToStream.end())
             return *iter->second;
-        }
 
 #if FL_ARRAYFIRE_USE_CPU
         auto resIter = afIdToStream.emplace(afId, ArrayFireCPUStream::create());
@@ -78,9 +77,8 @@ ArrayFireBackend::ArrayFireBackend() {
             // AF race conditions when tearing down our custom memory manager.
             // TODO: remove this temporary workaround for crashes when using custom
             // opencl kernels.
-            if(FL_BACKEND_CUDA) {
+            if(FL_BACKEND_CUDA)
                 MemoryManagerInstaller::installDefaultMemoryManager();
-            }
         }
     );
 
@@ -170,45 +168,39 @@ void ArrayFireBackend::getMemMgrInfo(
     std::ostream* ostream
 ) {
     int deviceId = nativeIdToId_.at(nativeDeviceId);
-    if(ostream == nullptr) {
+    if(ostream == nullptr)
         throw std::invalid_argument(
             "ArrayFireBackend::getMemMgrInfo - got null ostream pointer"
         );
-    }
     auto* curMemMgr =
         fl::MemoryManagerInstaller::currentlyInstalledMemoryManager();
-    if(curMemMgr) {
+    if(curMemMgr)
         curMemMgr->printInfo(msg, deviceId, ostream);
-    }
 }
 
 void ArrayFireBackend::setMemMgrLogStream(std::ostream* stream) {
-    if(stream == nullptr) {
+    if(stream == nullptr)
         throw std::invalid_argument(
             "ArrayFireBackend::getMemMgrInfo - got null ostream pointer"
         );
-    }
     auto* curMemMgr =
         fl::MemoryManagerInstaller::currentlyInstalledMemoryManager();
-    if(curMemMgr) {
+    if(curMemMgr)
         curMemMgr->setLogStream(stream);
-    }
 }
 
 void ArrayFireBackend::setMemMgrLoggingEnabled(const bool enabled) {
     auto* curMemMgr =
         fl::MemoryManagerInstaller::currentlyInstalledMemoryManager();
-    if(curMemMgr) {
+    if(curMemMgr)
         curMemMgr->setLoggingEnabled(enabled);
-    }
 }
 
 void ArrayFireBackend::setMemMgrFlushInterval(const size_t interval) {
     auto* curMemMgr =
         fl::MemoryManagerInstaller::currentlyInstalledMemoryManager();
-    if(curMemMgr) {
+    if(curMemMgr)
         curMemMgr->setLogFlushInterval(interval);
-    }
 }
 
 /* -------------------------- Rand Functions -------------------------- */
@@ -320,11 +312,10 @@ void ArrayFireBackend::topk(
     const Dim axis,
     const SortMode sortMode
 ) {
-    if(axis != 0) {
+    if(axis != 0)
         throw std::invalid_argument(
             "ArrayFireTensor topk: operation only supported along zero axis."
         );
-    }
     af::array valuesArr, indicesArr;
     af::topk(
         valuesArr,
@@ -344,12 +335,11 @@ Tensor ArrayFireBackend::sort(
     const Dim axis,
     const SortMode sortMode
 ) {
-    if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending) {
+    if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending)
         throw std::invalid_argument(
             "Cannot sort ArrayFire tensor with given SortMode: "
             "only Descending and Ascending supported."
         );
-    }
 
     af::array values, indices;
     af::sort(
@@ -369,12 +359,11 @@ void ArrayFireBackend::sort(
     const Dim axis,
     const SortMode sortMode
 ) {
-    if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending) {
+    if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending)
         throw std::invalid_argument(
             "Cannot sort ArrayFire tensor with given SortMode: "
             "only Descending and Ascending supported."
         );
-    }
 
     af::array _values, _indices;
     af::sort(
@@ -393,12 +382,11 @@ Tensor ArrayFireBackend::argsort(
     const Dim axis,
     const SortMode sortMode
 ) {
-    if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending) {
+    if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending)
         throw std::invalid_argument(
             "Cannot sort ArrayFire tensor with given SortMode: "
             "only Descending and Ascending supported."
         );
-    }
 
     af::array values, indices;
     af::sort(

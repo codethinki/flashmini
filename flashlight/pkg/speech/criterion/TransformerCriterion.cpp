@@ -40,7 +40,7 @@ TransformerCriterion::TransformerCriterion(
     labelSmooth_(labelSmooth),
     pctTeacherForcing_(pctTeacherForcing) {
     add(std::make_shared<fl::Embedding>(hiddenDim, nClass));
-    for(size_t i = 0; i < nLayer_; i++) {
+    for(size_t i = 0; i < nLayer_; i++)
         add(
             std::make_shared<Transformer>(
                 hiddenDim,
@@ -53,7 +53,6 @@ TransformerCriterion::TransformerCriterion(
                 true
             )
         );
-    }
     add(std::make_shared<fl::Linear>(hiddenDim, nClass));
     add(attention);
     params_.push_back(fl::uniform(Shape{hiddenDim}, -1e-1, 1e-1));
@@ -68,12 +67,11 @@ std::unique_ptr<Module> TransformerCriterion::clone() const {
 std::vector<Variable> TransformerCriterion::forward(
     const std::vector<Variable>& inputs
 ) {
-    if(inputs.size() < 2 || inputs.size() > 4) {
+    if(inputs.size() < 2 || inputs.size() > 4)
         throw std::invalid_argument(
             "Invalid inputs size; Transformer criterion takes input,"
             " target, inputSizes [optional], targetSizes [optional]"
         );
-    }
     const Variable& input = inputs[0];
     const Variable& target = inputs[1];
     const auto& inputSizes =
@@ -142,16 +140,14 @@ std::pair<Variable, Variable> TransformerCriterion::vectorizedDecoder(
 
     Variable alpha, summaries;
     Variable padMask; // no mask, decoder is not looking into future
-    for(int i = 0; i < nLayer_; i++) {
+    for(int i = 0; i < nLayer_; i++)
         hy = layer(i)->forward(std::vector<Variable>({hy, padMask})).front();
-    }
 
     if(!input.isEmpty()) {
         Variable windowWeight;
-        if(window_ && (!train_ || trainWithWindow_)) {
+        if(window_ && (!train_ || trainWithWindow_))
             windowWeight =
                 window_->computeVectorizedWindow(U, T, B, inputSizes, targetSizes);
-        }
 
         std::tie(alpha, summaries) = attention()->forward(
             hy,
@@ -198,17 +194,15 @@ std::pair<Tensor, Variable> TransformerCriterion::viterbiPathBase(
         maxIdx.host(&pred);
         // TODO: saveAttn
 
-        if(pred == eos_) {
+        if(pred == eos_)
             break;
-        }
         y = constant(pred, {1}, fl::dtype::s32, false);
         path.push_back(pred);
     }
     // TODO: saveAttn
 
-    if(wasTrain) {
+    if(wasTrain)
         train();
-    }
 
     auto vPath = path.empty() ? Tensor() : Tensor::fromVector(path);
     return std::make_pair(vPath, alpha);
@@ -221,11 +215,10 @@ std::pair<Variable, TS2SState> TransformerCriterion::decodeStep(
     const Tensor& inputSizes
 ) const {
     Variable hy;
-    if(y.isEmpty()) {
+    if(y.isEmpty())
         hy = tile(startEmbedding(), {1, 1, xEncoded.dim(2)});
-    } else {
+    else
         hy = embedding()->forward(y);
-    }
 
     // TODO: inputFeeding
 
@@ -248,7 +241,7 @@ std::pair<Variable, TS2SState> TransformerCriterion::decodeStep(
     }
 
     Variable windowWeight, alpha, summary;
-    if(window_ && (!train_ || trainWithWindow_)) {
+    if(window_ && (!train_ || trainWithWindow_))
         // TODO fix for softpretrain where target size is used
         // for now force to xEncoded.dim(1)
         windowWeight = window_->computeWindow(
@@ -260,7 +253,6 @@ std::pair<Variable, TS2SState> TransformerCriterion::decodeStep(
             inputSizes,
             Tensor()
         );
-    }
 
     std::tie(alpha, summary) = attention()->forward(
         hy,
@@ -287,11 +279,11 @@ std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>> Transforme
     int B = ys.size();
 
     for(int i = 0; i < B; i++) {
-        if(ys[i].isEmpty()) {
+        if(ys[i].isEmpty())
             ys[i] = startEmbedding();
-        } else {
+        else
             ys[i] = embedding()->forward(ys[i]);
-        } // TODO: input feeding
+        // TODO: input feeding
         ys[i] = moddims(ys[i], {ys[i].dim(0), 1, -1});
     }
     Variable yBatched = concatenate(ys, 2); // D x 1 x B
@@ -305,21 +297,18 @@ std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>> Transforme
     Variable outStateBatched;
     for(int i = 0; i < nLayer_; i++) {
         if(inStates[0]->step == 0) {
-            for(int j = 0; j < B; j++) {
+            for(int j = 0; j < B; j++)
                 outstates[j]->hidden.push_back(yBatched(fl::span, fl::span, j));
-            }
             yBatched = layer(i)->forward(std::vector<Variable>({yBatched})).front();
         } else {
             std::vector<Variable> statesVector(B);
-            for(int j = 0; j < B; j++) {
+            for(int j = 0; j < B; j++)
                 statesVector[j] = inStates[j]->hidden[i];
-            }
             Variable inStateHiddenBatched = concatenate(statesVector, 2);
             auto tmp = std::vector<Variable>({inStateHiddenBatched, yBatched});
             auto tmp2 = concatenate(tmp, 1);
-            for(int j = 0; j < B; j++) {
+            for(int j = 0; j < B; j++)
                 outstates[j]->hidden.push_back(tmp2(fl::span, fl::span, j));
-            }
             yBatched = layer(i)->forward(tmp).front();
         }
     }
@@ -334,9 +323,8 @@ std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>> Transforme
     auto outBatched = linearOut()->forward(yBatched);
     outBatched = logSoftmax(outBatched / smoothingTemperature, 0);
     std::vector<std::vector<float>> out(B);
-    for(int i = 0; i < B; i++) {
+    for(int i = 0; i < B; i++)
         out[i] = outBatched(fl::span, i).tensor().toHostVector<float>();
-    }
 
     return std::make_pair(out, outstates);
 }
@@ -362,12 +350,11 @@ EmittingModelUpdateFunc buildSeq2SeqTransformerUpdateFunction(
             const std::vector<int>& /* prevHypBeamIdxs */,
             const std::vector<EmittingModelStatePtr>& rawPrevStates,
             int& t) {
-            if(t == 0) {
+            if(t == 0)
                 buf->input = fl::Variable(
                     Tensor::fromBuffer({N, T}, emissions, MemoryLocation::Host),
                     false
                 );
-            }
             int B = rawY.size();
             std::vector<EmittingModelStatePtr> out;
             std::vector<std::vector<float>> amScoresAll;
@@ -385,18 +372,16 @@ EmittingModelUpdateFunc buildSeq2SeqTransformerUpdateFunction(
                 buf->ys.resize(0);
 
                 int end = start + step;
-                if(end > B) {
+                if(end > B)
                     end = B;
-                }
                 for(int i = start; i < end; i++) {
                     TS2SState* prevState =
                         static_cast<TS2SState*>(rawPrevStates[i].get());
                     fl::Variable y;
-                    if(t > 0) {
+                    if(t > 0)
                         y = fl::constant(rawY[i], {1}, fl::dtype::s32, false);
-                    } else {
+                    else
                         prevState = &buf->dummyState;
-                    }
                     buf->ys.push_back(y);
                     buf->prevStates.push_back(prevState);
                 }
@@ -409,12 +394,10 @@ EmittingModelUpdateFunc buildSeq2SeqTransformerUpdateFunction(
                     buf->attentionThreshold,
                     buf->smoothingTemperature
                 );
-                for(auto& os : outStates) {
+                for(auto& os : outStates)
                     out.push_back(os);
-                }
-                for(auto& s : amScores) {
+                for(auto& s : amScores)
                     amScoresAll.push_back(s);
-                }
                 // clean the previous state which is not needed anymore
                 // to prevent from OOM
                 for(int i = start; i < end; i++) {
@@ -425,9 +408,8 @@ EmittingModelUpdateFunc buildSeq2SeqTransformerUpdateFunction(
                         && (lastIndexOfStatePtr.find(prevState)
                         == lastIndexOfStatePtr.end()
                         || lastIndexOfStatePtr.find(prevState)->second == i)
-                    ) {
+                    )
                         prevState->hidden.clear();
-                    }
                 }
                 start += step;
             }

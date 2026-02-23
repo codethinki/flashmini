@@ -34,14 +34,13 @@ TEST(DeviceManagerTest, getDeviceCount) {
     // For now we always treat CPU as a single device
     ASSERT_EQ(manager.getDeviceCount(DeviceType::x64), 1);
 
-    if(manager.isDeviceTypeAvailable(DeviceType::CUDA)) {
+    if(manager.isDeviceTypeAvailable(DeviceType::CUDA))
         ASSERT_NO_THROW(manager.getDeviceCount(DeviceType::CUDA));
-    } else {
+    else
         ASSERT_THROW(
             manager.getDeviceCount(DeviceType::CUDA),
             std::runtime_error
         );
-    }
 }
 
 TEST(DeviceManagerTest, getDevicesOfType) {
@@ -50,16 +49,14 @@ TEST(DeviceManagerTest, getDevicesOfType) {
     ASSERT_EQ(manager.getDevicesOfType(DeviceType::x64).size(), 1);
 
     for(auto type : fl::getDeviceTypes()) {
-        if(manager.isDeviceTypeAvailable(DeviceType::CUDA)) {
-            for(auto device : manager.getDevicesOfType(type)) {
+        if(manager.isDeviceTypeAvailable(DeviceType::CUDA))
+            for(auto device : manager.getDevicesOfType(type))
                 ASSERT_EQ(device->type(), type);
-            }
-        } else {
+        else
             ASSERT_THROW(
                 manager.getDeviceCount(DeviceType::CUDA),
                 std::runtime_error
             );
-        }
     }
 }
 
@@ -73,11 +70,10 @@ TEST(DeviceManagerTest, getDevice) {
 TEST(DeviceManagerTest, getActiveDevice) {
     auto& manager = DeviceManager::getInstance();
     for(auto type : fl::getDeviceTypes()) {
-        if(manager.isDeviceTypeAvailable(type)) {
+        if(manager.isDeviceTypeAvailable(type))
             ASSERT_EQ(manager.getActiveDevice(type).type(), type);
-        } else {
+        else
             ASSERT_THROW(manager.getActiveDevice(type), std::runtime_error);
-        }
     }
 }
 

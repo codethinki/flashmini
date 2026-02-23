@@ -18,18 +18,16 @@ std::unordered_set<int> Residual::getProjectionsIndices() const {
 
 void Residual::addScale(int beforeLayer, float scale) {
     int nLayers = modules_.size() - projectionsIndices_.size();
-    if(beforeLayer < 1 || beforeLayer > nLayers + 1) {
+    if(beforeLayer < 1 || beforeLayer > nLayers + 1)
         throw std::invalid_argument(
             "Residual: invalid layer index " + std::to_string(beforeLayer)
             + " before which apply the scaling"
         );
-    }
-    if(scales_.find(beforeLayer - 1) != scales_.end()) {
+    if(scales_.find(beforeLayer - 1) != scales_.end())
         throw std::invalid_argument(
             "Residual: scaling before layer " + std::to_string(beforeLayer)
             + " was already added; adding only once is allowed"
         );
-    }
     scales_[beforeLayer - 1] = scale;
 }
 
@@ -39,22 +37,20 @@ void Residual::checkShortcut(int fromLayer, int toLayer) {
     if(
         fromLayer < 0 || fromLayer >= nLayers || toLayer <= 0
         || toLayer > nLayers + 2 || toLayer - fromLayer <= 1
-    ) {
+    )
         throw std::invalid_argument(
             "Residual: invalid skip connection; check fromLayer="
             + std::to_string(fromLayer) + " and toLayer=" + std::to_string(toLayer)
             + " parameters. They are out of range of added layers"
         );
-    }
     if(
         shortcut_.find(toLayer - 1) != shortcut_.end()
         && shortcut_[toLayer - 1].find(fromLayer) != shortcut_[toLayer - 1].end()
-    ) {
+    )
         throw std::invalid_argument(
             "Residual: skip connection for fromLayer " + std::to_string(fromLayer)
             + " to toLayer " + std::to_string(toLayer) + " is already added"
         );
-    }
 }
 
 void Residual::processShortcut(
@@ -80,9 +76,8 @@ Variable Residual::applyScale(const Variable& input, const int layerIndex) {
 }
 
 std::vector<Variable> Residual::forward(const std::vector<Variable>& inputs) {
-    if(inputs.size() != 1) {
+    if(inputs.size() != 1)
         throw std::invalid_argument("Residual module expects only one input");
-    }
     return {forward(inputs[0])};
 }
 
@@ -98,17 +93,15 @@ Variable Residual::forward(const Variable& input) {
         while(projectionsIndices_.find(moduleIndex) != projectionsIndices_.end()) {
             moduleIndex++;
         }
-        if(shortcut_.find(layerIndex) != shortcut_.end()) {
+        if(shortcut_.find(layerIndex) != shortcut_.end())
             for(const auto& shortcut : shortcut_[layerIndex]) {
                 Variable connectionOut = outputs[shortcut.first];
-                if(shortcut.second != -1) {
+                if(shortcut.second != -1)
                     connectionOut = modules_[shortcut.second]
                         ->forward({outputs[shortcut.first]})
                         .front();
-                }
                 output = output + connectionOut.astype(output.type());
             }
-        }
         output = modules_[moduleIndex]
             ->forward({applyScale(output, layerIndex)})
             .front();
@@ -116,17 +109,15 @@ Variable Residual::forward(const Variable& input) {
         layerIndex++;
         moduleIndex++;
     }
-    if(shortcut_.find(nLayers) != shortcut_.end()) {
+    if(shortcut_.find(nLayers) != shortcut_.end())
         for(const auto& shortcut : shortcut_[nLayers]) {
             Variable connectionOut = outputs[shortcut.first];
-            if(shortcut.second != -1) {
+            if(shortcut.second != -1)
                 connectionOut = modules_[shortcut.second]
                     ->forward({outputs[shortcut.first]})
                     .front();
-            }
             output = output + connectionOut.astype(output.type());
         }
-    }
     return applyScale(output, nLayers);
 }
 
@@ -135,11 +126,9 @@ std::string Residual::prettyString() const {
     // prepare inverted residual skip connection
     std::unordered_map<int, std::unordered_map<int, int>>
     reverseShortcut; // start -> end
-    for(const auto& shortcut : shortcut_) {
-        for(const auto& value : shortcut.second) {
+    for(const auto& shortcut : shortcut_)
+        for(const auto& value : shortcut.second)
             reverseShortcut[value.first].insert({shortcut.first, value.second});
-        }
-    }
 
     int nLayers = modules_.size() - projectionsIndices_.size();
     int moduleIndex = -1, layerIndex = 0;
@@ -147,9 +136,9 @@ std::string Residual::prettyString() const {
 
     while(layerIndex <= nLayers) {
         ss << "\n\tRes(" << layerIndex << "): ";
-        if(layerIndex == 0) {
+        if(layerIndex == 0)
             ss << "Input";
-        } else {
+        else {
             while(
                 projectionsIndices_.find(moduleIndex)
                 != projectionsIndices_.end()
@@ -160,9 +149,8 @@ std::string Residual::prettyString() const {
         }
 
         scaleIt = scales_.find(layerIndex);
-        if(scaleIt != scales_.end()) {
+        if(scaleIt != scales_.end())
             ss << " with scale (before layer is applied) " << scaleIt->second << ";";
-        }
 
         if(
             reverseShortcut.find(layerIndex) != reverseShortcut.end()
@@ -170,15 +158,13 @@ std::string Residual::prettyString() const {
         ) {
             ss << "; skip connection to ";
             for(auto shortcut : reverseShortcut[layerIndex]) {
-                if(shortcut.first < nLayers) {
+                if(shortcut.first < nLayers)
                     ss << "layer Res(" << shortcut.first + 1 << ")";
-                } else {
+                else
                     ss << "output";
-                }
-                if(shortcut.second != -1) {
+                if(shortcut.second != -1)
                     ss << " with transformation: "
                     << modules_[shortcut.second]->prettyString() << ";";
-                }
                 ss << " ";
             }
         }
@@ -187,9 +173,8 @@ std::string Residual::prettyString() const {
     }
     ss << "\n\tRes(" << nLayers + 1 << "): Output;";
     scaleIt = scales_.find(nLayers + 1);
-    if(scaleIt != scales_.end()) {
+    if(scaleIt != scales_.end())
         ss << " with scale (before layer is applied) " << scaleIt->second << ";";
-    }
 
     return ss.str();
 }

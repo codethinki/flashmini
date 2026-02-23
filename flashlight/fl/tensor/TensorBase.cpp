@@ -210,9 +210,8 @@ FL_CREATE_MEMORY_OPS(unsigned short);
 // void specializations
 template<>
 FL_API void* Tensor::device() const {
-    if(isEmpty()) {
+    if(isEmpty())
         return nullptr;
-    }
     void* out;
     impl_->device(&out);
     return out;
@@ -220,17 +219,15 @@ FL_API void* Tensor::device() const {
 
 template<>
 FL_API void Tensor::device(void** ptr) const {
-    if(isEmpty()) {
+    if(isEmpty())
         return;
-    }
     impl_->device(ptr);
 }
 
 template<>
 FL_API void* Tensor::host() const {
-    if(isEmpty()) {
+    if(isEmpty())
         return nullptr;
-    }
     void* out = reinterpret_cast<void*>(new char[bytes()]);
     impl_->host(out);
     return out;
@@ -410,9 +407,8 @@ Tensor tile(const Tensor& tensor, const Shape& shape) {
 }
 
 Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis) {
-    if(tensors.empty()) {
+    if(tensors.empty())
         throw std::invalid_argument("concatenate: called on empty set of tensors");
-    }
 
     // Check all backends match
     const TensorBackendType b = tensors.front().backendType();
@@ -424,11 +420,10 @@ Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis) {
             return t.backendType() == b;
         }
         );
-    if(!matches) {
+    if(!matches)
         throw std::invalid_argument(
             "concatenate: tried to concatenate tensors of different backends"
         );
-    }
 
     return tensors.front().backend().concatenate(tensors, axis);
 }
@@ -861,15 +856,12 @@ bool allClose(
     const fl::Tensor& b,
     const double absTolerance
 ) {
-    if(a.type() != b.type()) {
+    if(a.type() != b.type())
         return false;
-    }
-    if(a.shape() != b.shape()) {
+    if(a.shape() != b.shape())
         return false;
-    }
-    if(a.elements() == 0 && b.elements() == 0) {
+    if(a.elements() == 0 && b.elements() == 0)
         return true;
-    }
     return fl::amax(fl::abs(a - b)).astype(dtype::f64).scalar<double>()
            < absTolerance;
 }

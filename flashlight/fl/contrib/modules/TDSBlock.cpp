@@ -22,11 +22,10 @@ TDSBlock::TDSBlock(
     auto convPadding = static_cast<int>(fl::PaddingMode::SAME);
     if(rightPadding != -1) {
         int totalPadding = kernelSize - 1;
-        if(rightPadding > totalPadding) {
+        if(rightPadding > totalPadding)
             throw std::invalid_argument(
                 "right padding exceeds the 'SAME' padding required for TDSBlock"
             );
-        }
         conv.add(
             Padding(
                 {std::pair<int, int>{totalPadding - rightPadding, rightPadding}},
@@ -40,37 +39,32 @@ TDSBlock::TDSBlock(
     conv.add(Dropout(dropout));
 
     int linearDim = channels * width;
-    if(innerLinearDim == 0) {
+    if(innerLinearDim == 0)
         innerLinearDim = linearDim;
-    }
     Sequential fc;
     fc.add(Reorder({2, 1, 0, 3}));
     fc.add(View({linearDim, -1, 1, 0}));
 
     fc.add(Linear(linearDim, innerLinearDim));
     fc.add(ReLU());
-    if(dropout > 0) {
+    if(dropout > 0)
         fc.add(Dropout(dropout));
-    }
     fc.add(Linear(innerLinearDim, linearDim));
     fc.add(View({channels, width, -1, 0}));
     fc.add(Reorder({2, 1, 0, 3}));
-    if(dropout > 0) {
+    if(dropout > 0)
         fc.add(Dropout(dropout));
-    }
 
     add(std::move(conv));
-    if(lNormIncludeTime) {
+    if(lNormIncludeTime)
         add(LayerNorm(std::vector<int>{0, 1, 2}));
-    } else {
+    else
         add(LayerNorm(std::vector<int>{1, 2}));
-    }
     add(std::move(fc));
-    if(lNormIncludeTime) {
+    if(lNormIncludeTime)
         add(LayerNorm(std::vector<int>{0, 1, 2}));
-    } else {
+    else
         add(LayerNorm(std::vector<int>{1, 2}));
-    }
 }
 
 std::vector<Variable> TDSBlock::forward(const std::vector<Variable>& inputs) {

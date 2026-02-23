@@ -116,14 +116,12 @@ std::vector<Tensor> randomResize(std::vector<Tensor> inputs, int size, int maxsi
             if(maxSize > 0) {
                 float minOriginalSize = std::min(w, h);
                 float maxOriginalSize = std::max(w, h);
-                if(maxOriginalSize / minOriginalSize * size > maxSize) {
+                if(maxOriginalSize / minOriginalSize * size > maxSize)
                     size = round(maxSize * minOriginalSize / maxOriginalSize);
-                }
             }
 
-            if((w <= h && w == size) || (h <= w && h == size)) {
+            if((w <= h && w == size) || (h <= w && h == size))
                 return std::make_pair(w, h);
-            }
             int ow, oh;
             if(w < h) {
                 ow = size;
@@ -238,20 +236,18 @@ TransformAllFunction randomResize(std::vector<int> sizes, int maxsize) {
 
 TransformAllFunction randomHorizontalFlip(float p) {
     return [p](const std::vector<Tensor>& in) {
-               if(static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) > p) {
+               if(static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) > p)
                    return hflip(in);
-               } else {
+               else
                    return in;
-               }
     };
 }
 
 TransformAllFunction compose(std::vector<TransformAllFunction> fns) {
     return [fns](const std::vector<Tensor>& in) {
                std::vector<Tensor> out = in;
-               for(const auto& fn : fns) {
+               for(const auto& fn : fns)
                    out = fn(out);
-               }
                return out;
     };
 }

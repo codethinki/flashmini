@@ -16,9 +16,8 @@ TransformDataset::TransformDataset(
     const std::vector<TransformFunction>& transformfns
 ) : dataset_(dataset),
     transformFns_(transformfns) {
-    if(!dataset_) {
+    if(!dataset_)
         throw std::invalid_argument("dataset to be transformed is null");
-    }
 }
 
 std::vector<Tensor> TransformDataset::get(const int64_t idx) const {
@@ -27,9 +26,8 @@ std::vector<Tensor> TransformDataset::get(const int64_t idx) const {
     auto result = dataset_->get(idx);
 
     for(int64_t i = 0; i < result.size(); ++i) {
-        if(i >= transformFns_.size() || !transformFns_[i]) {
+        if(i >= transformFns_.size() || !transformFns_[i])
             continue;
-        }
         result[i] = transformFns_[i](result[i]);
     }
     return result;

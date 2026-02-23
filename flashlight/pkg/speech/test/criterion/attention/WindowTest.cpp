@@ -308,7 +308,7 @@ TEST(WindowTest, SoftPretrainWindow) {
 
     // single step
     std::vector<Variable> masks;
-    for(int step = 0; step < targetlen; ++step) {
+    for(int step = 0; step < targetlen; ++step)
         masks.emplace_back(
             window.computeWindow(
                 inputAttn,
@@ -318,7 +318,6 @@ TEST(WindowTest, SoftPretrainWindow) {
                 batchsize
             )
         );
-    }
     auto maskS = concatenate(masks, 0);
     Tensor maxv, maxidx;
     max(maxv, maxidx, maskS.tensor()(fl::span, fl::span, 0), 1);

@@ -58,16 +58,13 @@ Tensor flatten(const Tensor& x, int start, int stop) {
     auto dims = x.shape();
     Shape newDims(std::vector<Dim>(x.ndim(), 1));
     int flattenedDims = 1;
-    for(int i = start; i <= stop; i++) {
+    for(int i = start; i <= stop; i++)
         flattenedDims = flattenedDims * dims[i];
-    }
-    for(int i = 0; i < start; i++) {
+    for(int i = 0; i < start; i++)
         newDims[i] = dims[i];
-    }
     newDims[start] = flattenedDims;
-    for(int i = start + 1; i < (x.ndim() - stop); i++) {
+    for(int i = start + 1; i < (x.ndim() - stop); i++)
         newDims[i] = dims[i + stop];
-    }
     return fl::reshape(x, newDims);
 };
 
@@ -76,16 +73,13 @@ fl::Variable flatten(const fl::Variable& x, int start, int stop) {
     auto dims = x.shape();
     Shape newDims(std::vector<Dim>(n, 1));
     int flattenedDims = 1;
-    for(int i = start; i <= stop; i++) {
+    for(int i = start; i <= stop; i++)
         flattenedDims = flattenedDims * dims[i];
-    }
-    for(int i = 0; i < start; i++) {
+    for(int i = 0; i < start; i++)
         newDims[i] = dims[i];
-    }
     newDims[start] = flattenedDims;
-    for(int i = start + 1; i < (n - stop); i++) {
+    for(int i = start + 1; i < (n - stop); i++)
         newDims[i] = dims[i + stop];
-    }
     return moddims(x, newDims);
 };
 
@@ -108,11 +102,10 @@ fl::Variable boxArea(const fl::Variable& bboxes) {
 }
 
 Variable cartesian(const Variable& x, const Variable& y, batchFuncVar_t fn) {
-    if(x.ndim() != 3 || y.ndim() != 3) {
+    if(x.ndim() != 3 || y.ndim() != 3)
         throw std::invalid_argument(
             "vision::cartesian - x and y inputs must have 3 dimensions"
         );
-    }
     assert(x.dim(2) == y.dim(2));
     Shape yDims = {y.dim(0), 1, y.dim(1), y.dim(2)};
     auto yMod = moddims(y, {y.dim(0), 1, y.dim(1), y.dim(2)});
@@ -126,11 +119,10 @@ Variable cartesian(const Variable& x, const Variable& y, batchFuncVar_t fn) {
 }
 
 Tensor cartesian(const Tensor& x, const Tensor& y, batchFuncArr_t fn) {
-    if(x.ndim() != 3 || y.ndim() != 3) {
+    if(x.ndim() != 3 || y.ndim() != 3)
         throw std::invalid_argument(
             "vision::cartesian - x and y inputs must have 3 dimensions"
         );
-    }
     assert(x.dim(2) == y.dim(2));
     Shape yDims = {y.dim(0), 1, y.dim(1), y.dim(2)};
     auto yMod = fl::reshape(y, {y.dim(0), 1, y.dim(1), y.dim(2)});
@@ -145,12 +137,11 @@ std::tuple<Tensor, Tensor> boxIou(
     const Tensor& bboxes1,
     const Tensor& bboxes2
 ) {
-    if(bboxes1.ndim() != 3 || bboxes2.ndim() != 3) {
+    if(bboxes1.ndim() != 3 || bboxes2.ndim() != 3)
         throw std::invalid_argument(
             "vision::boxIou - bbox inputs must be of shape "
             "[4, N, B, ...] and [4, M, B, ...]"
         );
-    }
     auto area1 = boxArea(bboxes1);
     auto area2 = boxArea(bboxes2);
     auto lt = cartesian(

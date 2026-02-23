@@ -21,9 +21,8 @@ FL_API DistributedBackend distributedBackend() {
 }
 
 FL_API void allReduce(Variable& var, double scale /* = 1.0 */, bool async /* = false */) {
-    if(getWorldSize() > 1) {
+    if(getWorldSize() > 1)
         allReduce(var.tensor(), async);
-    }
     var.tensor() *= scale;
 }
 
@@ -35,15 +34,12 @@ FL_API void allReduceMultiple(
 ) {
     // return a vector of pointers to avoid copying
     std::vector<Tensor*> arrs;
-    for(auto& var : vars) {
+    for(auto& var : vars)
         arrs.push_back(&var.tensor());
-    }
-    if(getWorldSize() > 1) {
+    if(getWorldSize() > 1)
         allReduceMultiple(arrs, async, contiguous);
-    }
-    for(auto& var : vars) {
+    for(auto& var : vars)
         var.tensor() *= scale;
-    }
 }
 
 FL_API void barrier() {

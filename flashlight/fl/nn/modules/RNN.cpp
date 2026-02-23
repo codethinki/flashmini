@@ -69,9 +69,8 @@ void RNN::initialize() {
 }
 
 std::vector<Variable> RNN::forward(const std::vector<Variable>& inputs) {
-    if(inputs.empty() || inputs.size() > 3) {
+    if(inputs.empty() || inputs.size() > 3)
         throw std::invalid_argument("Invalid inputs size");
-    }
 
     const auto& input = inputs[0];
     const auto& hiddenState = inputs.size() >= 2 ? inputs[1] : Variable();
@@ -92,12 +91,10 @@ std::vector<Variable> RNN::forward(const std::vector<Variable>& inputs) {
         );
 
     std::vector<Variable> output(1, std::get<0>(rnnRes));
-    if(inputs.size() >= 2) {
+    if(inputs.size() >= 2)
         output.push_back(std::get<1>(rnnRes));
-    }
-    if(inputs.size() == 3) {
+    if(inputs.size() == 3)
         output.push_back(std::get<2>(rnnRes));
-    }
     return output;
 }
 
@@ -165,15 +162,12 @@ std::string RNN::prettyString() const {
     }
     int output_size = bidirectional_ ? 2 * hiddenSize_ : hiddenSize_;
     ss << " (" << inputSize_ << "->" << output_size << ")";
-    if(numLayers_ > 1) {
+    if(numLayers_ > 1)
         ss << " (" << numLayers_ << "-layer)";
-    }
-    if(bidirectional_) {
+    if(bidirectional_)
         ss << " (bidirectional)";
-    }
-    if(dropProb_ > 0) {
+    if(dropProb_ > 0)
         ss << " (dropout=" << dropProb_ << ")";
-    }
     return ss.str();
 }
 

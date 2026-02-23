@@ -23,9 +23,8 @@ FirstOrderOptimizer::FirstOrderOptimizer(
     lr_(learningRate) {}
 
 void FirstOrderOptimizer::zeroGrad() {
-    for(auto& parameter : parameters_) {
+    for(auto& parameter : parameters_)
         parameter.zeroGrad();
-    }
 }
 
 } // namespace fl

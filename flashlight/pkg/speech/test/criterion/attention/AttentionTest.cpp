@@ -49,9 +49,8 @@ bool jacobianTestImpl(
     for(int i = 0; i < dout.elements(); ++i) {
         dout.tensor().flat(i) = 1; // element in 1D view
         input.zeroGrad();
-        for(auto* var : zeroGradientVariables) {
+        for(auto* var : zeroGradientVariables)
             var->zeroGrad();
-        }
         auto out = func(input);
         out.backward(dout);
 
@@ -157,13 +156,12 @@ TEST(AttentionTest, NeuralContentAttention) {
         );
         ASSERT_EQ(alphas.shape(), Shape({U, T, B}));
         ASSERT_EQ(summaries.shape(), Shape({H, U, B}));
-        if(!currentPad.isEmpty()) {
+        if(!currentPad.isEmpty())
             ASSERT_EQ(
                 fl::countNonzero(
                     alphas.tensor()(fl::span, fl::range(T - T / 2, T), 0) == 0)
                     .scalar<unsigned>(),
                     T / 2 * U);
-        }
         auto alphasum = sum(alphas.tensor(), {1});
         auto ones = fl::full(alphasum.shape(), 1.0, alphasum.type());
         ASSERT_TRUE(allClose(alphasum, ones, 1e-5));
@@ -210,8 +208,8 @@ TEST(AttentionTest, MultiHeadContentAttention) {
     Variable pad = Variable(Tensor::fromVector({1, B}, padRaw), false);
 
     std::vector<Variable> padV = {Variable(), pad};
-    for(const auto& currentPad : padV) {
-        for(bool keyValue : {true, false}) {
+    for(const auto& currentPad : padV)
+        for(bool keyValue : {true, false})
             for(bool splitInput : {true, false}) {
                 MultiHeadContentAttention attention(H, NH, keyValue, splitInput);
 
@@ -229,20 +227,17 @@ TEST(AttentionTest, MultiHeadContentAttention) {
                 );
                 ASSERT_EQ(alphas.shape(), Shape({U* NH, T, B}));
                 ASSERT_EQ(summaries.shape(), Shape({H, U, B}));
-                if(!currentPad.isEmpty()) {
+                if(!currentPad.isEmpty())
                     ASSERT_EQ(
                         fl::countNonzero(
                             alphas.tensor()(fl::span, fl::range(T - T / 2, T), 0) == 0)
                             .scalar<unsigned>(),
                             T / 2 * U * NH);
-                }
 
                 auto alphasum = sum(alphas.tensor(), {1});
                 auto ones = fl::full(alphasum.shape(), 1.0, alphasum.type());
                 ASSERT_TRUE(allClose(alphasum, ones, 1e-5));
             }
-        }
-    }
 }
 
 TEST(AttentionTest, JacobianMaskAttention) {

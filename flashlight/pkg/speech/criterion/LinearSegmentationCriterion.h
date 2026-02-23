@@ -32,9 +32,8 @@ namespace pkg {
             std::vector<fl::Variable> forward(
                 const std::vector<fl::Variable>& inputs
             ) override {
-                if(inputs.size() != 2) {
+                if(inputs.size() != 2)
                     throw std::invalid_argument("Invalid inputs size");
-                }
                 const auto& input = inputs[0];
                 const auto& target = inputs[1];
                 return AutoSegmentationCriterion::forward(

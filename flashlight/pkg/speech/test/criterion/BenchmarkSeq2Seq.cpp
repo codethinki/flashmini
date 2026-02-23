@@ -39,9 +39,8 @@ void timeBeamSearch() {
     std::vector<int> beamsizes = {1, 5, 10, 20};
     for(auto b : beamsizes) {
         auto s = fl::Timer::start();
-        for(int i = 0; i < iters; ++i) {
+        for(int i = 0; i < iters; ++i)
             seq2seq.beamPath(input, Tensor(), b);
-        }
         fl::sync();
         auto e = fl::Timer::stop(s);
         std::cout << "Total time (beam size: " << b << ") " << std::setprecision(5)

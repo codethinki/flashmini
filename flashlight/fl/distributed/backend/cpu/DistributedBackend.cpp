@@ -80,16 +80,14 @@ void distributedInit(
         return;
     }
 
-    if(initMethod != DistributedInit::MPI) {
+    if(initMethod != DistributedInit::MPI)
         throw std::runtime_error(
             "unsupported distributed init method for gloo backend"
         );
-    }
 
     // using MPI
-    if(glooContext_ != nullptr) {
+    if(glooContext_ != nullptr)
         return;
-    }
     // TODO: ibverbs support.
     auto glooDev = gloo::transport::tcp::CreateDevice("");
 
@@ -100,25 +98,21 @@ void distributedInit(
 
     detail::DistributedInfo::getInstance().backend_ = DistributedBackend::GLOO;
     detail::DistributedInfo::getInstance().isInitialized_ = true;
-    if(glooContext_->rank == 0) {
+    if(glooContext_->rank == 0)
         std::cout << "Initialized Gloo successfully!\n";
-    }
 }
 
 void allReduce(fl::Tensor& tensor, bool async /* = false */) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         throw std::runtime_error("distributed environment not initialized");
-    }
-    if(async) {
+    if(async)
         throw std::runtime_error(
             "Asynchronous allReduce not yet supported for Gloo backend"
         );
-    }
     size_t tensorSize = tensor.elements() * fl::getTypeSize(tensor.type());
-    if(tensorSize > cacheTensor_.elements()) {
+    if(tensorSize > cacheTensor_.elements())
         cacheTensor_ =
             fl::Tensor({static_cast<long long>(tensorSize)}, fl::dtype::b8);
-    }
     DevicePtr tensorPtr(tensor);
     DevicePtr cacheTensorPtr(cacheTensor_);
     memcpy(cacheTensorPtr.get(), tensorPtr.get(), tensorSize);
@@ -159,15 +153,13 @@ void allReduceMultiple(
     bool async /* = false */,
     bool contiguous /* = false */
 ) {
-    if(contiguous) {
+    if(contiguous)
         throw std::runtime_error(
             "contiguous allReduceMultiple is not yet supported for Gloo backend"
         );
-    }
 
-    for(auto& tensor : tensors) {
+    for(auto& tensor : tensors)
         allReduce(*tensor, async);
-    }
 }
 
 void syncDistributed() {
@@ -177,16 +169,14 @@ void syncDistributed() {
 }
 
 int getWorldRank() {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         return 0;
-    }
     return detail::globalContext()->rank;
 }
 
 int getWorldSize() {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         return 1;
-    }
     return detail::globalContext()->size;
 }
 } // namespace fl

@@ -26,9 +26,8 @@ DistributedDataset::DistributedDataset(
 
     int partitionSize = shuffle_->size() / worldSize;
     int leftOver = shuffle_->size() % worldSize;
-    if(worldRank < leftOver) {
+    if(worldRank < leftOver)
         partitionSize++;
-    }
     ds_ = std::make_shared<ResampleDataset>(shuffle_, permfn, partitionSize);
     ds_ = std::make_shared<PrefetchDataset>(ds_, numThreads, prefetchSize);
     ds_ = std::make_shared<BatchDataset>(ds_, batchSize, batchPolicy);

@@ -29,13 +29,12 @@ namespace {
     ) {
         int nfeatures = 1;
         for(auto ax : axes) {
-            if(ax > input.ndim() - 1) {
+            if(ax > input.ndim() - 1)
                 throw std::invalid_argument(
                     "batchnorm - passed axes (axis value " + std::to_string(ax)
                     + ") exceeds the number of dimensions of the input ("
                     + std::to_string(input.ndim()) + ")"
                 );
-            }
             nfeatures *= input.dim(ax);
         }
 
@@ -44,9 +43,8 @@ namespace {
 
         // assuming no duplicates
         bool axes_continuous = (axes.size() == (maxAxis - minAxis + 1));
-        if(!axes_continuous) {
+        if(!axes_continuous)
             throw std::invalid_argument("unsupported axis config for cuDNN batchnorm");
-        }
 
         if(minAxis == 0) {
             modeOut = CUDNN_BATCHNORM_PER_ACTIVATION;
@@ -60,14 +58,13 @@ namespace {
         } else {
             modeOut = CUDNN_BATCHNORM_SPATIAL;
 #if CUDNN_VERSION >= 7003
-            if(train) {
+            if(train)
                 modeOut = CUDNN_BATCHNORM_SPATIAL_PERSISTENT;
-            }
+
 #endif
             int batchsz = 1;
-            for(int i = maxAxis + 1; i < input.ndim(); ++i) {
+            for(int i = maxAxis + 1; i < input.ndim(); ++i)
                 batchsz *= input.dim(i);
-            }
             inDescDimsOut = Shape(
                 {
                     1,
@@ -96,11 +93,10 @@ Tensor CudnnAutogradExtension::batchnorm(
     const double epsilon,
     std::shared_ptr<detail::AutogradPayload>
 ) {
-    if(input.type() == fl::dtype::f16 && weight.type() != fl::dtype::f32) {
+    if(input.type() == fl::dtype::f16 && weight.type() != fl::dtype::f32)
         throw std::invalid_argument(
             "fl::batchnorm: non-input tensors must be of type f32"
         );
-    }
     FL_TENSOR_DTYPES_MATCH_CHECK(weight, bias, runningMean, runningVar);
 
     auto output = Tensor(input.shape(), input.type());
@@ -109,13 +105,11 @@ Tensor CudnnAutogradExtension::batchnorm(
     Shape inDescDims, wtDescDims;
     getBatchnormMetadata(mode, inDescDims, wtDescDims, input, axes, train);
 
-    if(!weight.isEmpty() && weight.elements() != wtDescDims.elements()) {
+    if(!weight.isEmpty() && weight.elements() != wtDescDims.elements())
         throw std::invalid_argument("[BatchNorm] Invalid shape for weight.");
-    }
 
-    if(!bias.isEmpty() && bias.elements() != wtDescDims.elements()) {
+    if(!bias.isEmpty() && bias.elements() != wtDescDims.elements())
         throw std::invalid_argument("[BatchNorm] Invalid shape for bias.");
-    }
     // Weight, bias, and running mean/var arrays can't be fp16 (must be fp32)
     Tensor weightArray = weight.isEmpty()
         ? fl::full(wtDescDims, 1.0, fl::dtype::f32)
@@ -172,7 +166,7 @@ Tensor CudnnAutogradExtension::batchnorm(
                     saveVarRaw.get()
                 )
             );
-        } else {
+        } else
             CUDNN_CHECK_ERR(
                 cudnnBatchNormalizationForwardInference(
                     getCudnnHandle(),
@@ -191,7 +185,6 @@ Tensor CudnnAutogradExtension::batchnorm(
                     epsilon
                 )
             );
-        }
         // ensure output stream waits on cudnn compute stream
         relativeSync({output}, cudnnStream);
     }
@@ -209,11 +202,10 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::batchnormBackward(
     const float epsilon,
     std::shared_ptr<detail::AutogradPayload>
 ) {
-    if(!train) {
+    if(!train)
         throw std::logic_error(
             "can't compute batchnorm grad when train was not specified"
         );
-    }
 
     cudnnBatchNormMode_t mode;
     Shape inDescDims, wtDescDims;

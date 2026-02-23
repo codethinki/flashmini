@@ -13,14 +13,11 @@
 
 template<typename T>
 bool compareVec(std::vector<T> A, std::vector<T> B, float precision = 1E-5) {
-    if(A.size() != B.size()) {
+    if(A.size() != B.size())
         return false;
-    }
-    for(std::size_t i = 0; i < A.size(); ++i) {
-        if(std::abs(A[i] - B[i]) > precision) {
+    for(std::size_t i = 0; i < A.size(); ++i)
+        if(std::abs(A[i] - B[i]) > precision)
             return false;
-        }
-    }
     return true;
 }
 
@@ -37,10 +34,8 @@ std::vector<T> randVec(std::size_t N, float min = -1.0, float max = 1.0) {
 template<typename T>
 std::vector<T> transposeVec(const std::vector<T>& in, int inRow, int inCol) {
     std::vector<T> out(inRow * inCol);
-    for(size_t r = 0; r < inRow; ++r) {
-        for(size_t c = 0; c < inCol; ++c) {
+    for(size_t r = 0; r < inRow; ++r)
+        for(size_t c = 0; c < inCol; ++c)
             out[c * inRow + r] = in[r * inCol + c];
-        }
-    }
     return out;
 }

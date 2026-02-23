@@ -41,9 +41,8 @@ namespace {
 
     std::string getFileName(const std::string& path) {
         const size_t separatorIndex = path.rfind(kSeparator, path.length());
-        if(separatorIndex == std::string::npos) {
+        if(separatorIndex == std::string::npos)
             return path;
-        }
         return path.substr(separatorIndex + 1, path.length() - separatorIndex);
     }
 
@@ -62,9 +61,8 @@ namespace {
         constexpr size_t bufferSize = 50;
         char buffer[bufferSize];
         const size_t nWrittenBytes = std::strftime(buffer, 30, "%m%d %T", timeinfo);
-        if(!nWrittenBytes) {
+        if(!nWrittenBytes)
             return "getTime() failed to format time";
-        }
 
         const std::chrono::system_clock::time_point timeInSecondsResolution =
             std::chrono::system_clock::from_time_t(secondsSinceEpoc);
@@ -95,9 +93,8 @@ namespace {
         ss << std::this_thread::get_id();
 
         std::string threadId = ss.str();
-        if(threadId.size() > maxThreadIdNumDigits) {
+        if(threadId.size() > maxThreadIdNumDigits)
             threadId = threadId.substr(threadId.size() - maxThreadIdNumDigits);
-        }
 
 
         (*outputStream) << dateTimeWithMicroSeconds() << ' '
@@ -140,9 +137,8 @@ Logging::~Logging() {
         stringStream_ << std::endl;
         (*outputStreamPtr_) << stringStream_.str();
         outputStreamPtr_->flush();
-        if(level_ == LogLevel::FATAL) {
+        if(level_ == LogLevel::FATAL)
             exit(-1);
-        }
     }
 }
 
@@ -293,11 +289,9 @@ constexpr std::array<const char* const, 5> flLogLevelNames =
 {"INFO", "WARNING", "ERROR", "FATAL", "DISABLED"};
 
 std::string logLevelName(LogLevel level) {
-    for(int i = 0; i < flLogLevelValues.size(); ++i) {
-        if(level == flLogLevelValues.at(i)) {
+    for(int i = 0; i < flLogLevelValues.size(); ++i)
+        if(level == flLogLevelValues.at(i))
             return flLogLevelNames.at(i);
-        }
-    }
     std::stringstream ss;
     ss << "logLevelName(level=" << static_cast<int>(level)
     << ") invalid level. Level should be in the range [0.."
@@ -306,11 +300,9 @@ std::string logLevelName(LogLevel level) {
 }
 
 LogLevel logLevelValue(const std::string& level) {
-    for(int i = 0; i < flLogLevelValues.size(); ++i) {
-        if(level == std::string(flLogLevelNames.at(i))) {
+    for(int i = 0; i < flLogLevelValues.size(); ++i)
+        if(level == std::string(flLogLevelNames.at(i)))
             return flLogLevelValues.at(i);
-        }
-    }
     std::stringstream ss;
     ss << "logLevelValue(level=" << level
     << ") invalid level. Level should be INFO, WARNING, ERROR or FATAL";

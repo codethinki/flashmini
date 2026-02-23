@@ -75,11 +75,10 @@ Variable BatchNorm::forward(const Variable& input) {
 
     if(train_ && trackStats_) {
         ++numBatchesTracked_;
-        if(momentum_ < 0) { // cumulative moving average
+        if(momentum_ < 0) // cumulative moving average
             avgFactor = 1.0 / numBatchesTracked_;
-        } else { // exponential moving average
+        else // exponential moving average
             avgFactor = momentum_;
-        }
     }
 
     auto paramsType =
@@ -118,9 +117,8 @@ std::string BatchNorm::prettyString() const {
     std::ostringstream ss;
     ss << "BatchNorm";
     ss << " ( axis : { ";
-    for(auto x : featAxis_) {
+    for(auto x : featAxis_)
         ss << x << " ";
-    }
     ss << "}, size : " << featSize_ << " )";
     return ss.str();
 }

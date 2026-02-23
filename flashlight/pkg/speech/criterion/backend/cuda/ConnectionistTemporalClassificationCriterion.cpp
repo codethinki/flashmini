@@ -25,20 +25,18 @@ namespace fl::pkg::speech {
 
 namespace {
     inline void throw_on_error(ctcStatus_t status, const char* message) {
-        if(status != CTC_STATUS_SUCCESS) {
+        if(status != CTC_STATUS_SUCCESS)
             throw std::runtime_error(
                 message + (", stat = " + std::string(ctcGetStatusString(status)))
             );
-        }
     }
 } // namespace
 
 std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
     const std::vector<Variable>& inputs
 ) {
-    if(inputs.size() != 2) {
+    if(inputs.size() != 2)
         throw std::invalid_argument("Invalid inputs size");
-    }
     const auto& input =
         fl::moddims(inputs[0], {0, 0, 0}); // remove trailing singleton dims
     const auto& target = inputs[1];
@@ -59,9 +57,8 @@ std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
         fl::transpose(input.tensor(), {0, 2, 1});
 
     Tensor grad;
-    if(input.isCalcGrad()) {
+    if(input.isCalcGrad())
         grad = fl::full(inputarr.shape(), 0.0, inputarr.type());
-    }
 
     std::vector<int> inputLengths(B, T);
     std::vector<int> labels;
@@ -110,9 +107,8 @@ std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
         L = std::min(L + R, T) - R;
 
         labelLengths.push_back(L);
-        for(int l = 0; l < L; ++l) {
+        for(int l = 0; l < L; ++l)
             labels.push_back(targetVec[l]);
-        }
     }
     Tensor batchScales = Tensor::fromVector({B}, batchScaleVec);
 

@@ -14,11 +14,10 @@ ForceAlignmentCriterion::ForceAlignmentCriterion(
     fl::lib::seq::CriterionScaleMode scalemode
 ) : N_(N),
     scaleMode_(scalemode) {
-    if(N_ <= 0) {
+    if(N_ <= 0)
         throw std::invalid_argument(
             "FAC: Size of transition matrix is less than 0"
         );
-    }
     auto transition = fl::constant(0.0, {N_, N_});
     params_ = {transition};
 }

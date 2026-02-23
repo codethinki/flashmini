@@ -20,9 +20,9 @@ void DynamicBenchmark::audit(
     // Only run the benchmarking components if some options are yet to be
     // fully-timed and benchmark mode is on - otherwise, only run the passed
     // lambda
-    if(options_->timingsComplete() || !benchmarkMode_) {
+    if(options_->timingsComplete() || !benchmarkMode_)
         function();
-    } else {
+    else {
         start();
         function();
         stop(incrementCount);

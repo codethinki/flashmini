@@ -22,13 +22,12 @@ namespace pkg {
             auto T = input.dim(1);
             auto N = input.dim(0);
 
-            if(N != trans.dim(0) || N != trans.dim(1)) {
+            if(N != trans.dim(0) || N != trans.dim(1))
                 throw std::invalid_argument("viterbiPath: mismatched dims");
-            } else if(input.type() != fl::dtype::f32) {
+            else if(input.type() != fl::dtype::f32)
                 throw std::invalid_argument("viterbiPath: input must be float32");
-            } else if(trans.type() != fl::dtype::f32) {
+            else if(trans.type() != fl::dtype::f32)
                 throw std::invalid_argument("viterbiPath: trans must be float32");
-            }
 
             auto inputVec = input.toHostVector<float>();
             auto transVec = trans.toHostVector<float>();

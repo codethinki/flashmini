@@ -77,12 +77,11 @@ inline ThreadPool::ThreadPool(
     size_t threads,
     const std::function<void(size_t)>& initFn /* = nullptr */
 ) : stop(false) {
-    for(size_t id = 0; id < threads; ++id) {
+    for(size_t id = 0; id < threads; ++id)
         workers.emplace_back(
             [this, initFn, id] {
-                if(initFn) {
+                if(initFn)
                     initFn(id);
-                }
                 for(;;) {
                     std::function<void()> task;
 
@@ -91,9 +90,8 @@ inline ThreadPool::ThreadPool(
                         this->condition.wait(
                             lock,
                             [this] { return this->stop || !this->tasks.empty(); });
-                        if(this->stop && this->tasks.empty()) {
+                        if(this->stop && this->tasks.empty())
                             return;
-                        }
                         task = std::move(this->tasks.front());
                         this->tasks.pop();
                     }
@@ -102,7 +100,6 @@ inline ThreadPool::ThreadPool(
                 }
             }
         );
-    }
 }
 
 template<class F, class... Args>
@@ -119,9 +116,8 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
         std::unique_lock<std::mutex> lock(queue_mutex);
 
         // don't allow enqueueing after stopping the pool
-        if(stop) {
+        if(stop)
             throw std::runtime_error("enqueue on stopped ThreadPool");
-        }
 
         tasks.emplace([task]() { (*task)(); });
     }
@@ -135,8 +131,7 @@ inline ThreadPool::~ThreadPool() {
         stop = true;
     }
     condition.notify_all();
-    for(std::thread& worker : workers) {
+    for(std::thread& worker : workers)
         worker.join();
-    }
 }
 } // namespace fl

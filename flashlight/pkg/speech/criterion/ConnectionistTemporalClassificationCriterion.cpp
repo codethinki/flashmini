@@ -25,9 +25,8 @@ struct CTCContext {
 Tensor logSoftmax(const Tensor& input, const int dim) {
     Tensor maxvals = fl::amax(input, {dim}, /* keepDims = */ true);
     Shape tiledims(std::vector<Dim>(input.ndim(), 1));
-    if(dim > 3) {
+    if(dim > 3)
         throw std::invalid_argument("logSoftmax: Dimension must be less than 3");
-    }
     tiledims[dim] = input.dim(dim);
     // Compute log softmax.
     // Subtracting then adding maxvals is for numerical stability.
@@ -79,12 +78,11 @@ Tensor ConnectionistTemporalClassificationCriterion::viterbiPathWithTarget(
     const Tensor& inputSizes /* = Tensor() */,
     const Tensor& targetSizes /* = Tensor() */
 ) {
-    if(input.ndim() != 3) {
+    if(input.ndim() != 3)
         throw std::invalid_argument(
             "ConnectionistTemporalClassificationCriterion::viterbiPathWithTarget: "
             "expected input of shape {N x T x B}"
         );
-    }
     int N = input.dim(0);
     int T = input.dim(1);
     int B = input.dim(2);
@@ -122,27 +120,23 @@ void ConnectionistTemporalClassificationCriterion::validate(
     const Variable& input,
     const Variable& target
 ) {
-    if(input.isEmpty()) {
+    if(input.isEmpty())
         throw std::invalid_argument("CTC: Input cannot be empty");
-    }
-    if(target.ndim() < 2) {
+    if(target.ndim() < 2)
         throw std::invalid_argument(
             "CTC: Incorrect dimensions for target. Expected {L, B}, got "
             + target.shape().toString()
         );
-    }
-    if(input.ndim() < 3) {
+    if(input.ndim() < 3)
         throw std::invalid_argument(
             "CTC: Incorrect dimensions for input. Expected {N, T, B}, got "
             + input.shape().toString()
         );
-    }
-    if(input.dim(2) != target.dim(1)) {
+    if(input.dim(2) != target.dim(1))
         throw std::invalid_argument(
             "CTC: Batchsize mismatch for input and target with dims "
             + input.shape().toString() + " and " + target.shape().toString()
             + ", respectively"
         );
-    }
 }
 } // namespace fl

@@ -114,9 +114,8 @@ static sf_count_t sf_vio_ro_read(void* ptr, sf_count_t count, void* user_data) {
     std::istream* f = reinterpret_cast<std::istream*>(user_data);
     f->read((char*) ptr, count);
     auto n = f->gcount();
-    if(!f->good()) {
+    if(!f->good())
         f->clear();
-    }
     return n;
 }
 
@@ -184,9 +183,8 @@ static sf_count_t sf_vio_wo_tell(void* user_data) {
 
 SoundInfo loadSoundInfo(const std::string& filename) {
     std::ifstream f(filename);
-    if(!f.is_open()) {
+    if(!f.is_open())
         throw std::runtime_error("could not open file for read " + filename);
-    }
     return loadSoundInfo(f);
 }
 
@@ -203,11 +201,10 @@ SoundInfo loadSoundInfo(std::istream& f) {
     /* mandatory */
     info.format = 0;
 
-    if(!(file = sf_open_virtual(&vsf, SFM_READ, &info, &f))) {
+    if(!(file = sf_open_virtual(&vsf, SFM_READ, &info, &f)))
         throw std::runtime_error(
             "loadSoundInfo: unknown format or could not open stream"
         );
-    }
 
     sf_close(file);
 
@@ -221,9 +218,8 @@ SoundInfo loadSoundInfo(std::istream& f) {
 template<typename T>
 std::vector<T> loadSound(const std::string& filename) {
     std::ifstream f(filename);
-    if(!f.is_open()) {
+    if(!f.is_open())
         throw std::runtime_error("could not open file " + filename);
-    }
     return loadSound<T>(f);
 }
 
@@ -239,35 +235,32 @@ std::vector<T> loadSound(std::istream& f) {
 
     info.format = 0;
 
-    if(!(file = sf_open_virtual(&vsf, SFM_READ, &info, &f))) {
+    if(!(file = sf_open_virtual(&vsf, SFM_READ, &info, &f)))
         throw std::runtime_error(
             "loadSound: unknown format or could not open stream"
         );
-    }
 
     std::vector<T> in(info.frames * info.channels);
     sf_count_t nframe;
-    if(std::is_same<T, float>::value) {
+    if(std::is_same<T, float>::value)
         nframe =
             sf_readf_float(file, reinterpret_cast<float*>(in.data()), info.frames);
-    } else if(std::is_same<T, double>::value) {
+    else if(std::is_same<T, double>::value)
         nframe = sf_readf_double(
             file,
             reinterpret_cast<double*>(in.data()),
             info.frames
         );
-    } else if(std::is_same<T, int>::value) {
+    else if(std::is_same<T, int>::value)
         nframe = sf_readf_int(file, reinterpret_cast<int*>(in.data()), info.frames);
-    } else if(std::is_same<T, short>::value) {
+    else if(std::is_same<T, short>::value)
         nframe =
             sf_readf_short(file, reinterpret_cast<short*>(in.data()), info.frames);
-    } else {
+    else
         throw std::logic_error("loadSound: called with unsupported T");
-    }
     sf_close(file);
-    if(nframe != info.frames) {
+    if(nframe != info.frames)
         throw std::runtime_error("loadSound: read error");
-    }
     return in;
 }
 
@@ -281,9 +274,8 @@ void saveSound(
     SoundSubFormat subformat
 ) {
     std::ofstream f(filename);
-    if(!f.is_open()) {
+    if(!f.is_open())
         throw std::runtime_error("could not open file for write " + filename);
-    }
     saveSound<T>(f, input, samplerate, channels, format, subformat);
 }
 
@@ -304,23 +296,20 @@ void saveSound(
     SNDFILE* file;
     SF_INFO info;
 
-    if(formats.find(format) == formats.end()) {
+    if(formats.find(format) == formats.end())
         throw std::invalid_argument("saveSound: invalid format");
-    }
-    if(subformats.find(subformat) == subformats.end()) {
+    if(subformats.find(subformat) == subformats.end())
         throw std::invalid_argument("saveSound: invalid subformat");
-    }
 
     info.channels = channels;
     info.samplerate = samplerate;
     info.format =
         formats.find(format)->second | subformats.find(subformat)->second;
 
-    if(!(file = sf_open_virtual(&vsf, SFM_WRITE, &info, &f))) {
+    if(!(file = sf_open_virtual(&vsf, SFM_WRITE, &info, &f)))
         throw std::runtime_error(
             "saveSound: invalid format or could not write stream"
         );
-    }
 
     /* Circumvent a bug in Vorbis with large buffers */
     sf_count_t remainCount = input.size() / channels;
@@ -329,37 +318,36 @@ void saveSound(
     while(remainCount > 0) {
         sf_count_t writableCount = std::min(chunkSize, remainCount);
         sf_count_t writtenCount = 0;
-        if(std::is_same<T, float>::value) {
+        if(std::is_same<T, float>::value)
             writtenCount = sf_writef_float(
                 file,
                 const_cast<float*>(reinterpret_cast<const float*>(input.data()))
                 + offsetCount * channels,
                 writableCount
             );
-        } else if(std::is_same<T, double>::value) {
+        else if(std::is_same<T, double>::value)
             writtenCount = sf_writef_double(
                 file,
                 const_cast<double*>(reinterpret_cast<const double*>(input.data()))
                 + offsetCount * channels,
                 writableCount
             );
-        } else if(std::is_same<T, int>::value) {
+        else if(std::is_same<T, int>::value)
             writtenCount = sf_writef_int(
                 file,
                 const_cast<int*>(reinterpret_cast<const int*>(input.data()))
                 + offsetCount * channels,
                 writableCount
             );
-        } else if(std::is_same<T, short>::value) {
+        else if(std::is_same<T, short>::value)
             writtenCount = sf_writef_short(
                 file,
                 const_cast<short*>(reinterpret_cast<const short*>(input.data()))
                 + offsetCount * channels,
                 writableCount
             );
-        } else {
+        else
             throw std::logic_error("saveSound: called with unsupported T");
-        }
         if(writtenCount != writableCount) {
             sf_close(file);
             throw std::runtime_error("saveSound: write error");

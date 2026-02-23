@@ -206,9 +206,8 @@ TEST(TensorBaseTest, ConstructFromData) {
     std::vector<float> ascending = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     auto t = fl::Tensor::fromVector({3, 4}, ascending);
     ASSERT_EQ(t.type(), fl::dtype::f32);
-    for(int i = 0; i < ascending.size(); ++i) {
+    for(int i = 0; i < ascending.size(); ++i)
         ASSERT_FLOAT_EQ(t(i % 3, i / 3).scalar<float>(), ascending[i]);
-    }
 
     // TODO: add fixtures/check stuff
     std::vector<int> intV = {1, 2, 3};
@@ -336,9 +335,8 @@ TEST(TensorBaseTest, concatenate) {
 TEST(TensorBaseTest, nonzero) {
     std::vector<int> idxs = {0, 1, 4, 9, 11, 23, 55, 82, 91};
     auto a = fl::full({10, 10}, 1, fl::dtype::u32);
-    for(const auto idx : idxs) {
+    for(const auto idx : idxs)
         a(idx / 10, idx % 10) = 0;
-    }
     auto indices = fl::nonzero(a);
     int nnz = a.elements() - idxs.size();
     ASSERT_EQ(indices.shape(), Shape({nnz}));
@@ -458,9 +456,8 @@ TEST(TensorBaseTest, sort) {
     auto sorted = fl::sort(a, /* axis = */ 0, SortMode::Descending);
 
     Tensor expected({dims[0]}, a.type());
-    for(int i = 0; i < dims[0]; ++i) {
+    for(int i = 0; i < dims[0]; ++i)
         expected(i) = dims[0] - i - 1;
-    }
     auto tiled = fl::tile(expected, {1, 2});
     ASSERT_TRUE(allClose(sorted, tiled));
 
@@ -483,9 +480,8 @@ TEST(TensorBaseTest, argsort) {
     auto sorted = fl::argsort(a, /* axis = */ 0, SortMode::Descending);
 
     Tensor expected({dims[0]}, fl::dtype::u32);
-    for(int i = 0; i < dims[0]; ++i) {
+    for(int i = 0; i < dims[0]; ++i)
         expected(i) = dims[0] - i - 1;
-    }
     auto tiled = fl::tile(expected, {1, 2});
     ASSERT_TRUE(allClose(sorted, tiled));
 
@@ -507,15 +503,14 @@ void assertScalarBehavior(fl::dtype type) {
     if(
         (type == fl::dtype::f16) || (type == fl::dtype::f32)
         || (type == fl::dtype::f64)
-    ) {
+    )
         ASSERT_FLOAT_EQ(one.template scalar<ScalarArgType>(), scalar)
         << "dtype: " << type
         << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
-    } else {
+    else
         ASSERT_EQ(one.template scalar<ScalarArgType>(), scalar)
         << "dtype: " << type
         << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
-    }
 
 
     ScalarArgType val = static_cast<ScalarArgType>(rand());
@@ -598,15 +593,13 @@ TEST(TensorBaseTest, host) {
     auto a = fl::rand({10, 10});
 
     float* ptr = a.host<float>();
-    for(int i = 0; i < a.elements(); ++i) {
+    for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(ptr[i], a.flatten()(i).scalar<float>());
-    }
 
     float* existingBuffer = new float[100];
     a.host(existingBuffer);
-    for(int i = 0; i < a.elements(); ++i) {
+    for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(existingBuffer[i], a.flatten()(i).scalar<float>());
-    }
 
     ASSERT_EQ(Tensor().host<void>(), nullptr);
 }
@@ -615,9 +608,8 @@ TEST(TensorBaseTest, toHostVector) {
     auto a = fl::rand({10, 10});
     auto vec = a.toHostVector<float>();
 
-    for(int i = 0; i < a.elements(); ++i) {
+    for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(vec[i], a.flatten()(i).scalar<float>());
-    }
 
     ASSERT_EQ(Tensor().toHostVector<float>().size(), 0);
 }

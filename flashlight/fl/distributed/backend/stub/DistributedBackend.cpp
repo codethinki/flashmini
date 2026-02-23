@@ -25,17 +25,15 @@ void distributedInit(
         std::cerr << "warning: fl::distributedInit() called more than once\n";
         return;
     }
-    if(worldSize > 1 || worldRank > 0) {
+    if(worldSize > 1 || worldRank > 0)
         throw std::runtime_error("worldSize must be 1 with distributed stub");
-    }
     detail::DistributedInfo::getInstance().backend_ = DistributedBackend::STUB;
     detail::DistributedInfo::getInstance().isInitialized_ = true;
 }
 
 void allReduce(Tensor& arr, bool async /* = false */) {
-    if(!isDistributedInit()) {
+    if(!isDistributedInit())
         throw std::runtime_error("distributed environment not initialized");
-    }
     throw std::runtime_error("allReduce not supported for stub backend");
 }
 

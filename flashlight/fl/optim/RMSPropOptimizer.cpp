@@ -29,9 +29,8 @@ RMSPropOptimizer::RMSPropOptimizer(
     wd_(weightDecay),
     first_(),
     second_() {
-    if(useFirst_) {
+    if(useFirst_)
         first_.reserve(parameters.size());
-    }
     second_.reserve(parameters.size());
 
     for(const auto& parameter : parameters_) {
@@ -47,17 +46,15 @@ RMSPropOptimizer::RMSPropOptimizer(
 
 void RMSPropOptimizer::step() {
     for(size_t i = 0; i < parameters_.size(); i++) {
-        if(!parameters_[i].isGradAvailable()) {
+        if(!parameters_[i].isGradAvailable())
             continue;
-        }
 
         const Tensor& grad = parameters_[i].grad().tensor();
         Tensor& data = parameters_[i].tensor();
 
-        if(wd_ != 0) {
+        if(wd_ != 0)
             // Weight decay term
             data = data - wd_ * data;
-        }
 
         Tensor& second = second_[i];
         second = rho_ * second + (1 - rho_) * grad * grad;
@@ -83,13 +80,11 @@ std::string RMSPropOptimizer::prettyString() const {
     std::ostringstream ss;
     ss << "RMSProp";
 
-    if(wd_ != 0) {
+    if(wd_ != 0)
         ss << " (weight decay=" << wd_ << ")";
-    }
 
-    if(useFirst_) {
+    if(useFirst_)
         ss << " (use first moment)";
-    }
 
     return ss.str();
 }

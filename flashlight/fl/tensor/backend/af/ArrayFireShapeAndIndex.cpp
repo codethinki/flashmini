@@ -27,22 +27,21 @@ Tensor ArrayFireBackend::transpose(
     const Tensor& tensor,
     const Shape& axes /* = {} */
 ) {
-    if(tensor.ndim() == 1) {
+    if(tensor.ndim() == 1)
         return tensor;
-    } else if(
-        tensor.ndim() == 2 && (axes.ndim() == 0 || axes == Shape({1, 0}))) {
+    else if(
+        tensor.ndim() == 2 && (axes.ndim() == 0 || axes == Shape({1, 0})))
         // fastpath for matrices
         return toTensor<ArrayFireTensor>(
             af::transpose(toArray(tensor)),
             tensor.ndim()
         );
-    } else if(axes.ndim() == 0) {
+    else if(axes.ndim() == 0) {
         std::vector<Dim> dims(AF_MAX_DIMS);
         std::iota(std::begin(dims), std::end(dims), 0);
         // Compute the reversed dimensions for as many ndims as are in the input
-        for(unsigned i = 0; i < tensor.ndim(); ++i) {
+        for(unsigned i = 0; i < tensor.ndim(); ++i)
             dims[i] = tensor.ndim() - 1 - i;
-        }
 
         // flip all dimensions
         return toTensor<ArrayFireTensor>(
@@ -50,29 +49,26 @@ Tensor ArrayFireBackend::transpose(
             tensor.ndim()
         );
     } else {
-        if(axes.ndim() > AF_MAX_DIMS) {
+        if(axes.ndim() > AF_MAX_DIMS)
             throw std::invalid_argument(
                 "ArrayFire tensor transpose was given "
                 "permutation dims with > 4 axes"
             );
-        }
-        if(axes.ndim() != tensor.ndim()) {
+        if(axes.ndim() != tensor.ndim())
             throw std::invalid_argument(
                 "ArrayFire tensor transpose axes don't match tensor's for "
                 "permutation - axes must have the same number of "
                 "dimensions as the tensor"
             );
-        }
         // reorder based on specified dimensions
         std::vector<dim_t> d(AF_MAX_DIMS);
         std::iota(std::begin(d), std::end(d), 0);
         for(size_t i = 0; i < axes.ndim(); ++i) {
-            if(axes[i] > tensor.ndim() - 1) {
+            if(axes[i] > tensor.ndim() - 1)
                 throw std::invalid_argument(
                     "ArrayFireBackend::transpose - given dimension is larger "
                     "than the number of dimensions in the tensor"
                 );
-            }
 
             d[i] = axes[i];
         }
@@ -129,9 +125,8 @@ Tensor ArrayFireBackend::concatenate(
     }
 
     unsigned numDims = tensors[0].ndim();
-    if(axis > std::max(numDims - 1, 0u)) {
+    if(axis > std::max(numDims - 1, 0u))
         numDims = axis + 1;
-    }
 
     // All tensors have the same numdims else AF would throw
     return toTensor<ArrayFireTensor>(std::move(out), numDims);
@@ -149,11 +144,10 @@ Tensor ArrayFireBackend::pad(
     const std::vector<std::pair<int, int>>& padWidths,
     const PadType type
 ) {
-    if(padWidths.size() > AF_MAX_DIMS) {
+    if(padWidths.size() > AF_MAX_DIMS)
         throw std::invalid_argument(
             "ArrayFireBackend::pad - given padWidths for more than 4 dimensions"
         );
-    }
 
     // convert ((begin_1, end_1), ..., (begin_k, end_k)) to ((begin_1, ...,
     // begin_k), (end_1, ..., end_k)) for ArrayFire

@@ -79,14 +79,14 @@ namespace {
              inputShape.dim(kHIdx),
              inputShape.dim(kWIdx)}
         );
-        if(groups == 1) {
+        if(groups == 1)
             out.weightDims = detail::convertToDnnlDims(
                 {weightsShape.dim(kWeightOutputChannelSizeIdx),
                  inputShape.dim(kIOChannelSizeIdx),
                  weightsShape.dim(kHIdx),
                  weightsShape.dim(kWIdx)}
             );
-        } else {
+        else
             out.weightDims = detail::convertToDnnlDims(
                 {groups,
                  weightsShape.dim(kWeightOutputChannelSizeIdx) / groups,
@@ -94,7 +94,6 @@ namespace {
                  weightsShape.dim(kHIdx),
                  weightsShape.dim(kWIdx)}
             );
-        }
         out.outputDims = detail::convertToDnnlDims(
             {inputShape.dim(kIOBatchSizeIdx),
              weightsShape.dim(kWeightOutputChannelSizeIdx),
@@ -125,7 +124,7 @@ namespace {
 
         auto& dnnlEngine = detail::DnnlEngine::getInstance().getEngine();
         convolution_forward::primitive_desc fwdPrimitiveDescriptor;
-        if(hasBias) {
+        if(hasBias)
             fwdPrimitiveDescriptor = convolution_forward::primitive_desc(
                 dnnlEngine,
                 forwardMode,
@@ -139,7 +138,7 @@ namespace {
                 out.paddingDims,
                 out.paddingDims
             );
-        } else {
+        else
             fwdPrimitiveDescriptor = convolution_forward::primitive_desc(
                 dnnlEngine,
                 forwardMode,
@@ -152,7 +151,6 @@ namespace {
                 out.paddingDims,
                 out.paddingDims
             );
-        }
         out.fwdPrimDesc = std::move(fwdPrimitiveDescriptor);
 
         return out;
@@ -173,9 +171,8 @@ Tensor OneDnnAutogradExtension::conv2d(
     const int groups,
     std::shared_ptr<detail::AutogradPayload>
 ) {
-    if(input.type() == fl::dtype::f16) {
+    if(input.type() == fl::dtype::f16)
         throw std::runtime_error("Half precision is not supported in CPU.");
-    }
 
     // flashlight input, weight, and output shapes in column-major:
     // - Input is WHCN
@@ -252,9 +249,8 @@ Tensor OneDnnAutogradExtension::conv2d(
     );
     // Output - adds a reorder after the conv if needed
     auto outputMemory = outputMemInit.getMemory();
-    if(outputMemInit.getMemory().get_desc() != outputDesc) {
+    if(outputMemInit.getMemory().get_desc() != outputDesc)
         outputMemory = memory(outputDesc, dnnlEngine);
-    }
 
     // Create convolution
     std::shared_ptr<convolution_forward> conv;
@@ -269,9 +265,8 @@ Tensor OneDnnAutogradExtension::conv2d(
         {DNNL_ARG_SRC, inputMemory},
         {DNNL_ARG_WEIGHTS, weightsMemory},
         {DNNL_ARG_DST, outputMemory}};
-    if(hasBias) {
+    if(hasBias)
         convFwdArgs[DNNL_ARG_BIAS] = biasMemory.getMemory();
-    }
     fwdArgs.push_back(convFwdArgs);
 
     // Add output reordering if needed
@@ -370,9 +365,8 @@ Tensor OneDnnAutogradExtension::conv2dBackwardData(
     );
     auto gradInputMemory = gradInputMemInit.getMemory();
     // Don't reorder the gradient until after the conv
-    if(gradInputMemInit.getMemory().get_desc() != gradInputDesc) {
+    if(gradInputMemInit.getMemory().get_desc() != gradInputDesc)
         gradInputMemory = memory(gradInputDesc, dnnlEngineBwd);
-    }
 
     // Convolution backwards
     auto convBwdData =
@@ -439,13 +433,12 @@ std::pair<Tensor, Tensor> OneDnnAutogradExtension::conv2dBackwardFilterBias(
 
     Tensor gradBias;
     bool computeBiasGrad = !bias.isEmpty() && !conv2DData.biasMemDesc.is_zero();
-    if(computeBiasGrad) {
+    if(computeBiasGrad)
         gradBias = Tensor(bias.shape(), bias.type());
-    }
 
     // Weight backward descriptor
     convolution_backward_weights::primitive_desc bwdWeightPrimitiveDesc;
-    if(computeBiasGrad) {
+    if(computeBiasGrad)
         bwdWeightPrimitiveDesc = convolution_backward_weights::primitive_desc(
             dnnlEngineBwd,
             algorithm::convolution_direct,
@@ -459,7 +452,7 @@ std::pair<Tensor, Tensor> OneDnnAutogradExtension::conv2dBackwardFilterBias(
             conv2DData.paddingDims,
             conv2DData.fwdPrimDesc
         );
-    } else {
+    else
         bwdWeightPrimitiveDesc = convolution_backward_weights::primitive_desc(
             dnnlEngineBwd,
             algorithm::convolution_direct,
@@ -472,7 +465,6 @@ std::pair<Tensor, Tensor> OneDnnAutogradExtension::conv2dBackwardFilterBias(
             conv2DData.paddingDims,
             conv2DData.fwdPrimDesc
         );
-    }
     // Weight backward primitive descriptor
     auto bwdWeights =
         std::make_shared<convolution_backward_weights>(bwdWeightPrimitiveDesc);
@@ -506,9 +498,8 @@ std::pair<Tensor, Tensor> OneDnnAutogradExtension::conv2dBackwardFilterBias(
     );
     // Don't reorder the grads until after the conv bwd
     auto gradWeightsMemory = gradWeightsMemInit.getMemory();
-    if(gradWeightsMemInit.getMemory().get_desc() != gradWeightsDesc) {
+    if(gradWeightsMemInit.getMemory().get_desc() != gradWeightsDesc)
         gradWeightsMemory = memory(gradWeightsDesc, dnnlEngineBwd);
-    }
 
     // Create the convolution backward weight
     std::unordered_map<int, dnnl::memory> bwdConvWeightsArgs = {

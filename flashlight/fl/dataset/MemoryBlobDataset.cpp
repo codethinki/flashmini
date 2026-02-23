@@ -21,9 +21,8 @@ int64_t MemoryBlobDataset::writeData(
     int64_t size
 ) const {
     std::lock_guard<std::mutex> lock(writeMutex_);
-    if(offset + size > data_.size()) {
+    if(offset + size > data_.size())
         data_.resize(offset + size);
-    }
     std::memcpy(data_.data() + offset, data, size);
     return size;
 }

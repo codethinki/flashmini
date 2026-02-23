@@ -26,13 +26,10 @@ TEST(TensorBLASTest, matmul) {
 
             auto out = fl::full({M, K}, 0.);
 
-            for(unsigned i = 0; i < M; ++i) {
-                for(unsigned j = 0; j < K; ++j) {
-                    for(unsigned k = 0; k < N; ++k) {
+            for(unsigned i = 0; i < M; ++i)
+                for(unsigned j = 0; j < K; ++j)
+                    for(unsigned k = 0; k < N; ++k)
                         out(i, j) += lhs(i, k) * rhs(k, j);
-                    }
-                }
-            }
             return out;
         };
 

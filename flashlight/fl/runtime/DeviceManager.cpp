@@ -48,11 +48,10 @@ void DeviceManager::enforceDeviceTypeAvailable(
     std::string_view errorPrefix,
     const DeviceType type
 ) const {
-    if(!isDeviceTypeAvailable(type)) {
+    if(!isDeviceTypeAvailable(type))
         throw std::runtime_error(
             std::string(errorPrefix) + " device type unavailable"
         );
-    }
 }
 
 DeviceManager& DeviceManager::getInstance() {
@@ -74,9 +73,8 @@ std::vector<Device*> DeviceManager::getDevicesOfType(
 ) {
     enforceDeviceTypeAvailable("[DeviceManager::getDevicesOfType]", type);
     std::vector<Device*> devices;
-    for(auto&[_, device] : deviceTypeToInfo_.at(type)) {
+    for(auto&[_, device] : deviceTypeToInfo_.at(type))
         devices.push_back(device.get());
-    }
     return devices;
 }
 
@@ -85,20 +83,18 @@ std::vector<const Device*> DeviceManager::getDevicesOfType(
 ) const {
     enforceDeviceTypeAvailable("[DeviceManager::getDevicesOfType]", type);
     std::vector<const Device*> devices;
-    for(auto&[_, device] : deviceTypeToInfo_.at(type)) {
+    for(auto&[_, device] : deviceTypeToInfo_.at(type))
         devices.push_back(device.get());
-    }
     return devices;
 }
 
 Device& DeviceManager::getDevice(const DeviceType type, int id) const {
     enforceDeviceTypeAvailable("[DeviceManager::getActiveDevice]", type);
     auto& idToDevice = deviceTypeToInfo_.at(type);
-    if(!idToDevice.contains(id)) {
+    if(!idToDevice.contains(id))
         throw std::runtime_error(
             "[DeviceManager::getDevice] unknown device id"
         );
-    }
     return *idToDevice.at(id);
 }
 

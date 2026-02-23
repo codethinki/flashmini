@@ -36,9 +36,8 @@ TEST_F(DynamicBenchmark, OptionsStateBasic) {
 
     ASSERT_FALSE(options->timingsComplete());
     ASSERT_EQ(options->currentOption(), 1);
-    for(size_t i = 0; i < maxCount * ops.size(); ++i) {
+    for(size_t i = 0; i < maxCount * ops.size(); ++i)
         options->accumulateTimeToCurrentOption(1);
-    }
     ASSERT_TRUE(options->timingsComplete());
     ASSERT_EQ(options->currentOption(), 1); // best idx should never have changed
 }
@@ -64,9 +63,9 @@ TEST_F(DynamicBenchmark, OptionsStateTimed) {
 
     for(size_t i = 0; i < maxCount * ops.size(); ++i) {
         // option 4 is faster
-        if(options->currentOption() == 4) {
+        if(options->currentOption() == 4)
             options->accumulateTimeToCurrentOption(1);
-        } else {
+        else {
             options->accumulateTimeToCurrentOption(
                 10 * (i + 1), /* incrementCount = */
                 false

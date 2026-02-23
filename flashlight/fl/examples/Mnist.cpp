@@ -84,9 +84,8 @@ std::pair<Tensor, Tensor> load_dataset(
 
 int main(int argc, char** argv) {
     fl::init();
-    if(argc != 2) {
+    if(argc != 2)
         throw std::runtime_error("You must pass a data directory.");
-    }
     fl::setSeed(1);
     std::string data_dir = argv[1];
 
@@ -225,17 +224,15 @@ Tensor load_data(
     const std::vector<long long int>& dims
 ) {
     std::ifstream file(im_file, std::ios::binary);
-    if(!file.is_open()) {
+    if(!file.is_open())
         throw std::runtime_error("[mnist:load_data] Can't find MNIST file.");
-    }
     read_int(file); // unused magic
     size_t elems = 1;
     for(auto d : dims) {
         int read_d = read_int(file);
         elems *= read_d;
-        if(read_d != d) {
+        if(read_d != d)
             throw std::runtime_error("[mnist:load_data] Unexpected MNIST dimension.");
-        }
     }
 
     std::vector<T> data;

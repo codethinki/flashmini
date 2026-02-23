@@ -60,13 +60,12 @@ SinusoidalPositionEmbedding& SinusoidalPositionEmbedding::operator=(
 std::vector<Variable> SinusoidalPositionEmbedding::forward(
     const std::vector<Variable>& input
 ) {
-    if(input[0].dim(0) != layerDim_) {
+    if(input[0].dim(0) != layerDim_)
         throw std::invalid_argument(
             "Input dimenstion " + std::to_string(input[0].dim(0))
             + " and Embedding dimension " + std::to_string(layerDim_)
             + " are different."
         );
-    }
     // Retrieve the number of tokens (positions) and the numeric type (floating
     // point precision).
     const int nPositions = input[0].dim(1);

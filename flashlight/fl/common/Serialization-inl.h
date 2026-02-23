@@ -61,9 +61,8 @@ namespace detail {
 // 1 argument, version-restricted.
     template<typename Archive, typename T>
     void applyArchive(Archive& ar, const uint32_t version, Versioned<T> varg) {
-        if(version >= varg.minVersion && version <= varg.maxVersion) {
+        if(version >= varg.minVersion && version <= varg.maxVersion)
             applyArchive(ar, version, std::forward<T>(varg.ref));
-        }
     }
 
 // 1 argument, with conversion, saving.
@@ -73,11 +72,10 @@ namespace detail {
         typename T,
         std::enable_if_t<IsOutputArchive<Archive>::value, int> = 0>
     void applyArchive(Archive& ar, const uint32_t version, SerializeAs<S, T> arg) {
-        if(arg.saveConverter) {
+        if(arg.saveConverter)
             applyArchive(ar, version, arg.saveConverter(arg.ref));
-        } else {
+        else
             applyArchive(ar, version, static_cast<const S&>(arg.ref));
-        }
     }
 
 // 1 argument, with conversion, loading.
@@ -90,11 +88,10 @@ namespace detail {
         using T0 = std::remove_reference_t<T>;
         S s;
         applyArchive(ar, version, s);
-        if(arg.loadConverter) {
+        if(arg.loadConverter)
             arg.ref = arg.loadConverter(std::move(s));
-        } else {
+        else
             arg.ref = static_cast<T0>(std::move(s));
-        }
     }
 
 // 2+ arguments (recurse).
@@ -206,11 +203,10 @@ void save(
 ) {
     const auto& tensor = tensor_.val;
     // TODO{fl::Tensor}{sparse} figure out what to do here...
-    if(tensor.isSparse()) {
+    if(tensor.isSparse())
         throw cereal::Exception(
             "Serialzation of sparse Tensor is not supported yet!"
         );
-    }
     std::vector<uint8_t> vec(tensor.bytes());
     tensor.host(vec.data());
     ar(tensor.shape(), tensor.type(), vec);

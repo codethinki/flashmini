@@ -29,15 +29,14 @@ Mfsc::Mfsc(const FeatureParams& params) : PowerSpectrum(params),
 
 std::vector<float> Mfsc::apply(const std::vector<float>& input) {
     auto frames = frameSignal(input, this->featParams_);
-    if(frames.empty()) {
+    if(frames.empty())
         return {};
-    }
 
     int nSamples = this->featParams_.numFrameSizeSamples();
     int nFrames = frames.size() / nSamples;
 
     std::vector<float> energy(nFrames);
-    if(this->featParams_.useEnergy && this->featParams_.rawEnergy) {
+    if(this->featParams_.useEnergy && this->featParams_.rawEnergy)
         for(size_t f = 0; f < nFrames; ++f) {
             auto begin = frames.data() + f * nSamples;
             energy[f] = std::log(
@@ -52,11 +51,10 @@ std::vector<float> Mfsc::apply(const std::vector<float>& input) {
                 )
             );
         }
-    }
     auto mfscFeat = mfscImpl(frames);
     auto numFeat = this->featParams_.numFilterbankChans;
     if(this->featParams_.useEnergy) {
-        if(!this->featParams_.rawEnergy) {
+        if(!this->featParams_.rawEnergy)
             for(size_t f = 0; f < nFrames; ++f) {
                 auto begin = frames.data() + f * nSamples;
                 energy[f] = std::log(
@@ -71,7 +69,6 @@ std::vector<float> Mfsc::apply(const std::vector<float>& input) {
                     )
                 );
             }
-        }
         std::vector<float> newMfscFeat(mfscFeat.size() + nFrames);
         for(size_t f = 0; f < nFrames; ++f) {
             size_t start = f * numFeat;
@@ -91,13 +88,12 @@ std::vector<float> Mfsc::apply(const std::vector<float>& input) {
 
 std::vector<float> Mfsc::mfscImpl(std::vector<float>& frames) {
     auto powspectrum = this->powSpectrumImpl(frames);
-    if(this->featParams_.usePower) {
+    if(this->featParams_.usePower)
         std::transform(
             powspectrum.begin(),
             powspectrum.end(),
             powspectrum.begin(),
             [](float x) { return x * x; });
-    }
     auto triflt = triFltBank_.apply(powspectrum, this->featParams_.melFloor);
     std::transform(
         triflt.begin(),
@@ -116,10 +112,9 @@ int Mfsc::outputSize(int inputSz) {
 
 void Mfsc::validateMfscParams() const {
     this->validatePowSpecParams();
-    if(this->featParams_.numFilterbankChans <= 0) {
+    if(this->featParams_.numFilterbankChans <= 0)
         throw std::invalid_argument("Mfsc: numFilterbankChans must be positive");
-    } else if(this->featParams_.melFloor <= 0.0) {
+    else if(this->featParams_.melFloor <= 0.0)
         throw std::invalid_argument("Mfsc: melfloor must be positive");
-    }
 }
 } // namespace fl

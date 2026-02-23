@@ -22,8 +22,7 @@ std::vector<float> Dither::apply(const std::vector<float>& input) {
 
 void Dither::applyInPlace(std::vector<float>& input) {
     std::uniform_real_distribution<float> distribution(0.0, 1.0);
-    for(auto& i : input) {
+    for(auto& i : input)
         i += ditherVal_ * distribution(rng_);
-    }
 }
 } // namespace fl

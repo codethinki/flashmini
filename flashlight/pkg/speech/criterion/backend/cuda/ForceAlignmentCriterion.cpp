@@ -31,14 +31,12 @@ static void backward(
     const Tensor& targetSize,
     Tensor& workspace
 ) {
-    if(gradVar.type() != fl::dtype::f32) {
+    if(gradVar.type() != fl::dtype::f32)
         throw std::invalid_argument("FAC: grad must be float32");
-    }
-    if(inputs.size() != 2) {
+    if(inputs.size() != 2)
         throw std::invalid_argument(
             "ForceAlignmentCriterion backward expects two input args"
         );
-    }
 
     const auto& grad = gradVar.tensor();
     Tensor inputGrad({N, T, B}, fl::dtype::f32);
@@ -80,13 +78,12 @@ Variable ForceAlignmentCriterion::forward(
     int N = inputVar.dim(0);
     int L = targetVar.dim(0);
 
-    if(N != transVar.dim(0)) {
+    if(N != transVar.dim(0))
         throw std::invalid_argument("FAC: input dim doesn't match N");
-    } else if(inputVar.type() != fl::dtype::f32) {
+    else if(inputVar.type() != fl::dtype::f32)
         throw std::invalid_argument("FAC: input must be float32");
-    } else if(targetVar.type() != fl::dtype::s32) {
+    else if(targetVar.type() != fl::dtype::s32)
         throw std::invalid_argument("FAC: target must be int32");
-    }
 
     const auto& input = inputVar.tensor();
     const auto& target = targetVar.tensor();
@@ -134,12 +131,11 @@ Tensor ForceAlignmentCriterion::viterbiPath(
     const Tensor& input,
     const Tensor& target
 ) {
-    if(input.ndim() != 3) {
+    if(input.ndim() != 3)
         throw std::invalid_argument(
             "ForceAlignmentCriterion::viterbiPath: "
             "expects input with dimensions {N, T, B}"
         );
-    }
     int N = input.dim(0);
     int T = input.dim(1);
     int B = input.dim(2);
@@ -148,13 +144,12 @@ Tensor ForceAlignmentCriterion::viterbiPath(
     std::vector<std::vector<int>> bestPaths;
     const auto& transVar = param(0);
 
-    if(N != transVar.dim(0)) {
+    if(N != transVar.dim(0))
         throw std::invalid_argument("FAC: input dim doesn't match N:");
-    } else if(input.type() != fl::dtype::f32) {
+    else if(input.type() != fl::dtype::f32)
         throw std::invalid_argument("FAC: input must be float32");
-    } else if(target.type() != fl::dtype::s32) {
+    else if(target.type() != fl::dtype::s32)
         throw std::invalid_argument("FAC: target must be int32");
-    }
 
     const auto& targetSize = getTargetSizeArray(target, T);
     const auto& trans = transVar.tensor();

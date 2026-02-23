@@ -19,11 +19,10 @@ using namespace fl;
 static std::function<int(void)> makeSucceedsAfterIters(int iters) {
     auto state = std::make_shared<int>(0);
     return [state, iters]() {
-               if(++*state >= iters) {
+               if(++*state >= iters)
                    return 42;
-               } else {
+               else
                    throw std::runtime_error("bleh");
-               }
     };
 }
 
@@ -32,14 +31,12 @@ static std::function<int(void)> makeSucceedsAfterMs(double ms) {
     auto state = std::make_shared<time_point<steady_clock>>();
     return [state, ms]() {
                auto now = steady_clock::now();
-               if(state->time_since_epoch().count() == 0) {
+               if(state->time_since_epoch().count() == 0)
                    *state = now;
-               }
-               if(now - *state >= duration<double, std::milli>(ms)) {
+               if(now - *state >= duration<double, std::milli>(ms))
                    return 42;
-               } else {
+               else
                    throw std::runtime_error("bleh");
-               }
     };
 }
 
@@ -90,15 +87,12 @@ TEST(SystemTest, RetryWithBackoff) {
     invalids.push_back(retryAsync(ms50, 2.0, 0, alwaysSucceeds));
     invalids.push_back(retryAsync(ms50, 2.0, -1, alwaysSucceeds));
 
-    for(auto& fut : goods) {
+    for(auto& fut : goods)
         ASSERT_EQ(fut.get(), 42);
-    }
-    for(auto& fut : bads) {
+    for(auto& fut : bads)
         ASSERT_THROW(fut.get(), std::runtime_error);
-    }
-    for(auto& fut : invalids) {
+    for(auto& fut : invalids)
         ASSERT_THROW(fut.get(), std::invalid_argument);
-    }
 
     // check special case promise<void> / future<void>
     auto alwaysSucceedsVoid = []() -> void {};

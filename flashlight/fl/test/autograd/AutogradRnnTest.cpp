@@ -184,48 +184,42 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
 }
 
 TEST(AutogradRnnTest, Rnn) {
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "RNN gradient computation not yet supported on CPU";
-    }
 
     testRnnImpl(RnnMode::TANH);
 }
 
 TEST(AutogradRnnTest, Lstm) {
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "RNN LSTM graident computation not yet supported on CPU";
-    }
 
     testRnnImpl(RnnMode::LSTM);
 }
 
 TEST(AutogradRnnTest, Gru) {
-    if(FL_BACKEND_CPU) {
+    if(FL_BACKEND_CPU)
         GTEST_SKIP() << "RNN GRU graident computation not yet supported on CPU";
-    }
     testRnnImpl(RnnMode::GRU);
 }
 
 TEST_F(AutogradTestF16, RnnF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     testRnnImpl(RnnMode::TANH, fl::dtype::f16);
 }
 
 TEST_F(AutogradTestF16, LstmF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     testRnnImpl(RnnMode::LSTM, fl::dtype::f16);
 }
 
 TEST_F(AutogradTestF16, GruF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     testRnnImpl(RnnMode::GRU, fl::dtype::f16);
 }

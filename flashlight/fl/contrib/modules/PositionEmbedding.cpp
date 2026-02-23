@@ -42,21 +42,19 @@ PositionEmbedding& PositionEmbedding::operator=(
 std::vector<Variable> PositionEmbedding::forward(
     const std::vector<Variable>& input
 ) {
-    if(input[0].ndim() != 3) {
+    if(input[0].ndim() != 3)
         throw std::invalid_argument(
             "PositionEmbedding::forward - expect a tensor with "
             "3 dimensions - C x T x B"
         );
-    }
 
     int n = input[0].dim(1);
     Variable posEmb = tileAs(
         params_[0].astype(input[0].type())(fl::span, fl::range(0, n)), input[0]);
-        if(dropout_ > 0.0 && train_) {
+        if(dropout_ > 0.0 && train_)
             return {input[0] + dropout(posEmb, dropout_)};
-        } else {
+        else
             return {input[0] + posEmb};
-        }
 }
 
 std::vector<Variable> PositionEmbedding::operator()(

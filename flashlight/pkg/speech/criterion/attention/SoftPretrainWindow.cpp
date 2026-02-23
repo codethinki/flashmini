@@ -25,13 +25,12 @@ Variable SoftPretrainWindow::compute(
 ) const {
     int decoderStepsDim = decoderSteps.dim(0);
     auto ts = fl::arange({decoderStepsDim, inputSteps, batchSize}, 1);
-    if(inputSizes.isEmpty() && targetSizes.isEmpty()) {
+    if(inputSizes.isEmpty() && targetSizes.isEmpty())
         return Variable(
             -fl::power(ts - inputSteps / targetLen * decoderSteps, 2)
             / (2 * std_ * std_),
             false
         );
-    }
 
     Tensor inputNotPaddedSize = computeInputNotPaddedSize(
         inputSizes,

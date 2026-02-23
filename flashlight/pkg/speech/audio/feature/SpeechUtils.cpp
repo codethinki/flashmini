@@ -32,11 +32,9 @@ std::vector<float> frameSignal(
     // not range -1..1, hence scale up here to match (approx)
     float scale = 32768.0;
     std::vector<float> frames(numframes * frameSize);
-    for(size_t f = 0; f < numframes; ++f) {
-        for(size_t i = 0; i < frameSize; ++i) {
+    for(size_t f = 0; f < numframes; ++f)
+        for(size_t i = 0; i < frameSize; ++i)
             frames[f * frameSize + i] = scale * input[f * frameStride + i];
-        }
-    }
     return frames;
 }
 
@@ -49,9 +47,8 @@ std::vector<float> cblasGemm(
     if(
         n <= 0 || k <= 0 || matA.empty() || (matA.size() % k != 0)
         || (matB.size() != n * k)
-    ) {
+    )
         throw std::invalid_argument("cblasGemm: invalid arguments");
-    }
 
     int m = matA.size() / k;
 

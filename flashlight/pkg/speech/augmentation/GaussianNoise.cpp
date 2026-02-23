@@ -34,16 +34,14 @@ GaussianNoise::GaussianNoise(
     rng_(seed) {}
 
 void GaussianNoise::apply(std::vector<float>& signal) {
-    if(rng_.random() >= conf_.proba_) {
+    if(rng_.random() >= conf_.proba_)
         return;
-    }
     const float signalRms = rootMeanSquare(signal);
     const float snr = rng_.uniform(conf_.minSnr_, conf_.maxSnr_);
     const float noiseMult = signalRms / std::pow(10, snr / 20.0);
 
-    for(int i = 0; i < signal.size(); ++i) {
+    for(int i = 0; i < signal.size(); ++i)
         signal[i] += rng_.gaussian(0, noiseMult);
-    }
 }
 
 } // namespace fl

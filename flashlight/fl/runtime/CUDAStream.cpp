@@ -65,13 +65,11 @@ std::shared_ptr<CUDAStream> CUDAStream::wrapUnmanaged(
         manager.getDevice(DeviceType::CUDA, deviceId).impl<CUDADevice>();
     // satisfies assumptions of makeSharedAndRegister
     bool needDeviceSwitch = &oldActiveDevice != &device;
-    if(needDeviceSwitch) {
+    if(needDeviceSwitch)
         device.setActive();
-    }
     auto streamPtr = makeSharedAndRegister(device, stream, /* managed */ false);
-    if(needDeviceSwitch) {
+    if(needDeviceSwitch)
         oldActiveDevice.setActive();
-    }
     return streamPtr;
 }
 
@@ -111,9 +109,8 @@ void CUDAStream::relativeSync(const CUDAStream& waitOn) const {
     auto& manager = DeviceManager::getInstance();
     auto* oldActiveCUDADevice = &manager.getActiveDevice(DeviceType::CUDA);
     bool needDeviceSwitch = oldActiveCUDADevice != &device_;
-    if(needDeviceSwitch) {
+    if(needDeviceSwitch)
         device_.setActive();
-    }
     // event and stream from same instance are guaranteed to have been created
     // from the same device
     FL_CUDA_CHECK(cudaEventRecord(waitOn.event_, waitOn.nativeStream_));
@@ -124,9 +121,8 @@ void CUDAStream::relativeSync(const CUDAStream& waitOn) const {
             0
         )
     );
-    if(needDeviceSwitch) {
+    if(needDeviceSwitch)
         oldActiveCUDADevice->setActive();
-    }
 }
 
 cudaStream_t CUDAStream::handle() const {

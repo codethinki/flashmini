@@ -35,9 +35,8 @@ struct CTASegReduce {
         for(int i = 0; i < VT; ++i) {
             int index = VT * tid + 1 + i;
             T next = keys[index];
-            if(index == count || (index < count && key != next)) {
+            if(index == count || (index < count && key != next))
                 endFlags |= 1 << i;
-            }
             key = next;
         }
 
@@ -52,14 +51,13 @@ struct CTASegReduce {
         // use indices as scratch space
         int outputPos = scan;
 #pragma unroll
-        for(int i = 0; i < VT; ++i) {
+        for(int i = 0; i < VT; ++i)
 
             if((endFlags >> i) & 1) {
                 shared.indices[outputPos] = keys[VT * tid + i];
                 scanout[outputPos] = VT * tid + i;
                 outputPos++;
             }
-        }
 
         __syncthreads();
 
@@ -73,9 +71,8 @@ struct CTASegReduce {
 
         // copy from the scratch space back into the keys
 #pragma unroll
-        for(int i = 0; i < VT; ++i) {
+        for(int i = 0; i < VT; ++i)
             keys[i * NT + tid] = shared.indices[i * NT + tid];
-        }
 
         __syncthreads();
     }
@@ -119,9 +116,8 @@ void compute_alpha_kernel(
     const int NV = NT * VT;
     __shared__ int label[NV];
 
-    if((L + repeats) > T) {
+    if((L + repeats) > T)
         return;
-    }
 
     // Generate labels with blanks from labels without blanks
     {
@@ -131,9 +127,8 @@ void compute_alpha_kernel(
             labels_with_blanks[offset] = blank_label;
             labels_with_blanks[offset + 1] = labels_without_blanks[label_start_offset + idx];
         }
-        if(tid == 0) {
+        if(tid == 0)
             labels_with_blanks[(blockIdx.x * S_memoffset) + 2 * L] = blank_label;
-        }
     }
     __syncthreads();
 
@@ -144,15 +139,13 @@ void compute_alpha_kernel(
     // Set the first row of alpha neg_inf - it is much more efficient to do it
     // here than outside
 #pragma unroll
-    for(int idx = tid; idx < min(S, NV); idx += blockDim.x) {
+    for(int idx = tid; idx < min(S, NV); idx += blockDim.x)
         alpha[idx] = ctc_helper::neg_inf<ProbT>();
-    }
 
     // Load labels into shared memory
 #pragma unroll
-    for(int i = tid; i < S; i += NT) {
+    for(int i = tid; i < S; i += NT)
         label[i] = label_global[i];
-    }
 
     __syncthreads();
 
@@ -160,9 +153,8 @@ void compute_alpha_kernel(
     int end = S > 1 ? 2 : 1;
 
     // Initialize the first row corresponding to t=0;
-    for(int i = tid; i < (end - start); i += blockDim.x) {
+    for(int i = tid; i < (end - start); i += blockDim.x)
         alpha[i + start] = probs[prob_offset + label[i + start]];
-    }
 
     __syncthreads();
 
@@ -179,12 +171,11 @@ void compute_alpha_kernel(
 
         // This is the first column and in this case there is nothing left of it
         if(tid == 0) {
-            if(start == 0) {
+            if(start == 0)
                 alpha[start_cur_row] = alpha[start_prev_row]
                     + probs[prob_offset + start_prob_col + blank_label];
-            } else if(start == 1) {
+            else if(start == 1)
                 alpha[start_cur_row] = alpha[start_prev_row];
-            }
         }
 
         __syncthreads();
@@ -202,9 +193,8 @@ void compute_alpha_kernel(
             if(
                 (label[idx] != blank_label)
                 && (idx != 1) && (label[idx] != label[idx - 2])
-            ) {
+            )
                 prev_sum = log_plus_f(prev_sum, alpha[(idx - 2) + start_prev_row]);
-            }
 
             alpha[idx + start_cur_row] =
                 prev_sum + probs[prob_offset + start_prob_col + label[idx]];
@@ -223,9 +213,8 @@ void compute_alpha_kernel(
         start = (val * (L != 0) + start);
         end = (val * (L != 0) + end);
 
-        for(int i = start; i < end; ++i) {
+        for(int i = start; i < end; ++i)
             loglike = log_plus_f(loglike, alpha[i + (T - 1) * S]);
-        }
 
         nll_forward[blockIdx.x] = -loglike;
     }
@@ -287,18 +276,16 @@ void compute_betas_and_grad_kernel(
 
     ProbT beta_val[VT];
 
-    if((L + repeats) > T) {
+    if((L + repeats) > T)
         return;
-    }
 
     int start = S > 1 ? (S - 2) : 0;
     int end = (L + repeats < T) ? S : S - 1;
 
     // Setup shared memory buffers
 #pragma unroll
-    for(int idx = tid; idx < NV; idx += NT) {
+    for(int idx = tid; idx < NV; idx += NT)
         label[idx] = (idx < S) ? label_global[idx] : INT_MAX;
-    }
 
     __syncthreads();
 
@@ -356,24 +343,21 @@ void compute_betas_and_grad_kernel(
 
     // Load labels back
 #pragma unroll
-    for(int idx = tid; idx < NV; idx += NT) {
+    for(int idx = tid; idx < NV; idx += NT)
         temp_buffer.beta[idx] = ctc_helper::neg_inf<ProbT>();
-    }
     __syncthreads();
 
     // Initialize the two rightmost values in the last row (assuming L non-zero)
-    for(int i = tid; i < (end - start); i += blockDim.x) {
+    for(int i = tid; i < (end - start); i += blockDim.x)
         temp_buffer.beta[i + start] =
             probs[prob_offset + (T - 1) * (out_dim * stride) + label[i + start]];
-    }
 
     __syncthreads();
 
     // Load output data in registers through the transpose trick - should really be a function
 #pragma unroll
-    for(int idx = tid; idx < S; idx += NT) {
+    for(int idx = tid; idx < S; idx += NT)
         output[idx] = alpha[idx + (T - 1) * S] + temp_buffer.beta[idx];
-    }
 
     __syncthreads();
 
@@ -399,9 +383,8 @@ void compute_betas_and_grad_kernel(
                 if(
                     (label[idx] != blank_label)
                     && (idx != (S - 2)) && (label[idx] != label[idx + 2])
-                ) {
+                )
                     next_sum = log_plus_f(next_sum, temp_buffer.beta[idx + 2]);
-                }
 
                 beta_val[i] = next_sum + probs[prob_offset + start_prob_col + label[idx]];
             }
@@ -410,24 +393,21 @@ void compute_betas_and_grad_kernel(
 
             // Initialize values for the rightmost column since there is nothing to the right
             // Update input buffer for next iteration
-            if((tid == 0) && (end == S)) {
+            if((tid == 0) && (end == S))
                 temp_buffer.beta[(S - 1)] = temp_buffer.beta[(S - 1)]
                     + probs[prob_offset + start_prob_col + blank_label];
-            }
 
 #pragma unroll
-            for(int idx = tid, i = 0; idx < (S - 1); idx += NT, i++) {
+            for(int idx = tid, i = 0; idx < (S - 1); idx += NT, i++)
                 temp_buffer.beta[idx] = beta_val[i];
-            }
 
             __syncthreads();
 
             // Beta Computation done - add to alpha and update the gradient. Reload
             // the gradient back for segmented reduce later on
 #pragma unroll
-            for(int idx = tid; idx < S; idx += NT) {
+            for(int idx = tid; idx < S; idx += NT)
                 output[idx] = alpha[idx + start_cur_row] + temp_buffer.beta[idx];
-            }
 
             __syncthreads();
 
@@ -443,16 +423,14 @@ void compute_betas_and_grad_kernel(
             for(int idx = tid, j = 0; idx < uniquelabels; idx += blockDim.x, ++j) {
 
                 accum[j] = ctc_helper::neg_inf<ProbT>();
-                for(int i = seg_start[j]; i <= seg_end[j]; ++i) {
+                for(int i = seg_start[j]; i <= seg_end[j]; ++i)
                     accum[j] = log_plus_f(accum[j], output[gather_indices[i]]);
-                }
             }
             __syncthreads();
 
             // Write accumulated value into output since that is not used
-            for(int idx = tid, j = 0; idx < uniquelabels; idx += blockDim.x, ++j) {
+            for(int idx = tid, j = 0; idx < uniquelabels; idx += blockDim.x, ++j)
                 output[idx] = accum[j];
-            }
             __syncthreads();
 
             for(int idx = tid; idx < out_dim; idx += blockDim.x) {
@@ -470,10 +448,9 @@ void compute_betas_and_grad_kernel(
                 if(
                     (grad == 0.0) || (exp(probs[grads_offset]) == 0.0)
                     || (grad == ctc_helper::neg_inf<ProbT>())
-                ) {} else {
+                ) {} else
                     grads[grads_offset] = exp(probs[grads_offset])
                         - exp(grad - probs[grads_offset] - log_partition);
-                }
             }
 
             __syncthreads();
@@ -489,9 +466,8 @@ void compute_betas_and_grad_kernel(
             end = (-val * (L != 0) + end);
 
             // Sum and return the leftmost one/two value(s) in first row
-            for(int i = start; i < end; ++i) {
+            for(int i = start; i < end; ++i)
                 loglike = log_plus_f(loglike, temp_buffer.beta[i]);
-            }
 
             nll_backward[blockIdx.x] = -loglike;
         }

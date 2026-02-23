@@ -28,9 +28,8 @@ TimeStretch::TimeStretch(
 }
 
 void TimeStretch::apply(std::vector<float>& signal) {
-    if(rng_.random() >= conf_.proba_) {
+    if(rng_.random() >= conf_.proba_)
         return;
-    }
     const float factor = rng_.uniform(conf_.minFactor_, conf_.maxFactor_);
     sox_effect_t* e = sox_create_effect(stretchEffect_);
     std::string _factor = std::to_string(factor);

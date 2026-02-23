@@ -22,9 +22,8 @@ void MSEMeter::reset() {
 }
 
 void MSEMeter::add(const Tensor& output, const Tensor& target) {
-    if(output.ndim() != target.ndim()) {
+    if(output.ndim() != target.ndim())
         throw std::invalid_argument("dimension mismatch in MSEMeter");
-    }
     ++curN_;
     curValue_ =
         (curValue_ * (curN_ - 1)

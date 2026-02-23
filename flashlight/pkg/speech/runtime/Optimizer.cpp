@@ -18,11 +18,10 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
     double momentum,
     double weightdecay
 ) {
-    if(nets.empty()) {
+    if(nets.empty())
         throw std::invalid_argument(
             "[InitOptimizer]: No network for initializing the optimizer"
         );
-    }
 
     std::vector<fl::Variable> params;
     for(const auto& n : nets) {
@@ -31,9 +30,9 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
     }
 
     std::shared_ptr<fl::FirstOrderOptimizer> opt;
-    if(optimizer == kSGDOptimizer) {
+    if(optimizer == kSGDOptimizer)
         opt = std::make_shared<fl::SGDOptimizer>(params, lr, momentum, weightdecay);
-    } else if(optimizer == kAdamOptimizer) {
+    else if(optimizer == kAdamOptimizer)
         opt = std::make_shared<fl::AdamOptimizer>(
             params,
             lr,
@@ -42,7 +41,7 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
             FLAGS_optimepsilon,
             weightdecay
         );
-    } else if(optimizer == kRMSPropOptimizer) {
+    else if(optimizer == kRMSPropOptimizer)
         opt = std::make_shared<fl::RMSPropOptimizer>(
             params,
             lr,
@@ -50,7 +49,7 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
             FLAGS_optimepsilon,
             weightdecay
         );
-    } else if(optimizer == kAdadeltaOptimizer) {
+    else if(optimizer == kAdadeltaOptimizer)
         opt = std::make_shared<fl::AdadeltaOptimizer>(
             params,
             lr,
@@ -58,10 +57,10 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
             FLAGS_optimepsilon,
             weightdecay
         );
-    } else if(optimizer == kAdagradOptimizer) {
+    else if(optimizer == kAdagradOptimizer)
         opt =
             std::make_shared<fl::AdagradOptimizer>(params, lr, FLAGS_optimepsilon);
-    } else if(optimizer == kAMSgradOptimizer) {
+    else if(optimizer == kAMSgradOptimizer)
         opt = std::make_shared<fl::AMSgradOptimizer>(
             params,
             lr,
@@ -71,7 +70,7 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
             weightdecay
         );
 
-    } else if(optimizer == kNovogradOptimizer) {
+    else if(optimizer == kNovogradOptimizer)
         opt = std::make_shared<fl::NovogradOptimizer>(
             params,
             lr,
@@ -80,9 +79,8 @@ std::shared_ptr<fl::FirstOrderOptimizer> initOptimizer(
             FLAGS_optimepsilon,
             weightdecay
         );
-    } else {
+    else
         LOG(FATAL) << "Optimizer option " << optimizer << " not implemented";
-    }
 
     return opt;
 }

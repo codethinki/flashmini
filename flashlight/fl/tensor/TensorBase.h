@@ -547,9 +547,8 @@ public:
      */
     template<typename T>
     std::vector<T> toHostVector() const {
-        if(isEmpty()) {
+        if(isEmpty())
             return std::vector<T>();
-        }
         std::vector<T> vec(this->elements());
         host(vec.data());
         return vec;
@@ -1738,16 +1737,15 @@ FL_API std::ostream& operator<<(std::ostream& os, const TensorBackendType type);
 template<typename T>
 Tensor to(Tensor&& t) {
     // Fast path -- types are the same
-    if(T::tensorBackendType == t.backendType()) {
+    if(T::tensorBackendType == t.backendType())
         return std::move(t);
-    }
 
-    if(t.isSparse()) {
+    if(t.isSparse())
         throw std::invalid_argument(
             "Tensor type conversion between sparse "
             "tensors not yet supported."
         );
-    } else {
+    else
         // TODO: dynamically fix the memory location based on the type of
         // backend/where base memory is
         return Tensor(
@@ -1758,7 +1756,6 @@ Tensor to(Tensor&& t) {
                 MemoryLocation::Device
             )
         );
-    }
 }
 
 /** @} */

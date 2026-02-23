@@ -26,11 +26,10 @@ int main(int argc, const char** argv) {
 
     int optim_mode = 0;
     std::string optimizer_arg = std::string(argv[1]);
-    if(optimizer_arg == "--adam") {
+    if(optimizer_arg == "--adam")
         optim_mode = 1;
-    } else if(optimizer_arg == "--rmsprop") {
+    else if(optimizer_arg == "--rmsprop")
         optim_mode = 2;
-    }
 
     const int inputSize = 2;
     const int outputSize = 1;
@@ -61,13 +60,12 @@ int main(int argc, const char** argv) {
 
     std::unique_ptr<FirstOrderOptimizer> optim;
 
-    if(optimizer_arg == "--rmsprop") {
+    if(optimizer_arg == "--rmsprop")
         optim = std::make_unique<RMSPropOptimizer>(model.params(), lr);
-    } else if(optimizer_arg == "--adam") {
+    else if(optimizer_arg == "--adam")
         optim = std::make_unique<AdamOptimizer>(model.params(), lr);
-    } else {
+    else
         optim = std::make_unique<SGDOptimizer>(model.params(), lr, mu);
-    }
 
     Variable result, l;
     for(int i = 0; i < 1000; i++) {

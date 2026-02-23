@@ -58,11 +58,10 @@ namespace pkg {
             ) {
                 try {
                     std::ofstream file(filepath, std::ios::binary);
-                    if(!file.is_open()) {
+                    if(!file.is_open())
                         throw std::runtime_error(
                             "failed to open file for writing: " + filepath.string()
                         );
-                    }
                     cereal::BinaryOutputArchive ar(file);
                     ar(version);
                     ar(args...);
@@ -77,11 +76,10 @@ namespace pkg {
             static void loadImpl(const fs::path& filepath, Args&... args) {
                 try {
                     std::ifstream file(filepath, std::ios::binary);
-                    if(!file.is_open()) {
+                    if(!file.is_open())
                         throw std::runtime_error(
                             "failed to open file for reading: " + filepath.string()
                         );
-                    }
                     cereal::BinaryInputArchive ar(file);
                     ar(args...);
                 } catch(const std::exception& ex) {

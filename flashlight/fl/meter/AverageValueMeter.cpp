@@ -26,9 +26,8 @@ void AverageValueMeter::add(const double val, const double w /* = 1.0 */) {
     curWeightSum_ += w;
     curWeightSquaredSum_ += w * w;
 
-    if(curWeightSum_ == 0) {
+    if(curWeightSum_ == 0)
         return;
-    }
 
     curMean_ = curMean_ + w * (val - curMean_) / curWeightSum_;
     curMeanSquaredSum_ =
@@ -40,9 +39,8 @@ void AverageValueMeter::add(const Tensor& vals) {
     curWeightSum_ += w;
     curWeightSquaredSum_ += w;
 
-    if(curWeightSum_ == 0) {
+    if(curWeightSum_ == 0)
         return;
-    }
 
     curMean_ = curMean_
         + (fl::sum(vals).asScalar<double>() - w * curMean_) / curWeightSum_;

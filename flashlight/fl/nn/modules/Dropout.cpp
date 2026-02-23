@@ -15,11 +15,10 @@ namespace fl {
 Dropout::Dropout(double drop_ratio) : ratio_(drop_ratio) {}
 
 Variable Dropout::forward(const Variable& input) {
-    if(train_) {
+    if(train_)
         return dropout(input, ratio_);
-    } else {
+    else
         return input;
-    }
 }
 
 std::unique_ptr<Module> Dropout::clone() const {

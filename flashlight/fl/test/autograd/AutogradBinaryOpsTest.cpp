@@ -143,9 +143,8 @@ TEST(AutogradBinaryOpsTest, Linear) {
 }
 
 TEST_F(AutogradTestF16, LinearF16) {
-    if(!fl::f16Supported()) {
+    if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
-    }
 
     std::vector<int> batchsizes = {1, 5};
     const float scale = 4.0; // scale prevent grad underflow

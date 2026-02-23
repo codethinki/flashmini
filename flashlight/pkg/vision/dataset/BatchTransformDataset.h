@@ -37,12 +37,10 @@ namespace pkg {
                 batchSize_(batchsize),
                 batchPolicy_(policy),
                 batchFn_(batchFn) {
-                if(!dataset_) {
+                if(!dataset_)
                     throw std::invalid_argument("dataset to be batched is null");
-                }
-                if(batchSize_ <= 0) {
+                if(batchSize_ <= 0)
                     throw std::invalid_argument("invalid batch size");
-                }
                 preBatchSize_ = dataset_->size();
                 switch(batchPolicy_) {
                     case BatchDatasetPolicy::INCLUDE_LAST:
@@ -52,11 +50,10 @@ namespace pkg {
                         size_ = std::floor(static_cast<double>(preBatchSize_) / batchSize_);
                         break;
                     case BatchDatasetPolicy::DIVISIBLE_ONLY:
-                        if(size_ % batchSize_ != 0) {
+                        if(size_ % batchSize_ != 0)
                             throw std::invalid_argument(
                                 "dataset is not evenly divisible into batches"
                             );
-                        }
                         size_ = std::ceil(static_cast<double>(preBatchSize_) / batchSize_);
                         break;
                     default:
@@ -67,9 +64,8 @@ namespace pkg {
             ~BatchTransformDataset() {}
 
             T get(const int64_t idx) {
-                if(!(idx >= 0 && idx < size())) {
+                if(!(idx >= 0 && idx < size()))
                     throw std::out_of_range("Dataset idx out of range");
-                }
                 std::vector<std::vector<Tensor>> buffer;
 
                 int64_t start = batchSize_ * idx;
@@ -77,12 +73,10 @@ namespace pkg {
 
                 for(int64_t batchidx = start; batchidx < end; ++batchidx) {
                     auto fds = dataset_->get(batchidx);
-                    if(buffer.size() < fds.size()) {
+                    if(buffer.size() < fds.size())
                         buffer.resize(fds.size());
-                    }
-                    for(int64_t i = 0; i < fds.size(); ++i) {
+                    for(int64_t i = 0; i < fds.size(); ++i)
                         buffer[i].emplace_back(fds[i]);
-                    }
                 }
                 return batchFn_(buffer);
             }

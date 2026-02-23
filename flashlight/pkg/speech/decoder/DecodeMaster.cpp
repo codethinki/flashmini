@@ -59,44 +59,39 @@ std::pair<std::vector<int64_t>,
     fl::EditDistanceMeter wordEditDist, tokenEditDist;
 
     for(auto& sample : *predDataset) {
-        if(sample.size() <= kDMWordPredIdx) {
+        if(sample.size() <= kDMWordPredIdx)
             throw std::runtime_error(
                 "computeMetrics: need token/word target to compute WER"
             );
-        }
         auto predictionWrd = sample[kDMWordPredIdx];
         auto targetWrd = sample[kDMWordTargetIdx];
         auto prediction = sample[kDMTokenPredIdx];
         auto target = sample[kDMTokenTargetIdx];
         bool isPredictingWrd = !predictionWrd.isEmpty();
 
-        if(prediction.ndim() > 2 || target.ndim() > 2) {
+        if(prediction.ndim() > 2 || target.ndim() > 2)
             throw std::runtime_error(
                 "computeMetrics: expecting TxB for prediction and target"
             );
-        }
-        if(isPredictingWrd && (predictionWrd.ndim() > 2 || targetWrd.ndim() > 2)) {
+        if(isPredictingWrd && (predictionWrd.ndim() > 2 || targetWrd.ndim() > 2))
             throw std::runtime_error(
                 "computeMetrics: expecting TxB for prediction and target"
             );
-        }
 
         if(
             !prediction.isEmpty() && !target.isEmpty()
             && (prediction.dim(1) != target.dim(1))
-        ) {
+        )
             throw std::runtime_error(
                 "computeMetrics: prediction and target do not match"
             );
-        }
         if(
             isPredictingWrd && !predictionWrd.isEmpty() && !targetWrd.isEmpty()
             && (predictionWrd.dim(1) != targetWrd.dim(1))
-        ) {
+        )
             throw std::runtime_error(
                 "computeMetrics: prediction and target do not match"
             );
-        }
         // token predictions and target
         std::vector<int> predictionV = prediction.toHostVector<int>();
         std::vector<int> targetV = target.toHostVector<int>();
@@ -151,27 +146,24 @@ std::shared_ptr<fl::Dataset> DecodeMaster::forward(
     auto emissionDataset = std::make_shared<fl::MemoryBlobDataset>();
     for(auto& batch : *ds) {
         Tensor output;
-        if(batch.empty()) {
+        if(batch.empty())
             continue;
-        }
-        if(usePlugin_) {
+        if(usePlugin_)
             output = net_->forward(
                 {fl::input(batch[kInputIdx]),
                  fl::noGrad(batch[kDurationIdx])}
             )
                 .front()
                 .tensor();
-        } else {
+        else
             output = fl::pkg::runtime::forwardSequentialModuleWithPadMask(
                 fl::input(batch[kInputIdx]),
                 net_,
                 batch[kDurationIdx]
             )
                 .tensor();
-        }
-        if(output.ndim() > 3) {
+        if(output.ndim() > 3)
             throw std::runtime_error("output should be NxTxB");
-        }
         Tensor tokenTarget =
             (batch.size() > kTargetIdx ? batch[kTargetIdx] : Tensor());
         Tensor wordTarget = (batch.size() > kWordIdx ? batch[kWordIdx] : Tensor());
@@ -180,15 +172,13 @@ std::shared_ptr<fl::Dataset> DecodeMaster::forward(
         if(
             !tokenTarget.isEmpty()
             && (tokenTarget.ndim() > 2 || tokenTarget.dim(1) != B)
-        ) {
+        )
             throw std::runtime_error("token target should be LxB");
-        }
         if(
             !wordTarget.isEmpty()
             && (wordTarget.ndim() > 2 || wordTarget.dim(1) != B)
-        ) {
+        )
             throw std::runtime_error("word target should be LxB");
-        }
         // todo s2s, if we pad only with -1 we will be good here (not pad with eos)
         for(int b = 0; b < B; b++) {
             std::vector<Tensor> res(4);
@@ -213,9 +203,8 @@ std::shared_ptr<fl::Dataset> DecodeMaster::decode(
     auto predDataset = std::make_shared<fl::MemoryBlobDataset>();
     for(auto& sample : *emissionDataset) {
         auto emission = sample[kDMTokenPredIdx];
-        if(emission.ndim() > 2) {
+        if(emission.ndim() > 2)
             throw std::runtime_error("emission should be NxT");
-        }
         std::vector<float> emissionV(emission.elements());
         emission.astype(fl::dtype::f32).host(emissionV.data());
         auto results =

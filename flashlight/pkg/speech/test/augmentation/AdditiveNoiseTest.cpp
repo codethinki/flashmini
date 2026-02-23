@@ -82,9 +82,8 @@ TEST(AdditiveNoise, Snr) {
         sfx.apply(augmented);
 
         std::vector<float> extractNoise(augmented.size());
-        for(int i = 0; i < extractNoise.size(); ++i) {
+        for(int i = 0; i < extractNoise.size(); ++i)
             extractNoise[i] = (augmented[i] - signal[i]);
-        }
 
         ASSERT_LE(
             signalToNoiseRatio(signal, extractNoise),

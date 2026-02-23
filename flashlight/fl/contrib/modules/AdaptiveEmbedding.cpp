@@ -23,9 +23,8 @@ AdaptiveEmbedding::AdaptiveEmbedding(
 ) : embeddingDim_(embeddingDim),
     cutoff_(cutoff),
     divValue_(divValue) {
-    if(cutoff_.empty()) {
+    if(cutoff_.empty())
         throw std::invalid_argument("Invalid cutoff for AdaptiveEmbedding");
-    }
     double stdv = std::sqrt(1.0 / static_cast<double>(embeddingDim_));
     // to be in agreement with the adaptive softmax to simplify
     // tied version of adaptive input and softmax
@@ -62,12 +61,11 @@ AdaptiveEmbedding::AdaptiveEmbedding(
 }
 
 Variable AdaptiveEmbedding::forward(const Variable& input) {
-    if(input.ndim() != 2) {
+    if(input.ndim() != 2)
         throw std::invalid_argument(
             "AdaptiveEmbedding::forward - input must "
             "have 2 dimensions - expect T x B"
         );
-    }
 
     auto flatInput = flat(input);
     std::vector<Variable> indices;
@@ -95,11 +93,10 @@ Variable AdaptiveEmbedding::forward(const Variable& input) {
             embeddings.push_back(tailEmbedding);
         }
     }
-    if(embeddings.empty()) {
+    if(embeddings.empty())
         throw std::invalid_argument(
             "Invalid input, no positions in the AdaptiveEmbedding layer"
         );
-    }
 
     Shape outShape({embeddingDim_, input.dim(0), input.dim(1)});
     auto result = fl::concatenate(embeddings, 1);
@@ -115,9 +112,8 @@ std::unique_ptr<Module> AdaptiveEmbedding::clone() const {
 std::string AdaptiveEmbedding::prettyString() const {
     std::ostringstream ss;
     ss << "AdaptiveEmbedding (dim: " << embeddingDim_ << "), (cutoff: ";
-    for(int i = 0; i < cutoff_.size() - 1; i++) {
+    for(int i = 0; i < cutoff_.size() - 1; i++)
         ss << cutoff_[i] << ", ";
-    }
     ss << cutoff_[cutoff_.size() - 1] << "), "
     << "(divValue: " << divValue_ << ")";
     return ss.str();

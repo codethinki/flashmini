@@ -31,9 +31,8 @@ void Shape::checkDimsOrThrow(const size_t dim) const {
 }
 
 Dim Shape::elements() const {
-    if(dims_.empty()) {
+    if(dims_.empty())
         return kEmptyShapeNumberOfElements;
-    }
     return std::accumulate(dims_.begin(), dims_.end(), static_cast<Dim>(1), std::multiplies<Dim>());
 }
 
@@ -84,9 +83,8 @@ std::vector<Dim>& Shape::get() {
 std::string Shape::toString() const {
     std::stringstream ss;
     ss << "(";
-    for(size_t i = 0; i < ndim(); ++i) {
+    for(size_t i = 0; i < ndim(); ++i)
         ss << dim(i) << (i == ndim() - 1 ? "" : ", ");
-    }
     ss << ")";
     return ss.str();
 }

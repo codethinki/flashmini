@@ -71,9 +71,8 @@ namespace detail {
     }
 
     Tensor erfinv(const Tensor& y) {
-        if(fl::any(fl::abs(y) >= 1.).scalar<char>()) {
+        if(fl::any(fl::abs(y) >= 1.).scalar<char>())
             throw std::runtime_error("[erfinv] input is out of range (-1, 1)");
-        }
         double a[4] = {0.886226899, -1.645349621, 0.914624893, -0.140543331};
         double b[4] = {-2.118377725, 1.442710462, -0.329097515, 0.012229801};
         double c[4] = {-1.970840454, -1.624906493, 3.429567803, 1.641345311};
@@ -101,9 +100,8 @@ namespace detail {
         if(
             fl::any(fl::isnan(x)).asScalar<bool>()
             || fl::any(fl::isinf(x)).asScalar<bool>()
-        ) {
+        )
             throw std::runtime_error("[erfinv] invalid result");
-        }
         return x;
     }
 
@@ -137,13 +135,12 @@ Variable constant(double val, const Shape& dims, fl::dtype type, bool calcGrad) 
 
 Variable identity(int outputSize, int inputSize, fl::dtype type, bool calcGrad) {
     // TODO{fl::Tensor}{fixme} add non-square identity to API
-    if(inputSize != outputSize) {
+    if(inputSize != outputSize)
         throw std::invalid_argument(
             "identity - can't create tensor with "
             "different in and output size - only square identity "
             "tensors supported"
         );
-    }
     return identity(Shape({inputSize, outputSize}), type, calcGrad);
 }
 

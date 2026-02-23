@@ -72,12 +72,11 @@ struct DynamicBenchmarkOptions : DynamicBenchmarkOptionsBase {
      */
     DynamicBenchmarkOptions(std::vector<T> options, size_t benchCount)
         : options_(options), benchCount_(benchCount) {
-        if(options_.empty()) {
+        if(options_.empty())
             throw std::invalid_argument(
                 "DynamicBenchmarkOptions: "
                 "Options must be passed vector with at least one element"
             );
-        }
         reset();
     }
 
@@ -105,22 +104,19 @@ struct DynamicBenchmarkOptions : DynamicBenchmarkOptionsBase {
      */
     T updateState() {
         if(!timingsComplete_) {
-            for(size_t i = 0; i < options_.size(); ++i) {
+            for(size_t i = 0; i < options_.size(); ++i)
                 if(counts_[i] < benchCount_) {
                     currentOptionIdx_ = i;
                     return options_[i];
                 }
-            }
             timingsComplete_ = true;
 
             // All options have been benchmarked with the max count - pick the one
             // with the lowest time
             size_t minTimeOptionIdx{0};
-            for(size_t i = 0; i < options_.size(); ++i) {
-                if(times_[i] < times_[minTimeOptionIdx]) {
+            for(size_t i = 0; i < options_.size(); ++i)
+                if(times_[i] < times_[minTimeOptionIdx])
                     minTimeOptionIdx = i;
-                }
-            }
             currentOptionIdx_ = minTimeOptionIdx;
         }
         return options_[currentOptionIdx_];
@@ -155,17 +151,15 @@ struct DynamicBenchmarkOptions : DynamicBenchmarkOptionsBase {
      */
     void accumulateTimeToCurrentOption(double time, bool incrementCount = true)
     override {
-        if(timingsComplete()) {
+        if(timingsComplete())
             throw std::invalid_argument(
                 "Options::accumulateTimeToCurrentOption: "
                 "Tried to accumulate time when benchmarking is complete"
             );
-        }
         updateState();
         times_[currentOptionIdx_] += time;
-        if(incrementCount) {
+        if(incrementCount)
             counts_[currentOptionIdx_]++;
-        }
     }
 
     /**

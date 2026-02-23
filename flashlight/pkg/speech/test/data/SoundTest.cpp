@@ -44,17 +44,15 @@ TEST(SoundTest, Mono) {
     // Double
     auto vecDouble = loadSound<double>(audiopath);
     ASSERT_EQ(vecDouble.size(), info.channels * info.frames);
-    for(int64_t i = 0; i < vecDouble.size(); ++i) {
+    for(int64_t i = 0; i < vecDouble.size(); ++i)
         ASSERT_NEAR(vecDouble[i], data[i], 1E-8);
-    }
 
     // Float
     auto vecFloat = loadSound<float>(audiopath);
     ASSERT_EQ(vecFloat.size(), info.channels * info.frames);
 
-    for(int64_t i = 0; i < vecFloat.size(); ++i) {
+    for(int64_t i = 0; i < vecFloat.size(); ++i)
         ASSERT_NEAR(vecFloat[i], data[i], 1E-6);
-    }
 
     // scale by max value for short
     std::transform(
@@ -70,9 +68,8 @@ TEST(SoundTest, Mono) {
     auto vecShort = loadSound<short>(audiopath);
     ASSERT_EQ(vecShort.size(), info.channels * info.frames);
 
-    for(int64_t i = 0; i < vecShort.size(); ++i) {
+    for(int64_t i = 0; i < vecShort.size(); ++i)
         ASSERT_NEAR(vecShort[i], data[i], 0.5);
-    }
 
     // scale by (max value for int64_t / max value of short)
     std::transform(
@@ -86,9 +83,8 @@ TEST(SoundTest, Mono) {
     // Int
     auto vecInt = loadSound<int>(audiopath);
     ASSERT_EQ(vecInt.size(), info.channels * info.frames);
-    for(int64_t i = 0; i < vecInt.size(); ++i) {
+    for(int64_t i = 0; i < vecInt.size(); ++i)
         ASSERT_NEAR(vecInt[i], data[i], 25);
-    }
 }
 
 TEST(SoundTest, Stereo) {
@@ -106,9 +102,8 @@ TEST(SoundTest, Stereo) {
     auto data = loadData(datapath);
     ASSERT_EQ(data.size(), info.channels * info.frames);
 
-    for(int64_t i = 0; i < vecFloat.size(); ++i) {
+    for(int64_t i = 0; i < vecFloat.size(); ++i)
         ASSERT_NEAR(vecFloat[i], data[i], 1E-6);
-    }
 }
 
 TEST(SoundTest, OggReadWrite) {
@@ -131,9 +126,8 @@ TEST(SoundTest, OggReadWrite) {
 
     ASSERT_EQ(vecFloat.size(), vecFloatOut.size());
 
-    for(int64_t i = 0; i < vecFloat.size(); ++i) {
+    for(int64_t i = 0; i < vecFloat.size(); ++i)
         ASSERT_NEAR(vecFloat[i], vecFloatOut[i], 5E-3);
-    }
 }
 
 TEST(SoundTest, StreamReadWrite) {
@@ -163,9 +157,8 @@ TEST(SoundTest, StreamReadWrite) {
     auto vecShortStream = loadSound<short>(f);
 
     ASSERT_EQ(vecShort.size(), vecShortStream.size());
-    for(int64_t i = 0; i < vecShort.size(); ++i) {
+    for(int64_t i = 0; i < vecShort.size(); ++i)
         ASSERT_EQ(vecShort[i], vecShortStream[i]);
-    }
 }
 
 int main(int argc, char** argv) {
