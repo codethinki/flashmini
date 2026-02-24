@@ -10,8 +10,8 @@
 namespace fl {
 
 TensorBackend& defaultTensorBackend() {
-  // TODO: improve this implementation! Hacky/requires creating a tensor
-  return Tensor().backend();
+    // TODO: improve this implementation! Hacky/requires creating a tensor
+    return Tensor().backend();
 }
 
 } // namespace fl

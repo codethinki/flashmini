@@ -2,5 +2,10 @@
 .github/workflows/ @codethinki
 ci/docker/ @codethinki
 
+CITATION @codethinki
 LICENSE @codethinki
-.clang-format @codethinki
+FLASHLIGHT_LICENSE @codethinki
+
+.clang_tidy @codethinki
+uncrustify.cfg @codethinki
+

@@ -19,24 +19,24 @@ class Variable;
  * general.
  */
 class Reducer {
- public:
-  virtual ~Reducer() = default;
+public:
+    virtual ~Reducer() = default;
 
-  /**
-   * Have the Reducer ingest a Variable. What happens next is
-   * implementation-specific; the implementation may cache the value,
-   * process/synchronize immediately, or ignore the value.
-   *
-   * @param[in] var a Variable to be ingested
-   */
-  virtual void add(Variable& var) = 0;
+    /**
+     * Have the Reducer ingest a Variable. What happens next is
+     * implementation-specific; the implementation may cache the value,
+     * process/synchronize immediately, or ignore the value.
+     *
+     * @param[in] var a Variable to be ingested
+     */
+    virtual void add(Variable& var) = 0;
 
-  /**
-   * Forces a reduction/synchronization of the Reducer.
-   * For some implementations, this may be a no-op if the Reducer immediately
-   * processes or synchronizes all gradients that are added.
-   */
-  virtual void finalize() = 0;
+    /**
+     * Forces a reduction/synchronization of the Reducer.
+     * For some implementations, this may be a no-op if the Reducer immediately
+     * processes or synchronizes all gradients that are added.
+     */
+    virtual void finalize() = 0;
 };
 
 } // namespace fl

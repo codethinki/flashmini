@@ -15,83 +15,86 @@
 namespace fl {
 namespace {
 
-bool canBroadcast(const Shape& lhs, const Shape& rhs) {
-  unsigned nDim = std::max(lhs.ndim(), rhs.ndim());
+    bool canBroadcast(const Shape& lhs, const Shape& rhs) {
+        unsigned nDim = std::max(lhs.ndim(), rhs.ndim());
 
-  for (unsigned i = 0; i < nDim; ++i) {
-    if (i + 1 > lhs.ndim() || i + 1 > rhs.ndim()) {
-      // One Shape has more dimensions than the other - will broadcast to the
-      // smaller tensor
-      continue;
+        for(unsigned i = 0; i < nDim; ++i) {
+            if(i + 1 > lhs.ndim() || i + 1 > rhs.ndim())
+                // One Shape has more dimensions than the other - will broadcast to the
+                // smaller tensor
+                continue;
+            if(lhs[i] != rhs[i] && lhs[i] != 1 && rhs[i] != 1)
+                return false;
+        }
+        return true;
     }
-    if (lhs[i] != rhs[i] && lhs[i] != 1 && rhs[i] != 1) {
-      return false;
-    }
-  }
-  return true;
-}
 
 // A binary operation on two ArrayFire arrays
-using binaryOpFunc_t =
-    af::array (*)(const af::array& lhs, const af::array& rhs);
+    using binaryOpFunc_t =
+        af::array (*)(const af::array& lhs, const af::array& rhs);
 
-Tensor doBinaryOpOrBroadcast(
-    const Tensor& lhs,
-    const Tensor& rhs,
-    binaryOpFunc_t func) {
-  // Dims are the same or scalar <> 1-el tensor - no broadcasting
-  if (lhs.shape() == rhs.shape() ||
-      (lhs.elements() <= 1 && rhs.elements() <= 1)) {
-    return toTensor<ArrayFireTensor>(
-        func(toArray(lhs), toArray(rhs)), lhs.ndim());
-  }
+    Tensor doBinaryOpOrBroadcast(
+        const Tensor& lhs,
+        const Tensor& rhs,
+        binaryOpFunc_t func
+    ) {
+        // Dims are the same or scalar <> 1-el tensor - no broadcasting
+        if(
+            lhs.shape() == rhs.shape()
+            || (lhs.elements() <= 1 && rhs.elements() <= 1)
+        )
+            return toTensor<ArrayFireTensor>(
+                func(toArray(lhs), toArray(rhs)),
+                lhs.ndim()
+            );
 
-  if (canBroadcast(lhs.shape(), rhs.shape())) {
-    return toTensor<ArrayFireTensor>(
-        af::batchFunc(toArray(lhs), toArray(rhs), func),
-        std::max(lhs.ndim(), rhs.ndim()));
-  } else {
-    std::stringstream ss;
-    ss << "doBinaryOpOrBroadcast: cannot perform operation "
-          "or broadcasting with tensors of shapes "
-       << lhs.shape() << " and " << rhs.shape() << " - dimension mismatch.";
-    throw std::invalid_argument(ss.str());
-  }
-}
+        if(canBroadcast(lhs.shape(), rhs.shape()))
+            return toTensor<ArrayFireTensor>(
+                af::batchFunc(toArray(lhs), toArray(rhs), func),
+                std::max(lhs.ndim(), rhs.ndim())
+            );
+        else {
+            std::stringstream ss;
+            ss << "doBinaryOpOrBroadcast: cannot perform operation "
+                "or broadcasting with tensors of shapes "
+               << lhs.shape() << " and " << rhs.shape() << " - dimension mismatch.";
+            throw std::invalid_argument(ss.str());
+        }
+    }
 } // namespace
 
 // For ArrayFire, af::array already implements overloads for all needed
 // operators -- use these by default.
-#define FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, TYPE)                   \
-  Tensor ArrayFireBackend::FUNC(const Tensor& a, TYPE rhs) {       \
-    return toTensor<ArrayFireTensor>(toArray(a) OP rhs, a.ndim()); \
-  }                                                                \
-  Tensor ArrayFireBackend::FUNC(TYPE lhs, const Tensor& a) {       \
-    return toTensor<ArrayFireTensor>(lhs OP toArray(a), a.ndim()); \
-  }
+#define FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, TYPE)                           \
+        Tensor ArrayFireBackend::FUNC(const Tensor& a, TYPE rhs) {         \
+            return toTensor<ArrayFireTensor>(toArray(a) OP rhs, a.ndim()); \
+        }                                                                  \
+        Tensor ArrayFireBackend::FUNC(TYPE lhs, const Tensor& a) {         \
+            return toTensor<ArrayFireTensor>(lhs OP toArray(a), a.ndim()); \
+        }
 
-#define FL_AF_BINARY_OP_LITERALS_DEF(FUNC, OP)                   \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const bool&);               \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const int&);                \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned&);           \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const char&);               \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned char&);      \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const long&);               \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned long&);      \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const long long&);          \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned long long&); \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const double&);             \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const float&);              \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const short&);              \
-  FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned short&);
+#define FL_AF_BINARY_OP_LITERALS_DEF(FUNC, OP)                         \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const bool&);               \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const int&);                \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned&);           \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const char&);               \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned char&);      \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const long&);               \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned long&);      \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const long long&);          \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned long long&); \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const double&);             \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const float&);              \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const short&);              \
+        FL_AF_BINARY_OP_TYPE_DEF(FUNC, OP, const unsigned short&);
 
 // Operations on fl::Tensor call the respective operator overloads that are
 // already defined on af::arrays
-#define FL_AF_BINARY_OP_DEF(OP, FUNC)                                   \
-  Tensor ArrayFireBackend::FUNC(const Tensor& lhs, const Tensor& rhs) { \
-    return doBinaryOpOrBroadcast(lhs, rhs, af::operator OP);            \
-  }                                                                     \
-  FL_AF_BINARY_OP_LITERALS_DEF(FUNC, OP);
+#define FL_AF_BINARY_OP_DEF(OP, FUNC)                                         \
+        Tensor ArrayFireBackend::FUNC(const Tensor& lhs, const Tensor& rhs) { \
+            return doBinaryOpOrBroadcast(lhs, rhs, af::operator OP);          \
+        }                                                                     \
+        FL_AF_BINARY_OP_LITERALS_DEF(FUNC, OP);
 
 // Definitions
 // Since ArrayFire implements operator overloads, map both fl::Tensor
@@ -120,14 +123,14 @@ FL_AF_BINARY_OP_DEF(>>, rShift);
 #undef FL_AF_BINARY_OP_LITERALS_DEF
 
 Tensor ArrayFireBackend::minimum(const Tensor& lhs, const Tensor& rhs) {
-  return doBinaryOpOrBroadcast(lhs, rhs, af::min);
+    return doBinaryOpOrBroadcast(lhs, rhs, af::min);
 }
 
 Tensor ArrayFireBackend::maximum(const Tensor& lhs, const Tensor& rhs) {
-  return doBinaryOpOrBroadcast(lhs, rhs, af::max);
+    return doBinaryOpOrBroadcast(lhs, rhs, af::max);
 }
 
 Tensor ArrayFireBackend::power(const Tensor& lhs, const Tensor& rhs) {
-  return doBinaryOpOrBroadcast(lhs, rhs, af::pow);
+    return doBinaryOpOrBroadcast(lhs, rhs, af::pow);
 }
 } // namespace fl

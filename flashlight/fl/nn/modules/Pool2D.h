@@ -20,53 +20,55 @@ namespace fl {
  * of shape [\f$X_{out}\f$, \f$Y_{out}\f$, \f$C\f$, \f$N\f$].
  */
 class FL_API Pool2D : public UnaryModule {
- private:
-  Pool2D() = default; // Intentionally private
+private:
+    Pool2D() = default; // Intentionally private
 
-  int xFilter_, yFilter_; // pooling dims
-  int xStride_, yStride_; // stride
-  int xPad_, yPad_; // padding - used iff padding mode is none
-  PoolingMode mode_; // pooling type
+    int xFilter_, yFilter_; // pooling dims
+    int xStride_, yStride_; // stride
+    int xPad_, yPad_; // padding - used iff padding mode is none
+    PoolingMode mode_; // pooling type
 
-  FL_SAVE_LOAD_WITH_BASE(
-      UnaryModule,
-      xFilter_,
-      yFilter_,
-      xStride_,
-      yStride_,
-      xPad_,
-      yPad_,
-      mode_)
+    FL_SAVE_LOAD_WITH_BASE(
+        UnaryModule,
+        xFilter_,
+        yFilter_,
+        xStride_,
+        yStride_,
+        xPad_,
+        yPad_,
+        mode_
+    )
 
- public:
-  /** Construct a Pool2D layer.
-   * @param wx pooling window size in the first dimension
-   * @param wy pooling window size in the second dimension
-   * @param sx stride in the first dimension
-   * @param sy stride in the second dimension
-   * @param px amount of zero-padding on both sides in the first dimension.
-   * Accepts a non-negative integer value or an enum fl::PaddingMode
-   * @param py amount of zero-padding on both sides in the second dimension.
-   * Accepts a non-negative integer value or an enum fl::PaddingMode
-   * @param mode pooling mode. Can be any of:
-   * - MAX
-   * - AVG_INCLUDE_PADDING
-   * - AVG_EXCLUDE_PADDING
-   */
-  Pool2D(
-      int wx,
-      int wy,
-      int sx = 1,
-      int sy = 1,
-      detail::IntOrPadMode px = 0,
-      detail::IntOrPadMode py = 0,
-      PoolingMode mode = PoolingMode::MAX);
+public:
+    /** Construct a Pool2D layer.
+     * @param wx pooling window size in the first dimension
+     * @param wy pooling window size in the second dimension
+     * @param sx stride in the first dimension
+     * @param sy stride in the second dimension
+     * @param px amount of zero-padding on both sides in the first dimension.
+     * Accepts a non-negative integer value or an enum fl::PaddingMode
+     * @param py amount of zero-padding on both sides in the second dimension.
+     * Accepts a non-negative integer value or an enum fl::PaddingMode
+     * @param mode pooling mode. Can be any of:
+     * - MAX
+     * - AVG_INCLUDE_PADDING
+     * - AVG_EXCLUDE_PADDING
+     */
+    Pool2D(
+        int wx,
+        int wy,
+        int sx = 1,
+        int sy = 1,
+        detail::IntOrPadMode px = 0,
+        detail::IntOrPadMode py = 0,
+        PoolingMode mode = PoolingMode::MAX
+    );
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 } // namespace fl

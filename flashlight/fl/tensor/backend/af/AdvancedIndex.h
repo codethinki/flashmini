@@ -30,13 +30,14 @@ namespace detail {
  * @param out The output Varible which is the gradient of input of index
  * operator
  */
-void advancedIndex(
-    const af::array& inp,
-    const af::dim4& idxStart,
-    const af::dim4& idxEnd,
-    const af::dim4& outDims,
-    const std::vector<af::array>& idxArr,
-    af::array& out);
+    void advancedIndex(
+        const af::array& inp,
+        const af::dim4& idxStart,
+        const af::dim4& idxEnd,
+        const af::dim4& outDims,
+        const std::vector<af::array>& idxArr,
+        af::array& out
+    );
 
 } // namespace detail
 } // namespace fl

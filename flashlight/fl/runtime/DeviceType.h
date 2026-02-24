@@ -20,8 +20,8 @@ namespace fl {
  * NOTE update `fl::getAllDeviceTypes` after changing enum values.
  */
 enum class DeviceType {
-  x64,
-  CUDA,
+    x64,
+    CUDA,
 };
 
 #if FL_BACKEND_CUDA

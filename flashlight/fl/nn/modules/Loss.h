@@ -18,50 +18,50 @@ class Tensor;
 
 /**
  * Computes the [mean squared
- error](https://en.wikipedia.org/wiki/Mean_squared_error) between elements
+   error](https://en.wikipedia.org/wiki/Mean_squared_error) between elements
  * across two tensors:
  * \f[
    \mathcal{L}(x, y) = \frac{1}{n} \sum_{i = 0}^n \left( x_i - y_i \right)^2
    \f]
  * for input tensor \f$x\f$ and target tensor \f$y\f$ each of which contain
- \f$n\f$ elements.
+   \f$n\f$ elements.
  */
 class FL_API MeanSquaredError : public BinaryModule {
- public:
-  MeanSquaredError() = default;
+public:
+    MeanSquaredError() = default;
 
-  Variable forward(const Variable& inputs, const Variable& targets) override;
+    Variable forward(const Variable& inputs, const Variable& targets) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(BinaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(BinaryModule)
 };
 
 /**
  * Computes the [mean absolute
- error](https://en.wikipedia.org/wiki/Mean_absolute_error) (equivalent to the
- \f$L_1\f$ loss):
+   error](https://en.wikipedia.org/wiki/Mean_absolute_error) (equivalent to the
+   \f$L_1\f$ loss):
  * \f[
    \mathcal{L}(x, y) = \frac{1}{n} \sum_{i = 0}^n \left| x_i - y_i \right|
    \f]
  * for input tensor \f$x\f$ and target tensor \f$y\f$ each of which contain
- \f$n\f$ elements.
+   \f$n\f$ elements.
  */
 class FL_API MeanAbsoluteError : public BinaryModule {
- public:
-  MeanAbsoluteError() = default;
+public:
+    MeanAbsoluteError() = default;
 
-  Variable forward(const Variable& inputs, const Variable& targets) override;
+    Variable forward(const Variable& inputs, const Variable& targets) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(BinaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(BinaryModule)
 };
 
 /**
@@ -69,37 +69,38 @@ class FL_API MeanAbsoluteError : public BinaryModule {
  * target tensor \f$y\f$. The binary cross entropy loss is:
  * \f[
    B(x, y) = \frac{1}{n} \sum_{i = 0}^n -\left( w_i \times (y_i \times \log(x_i)
-   + (1 - y_i) \times \log(1 - x_i)) \right) \f]
+ + (1 - y_i) \times \log(1 - x_i)) \right) \f]
  * where \f$w\f$ is an optional weight parameter for rescaling.
  *
  * Both the inputs and the targets are expected to be between 0 and 1.
  */
 class FL_API BinaryCrossEntropy : public BinaryModule {
- public:
-  BinaryCrossEntropy() = default;
+public:
+    BinaryCrossEntropy() = default;
 
-  using BinaryModule::forward;
+    using BinaryModule::forward;
 
-  Variable forward(const Variable& inputs, const Variable& targets) override;
+    Variable forward(const Variable& inputs, const Variable& targets) override;
 
-  /**
-   * Perform forward loss computation with an additional weight tensor.
-   *
-   * @param inputs a tensor with the predicted values
-   * @param targets a tensor with the target values
-   * @param weights a rescaling weight given to the loss of each element.
-   */
-  Variable forward(
-      const Variable& inputs,
-      const Variable& targets,
-      const Variable& weights);
+    /**
+     * Perform forward loss computation with an additional weight tensor.
+     *
+     * @param inputs a tensor with the predicted values
+     * @param targets a tensor with the target values
+     * @param weights a rescaling weight given to the loss of each element.
+     */
+    Variable forward(
+        const Variable& inputs,
+        const Variable& targets,
+        const Variable& weights
+    );
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(BinaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(BinaryModule)
 };
 
 /**
@@ -109,7 +110,7 @@ class FL_API BinaryCrossEntropy : public BinaryModule {
  * ground truth class for each input example.
  *
  * In the batch case, the output loss tensor \f$\{l_1,...,l_N\}^\top\f$, put
- \f$l_n = -x_{n, y_n}\f$
+   \f$l_n = -x_{n, y_n}\f$
  * (only consider the probability of the correct class). Then reduce via:
  * \f[
    \mathcal{L}(x, y) = \sum_{i = 1}^N l_i
@@ -123,44 +124,46 @@ class FL_API BinaryCrossEntropy : public BinaryModule {
  * `ReduceMode`.
  */
 class FL_API CategoricalCrossEntropy : public BinaryModule {
- private:
-  ReduceMode reduction_;
-  int ignoreIndex_{-1};
+private:
+    ReduceMode reduction_;
+    int ignoreIndex_{-1};
 
-  FL_SAVE_LOAD_WITH_BASE(
-      BinaryModule,
-      reduction_,
-      fl::versioned(ignoreIndex_, 1))
+    FL_SAVE_LOAD_WITH_BASE(
+        BinaryModule,
+        reduction_,
+        fl::versioned(ignoreIndex_, 1)
+    )
 
- public:
-  /**
-   * Creates a `CategoricalCrossEntropy`.
-   *
-   * @param reduction a reduction with which to compute the loss. See
-   * documentation on `ReduceMode` for available options.
-   * @param ignoreIndex a target value that is ignored and does not contribute
-   * to the loss or the input gradient. If `reduce` is MEAN, the loss is
-   * averaged over non-ignored targets.
-   */
-  explicit CategoricalCrossEntropy(
-      ReduceMode reduction = ReduceMode::MEAN,
-      int ignoreIndex = -1)
-      : reduction_(reduction), ignoreIndex_(ignoreIndex) {}
+public:
+    /**
+     * Creates a `CategoricalCrossEntropy`.
+     *
+     * @param reduction a reduction with which to compute the loss. See
+     * documentation on `ReduceMode` for available options.
+     * @param ignoreIndex a target value that is ignored and does not contribute
+     * to the loss or the input gradient. If `reduce` is MEAN, the loss is
+     * averaged over non-ignored targets.
+     */
+    explicit CategoricalCrossEntropy(
+        ReduceMode reduction = ReduceMode::MEAN,
+        int ignoreIndex = -1
+    ) : reduction_(reduction),
+        ignoreIndex_(ignoreIndex) {}
 
-  /**
-   * Computes the categorical cross entropy loss for some input and target
-   * tensors.
-   *
-   * @param inputs a `Variable` with shape [\f$C\f$, \f$B_1\f$, \f$B_2\f$,
-   * \f$B_3\f$] where \f$C\f$ is the number of classes.
-   * @param targets an integer `Variable` with shape [\f$B_1\f$, \f$B_2\f$,
-   * \f$B_3\f$]. The values must be in [\f$0\f$, \f$C - 1\f$]
-   */
-  Variable forward(const Variable& inputs, const Variable& targets) override;
+    /**
+     * Computes the categorical cross entropy loss for some input and target
+     * tensors.
+     *
+     * @param inputs a `Variable` with shape [\f$C\f$, \f$B_1\f$, \f$B_2\f$,
+     * \f$B_3\f$] where \f$C\f$ is the number of classes.
+     * @param targets an integer `Variable` with shape [\f$B_1\f$, \f$B_2\f$,
+     * \f$B_3\f$]. The values must be in [\f$0\f$, \f$C - 1\f$]
+     */
+    Variable forward(const Variable& inputs, const Variable& targets) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -178,53 +181,54 @@ class FL_API CategoricalCrossEntropy : public BinaryModule {
  * up computation.
  */
 class FL_API AdaptiveSoftMaxLoss : public BinaryModule {
- private:
-  FL_SAVE_LOAD_WITH_BASE(
-      BinaryModule,
-      activation_,
-      reduction_,
-      fl::versioned(ignoreIndex_, 1))
-  std::shared_ptr<AdaptiveSoftMax> activation_;
-  ReduceMode reduction_;
-  int ignoreIndex_{-1};
+private:
+    FL_SAVE_LOAD_WITH_BASE(
+        BinaryModule,
+        activation_,
+        reduction_,
+        fl::versioned(ignoreIndex_, 1)
+    )
+    std::shared_ptr<AdaptiveSoftMax> activation_;
+    ReduceMode reduction_;
+    int ignoreIndex_{-1};
 
-  Variable
-  cast(const Variable& input, const Shape& outDims, const Tensor& indices);
+    Variable cast(const Variable& input, const Shape& outDims, const Tensor& indices);
 
- public:
-  AdaptiveSoftMaxLoss() = default;
+public:
+    AdaptiveSoftMaxLoss() = default;
 
-  /**
-   * Create an `AdaptiveSoftMaxLoss` with given parameters
-   *
-   * @param reduction the reduction mode - see `ReductionMode` See
-   * documentation on `ReduceMode` for available options.
-   * @param ignoreIndex a target value that is ignored and does not contribute
-   * to the loss or the input gradient. If `reduce` is MEAN, the loss is
-   * averaged over non-ignored targets.
-   */
-  explicit AdaptiveSoftMaxLoss(
-      std::shared_ptr<AdaptiveSoftMax> activation,
-      ReduceMode reduction = ReduceMode::MEAN,
-      int ignoreIndex = -1);
-  std::shared_ptr<AdaptiveSoftMax> getActivation() const;
+    /**
+     * Create an `AdaptiveSoftMaxLoss` with given parameters
+     *
+     * @param reduction the reduction mode - see `ReductionMode` See
+     * documentation on `ReduceMode` for available options.
+     * @param ignoreIndex a target value that is ignored and does not contribute
+     * to the loss or the input gradient. If `reduce` is MEAN, the loss is
+     * averaged over non-ignored targets.
+     */
+    explicit AdaptiveSoftMaxLoss(
+        std::shared_ptr<AdaptiveSoftMax> activation,
+        ReduceMode reduction = ReduceMode::MEAN,
+        int ignoreIndex = -1
+    );
+    std::shared_ptr<AdaptiveSoftMax> getActivation() const;
 
-  /**
-   * Computes the categorical cross entropy loss for some input and target
-   * tensors (uses adaptive softmax function to do this efficiently)
-   *
-   * @param inputs a `Variable` with shape [\f$C\f$, \f$B_1\f$, \f$B_2\f$,
-   * \f$B_3\f$] where \f$C\f$ is the number of classes.
-   * @param targets an integer `Variable` with shape [\f$B_1\f$, \f$B_2\f$,
-   * \f$B_3\f$]. The values must be in [\f$0\f$, \f$C - 1\f$]
-   */
-  Variable forward(const Variable& inputs, const Variable& targets) override;
+    /**
+     * Computes the categorical cross entropy loss for some input and target
+     * tensors (uses adaptive softmax function to do this efficiently)
+     *
+     * @param inputs a `Variable` with shape [\f$C\f$, \f$B_1\f$, \f$B_2\f$,
+     * \f$B_3\f$] where \f$C\f$ is the number of classes.
+     * @param targets an integer `Variable` with shape [\f$B_1\f$, \f$B_2\f$,
+     * \f$B_3\f$]. The values must be in [\f$0\f$, \f$C - 1\f$]
+     */
+    Variable forward(const Variable& inputs, const Variable& targets) override;
 
-  void setParams(const Variable& var, int position) override;
+    void setParams(const Variable& var, int position) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 typedef MeanSquaredError MSE;

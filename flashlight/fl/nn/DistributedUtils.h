@@ -31,7 +31,8 @@ namespace fl {
 FL_API void distributeModuleGrads(
     std::shared_ptr<const Module> module,
     std::shared_ptr<Reducer> reducer =
-        std::make_shared<InlineReducer>(1.0 / getWorldSize()));
+    std::make_shared<InlineReducer>(1.0 / getWorldSize())
+);
 
 /**
  * Traverses the network and averages its parameters with allreduce.
@@ -49,7 +50,8 @@ FL_API void allReduceParameters(std::shared_ptr<const Module> module);
  */
 FL_API void allReduceGradients(
     std::shared_ptr<const Module> module,
-    double scale = 1.0);
+    double scale = 1.0
+);
 
 /** @} */
 

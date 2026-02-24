@@ -41,48 +41,45 @@ const std::unordered_map<std::string, dtype> kStringToType = {
 };
 
 size_t getTypeSize(dtype type) {
-  switch (type) {
-    case dtype::f16:
-      return sizeof(float) / 2;
-    case dtype::f32:
-      return sizeof(float);
-    case dtype::f64:
-      return sizeof(double);
-    case dtype::b8:
-      return sizeof(unsigned char);
-    case dtype::s16:
-      return sizeof(short);
-    case dtype::s64:
-      return sizeof(long long);
-    case dtype::s32:
-      return sizeof(int);
-    case dtype::u8:
-      return sizeof(unsigned char);
-    case dtype::u16:
-      return sizeof(unsigned short);
-    case dtype::u32:
-      return sizeof(unsigned);
-    case dtype::u64:
-      return sizeof(unsigned long long);
-    default:
-      throw std::invalid_argument("getTypeSize - invalid type queried.");
-  }
+    switch(type) {
+        case dtype::f16:
+            return sizeof(float) / 2;
+        case dtype::f32:
+            return sizeof(float);
+        case dtype::f64:
+            return sizeof(double);
+        case dtype::b8:
+            return sizeof(unsigned char);
+        case dtype::s16:
+            return sizeof(short);
+        case dtype::s64:
+            return sizeof(long long);
+        case dtype::s32:
+            return sizeof(int);
+        case dtype::u8:
+            return sizeof(unsigned char);
+        case dtype::u16:
+            return sizeof(unsigned short);
+        case dtype::u32:
+            return sizeof(unsigned);
+        case dtype::u64:
+            return sizeof(unsigned long long);
+        default:
+            throw std::invalid_argument("getTypeSize - invalid type queried.");
+    }
 }
 
-const std::string& dtypeToString(dtype type) {
-  return kTypeToString.at(type);
-}
+const std::string& dtypeToString(dtype type) { return kTypeToString.at(type); }
 
 fl::dtype stringToDtype(const std::string& string) {
-  if (kStringToType.find(string) != kStringToType.end()) {
-    return kStringToType.at(string);
-  }
-  throw std::invalid_argument("stringToDtype: Invalid input type: " + string);
+    if(kStringToType.find(string) != kStringToType.end())
+        return kStringToType.at(string);
+    throw std::invalid_argument("stringToDtype: Invalid input type: " + string);
 }
 
 std::ostream& operator<<(std::ostream& ostr, const dtype& s) {
-  ostr << dtypeToString(s);
-  return ostr;
+    ostr << dtypeToString(s);
+    return ostr;
 }
 
 } // namespace fl

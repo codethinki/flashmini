@@ -42,84 +42,84 @@ using Dim = long long;
  * backing storage or handles.
  */
 class FL_API Shape {
-  // Storage for the dimension values. Defaults to an empty Shape {0}, whereas
-  // {} is a scalar shape.
-  std::vector<Dim> dims_;
+    // Storage for the dimension values. Defaults to an empty Shape {0}, whereas
+    // {} is a scalar shape.
+    std::vector<Dim> dims_;
 
-  /**
-   * Check if a dimension is valid (i.e. in bounds) given the current size of
-   * the shape. If not valid, throws an exception.
-   */
-  void checkDimsOrThrow(const size_t dim) const;
+    /**
+     * Check if a dimension is valid (i.e. in bounds) given the current size of
+     * the shape. If not valid, throws an exception.
+     */
+    void checkDimsOrThrow(const size_t dim) const;
 
- public:
-  Shape() = default;
-  ~Shape() = default;
-  /**
-   * Gives the maximum number of dimensions a tensor of a particular shape can
-   * have.
-   *
-   * If the maximum size can be arbitrarily high, `std::numeric_limits<Dim>`
-   * should be used.
-   */
-  static constexpr size_t kMaxDims = std::numeric_limits<size_t>::max();
+public:
+    Shape() = default;
+    ~Shape() = default;
+    /**
+     * Gives the maximum number of dimensions a tensor of a particular shape can
+     * have.
+     *
+     * If the maximum size can be arbitrarily high, `std::numeric_limits<Dim>`
+     * should be used.
+     */
+    static constexpr size_t kMaxDims = std::numeric_limits<size_t>::max();
 
-  /**
-   * Initialize a Shape via a vector.
-   */
-  explicit Shape(std::vector<Dim> d);
+    /**
+     * Initialize a Shape via a vector.
+     */
+    explicit Shape(std::vector<Dim> d);
 
-  /**
-   * Initialize a Shape via an initializer list.
-   */
-  /* implicit */ Shape(std::initializer_list<Dim> d);
+    /**
+     * Initialize a Shape via an initializer list.
+     */
+    /* implicit */ Shape(std::initializer_list<Dim> d);
 
-  /**
-   * @return the number of elements in a tensor that has the given shape.
-   */
-  Dim elements() const;
+    /**
+     * @return the number of elements in a tensor that has the given shape.
+     */
+    Dim elements() const;
 
-  /**
-   * @return Number of dimensions in the shape.
-   */
-  int ndim() const;
+    /**
+     * @return Number of dimensions in the shape.
+     */
+    int ndim() const;
 
-  /**
-   * Get the size of a given dimension in the number of arguments. Throws if the
-   * given dimension is larger than the number of dimensions.
-   *
-   * @return the number of elements at the given dimension
-   */
-  Dim dim(const size_t dim) const;
+    /**
+     * Get the size of a given dimension in the number of arguments. Throws if the
+     * given dimension is larger than the number of dimensions.
+     *
+     * @return the number of elements at the given dimension
+     */
+    Dim dim(const size_t dim) const;
 
-  /**
-   * Returns a reference to the given index
-   */
-  Dim& operator[](const size_t dim);
-  const Dim& operator[](const size_t dim) const;
+    /**
+     * Returns a reference to the given index
+     */
+    Dim& operator[](const size_t dim);
+    const Dim& operator[](const size_t dim) const;
 
-  /**
-   * Compares two shapes. Returns true if their dim vectors are equal.
-   */
-  bool operator==(const Shape& other) const;
-  bool operator!=(const Shape& other) const;
+    /**
+     * Compares two shapes. Returns true if their dim vectors are equal.
+     */
+    bool operator==(const Shape& other) const;
+    bool operator!=(const Shape& other) const;
 
-  /**
-   * Compare a shape to an initializer list.
-   */
-  bool operator==(const std::initializer_list<Dim>& other) const;
-  bool operator!=(const std::initializer_list<Dim>& other) const;
+    /**
+     * Compare a shape to an initializer list.
+     */
+    bool operator==(const std::initializer_list<Dim>& other) const;
+    bool operator!=(const std::initializer_list<Dim>& other) const;
 
-  /**
-   * Gets a reference to the underying dims vector.
-   */
-  const std::vector<Dim>& get() const;
-  std::vector<Dim>& get();
+    /**
+     * Gets a reference to the underying dims vector.
+     */
+    const std::vector<Dim>& get() const;
+    std::vector<Dim>& get();
 
-  /**
-   * Returns a string representation of the Shape
-   */
-  std::string toString() const;
+    /**
+     * Returns a string representation of the Shape
+     */
+    std::string toString() const;
 };
 
 /**

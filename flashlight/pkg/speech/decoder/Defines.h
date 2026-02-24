@@ -13,38 +13,39 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 // Convenience structs for serializing emissions and targets
-struct EmissionUnit {
-  std::vector<float> emission; // A column-major tensor with shape T x N.
-  std::string sampleId;
-  int nFrames;
-  int nTokens;
+        struct EmissionUnit {
+            std::vector<float> emission; // A column-major tensor with shape T x N.
+            std::string sampleId;
+            int nFrames;
+            int nTokens;
 
-  FL_SAVE_LOAD(emission, sampleId, nFrames, nTokens)
+            FL_SAVE_LOAD(emission, sampleId, nFrames, nTokens)
 
-  EmissionUnit() : nFrames(0), nTokens(0) {}
+            EmissionUnit() : nFrames(0), nTokens(0) {}
 
-  EmissionUnit(
-      const std::vector<float>& emission,
-      const std::string& sampleId,
-      int nFrames,
-      int nTokens)
-      : emission(emission),
-        sampleId(sampleId),
-        nFrames(nFrames),
-        nTokens(nTokens) {}
-};
+            EmissionUnit(
+                const std::vector<float>& emission,
+                const std::string& sampleId,
+                int nFrames,
+                int nTokens
+            )
+                : emission(emission),
+                  sampleId(sampleId),
+                  nFrames(nFrames),
+                  nTokens(nTokens) {}
+        };
 
-struct TargetUnit {
-  std::vector<std::string> wordTargetStr; // Word targets in strings
-  std::vector<int> tokenTarget; // Token targets in indices
+        struct TargetUnit {
+            std::vector<std::string> wordTargetStr; // Word targets in strings
+            std::vector<int> tokenTarget; // Token targets in indices
 
-  FL_SAVE_LOAD(wordTargetStr, tokenTarget)
-};
+            FL_SAVE_LOAD(wordTargetStr, tokenTarget)
+        };
 
-using EmissionTargetPair = std::pair<EmissionUnit, TargetUnit>;
-} // namespace speech
+        using EmissionTargetPair = std::pair<EmissionUnit, TargetUnit>;
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

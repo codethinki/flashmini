@@ -19,62 +19,58 @@ std::vector<std::string> tknIdx2Ltr(
     const std::vector<int>& labels,
     const Dictionary& d,
     const bool useWordPiece,
-    const std::string& wordSep) {
-  std::vector<std::string> result;
+    const std::string& wordSep
+) {
+    std::vector<std::string> result;
 
-  for (auto id : labels) {
-    auto token = d.getEntry(id);
-    if (useWordPiece) {
-      auto splitToken = splitWrd(token);
-      for (const auto& c : splitToken) {
-        result.emplace_back(c);
-      }
-    } else {
-      result.emplace_back(token);
+    for(auto id : labels) {
+        auto token = d.getEntry(id);
+        if(useWordPiece) {
+            auto splitToken = splitWrd(token);
+            for(const auto& c : splitToken)
+                result.emplace_back(c);
+        } else
+            result.emplace_back(token);
     }
-  }
 
-  if (!result.empty() && !wordSep.empty()) {
-    if (result.front() == wordSep) {
-      result.erase(result.begin());
+    if(!result.empty() && !wordSep.empty()) {
+        if(result.front() == wordSep)
+            result.erase(result.begin());
+        if(!result.empty() && result.back() == wordSep)
+            result.pop_back();
     }
-    if (!result.empty() && result.back() == wordSep) {
-      result.pop_back();
-    }
-  }
 
-  return result;
+    return result;
 }
 
 std::vector<std::string> tkn2Wrd(
     const std::vector<std::string>& input,
-    const std::string& wordSep) {
-  std::vector<std::string> words;
-  std::string currentWord;
-  for (auto& tkn : input) {
-    if (tkn == wordSep) {
-      if (!currentWord.empty()) {
-        words.push_back(currentWord);
-        currentWord = "";
-      }
-    } else {
-      currentWord += tkn;
+    const std::string& wordSep
+) {
+    std::vector<std::string> words;
+    std::string currentWord;
+    for(auto& tkn : input) {
+        if(tkn == wordSep) {
+            if(!currentWord.empty()) {
+                words.push_back(currentWord);
+                currentWord = "";
+            }
+        } else
+            currentWord += tkn;
     }
-  }
-  if (!currentWord.empty()) {
-    words.push_back(currentWord);
-  }
-  return words;
+    if(!currentWord.empty())
+        words.push_back(currentWord);
+    return words;
 }
 
 std::vector<std::string> wrdIdx2Wrd(
     const std::vector<int>& input,
-    const Dictionary& wordDict) {
-  std::vector<std::string> words;
-  for (auto wrdIdx : input) {
-    words.push_back(wordDict.getEntry(wrdIdx));
-  }
-  return words;
+    const Dictionary& wordDict
+) {
+    std::vector<std::string> words;
+    for(auto wrdIdx : input)
+        words.push_back(wordDict.getEntry(wrdIdx));
+    return words;
 }
 
 std::vector<std::string> tknTarget2Ltr(
@@ -85,19 +81,17 @@ std::vector<std::string> tknTarget2Ltr(
     const bool isSeq2seqCrit,
     const int replabel,
     const bool useWordPiece,
-    const std::string& wordSep) {
-  if (tokens.empty()) {
-    return std::vector<std::string>{};
-  }
+    const std::string& wordSep
+) {
+    if(tokens.empty())
+        return std::vector<std::string>{};
 
-  if (isSeq2seqCrit) {
-    if (tokens.back() == tokenDict.getIndex(kEosToken)) {
-      tokens.pop_back();
-    }
-  }
-  remapLabels(tokens, tokenDict, surround, isSeq2seqCrit, replabel);
+    if(isSeq2seqCrit)
+        if(tokens.back() == tokenDict.getIndex(kEosToken))
+            tokens.pop_back();
+    remapLabels(tokens, tokenDict, surround, isSeq2seqCrit, replabel);
 
-  return tknIdx2Ltr(tokens, tokenDict, useWordPiece, wordSep);
+    return tknIdx2Ltr(tokens, tokenDict, useWordPiece, wordSep);
 }
 
 std::vector<std::string> tknPrediction2Ltr(
@@ -108,35 +102,35 @@ std::vector<std::string> tknPrediction2Ltr(
     const bool isSeq2seqCrit,
     const int replabel,
     const bool useWordPiece,
-    const std::string& wordSep) {
-  if (tokens.empty()) {
-    return std::vector<std::string>{};
-  }
+    const std::string& wordSep
+) {
+    if(tokens.empty())
+        return std::vector<std::string>{};
 
-  if (criterion == kCtcCriterion || criterion == kAsgCriterion) {
-    dedup(tokens);
-  }
-  if (criterion == kCtcCriterion) {
-    int blankIdx = tokenDict.getIndex(kBlankToken);
-    tokens.erase(
-        std::remove(tokens.begin(), tokens.end(), blankIdx), tokens.end());
-  }
-  tokens = validateIdx(tokens, -1);
-  remapLabels(tokens, tokenDict, surround, isSeq2seqCrit, replabel);
+    if(criterion == kCtcCriterion || criterion == kAsgCriterion)
+        dedup(tokens);
+    if(criterion == kCtcCriterion) {
+        int blankIdx = tokenDict.getIndex(kBlankToken);
+        tokens.erase(
+            std::remove(tokens.begin(), tokens.end(), blankIdx),
+            tokens.end()
+        );
+    }
+    tokens = validateIdx(tokens, -1);
+    remapLabels(tokens, tokenDict, surround, isSeq2seqCrit, replabel);
 
-  return tknIdx2Ltr(tokens, tokenDict, useWordPiece, wordSep);
+    return tknIdx2Ltr(tokens, tokenDict, useWordPiece, wordSep);
 }
 
 std::vector<int> validateIdx(std::vector<int> input, int unkIdx) {
-  int newSize = 0;
-  for (int i = 0; i < input.size(); i++) {
-    if (input[i] >= 0 && input[i] != unkIdx) {
-      input[newSize] = input[i];
-      newSize++;
-    }
-  }
-  input.resize(newSize);
+    int newSize = 0;
+    for(int i = 0; i < input.size(); i++)
+        if(input[i] >= 0 && input[i] != unkIdx) {
+            input[newSize] = input[i];
+            newSize++;
+        }
+    input.resize(newSize);
 
-  return input;
+    return input;
 }
 } // namespace fl

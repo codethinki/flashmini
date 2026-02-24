@@ -14,8 +14,7 @@ namespace fl {
 bool allClose(
     const Variable& a,
     const Variable& b,
-    double absTolerance /* = 1e-5 */) {
-  return allClose(a.tensor(), b.tensor(), absTolerance);
-}
+    double absTolerance /* = 1e-5 */
+) { return allClose(a.tensor(), b.tensor(), absTolerance); }
 
 } // namespace fl

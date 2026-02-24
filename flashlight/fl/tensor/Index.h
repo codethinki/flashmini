@@ -37,53 +37,53 @@ static const end_t end = end_t();
  *  -------------------------
  */
 class FL_API range {
-  using idx = std::variant<end_t, Dim>;
-  static constexpr Dim kDefaultStride = 1;
+    using idx = std::variant<end_t, Dim>;
+    static constexpr Dim kDefaultStride = 1;
 
-  Dim start_{0};
-  // end is exclusive; std::nullopt means including the last element
-  std::optional<Dim> end_{std::nullopt};
-  Dim stride_{kDefaultStride};
+    Dim start_{0};
+    // end is exclusive; std::nullopt means including the last element
+    std::optional<Dim> end_{std::nullopt};
+    Dim stride_{kDefaultStride};
 
- public:
-  /**
-   * Default ctor.
-   */
-  range() = default;
+public:
+    /**
+     * Default ctor.
+     */
+    range() = default;
 
-  /**
-   * Construct a range with the indices [0, idx) (i.e. [0, idx - 1])
-   *
-   * @param[in] idx the end index of the range, which will start from 0
-   */
-  explicit range(const Dim& idx);
+    /**
+     * Construct a range with the indices [0, idx) (i.e. [0, idx - 1])
+     *
+     * @param[in] idx the end index of the range, which will start from 0
+     */
+    explicit range(const Dim& idx);
 
-  /**
-   * Construct a range with the indices [start, end) (i.e. [start, end - 1])
-   *
-   * @param[in] start the starting index of the range
-   * @param[in] end the end index of the range, which will start from 0
-   */
-  range(const Dim& start, const idx& end);
+    /**
+     * Construct a range with the indices [start, end) (i.e. [start, end - 1])
+     *
+     * @param[in] start the starting index of the range
+     * @param[in] end the end index of the range, which will start from 0
+     */
+    range(const Dim& start, const idx& end);
 
-  /**
-   * Construct a range with the indices [start, end) (i.e. [start, end - 1])
-   * with the given stride.
-   *
-   * @param[in] start the starting index of the range
-   * @param[in] end the end index of the range, which will start from 0
-   * @param[in] stride the interval over which successive range elements appear
-   */
-  range(const Dim& start, const idx& end, const Dim stride);
+    /**
+     * Construct a range with the indices [start, end) (i.e. [start, end - 1])
+     * with the given stride.
+     *
+     * @param[in] start the starting index of the range
+     * @param[in] end the end index of the range, which will start from 0
+     * @param[in] stride the interval over which successive range elements appear
+     */
+    range(const Dim& start, const idx& end, const Dim stride);
 
-  Dim start() const;
-  // std::nullopt represents `end_t`
-  const std::optional<Dim>& end() const;
-  // throw if end is `end_t`
-  Dim endVal() const;
-  Dim stride() const;
-  bool operator==(const range& other) const;
-  bool operator!=(const range& other) const;
+    Dim start() const;
+    // std::nullopt represents `end_t`
+    const std::optional<Dim>& end() const;
+    // throw if end is `end_t`
+    Dim endVal() const;
+    Dim stride() const;
+    bool operator==(const range& other) const;
+    bool operator!=(const range& other) const;
 };
 
 // span is an instance of range
@@ -94,7 +94,7 @@ namespace detail {
 /**
  * Allowed indexing operators.
  */
-enum class IndexType : int { Tensor = 0, Range = 1, Literal = 2, Span = 3 };
+    enum class IndexType : int {Tensor = 0, Range = 1, Literal = 2, Span = 3};
 
 } // namespace detail
 
@@ -110,64 +110,62 @@ enum class IndexType : int { Tensor = 0, Range = 1, Literal = 2, Span = 3 };
  *   indexed.
  */
 struct FL_API Index {
-  using IndexVariant = std::variant<Dim, range, Tensor>;
+    using IndexVariant = std::variant<Dim, range, Tensor>;
 
- private:
-  // The type of indexing operator.
-  detail::IndexType type_;
+private:
+    // The type of indexing operator.
+    detail::IndexType type_;
 
-  // Underlying data referred to by the index
-  IndexVariant index_;
+    // Underlying data referred to by the index
+    IndexVariant index_;
 
-  // Intentionally private
-  Index() = default;
+    // Intentionally private
+    Index() = default;
 
- public:
-  /* implicit */ Index(const Tensor& tensor);
-  /* implicit */ Index(const range& range);
-  /* implicit */ Index(const Dim idx);
+public:
+    /* implicit */ Index(const Tensor& tensor);
+    /* implicit */ Index(const range& range);
+    /* implicit */ Index(const Dim idx);
 
-  /**
-   * Default copy assignment operator.
-   */
-  Index& operator=(const Index&) = default;
+    /**
+     * Default copy assignment operator.
+     */
+    Index& operator=(const Index&) = default;
 
-  /**
-   * Move constructor - moves the index data.
-   */
-  Index(Index&& index) noexcept;
-  Index(const Index& index) = default;
+    /**
+     * Move constructor - moves the index data.
+     */
+    Index(Index && index) noexcept;
+    Index(const Index& index) = default;
 
-  /**
-   * Get the index type for this index.
-   *
-   * @return the index type.
-   */
-  detail::IndexType type() const;
+    /**
+     * Get the index type for this index.
+     *
+     * @return the index type.
+     */
+    detail::IndexType type() const;
 
-  /**
-   * Returns true if the index represents a span.
-   */
-  bool isSpan() const;
+    /**
+     * Returns true if the index represents a span.
+     */
+    bool isSpan() const;
 
-  /**
-   * Get the internal data for a particular Index. Parameterized by type. Will
-   * throw as per std::variant if the type doesn't match this Index's underlying
-   * type.
-   */
-  template <typename T>
-  const T& get() const {
-    return std::get<T>(index_);
-  }
+    /**
+     * Get the internal data for a particular Index. Parameterized by type. Will
+     * throw as per std::variant if the type doesn't match this Index's underlying
+     * type.
+     */
+    template<typename T>
+    const T& get() const {
+        return std::get<T>(index_);
+    }
 
-  template <typename T>
-  T& get() {
-    return std::get<T>(index_);
-  }
+    template<typename T>
+    T& get() { return std::get<T>(index_); }
 
-  IndexVariant getVariant() const {
-    return index_;
-  }
+    IndexVariant getVariant() const {
+        return index_;
+    }
 };
 
 } // namespace fl

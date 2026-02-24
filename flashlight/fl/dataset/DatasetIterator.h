@@ -16,64 +16,64 @@ namespace detail {
  * STL style iterator class to easily iterate over a dataset.
  *
  * Example:
-  \ code{.cpp}
-  Tensor tensor = fl::rand({1, 2, 3});
-  TensorDataset tensords(std::vector<Tensor>{tensor});
-  for (auto& sample : tensords) {
+ \ code{.cpp}
+   Tensor tensor = fl::rand({1, 2, 3});
+   TensorDataset tensords(std::vector<Tensor>{tensor});
+   for (auto& sample : tensords) {
     // do something
-  }
-  \endcode
+   }
+   \endcode
  */
-template <typename D, typename F>
-class DatasetIterator {
- protected:
-  D* dataset_;
-  int64_t idx_;
-  F buffer_;
+    template<typename D, typename F>
+    class DatasetIterator {
+    protected:
+        D* dataset_;
+        int64_t idx_;
+        F buffer_;
 
- public:
-  // DatasetIterator traits, previously from std::iterator.
-  using value_type = F;
-  using reference = F&;
-  using pointer = F*;
-  using iterator_category = std::forward_iterator_tag;
+    public:
+        // DatasetIterator traits, previously from std::iterator.
+        using value_type = F;
+        using reference = F&;
+        using pointer = F*;
+        using iterator_category = std::forward_iterator_tag;
 
-  // Default constructible.
-  DatasetIterator() : dataset_(nullptr), idx_(-1) {}
+        // Default constructible.
+        DatasetIterator() : dataset_(nullptr),
+                            idx_(-1) {}
 
-  explicit DatasetIterator(D* dataset)
-      : dataset_(dataset), idx_(dataset_->size() > 0 ? 0 : -1) {}
+        explicit DatasetIterator(D* dataset) : dataset_(dataset),
+                                               idx_(dataset_->size() > 0 ? 0 : -1) {}
 
-  // Dereferencable
-  reference operator*() {
-    buffer_ = dataset_->get(idx_);
-    return buffer_;
-  }
+        // Dereferencable
+        reference operator*() {
+            buffer_ = dataset_->get(idx_);
+            return buffer_;
+        }
 
-  // Pre- and post-incrementable.
-  DatasetIterator& operator++() {
-    if (++idx_ >= dataset_->size()) {
-      idx_ = -1;
-    }
-    return *this;
-  }
+        // Pre- and post-incrementable.
+        DatasetIterator& operator++() {
+            if(++idx_ >= dataset_->size())
+                idx_ = -1;
+            return *this;
+        }
 
-  DatasetIterator operator++(int) {
-    DatasetIterator tmp(*this);
-    if (++idx_ >= dataset_->size())
-      idx_ = -1;
-    return tmp;
-  }
+        DatasetIterator operator++(int) {
+            DatasetIterator tmp(*this);
+            if(++idx_ >= dataset_->size())
+                idx_ = -1;
+            return tmp;
+        }
 
-  // Equality / inequality.
-  bool operator==(const DatasetIterator& that) const {
-    return (idx_ == that.idx_);
-  }
+        // Equality / inequality.
+        bool operator==(const DatasetIterator& that) const {
+            return idx_ == that.idx_;
+        }
 
-  bool operator!=(const DatasetIterator& that) const {
-    return (idx_ != that.idx_);
-  }
-};
+        bool operator!=(const DatasetIterator& that) const {
+            return idx_ != that.idx_;
+        }
+    };
 
 } // namespace detail
 } // namespace fl

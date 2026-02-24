@@ -13,25 +13,25 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
-using namespace fl::pkg::vision;
+        using namespace fl::pkg::vision;
 
-class Resnet50Backbone : public Container {
- public:
-  Resnet50Backbone();
+        class Resnet50Backbone : public Container {
+        public:
+            Resnet50Backbone();
 
-  std::vector<Variable> forward(const std::vector<Variable>& input) override;
+            std::vector<Variable> forward(const std::vector<Variable>& input) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
-  FL_BASIC_CONTAINER_CLONING(Resnet50Backbone)
+            FL_BASIC_CONTAINER_CLONING(Resnet50Backbone)
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(fl::Container)
-};
+        private:
+            FL_SAVE_LOAD_WITH_BASE(fl::Container)
+        };
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl
 

@@ -25,28 +25,28 @@ namespace fl {
  * tensor will have shape `(120, 20, 100)`.
  */
 class FL_API View : public UnaryModule {
- private:
-  View() = default; // Intentionally private
+private:
+    View() = default; // Intentionally private
 
-  Shape dims_;
+    Shape dims_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, dims_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, dims_)
 
- public:
-  /**
-   * Creates a `View` with the given dimensions.
-   *
-   * @param dims an `Shape` representing the dimensions of the `View`.
-   */
-  explicit View(Shape dims);
+public:
+    /**
+     * Creates a `View` with the given dimensions.
+     *
+     * @param dims an `Shape` representing the dimensions of the `View`.
+     */
+    explicit View(Shape dims);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
-  ~View() = default;
+    ~View() = default;
 };
 
 } // namespace fl

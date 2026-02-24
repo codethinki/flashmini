@@ -11,33 +11,33 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
 /*
  * Small generic utility class for loading data from a vector of type T into an
  * vector of arrayfire arrays
  */
-template <typename T>
-class LoaderDataset : public fl::Dataset {
- public:
-  using LoadFunc = std::function<std::vector<Tensor>(const T&)>;
+        template<typename T>
+        class LoaderDataset : public fl::Dataset {
+        public:
+            using LoadFunc = std::function<std::vector<Tensor>(const T&)>;
 
-  LoaderDataset(const std::vector<T>& list, LoadFunc loadfn)
-      : list_(list), loadfn_(loadfn) {}
+            LoaderDataset(const std::vector<T>& list, LoadFunc loadfn) : list_(list),
+                                                                         loadfn_(loadfn) {}
 
-  std::vector<Tensor> get(const int64_t idx) const override {
-    return loadfn_(list_[idx]);
-  }
+            std::vector<Tensor> get(const int64_t idx) const override {
+                return loadfn_(list_[idx]);
+            }
 
-  int64_t size() const override {
-    return list_.size();
-  }
+            int64_t size() const override {
+                return list_.size();
+            }
 
- private:
-  std::vector<T> list_;
-  LoadFunc loadfn_;
-};
+        private:
+            std::vector<T> list_;
+            LoadFunc loadfn_;
+        };
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl

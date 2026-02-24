@@ -18,13 +18,13 @@ namespace fl {
 
 FirstOrderOptimizer::FirstOrderOptimizer(
     const vector<Variable>& parameters,
-    double learningRate)
-    : parameters_(parameters.begin(), parameters.end()), lr_(learningRate) {}
+    double learningRate
+) : parameters_(parameters.begin(), parameters.end()),
+    lr_(learningRate) {}
 
 void FirstOrderOptimizer::zeroGrad() {
-  for (auto& parameter : parameters_) {
-    parameter.zeroGrad();
-  }
+    for(auto& parameter : parameters_)
+        parameter.zeroGrad();
 }
 
 } // namespace fl

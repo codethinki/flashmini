@@ -11,12 +11,12 @@
 
 namespace fl {
 
-using GetActiveDeviceIdFn = std::function<int()>;
-using GetMaxMemorySizeFn = std::function<size_t(int)>;
-using NativeAllocFn = std::function<void*(size_t)>;
-using NativeFreeFn = std::function<void(void*)>;
-using GetMemoryPressureThresholdFn = std::function<float()>;
-using SetMemoryPressureThresholdFn = std::function<void(float)>;
+using GetActiveDeviceIdFn = std::function<int ()>;
+using GetMaxMemorySizeFn = std::function<size_t (int)>;
+using NativeAllocFn = std::function<void* (size_t)>;
+using NativeFreeFn = std::function<void (void*)>;
+using GetMemoryPressureThresholdFn = std::function<float ()>;
+using SetMemoryPressureThresholdFn = std::function<void (float)>;
 
 /**
  * An interface for using native device memory management and JIT-related memory
@@ -37,14 +37,14 @@ using SetMemoryPressureThresholdFn = std::function<void(float)>;
  * header](https://git.io/Jv7do) for full specifications.
  */
 struct MemoryManagerDeviceInterface {
-  // Native memory management functions
-  GetActiveDeviceIdFn getActiveDeviceId;
-  GetMaxMemorySizeFn getMaxMemorySize;
-  NativeAllocFn nativeAlloc;
-  NativeFreeFn nativeFree;
-  // Memory pressure functions
-  GetMemoryPressureThresholdFn getMemoryPressureThreshold;
-  SetMemoryPressureThresholdFn setMemoryPressureThreshold;
+    // Native memory management functions
+    GetActiveDeviceIdFn getActiveDeviceId;
+    GetMaxMemorySizeFn getMaxMemorySize;
+    NativeAllocFn nativeAlloc;
+    NativeFreeFn nativeFree;
+    // Memory pressure functions
+    GetMemoryPressureThresholdFn getMemoryPressureThreshold;
+    SetMemoryPressureThresholdFn setMemoryPressureThreshold;
 };
 
 } // namespace fl

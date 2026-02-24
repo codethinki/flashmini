@@ -18,10 +18,10 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-using TokenToWordFunc = std::function<std::vector<
-    std::string>(const std::vector<int>&, const lib::text::Dictionary&, bool)>;
+        using TokenToWordFunc = std::function<std::vector<
+            std::string>(const std::vector<int>&, const lib::text::Dictionary&, bool)>;
 
 /**
  * PlGenerator is an easy plug-in to Train.cpp for generating pseudo labels on
@@ -56,93 +56,96 @@ using TokenToWordFunc = std::function<std::vector<
  *  }
  *
  */
-class PlGenerator {
- public:
-  PlGenerator(
-      const lib::text::Dictionary& tokenDict,
-      const fs::path& runPath,
-      int worldRank,
-      int worldSize,
-      int batchSize,
-      const fs::path& trainUnsupDir,
-      const std::string& trainUnsupLists,
-      const std::string& plEpoch,
-      const std::string& plRatio,
-      bool useExistingPl,
-      float seedModelWER,
-      double minInputSize, // in milliseconds
-      double maxInputSize, // in milliseconds
-      int minTargetSize, // in words
-      int maxTargetSize, // in words
-      const std::tuple<int, int, int>& padVal,
-      fl::Dataset::DataTransformFunction inputTransform,
-      fl::Dataset::DataTransformFunction targetTransform,
-      fl::Dataset::DataTransformFunction wordTransform,
-      TokenToWordFunc tokenToWord);
+        class PlGenerator {
+        public:
+            PlGenerator(
+                const lib::text::Dictionary& tokenDict,
+                const fs::path& runPath,
+                int worldRank,
+                int worldSize,
+                int batchSize,
+                const fs::path& trainUnsupDir,
+                const std::string& trainUnsupLists,
+                const std::string& plEpoch,
+                const std::string& plRatio,
+                bool useExistingPl,
+                float seedModelWER,
+                double minInputSize, // in milliseconds
+                double maxInputSize, // in milliseconds
+                int minTargetSize, // in words
+                int maxTargetSize, // in words
+                const std::tuple<int, int, int>& padVal,
+                fl::Dataset::DataTransformFunction inputTransform,
+                fl::Dataset::DataTransformFunction targetTransform,
+                fl::Dataset::DataTransformFunction wordTransform,
+                TokenToWordFunc tokenToWord
+            );
 
-  /*
-   * To resume trainig, try to load existing pseudo labels.
-   * `nullptr` is returned if loading fails.
-   */
-  std::string reloadPl(int curEpoch) const;
+            /*
+             * To resume trainig, try to load existing pseudo labels.
+             * `nullptr` is returned if loading fails.
+             */
+            std::string reloadPl(int curEpoch) const;
 
-  /*
-   * To regenerate pseudo labels with the current model.
-   * `nullptr` is returned if it's not supposed to do relabeling at the current
-   * epoch.
-   */
-  std::string regeneratePl(
-      int curEpoch,
-      const std::shared_ptr<fl::Module>& ntwrk,
-      const std::shared_ptr<SequenceCriterion> criterion,
-      const bool usePlugin = false) const;
+            /*
+             * To regenerate pseudo labels with the current model.
+             * `nullptr` is returned if it's not supposed to do relabeling at the current
+             * epoch.
+             */
+            std::string regeneratePl(
+                int curEpoch,
+                const std::shared_ptr<fl::Module>& ntwrk,
+                const std::shared_ptr<SequenceCriterion> criterion,
+                const bool usePlugin = false
+            ) const;
 
-  /*
-   * This function will create a mixture of supervised data and unalabeled data
-   * with pseudo labels.
-   */
-  std::shared_ptr<fl::Dataset> createTrainSet(
-      const fs::path& trainDir,
-      const fs::path& trainLists,
-      const fs::path& trainUnsupDir,
-      const std::string& batchingStrategy = kBatchStrategyNone,
-      int maxDurationPerBatch = 0) const;
+            /*
+             * This function will create a mixture of supervised data and unalabeled data
+             * with pseudo labels.
+             */
+            std::shared_ptr<fl::Dataset> createTrainSet(
+                const fs::path& trainDir,
+                const fs::path& trainLists,
+                const fs::path& trainUnsupDir,
+                const std::string& batchingStrategy = kBatchStrategyNone,
+                int maxDurationPerBatch = 0
+            ) const;
 
-  /* To set the WER of current model in PlGenerator */
-  void setModelWER(const float& wer);
+            /* To set the WER of current model in PlGenerator */
+            void setModelWER(const float& wer);
 
- private:
-  int worldRank_;
-  bool isMaster_;
-  int worldSize_;
-  int batchSize_;
+        private:
+            int worldRank_;
+            bool isMaster_;
+            int worldSize_;
+            int batchSize_;
 
-  lib::text::Dictionary tokenDict_;
-  fs::path plDir_;
+            lib::text::Dictionary tokenDict_;
+            fs::path plDir_;
 
-  bool useExistingPl_;
-  double seedModelWER_;
-  double currentModelWER_;
+            bool useExistingPl_;
+            double seedModelWER_;
+            double currentModelWER_;
 
-  float minInputSize_;
-  float maxInputSize_;
-  int minTargetSize_;
-  int maxTargetSize_;
+            float minInputSize_;
+            float maxInputSize_;
+            int minTargetSize_;
+            int maxTargetSize_;
 
-  std::tuple<int, int, int> padVal_;
-  fl::Dataset::DataTransformFunction inputTransform_;
-  fl::Dataset::DataTransformFunction targetTransform_;
-  fl::Dataset::DataTransformFunction wordTransform_;
-  TokenToWordFunc tokenToWord_;
+            std::tuple<int, int, int> padVal_;
+            fl::Dataset::DataTransformFunction inputTransform_;
+            fl::Dataset::DataTransformFunction targetTransform_;
+            fl::Dataset::DataTransformFunction wordTransform_;
+            TokenToWordFunc tokenToWord_;
 
-  std::shared_ptr<fl::Dataset> fullUnsupDs_;
-  std::vector<int> plEpochs_;
-  std::unordered_map<int, float> plUpdateMap_;
+            std::shared_ptr<fl::Dataset> fullUnsupDs_;
+            std::vector<int> plEpochs_;
+            std::unordered_map<int, float> plUpdateMap_;
 
-  int findLastPlEpoch(int curEpoch) const;
-  void logMaster(const std::string& message) const;
-};
+            int findLastPlEpoch(int curEpoch) const;
+            void logMaster(const std::string& message) const;
+        };
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

@@ -18,68 +18,64 @@ AdadeltaOptimizer::AdadeltaOptimizer(
     float learningRate /* = 1.0 */,
     float rho /* = 0.9 */,
     float epsilon /* = 1e-8 */,
-    float weightDecay /* = 0 */)
-    : FirstOrderOptimizer(parameters, learningRate),
-      rho_(rho),
-      eps_(epsilon),
-      wd_(weightDecay),
-      accGrad_(),
-      accDelta_() {
-  accGrad_.reserve(parameters.size());
-  accDelta_.reserve(parameters.size());
+    float weightDecay /* = 0 */
+) : FirstOrderOptimizer(parameters, learningRate),
+    rho_(rho),
+    eps_(epsilon),
+    wd_(weightDecay),
+    accGrad_(),
+    accDelta_() {
+    accGrad_.reserve(parameters.size());
+    accDelta_.reserve(parameters.size());
 
-  for (const auto& parameter : parameters_) {
-    accGrad_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
-    accDelta_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
+    for(const auto& parameter : parameters_) {
+        accGrad_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
+        accDelta_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
 
-    fl::eval(accGrad_.back());
-    fl::eval(accDelta_.back());
-  }
+        fl::eval(accGrad_.back());
+        fl::eval(accDelta_.back());
+    }
 }
 
 void AdadeltaOptimizer::step() {
-  for (size_t i = 0; i < parameters_.size(); i++) {
-    if (!parameters_[i].isGradAvailable()) {
-      continue;
+    for(size_t i = 0; i < parameters_.size(); i++) {
+        if(!parameters_[i].isGradAvailable())
+            continue;
+
+        const Tensor& grad = parameters_[i].grad().tensor();
+        Tensor& data = parameters_[i].tensor();
+
+        if(wd_ != 0)
+            // Weight decay term
+            data = data - wd_ * data;
+
+        Tensor& accGrad = accGrad_[i];
+        Tensor& accDelta = accDelta_[i];
+
+        accGrad = rho_ * accGrad + (1 - rho_) * grad * grad;
+        fl::eval(accGrad);
+
+        auto delta = fl::sqrt(accDelta + eps_) / fl::sqrt(accGrad + eps_) * grad;
+
+        data = data - lr_ * delta;
+        fl::eval(data);
+
+        accDelta = rho_ * accDelta + (1 - rho_) * delta * delta;
+        fl::eval(accDelta);
     }
-
-    const Tensor& grad = parameters_[i].grad().tensor();
-    Tensor& data = parameters_[i].tensor();
-
-    if (wd_ != 0) {
-      // Weight decay term
-      data = data - wd_ * data;
-    }
-
-    Tensor& accGrad = accGrad_[i];
-    Tensor& accDelta = accDelta_[i];
-
-    accGrad = rho_ * accGrad + (1 - rho_) * grad * grad;
-    fl::eval(accGrad);
-
-    auto delta = fl::sqrt(accDelta + eps_) / fl::sqrt(accGrad + eps_) * grad;
-
-    data = data - lr_ * delta;
-    fl::eval(data);
-
-    accDelta = rho_ * accDelta + (1 - rho_) * delta * delta;
-    fl::eval(accDelta);
-  }
 }
 
 std::string AdadeltaOptimizer::prettyString() const {
-  std::ostringstream ss;
-  ss << "Adadelta";
+    std::ostringstream ss;
+    ss << "Adadelta";
 
-  if (wd_ != 0) {
-    ss << " (weight decay=" << wd_ << ")";
-  }
-  ss << " (rho=" << rho_ << ")";
-  if (eps_ != 0) {
-    ss << " (epsilon=" << eps_ << ")";
-  }
+    if(wd_ != 0)
+        ss << " (weight decay=" << wd_ << ")";
+    ss << " (rho=" << rho_ << ")";
+    if(eps_ != 0)
+        ss << " (epsilon=" << eps_ << ")";
 
-  return ss.str();
+    return ss.str();
 }
 
 } // namespace fl

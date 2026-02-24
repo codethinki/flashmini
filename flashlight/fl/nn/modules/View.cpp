@@ -18,18 +18,18 @@ namespace fl {
 View::View(Shape dims) : dims_(std::move(dims)) {}
 
 Variable View::forward(const Variable& input) {
-  Shape dims = dims_;
-  return moddims(input, dims);
+    Shape dims = dims_;
+    return moddims(input, dims);
 }
 
 std::unique_ptr<Module> View::clone() const {
-  return std::make_unique<View>(*this);
+    return std::make_unique<View>(*this);
 }
 
 std::string View::prettyString() const {
-  std::ostringstream ss;
-  ss << "View (" << dims_ << ")";
-  return ss.str();
+    std::ostringstream ss;
+    ss << "View (" << dims_ << ")";
+    return ss.str();
 }
 
 } // namespace fl

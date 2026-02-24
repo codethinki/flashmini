@@ -6,102 +6,134 @@
 
 #include "detail/cpu_ctc.h"
 #ifdef __CUDACC__
-    #include "detail/gpu_ctc.h"
+#include "detail/gpu_ctc.h"
 #endif
-
 
 extern "C" {
 
-int get_warpctc_version() {
-    return 2;
-}
+int get_warpctc_version() { return 2; }
 
 const char* ctcGetStatusString(ctcStatus_t status) {
-    switch (status) {
-    case CTC_STATUS_SUCCESS:
-        return "no error";
-    case CTC_STATUS_MEMOPS_FAILED:
-        return "cuda memcpy or memset failed";
-    case CTC_STATUS_INVALID_VALUE:
-        return "invalid value";
-    case CTC_STATUS_EXECUTION_FAILED:
-        return "execution failed";
-    case CTC_STATUS_LABEL_LENGTH_TOO_LARGE:
-        return "label length >639 is not supported";
-    case CTC_STATUS_UNKNOWN_ERROR:
-    default:
-        return "unknown error";
+    switch(status) {
+        case CTC_STATUS_SUCCESS:
+            return "no error";
+        case CTC_STATUS_MEMOPS_FAILED:
+            return "cuda memcpy or memset failed";
+        case CTC_STATUS_INVALID_VALUE:
+            return "invalid value";
+        case CTC_STATUS_EXECUTION_FAILED:
+            return "execution failed";
+        case CTC_STATUS_LABEL_LENGTH_TOO_LARGE:
+            return "label length >639 is not supported";
+        case CTC_STATUS_UNKNOWN_ERROR:
+        default:
+            return "unknown error";
 
     }
 
 }
 
-
-ctcStatus_t compute_ctc_loss(const float* const activations,
-                             float* gradients,
-                             const int* const flat_labels,
-                             const int* const label_lengths,
-                             const int* const input_lengths,
-                             int alphabet_size,
-                             int minibatch,
-                             float *costs,
-                             void *workspace,
-                             ctcOptions options) {
-    if (activations == nullptr ||
-        label_lengths == nullptr ||
-        input_lengths == nullptr ||
-        costs == nullptr ||
-        workspace == nullptr ||
-        alphabet_size <= 0 ||
-        minibatch <= 0)
+ctcStatus_t compute_ctc_loss(
+    const float* const activations,
+    float* gradients,
+    const int* const flat_labels,
+    const int* const label_lengths,
+    const int* const input_lengths,
+    int alphabet_size,
+    int minibatch,
+    float* costs,
+    void* workspace,
+    ctcOptions options
+) {
+    if(
+        activations == nullptr
+        || label_lengths == nullptr
+        || input_lengths == nullptr
+        || costs == nullptr
+        || workspace == nullptr
+        || alphabet_size <= 0
+        || minibatch <= 0
+    )
         return CTC_STATUS_INVALID_VALUE;
 
-    if (options.loc == CTC_CPU) {
-        CpuCTC<float> ctc(alphabet_size, minibatch, workspace, options.num_threads,
-                          options.blank_label);
+    if(options.loc == CTC_CPU) {
+        CpuCTC<float> ctc(
+            alphabet_size,
+            minibatch,
+            workspace,
+            options.num_threads,
+            options.blank_label
+        );
 
-        if (gradients != NULL)
-            return ctc.cost_and_grad(activations, gradients,
-                                     costs,
-                                     flat_labels, label_lengths,
-                                     input_lengths);
+        if(gradients != NULL)
+            return ctc.cost_and_grad(
+                activations,
+                gradients,
+                costs,
+                flat_labels,
+                label_lengths,
+                input_lengths
+            );
         else
-            return ctc.score_forward(activations, costs, flat_labels,
-                                     label_lengths, input_lengths);
-    } else if (options.loc == CTC_GPU) {
+            return ctc.score_forward(
+                activations,
+                costs,
+                flat_labels,
+                label_lengths,
+                input_lengths
+            );
+    } else if(options.loc == CTC_GPU) {
 #ifdef __CUDACC__
-        GpuCTC<float> ctc(alphabet_size, minibatch, workspace, options.stream,
-                          options.blank_label);
+        GpuCTC<float> ctc(
+            alphabet_size,
+            minibatch,
+            workspace,
+            options.stream,
+            options.blank_label
+        );
 
-        if (gradients != NULL)
-            return ctc.cost_and_grad(activations, gradients, costs,
-                                     flat_labels, label_lengths,
-                                     input_lengths);
+        if(gradients != NULL)
+            return ctc.cost_and_grad(
+                activations,
+                gradients,
+                costs,
+                flat_labels,
+                label_lengths,
+                input_lengths
+            );
         else
-            return ctc.score_forward(activations, costs, flat_labels,
-                                     label_lengths, input_lengths);
+            return ctc.score_forward(
+                activations,
+                costs,
+                flat_labels,
+                label_lengths,
+                input_lengths
+            );
+
 #else
         std::cerr << "GPU execution requested, but not compiled with GPU support" << std::endl;
         return CTC_STATUS_EXECUTION_FAILED;
 #endif
-    } else {
+    } else
         return CTC_STATUS_INVALID_VALUE;
-    }
 }
 
+ctcStatus_t get_workspace_size(
+    const int* const label_lengths,
+    const int* const input_lengths,
+    int alphabet_size,
+    int minibatch,
+    ctcOptions options,
+    size_t* size_bytes
+) {
 
-ctcStatus_t get_workspace_size(const int* const label_lengths,
-                               const int* const input_lengths,
-                               int alphabet_size, int minibatch,
-                               ctcOptions options,
-                               size_t* size_bytes)
-{
-
-    if (label_lengths == nullptr ||
-        input_lengths == nullptr ||
-        size_bytes == nullptr ||
-        alphabet_size <= 0 ||
-        minibatch <= 0)
+    if(
+        label_lengths == nullptr
+        || input_lengths == nullptr
+        || size_bytes == nullptr
+        || alphabet_size <= 0
+        || minibatch <= 0
+    )
         return CTC_STATUS_INVALID_VALUE;
 
     // This is the max of all S and T for all examples in the minibatch.
@@ -112,61 +144,61 @@ ctcStatus_t get_workspace_size(const int* const label_lengths,
 
     *size_bytes = 0;
 
-    if (options.loc == CTC_GPU) {
+    if(options.loc == CTC_GPU) {
         // GPU storage
-        //nll_forward, nll_backward
+        // nll_forward, nll_backward
         *size_bytes += 2 * sizeof(float) * minibatch;
 
-        //repeats
+        // repeats
         *size_bytes += sizeof(int) * minibatch;
 
-        //label offsets
+        // label offsets
         *size_bytes += sizeof(int) * minibatch;
 
-        //utt_length
+        // utt_length
         *size_bytes += sizeof(int) * minibatch;
 
-        //label lengths
+        // label lengths
         *size_bytes += sizeof(int) * minibatch;
 
-        //labels without blanks - overallocate for now
+        // labels without blanks - overallocate for now
         *size_bytes += sizeof(int) * maxL * minibatch;
 
-        //labels with blanks
+        // labels with blanks
         *size_bytes += sizeof(int) * S * minibatch;
 
-        //alphas
+        // alphas
         *size_bytes += sizeof(float) * S * maxT * minibatch;
 
-        //denoms
+        // denoms
         *size_bytes += sizeof(float) * maxT * minibatch;
 
-        //probs (since we will pass in activations)
+        // probs (since we will pass in activations)
         *size_bytes += sizeof(float) * alphabet_size * maxT * minibatch;
 
     } else {
-        //cpu can eventually replace all minibatch with
-        //max number of concurrent threads if memory is
-        //really tight
+        // cpu can eventually replace all minibatch with
+        // max number of concurrent threads if memory is
+        // really tight
 
-        //per minibatch memory
+        // per minibatch memory
         size_t per_minibatch_bytes = 0;
 
-        //output
-        per_minibatch_bytes += sizeof(float) * alphabet_size ;
+        // output
+        per_minibatch_bytes += sizeof(float) * alphabet_size;
 
-        //alphas
+        // alphas
         per_minibatch_bytes += sizeof(float) * S * maxT;
 
-        //betas
+        // betas
         per_minibatch_bytes += sizeof(float) * S;
 
-        //labels w/blanks, e_inc, s_inc
+        // labels w/blanks, e_inc, s_inc
         per_minibatch_bytes += 3 * sizeof(int) * S;
 
         *size_bytes = per_minibatch_bytes * minibatch;
 
-        //probs
+        // probs
         *size_bytes += sizeof(float) * alphabet_size * maxT * minibatch;
     }
 

@@ -31,7 +31,8 @@ FL_API std::vector<int64_t> partitionByRoundRobin(
     int64_t partitionId,
     int64_t numPartitions,
     int64_t batchSz = 1,
-    bool allowEmpty = false);
+    bool allowEmpty = false
+);
 
 /**
  * Partitions the samples in a round-robin manner and return ids of the samples
@@ -42,13 +43,13 @@ FL_API std::vector<int64_t> partitionByRoundRobin(
  * @param numPartitions total partitions
  * @param maxTokens total number of tokens in the batch
  */
-FL_API std::pair<std::vector<int64_t>, std::vector<int64_t>>
-dynamicPartitionByRoundRobin(
+FL_API std::pair<std::vector<int64_t>, std::vector<int64_t>> dynamicPartitionByRoundRobin(
     const std::vector<float>& samplesSize,
     int64_t partitionId,
     int64_t numPartitions,
     int64_t maxSizePerBatch,
-    bool allowEmpty = false);
+    bool allowEmpty = false
+);
 
 /**
  * Make batch by applying batchFn to the data
@@ -71,7 +72,8 @@ FL_API std::vector<Tensor> makeBatchFromRange(
     std::shared_ptr<const Dataset> dataset,
     std::vector<Dataset::BatchFunction> batchFns,
     int64_t start,
-    int64_t end);
+    int64_t end
+);
 
 /** @} */
 

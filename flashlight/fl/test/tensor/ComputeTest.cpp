@@ -14,31 +14,31 @@
 #include "flashlight/fl/tensor/TensorBase.h"
 
 TEST(TensorComputeTest, sync) {
-  // Testing whether a value is ready isn't meaningful since any function to
-  // inspect its state will implicitly synchronize -- this test simply ensures
-  // sync runs
-  auto t1 = fl::full({10, 10}, 1.);
-  auto t2 = fl::full({10, 10}, 2.);
-  auto t3 = t1 + t2;
-  fl::sync();
+    // Testing whether a value is ready isn't meaningful since any function to
+    // inspect its state will implicitly synchronize -- this test simply ensures
+    // sync runs
+    auto t1 = fl::full({10, 10}, 1.);
+    auto t2 = fl::full({10, 10}, 2.);
+    auto t3 = t1 + t2;
+    fl::sync();
 
-  int deviceId = fl::getDevice();
-  auto t4 = t1 + t2 + t3;
-  fl::sync(deviceId);
+    int deviceId = fl::getDevice();
+    auto t4 = t1 + t2 + t3;
+    fl::sync(deviceId);
 }
 
 TEST(TensorComputeTest, eval) {
-  // Testing whether a value is ready isn't meaningful since any function to
-  // inspect its state will implicitly synchronize -- this test simply ensures
-  // eval runs
-  auto t1 = fl::full({10, 10}, 3.);
-  auto t2 = fl::full({10, 10}, 4.);
-  auto t3 = t1 * t2;
-  fl::eval(t3);
+    // Testing whether a value is ready isn't meaningful since any function to
+    // inspect its state will implicitly synchronize -- this test simply ensures
+    // eval runs
+    auto t1 = fl::full({10, 10}, 3.);
+    auto t2 = fl::full({10, 10}, 4.);
+    auto t3 = t1 * t2;
+    fl::eval(t3);
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

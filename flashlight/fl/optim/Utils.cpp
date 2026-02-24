@@ -14,26 +14,23 @@
 namespace fl {
 
 double clipGradNorm(const std::vector<Variable>& parameters, double maxNorm) {
-  double gradNorm = 0.0;
-  for (const auto& p : parameters) {
-    if (!p.isGradAvailable()) {
-      continue;
+    double gradNorm = 0.0;
+    for(const auto& p : parameters) {
+        if(!p.isGradAvailable())
+            continue;
+        const auto& grad = p.grad().tensor();
+        gradNorm += fl::sum(grad * grad).asScalar<double>();
     }
-    const auto& grad = p.grad().tensor();
-    gradNorm += fl::sum(grad * grad).asScalar<double>();
-  }
-  gradNorm = std::sqrt(gradNorm);
-  double scale = maxNorm / (gradNorm + 1e-6);
-  if (scale >= 1.0) {
+    gradNorm = std::sqrt(gradNorm);
+    double scale = maxNorm / (gradNorm + 1e-6);
+    if(scale >= 1.0)
+        return gradNorm;
+    for(auto& p : parameters) {
+        if(!p.isGradAvailable())
+            continue;
+        p.grad().tensor() *= scale;
+    }
     return gradNorm;
-  }
-  for (auto& p : parameters) {
-    if (!p.isGradAvailable()) {
-      continue;
-    }
-    p.grad().tensor() *= scale;
-  }
-  return gradNorm;
 }
 
 } // namespace fl

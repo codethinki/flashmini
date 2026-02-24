@@ -15,7 +15,7 @@
 
 namespace fl {
 namespace {
-std::once_flag flInitFlag;
+    std::once_flag flInitFlag;
 }
 
 /**
@@ -27,10 +27,13 @@ std::once_flag flInitFlag;
  * Body is only run once per process. Subsequent calls will be noops.
  */
 void init() {
-  std::call_once(flInitFlag, []() {
-    defaultTensorBackend();
-    initLogging();
-  });
+    std::call_once(
+        flInitFlag,
+        []() {
+            defaultTensorBackend();
+            initLogging();
+        }
+    );
 }
 
 } // namespace fl

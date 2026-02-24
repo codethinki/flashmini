@@ -17,52 +17,52 @@
 
 // Fwd decl
 class fftw_plan_s;
-using fftw_plan = fftw_plan_s *;
+using fftw_plan = fftw_plan_s*;
 
 namespace fl {
 namespace lib {
-namespace audio {
+    namespace audio {
 
 // Computes Power Spectrum features for a speech signal.
 
-class PowerSpectrum {
- public:
-  explicit PowerSpectrum(const FeatureParams& params);
+        class PowerSpectrum {
+        public:
+            explicit PowerSpectrum(const FeatureParams& params);
 
-  virtual ~PowerSpectrum();
+            virtual ~PowerSpectrum();
 
-  // input - input speech signal (T)
-  // Returns - Power spectrum (Col Major : FEAT X FRAMESZ)
-  virtual std::vector<float> apply(const std::vector<float>& input);
+            // input - input speech signal (T)
+            // Returns - Power spectrum (Col Major : FEAT X FRAMESZ)
+            virtual std::vector<float> apply(const std::vector<float>& input);
 
-  // input - input speech signal (Col Major : T X BATCHSZ)
-  // Returns - Output features (Col Major : FEAT X FRAMESZ X BATCHSZ)
-  std::vector<float> batchApply(const std::vector<float>& input, int batchSz);
+            // input - input speech signal (Col Major : T X BATCHSZ)
+            // Returns - Output features (Col Major : FEAT X FRAMESZ X BATCHSZ)
+            std::vector<float> batchApply(const std::vector<float>& input, int batchSz);
 
-  virtual int outputSize(int inputSz);
+            virtual int outputSize(int inputSz);
 
-  FeatureParams getFeatureParams() const;
+            FeatureParams getFeatureParams() const;
 
- protected:
-  FeatureParams featParams_;
+        protected:
+            FeatureParams featParams_;
 
-  // Helper function which takes input as signal after dividing the signal into
-  // frames. Main purpose of this function is to reuse it in MFSC, MFCC code
-  std::vector<float> powSpectrumImpl(std::vector<float>& frames);
+            // Helper function which takes input as signal after dividing the signal into
+            // frames. Main purpose of this function is to reuse it in MFSC, MFCC code
+            std::vector<float> powSpectrumImpl(std::vector<float>& frames);
 
-  void validatePowSpecParams() const;
+            void validatePowSpecParams() const;
 
- private:
-  // The following classes are defined in the order they are applied
-  Dither dither_;
-  PreEmphasis preEmphasis_;
-  Windowing windowing_;
+        private:
+            // The following classes are defined in the order they are applied
+            Dither dither_;
+            PreEmphasis preEmphasis_;
+            Windowing windowing_;
 
-  std::unique_ptr<fftw_plan> fftPlan_; // fftw_plan is an opque pointer type
-  std::vector<double> inFftBuf_, outFftBuf_;
-  std::mutex fftMutex_;
-  static std::mutex fftPlanMutex_;
-};
-} // namespace audio
+            std::unique_ptr<fftw_plan> fftPlan_; // fftw_plan is an opque pointer type
+            std::vector<double> inFftBuf_, outFftBuf_;
+            std::mutex fftMutex_;
+            static std::mutex fftPlanMutex_;
+        };
+    } // namespace audio
 } // namespace lib
 } // namespace fl

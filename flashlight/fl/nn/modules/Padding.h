@@ -19,32 +19,32 @@ namespace fl {
  * \f$i\f$ of size specified by the tuple `padi` to the input.
  */
 class FL_API Padding : public UnaryModule {
- private:
-  Padding() = default; // intentionally private
+private:
+    Padding() = default; // intentionally private
 
-  std::vector<std::pair<int, int>> m_pad;
-  double m_val;
+    std::vector<std::pair<int, int>> m_pad;
+    double m_val;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, m_pad, m_val)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, m_pad, m_val)
 
- public:
-  /**
-   * Constructs a Padding module that pads the first dimension of the input. If
-   * the input is of shape
-   * [\f$dim_0\f$, \f$dim_1\f$, \f$dim_2\f$, \f$dim_3\f$],
-   * the output will be of shape [\f$paddingBefore+dim_0+paddingAfter\f$,
-   * \f$dim_1\f$, \f$dim_2\f$, \f$dim_3\f$]
-   * @param[in] padding a vector of tuples representing padding (before,
-   * after) tuples for each axis
-   * @param val the value to be padded
-   */
-  Padding(std::vector<std::pair<int, int>> padding, double val);
+public:
+    /**
+     * Constructs a Padding module that pads the first dimension of the input. If
+     * the input is of shape
+     * [\f$dim_0\f$, \f$dim_1\f$, \f$dim_2\f$, \f$dim_3\f$],
+     * the output will be of shape [\f$paddingBefore+dim_0+paddingAfter\f$,
+     * \f$dim_1\f$, \f$dim_2\f$, \f$dim_3\f$]
+     * @param[in] padding a vector of tuples representing padding (before,
+     * after) tuples for each axis
+     * @param val the value to be padded
+     */
+    Padding(std::vector<std::pair<int, int>> padding, double val);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 } // namespace fl

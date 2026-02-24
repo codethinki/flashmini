@@ -13,21 +13,20 @@ namespace fl {
 
 Transform::Transform(
     const std::function<Variable(const Variable&)>& func,
-    const std::string& name /* = "" */)
-    : func_(func), name_(name) {}
+    const std::string& name /* = "" */
+) : func_(func),
+    name_(name) {}
 
-Variable Transform::forward(const Variable& input) {
-  return func_(input);
-}
+Variable Transform::forward(const Variable& input) { return func_(input); }
 
 std::unique_ptr<Module> Transform::clone() const {
-  return std::make_unique<Transform>(*this);
+    return std::make_unique<Transform>(*this);
 }
 
 std::string Transform::prettyString() const {
-  std::ostringstream ss;
-  ss << "Transform ('" << name_ << "')";
-  return ss.str();
+    std::ostringstream ss;
+    ss << "Transform ('" << name_ << "')";
+    return ss.str();
 }
 
 } // namespace fl

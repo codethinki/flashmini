@@ -15,19 +15,19 @@
 namespace fl::detail {
 
 ScopedProfiler::ScopedProfiler() {
-  FL_CUDA_CHECK(cudaProfilerStart());
+    FL_CUDA_CHECK(cudaProfilerStart());
 }
 
 ScopedProfiler::~ScopedProfiler() {
-  FL_CUDA_CHECK(cudaProfilerStop());
+    FL_CUDA_CHECK(cudaProfilerStop());
 }
 
 ProfileTracer::ProfileTracer(const std::string& name) {
-  nvtxRangePush(name.c_str());
+    nvtxRangePush(name.c_str());
 }
 
 ProfileTracer::~ProfileTracer() {
-  nvtxRangePop();
+    nvtxRangePop();
 }
 
 } // namespace fl

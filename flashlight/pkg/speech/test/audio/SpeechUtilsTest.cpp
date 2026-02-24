@@ -13,21 +13,21 @@
 using namespace fl::lib::audio;
 
 TEST(SpeechUtilsTest, SimpleMatmul) {
-  /*
-    A                B
-    [ 2  3  4 ]       [ 2  3 ]
-    [ 3  4  5 ],      [ 3  4 ]
-    [ 4  5  6 ],      [ 4  5 ]
-    [ 5  6  7 ],
-  */
-  std::vector<float> A = {2, 3, 4, 3, 4, 5, 4, 5, 6, 5, 6, 7};
-  std::vector<float> B = {2, 3, 3, 4, 4, 5};
-  auto op = cblasGemm(A, B, 2, 3);
-  std::vector<float> expectedOp = {29, 38, 38, 50, 47, 62, 56, 74};
-  EXPECT_TRUE(compareVec(op, expectedOp, 1E-10));
+    /*
+       A                B
+       [ 2  3  4 ]       [ 2  3 ]
+       [ 3  4  5 ],      [ 3  4 ]
+       [ 4  5  6 ],      [ 4  5 ]
+       [ 5  6  7 ],
+     */
+    std::vector<float> A = {2, 3, 4, 3, 4, 5, 4, 5, 6, 5, 6, 7};
+    std::vector<float> B = {2, 3, 3, 4, 4, 5};
+    auto op = cblasGemm(A, B, 2, 3);
+    std::vector<float> expectedOp = {29, 38, 38, 50, 47, 62, 56, 74};
+    EXPECT_TRUE(compareVec(op, expectedOp, 1E-10));
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

@@ -14,49 +14,46 @@
 
 namespace fl {
 
-Embedding::Embedding(int embeddingDim, int numEmbeddings)
-    : embeddingDim_(embeddingDim), numEmbeddings_(numEmbeddings) {
-  initialize();
+Embedding::Embedding(int embeddingDim, int numEmbeddings) : embeddingDim_(embeddingDim),
+                                                            numEmbeddings_(numEmbeddings) {
+    initialize();
 }
 
-Embedding::Embedding(const Variable& w)
-    : UnaryModule({w}), embeddingDim_(w.dim(0)), numEmbeddings_(w.dim(1)) {}
+Embedding::Embedding(const Variable& w) : UnaryModule({w}), embeddingDim_(w.dim(0)),
+                                          numEmbeddings_(w.dim(1)) {}
 
-Embedding::Embedding(const Embedding& other)
-    : UnaryModule(other.copyParams()),
-      embeddingDim_(other.embeddingDim_),
-      numEmbeddings_(other.numEmbeddings_) {
-  train_ = other.train_;
+Embedding::Embedding(const Embedding& other) : UnaryModule(other.copyParams()),
+                                               embeddingDim_(other.embeddingDim_),
+                                               numEmbeddings_(other.numEmbeddings_) {
+    train_ = other.train_;
 }
 
 Embedding& Embedding::operator=(const Embedding& other) {
-  params_ = other.copyParams();
-  train_ = other.train_;
-  embeddingDim_ = other.embeddingDim_;
-  numEmbeddings_ = other.numEmbeddings_;
-  return *this;
+    params_ = other.copyParams();
+    train_ = other.train_;
+    embeddingDim_ = other.embeddingDim_;
+    numEmbeddings_ = other.numEmbeddings_;
+    return *this;
 }
 
 void Embedding::initialize() {
-  double stdv = std::sqrt(1.0 / static_cast<double>(embeddingDim_));
-  auto embeddings =
-      uniform(embeddingDim_, numEmbeddings_, -stdv, stdv, fl::dtype::f32, true);
-  params_ = {embeddings};
+    double stdv = std::sqrt(1.0 / static_cast<double>(embeddingDim_));
+    auto embeddings =
+        uniform(embeddingDim_, numEmbeddings_, -stdv, stdv, fl::dtype::f32, true);
+    params_ = {embeddings};
 }
 
-Variable Embedding::forward(const Variable& input) {
-  return embedding(input, params_[0]);
-}
+Variable Embedding::forward(const Variable& input) { return embedding(input, params_[0]); }
 
 std::unique_ptr<Module> Embedding::clone() const {
-  return std::make_unique<Embedding>(*this);
+    return std::make_unique<Embedding>(*this);
 }
 
 std::string Embedding::prettyString() const {
-  std::ostringstream ss;
-  ss << "Embedding (embeddings: " << numEmbeddings_
-     << ") (dim: " << embeddingDim_ << ")";
-  return ss.str();
+    std::ostringstream ss;
+    ss << "Embedding (embeddings: " << numEmbeddings_
+       << ") (dim: " << embeddingDim_ << ")";
+    return ss.str();
 }
 
 } // namespace fl

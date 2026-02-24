@@ -20,13 +20,13 @@ namespace detail {
  * @return Wide string (UTF-16LE)
  * @throws std::runtime_error if conversion fails
  */
-std::wstring utf8ToWide(const std::string& utf8);
+    std::wstring utf8ToWide(const std::string& utf8);
 
 /**
  * Get a human-readable error message from the last Windows error code
  * @return Error message as UTF-8 string
  */
-std::string getWindowsErrorString();
+    std::string getWindowsErrorString();
 
 } // namespace detail
 } // namespace fl

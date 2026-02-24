@@ -22,24 +22,24 @@ namespace fl {
  *
  */
 class FL_API MemoryBlobDataset : public BlobDataset {
- public:
-  /**
-   * Creates a `MemoryBlobDataset`, specifying a blob file name.
-   */
-  MemoryBlobDataset();
+public:
+    /**
+     * Creates a `MemoryBlobDataset`, specifying a blob file name.
+     */
+    MemoryBlobDataset();
 
-  virtual ~MemoryBlobDataset() override = default;
+    virtual ~MemoryBlobDataset() override = default;
 
- protected:
-  int64_t writeData(int64_t offset, const char* data, int64_t size)
-      const override;
-  int64_t readData(int64_t offset, char* data, int64_t size) const override;
-  void flushData() override;
-  bool isEmptyData() const override;
+protected:
+    int64_t writeData(int64_t offset, const char* data, int64_t size)
+    const override;
+    int64_t readData(int64_t offset, char* data, int64_t size) const override;
+    void flushData() override;
+    bool isEmptyData() const override;
 
- private:
-  mutable std::mutex writeMutex_;
-  mutable std::vector<char> data_;
+private:
+    mutable std::mutex writeMutex_;
+    mutable std::vector<char> data_;
 };
 
 } // namespace fl

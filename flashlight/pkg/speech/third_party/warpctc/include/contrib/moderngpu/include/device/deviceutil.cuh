@@ -26,11 +26,11 @@
  ******************************************************************************/
 
 /******************************************************************************
- *
- * Code and text by Sean Baxter, NVIDIA Research
- * See http://nvlabs.github.io/moderngpu for repository and documentation.
- *
- ******************************************************************************/
+*
+* Code and text by Sean Baxter, NVIDIA Research
+* See http://nvlabs.github.io/moderngpu for repository and documentation.
+*
+******************************************************************************/
 
 #pragma once
 
@@ -39,43 +39,41 @@
 namespace mgpu {
 
 // Get the difference between two pointers in bytes.
-MGPU_HOST_DEVICE ptrdiff_t PtrDiff(const void* a, const void* b) {
-	return (const byte*)b - (const byte*)a;
-}
+MGPU_HOST_DEVICE ptrdiff_t PtrDiff(const void* a, const void* b) { return (const byte*) b - (const byte*) a; }
 
 // Offset a pointer by i bytes.
 template<typename T>
-MGPU_HOST_DEVICE const T* PtrOffset(const T* p, ptrdiff_t i) {
-	return (const T*)((const byte*)p + i);
-}
+MGPU_HOST_DEVICE const T* PtrOffset(const T* p, ptrdiff_t i) { return (const T*) ((const byte*) p + i); }
 template<typename T>
-MGPU_HOST_DEVICE T* PtrOffset(T* p, ptrdiff_t i) {
-	return (T*)((byte*)p + i);
-}
+MGPU_HOST_DEVICE T* PtrOffset(T* p, ptrdiff_t i) { return (T*) ((byte*) p + i); }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Task range support
 // Evenly distributes variable-length arrays over a fixed number of CTAs.
 
 MGPU_HOST int2 DivideTaskRange(int numItems, int numWorkers) {
-	div_t d = div(numItems, numWorkers);
-	return make_int2(d.quot, d.rem);
+    div_t d = div(numItems, numWorkers);
+    return make_int2(d.quot, d.rem);
 }
 
 MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task) {
-	int2 range;
-	range.x = task.x * block;
-	range.x += min(block, task.y);
-	range.y = range.x + task.x + (block < task.y);
-	return range;
+    int2 range;
+    range.x = task.x * block;
+    range.x += min(block, task.y);
+    range.y = range.x + task.x + (block < task.y);
+    return range;
 }
 
-MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task, int blockSize,
-	int count) {
-	int2 range = ComputeTaskRange(block, task);
-	range.x *= blockSize;
-	range.y = min(count, range.y * blockSize);
-	return range;
+MGPU_HOST_DEVICE int2 ComputeTaskRange(
+    int block,
+    int2 task,
+    int blockSize,
+    int count
+) {
+    int2 range = ComputeTaskRange(block, task);
+    range.x *= blockSize;
+    range.y = min(count, range.y * blockSize);
+    return range;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,19 +81,22 @@ MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task, int blockSize,
 // Input array flags is a bit array with 32 head flags per word.
 // ExtractThreadHeadFlags returns numBits flags starting at bit index.
 
-MGPU_HOST_DEVICE uint DeviceExtractHeadFlags(const uint* flags, int index,
-	int numBits) {
+MGPU_HOST_DEVICE uint DeviceExtractHeadFlags(
+    const uint* flags,
+    int index,
+    int numBits
+) {
 
-	int index2 = index>> 5;
-	int shift = 31 & index;
-	uint headFlags = flags[index2]>> shift;
-	int shifted = 32 - shift;
+    int index2 = index >> 5;
+    int shift = 31 & index;
+    uint headFlags = flags[index2] >> shift;
+    int shifted = 32 - shift;
 
-	if(shifted < numBits)
-		// We also need to shift in the next set of bits.
-		headFlags = bfi(flags[index2 + 1], headFlags, shifted, shift);
-	headFlags &= (1<< numBits) - 1;
-	return headFlags;
+    if(shifted < numBits)
+        // We also need to shift in the next set of bits.
+        headFlags = bfi(flags[index2 + 1], headFlags, shifted, shift);
+    headFlags &= (1 << numBits) - 1;
+    return headFlags;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,39 +106,41 @@ MGPU_HOST_DEVICE uint DeviceExtractHeadFlags(const uint* flags, int index,
 // return packed words.
 
 template<int NT, int VT>
-MGPU_DEVICE uint DevicePackHeadFlags(uint threadBits, int tid,
-	uint* flags_shared) {
+MGPU_DEVICE uint DevicePackHeadFlags(
+    uint threadBits,
+    int tid,
+    uint* flags_shared
+) {
 
-	const int WordCount = NT * VT / 32;
+    const int WordCount = NT * VT / 32;
 
-	// Each thread stores its thread bits to flags_shared[tid].
-	flags_shared[tid] = threadBits;
-	__syncthreads();
+    // Each thread stores its thread bits to flags_shared[tid].
+    flags_shared[tid] = threadBits;
+    __syncthreads();
 
-	uint packed = 0;
-	if(tid < WordCount) {
-		const int Items = MGPU_DIV_UP(32, VT);
-		int index = 32 * tid;
-		int first = index / VT;
-		int bit = 0;
+    uint packed = 0;
+    if(tid < WordCount) {
+        const int Items = MGPU_DIV_UP(32, VT);
+        int index = 32 * tid;
+        int first = index / VT;
+        int bit = 0;
 
-		int rem = index - VT * first;
-		packed = flags_shared[first]>> rem;
-		bit = VT - rem;
-		++first;
+        int rem = index - VT * first;
+        packed = flags_shared[first] >> rem;
+        bit = VT - rem;
+        ++first;
 
-		#pragma unroll
-		for(int i = 0; i < Items; ++i) {
-			if(i < Items - 1 || bit < 32) {
-				uint x = flags_shared[first + i];
-				if(bit < 32) packed |= x<< bit;
-				bit += VT;
-			}
-		}
-	}
-	__syncthreads();
+#pragma unroll
+        for(int i = 0; i < Items; ++i)
+            if(i < Items - 1 || bit < 32) {
+                uint x = flags_shared[first + i];
+                if(bit < 32) packed |= x << bit;
+                bit += VT;
+            }
+    }
+    __syncthreads();
 
-	return packed;
+    return packed;
 }
 
 } // namespace mgpu

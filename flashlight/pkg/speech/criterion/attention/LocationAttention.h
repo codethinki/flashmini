@@ -11,75 +11,79 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-class SimpleLocationAttention : public AttentionBase {
- public:
-  explicit SimpleLocationAttention(int convKernel);
+        class SimpleLocationAttention : public AttentionBase {
+        public:
+            explicit SimpleLocationAttention(int convKernel);
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::pair<Variable, Variable> forwardBase(
-      const Variable& state,
-      const Variable& xEncoded,
-      const Variable& prevAttn,
-      const Variable& logAttnWeight,
-      const Variable& xEncodedSizes) override;
+            std::pair<Variable, Variable> forwardBase(
+                const Variable& state,
+                const Variable& xEncoded,
+                const Variable& prevAttn,
+                const Variable& logAttnWeight,
+                const Variable& xEncodedSizes
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  SimpleLocationAttention() = default;
+        private:
+            SimpleLocationAttention() = default;
 
-  FL_SAVE_LOAD_WITH_BASE(AttentionBase)
-};
+            FL_SAVE_LOAD_WITH_BASE(AttentionBase)
+        };
 
-class LocationAttention : public AttentionBase {
- public:
-  LocationAttention(int encDim, int convKernel);
+        class LocationAttention : public AttentionBase {
+        public:
+            LocationAttention(int encDim, int convKernel);
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::pair<Variable, Variable> forwardBase(
-      const Variable& state,
-      const Variable& xEncoded,
-      const Variable& prevAttn,
-      const Variable& logAttnWeight,
-      const Variable& xEncodedSizes) override;
+            std::pair<Variable, Variable> forwardBase(
+                const Variable& state,
+                const Variable& xEncoded,
+                const Variable& prevAttn,
+                const Variable& logAttnWeight,
+                const Variable& xEncodedSizes
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  LocationAttention() = default;
+        private:
+            LocationAttention() = default;
 
-  FL_SAVE_LOAD_WITH_BASE(AttentionBase)
-};
+            FL_SAVE_LOAD_WITH_BASE(AttentionBase)
+        };
 
-class NeuralLocationAttention : public AttentionBase {
- public:
-  NeuralLocationAttention(
-      int encDim,
-      int attnDim,
-      int convChannel,
-      int convKernel);
+        class NeuralLocationAttention : public AttentionBase {
+        public:
+            NeuralLocationAttention(
+                int encDim,
+                int attnDim,
+                int convChannel,
+                int convKernel
+            );
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  std::pair<Variable, Variable> forwardBase(
-      const Variable& state,
-      const Variable& xEncoded,
-      const Variable& prevAttn,
-      const Variable& logAttnWeight,
-      const Variable& xEncodedSizes) override;
+            std::pair<Variable, Variable> forwardBase(
+                const Variable& state,
+                const Variable& xEncoded,
+                const Variable& prevAttn,
+                const Variable& logAttnWeight,
+                const Variable& xEncodedSizes
+            ) override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  NeuralLocationAttention() = default;
+        private:
+            NeuralLocationAttention() = default;
 
-  FL_SAVE_LOAD_WITH_BASE(AttentionBase)
-};
-} // namespace speech
+            FL_SAVE_LOAD_WITH_BASE(AttentionBase)
+        };
+    } // namespace speech
 } // namespace pkg
 } // namespace fl
 

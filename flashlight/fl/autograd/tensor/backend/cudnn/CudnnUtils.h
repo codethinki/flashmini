@@ -16,83 +16,86 @@
 namespace fl {
 
 class TensorDescriptor {
- public:
-  explicit TensorDescriptor(const Tensor& a);
+public:
+    explicit TensorDescriptor(const Tensor& a);
 
-  TensorDescriptor(const fl::dtype type, const Shape& af_dims);
+    TensorDescriptor(const fl::dtype type, const Shape& af_dims);
 
-  cudnnTensorDescriptor_t descriptor;
-  ~TensorDescriptor();
+    cudnnTensorDescriptor_t descriptor;
+    ~TensorDescriptor();
 };
 
 class TensorDescriptorArray {
- public:
-  TensorDescriptorArray(int size, const fl::dtype type, const Shape& dims);
+public:
+    TensorDescriptorArray(int size, const fl::dtype type, const Shape& dims);
 
-  cudnnTensorDescriptor_t* descriptors;
-  ~TensorDescriptorArray();
+    cudnnTensorDescriptor_t* descriptors;
+    ~TensorDescriptorArray();
 
- private:
-  std::vector<TensorDescriptor> desc_vec;
-  std::vector<cudnnTensorDescriptor_t> desc_raw_vec;
+private:
+    std::vector<TensorDescriptor> desc_vec;
+    std::vector<cudnnTensorDescriptor_t> desc_raw_vec;
 };
 
 class FilterDescriptor {
- public:
-  explicit FilterDescriptor(const Tensor& a);
-  cudnnFilterDescriptor_t descriptor;
-  ~FilterDescriptor();
+public:
+    explicit FilterDescriptor(const Tensor& a);
+    cudnnFilterDescriptor_t descriptor;
+    ~FilterDescriptor();
 };
 
 class ConvDescriptor {
- public:
-  ConvDescriptor(
-      fl::dtype type,
-      int px,
-      int py,
-      int sx,
-      int sy,
-      int dx,
-      int dy,
-      int groups = 1);
-  cudnnConvolutionDescriptor_t descriptor;
-  ~ConvDescriptor();
+public:
+    ConvDescriptor(
+        fl::dtype type,
+        int px,
+        int py,
+        int sx,
+        int sy,
+        int dx,
+        int dy,
+        int groups = 1
+    );
+    cudnnConvolutionDescriptor_t descriptor;
+    ~ConvDescriptor();
 };
 
 class PoolingDescriptor {
- public:
-  PoolingDescriptor(
-      int wx,
-      int wy,
-      int sx,
-      int sy,
-      int px,
-      int py,
-      PoolingMode mode);
-  cudnnPoolingDescriptor_t descriptor;
-  ~PoolingDescriptor();
+public:
+    PoolingDescriptor(
+        int wx,
+        int wy,
+        int sx,
+        int sy,
+        int px,
+        int py,
+        PoolingMode mode
+    );
+    cudnnPoolingDescriptor_t descriptor;
+    ~PoolingDescriptor();
 };
 
 class DropoutDescriptor {
- public:
-  explicit DropoutDescriptor(float drop_prob);
-  cudnnDropoutDescriptor_t descriptor;
-  ~DropoutDescriptor();
+public:
+    explicit DropoutDescriptor(float drop_prob);
+    cudnnDropoutDescriptor_t descriptor;
+    ~DropoutDescriptor();
 
-  Tensor& getDropoutStates();
+    Tensor& getDropoutStates();
 };
 
 class RNNDescriptor {
- public:
-  RNNDescriptor(
-      fl::dtype type,
-      int hidden_size,
-      int num_layers,
-      RnnMode mode,
-      bool bidirectional,
-      DropoutDescriptor& dropout);
-  cudnnRNNDescriptor_t descriptor;
-  ~RNNDescriptor();
+public:
+    RNNDescriptor(
+        fl::dtype type,
+        int hidden_size,
+        int num_layers,
+        RnnMode mode,
+        bool bidirectional,
+        DropoutDescriptor& dropout
+    );
+    cudnnRNNDescriptor_t descriptor;
+    ~RNNDescriptor();
 };
 
 #define CUDNN_CHECK_ERR(expr) ::fl::cudnnCheckErr((expr))

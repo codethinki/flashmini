@@ -11,31 +11,31 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 // attention
-const std::string kContentAttention = "content";
-const std::string kKeyValueAttention = "keyvalue";
-const std::string kLocationAttention = "location";
-const std::string kMultiHeadContentAttention = "multi";
-const std::string kMultiHeadKeyValueContentAttention = "multikv";
-const std::string kMultiHeadSplitContentAttention = "multisplit";
-const std::string kMultiHeadKeyValueSplitContentAttention = "multikvsplit";
-const std::string kNeuralContentAttention = "neural";
-const std::string kNeuralLocationAttention = "neuralloc";
-const std::string kSimpleLocationAttention = "simpleloc";
+        const std::string kContentAttention = "content";
+        const std::string kKeyValueAttention = "keyvalue";
+        const std::string kLocationAttention = "location";
+        const std::string kMultiHeadContentAttention = "multi";
+        const std::string kMultiHeadKeyValueContentAttention = "multikv";
+        const std::string kMultiHeadSplitContentAttention = "multisplit";
+        const std::string kMultiHeadKeyValueSplitContentAttention = "multikvsplit";
+        const std::string kNeuralContentAttention = "neural";
+        const std::string kNeuralLocationAttention = "neuralloc";
+        const std::string kSimpleLocationAttention = "simpleloc";
 
 // window
-const std::string kMedianWindow = "median";
-const std::string kNoWindow = "no";
-const std::string kSoftWindow = "soft";
-const std::string kSoftPretrainWindow = "softPretrain";
-const std::string kStepWindow = "step";
+        const std::string kMedianWindow = "median";
+        const std::string kNoWindow = "no";
+        const std::string kSoftWindow = "soft";
+        const std::string kSoftPretrainWindow = "softPretrain";
+        const std::string kStepWindow = "step";
 
 // to avoid nans when apply log to these var
 // which cannot be propagated correctly if we set -inf
-constexpr float kAttentionMaskValue = -10000;
+        constexpr float kAttentionMaskValue = -10000;
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

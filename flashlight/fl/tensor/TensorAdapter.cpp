@@ -15,36 +15,37 @@
 #include "flashlight/fl/tensor/TensorBackend.h"
 #include "flashlight/fl/tensor/TensorBase.h"
 
-
 namespace fl::detail {
 
 DefaultTensorType& DefaultTensorType::getInstance() {
-  static DefaultTensorType instance;
-  return instance;
+    static DefaultTensorType instance;
+    return instance;
 }
 
 DefaultTensorType::DefaultTensorType() {
-  // Resolve the default backend in order of preference/availability
-  // See DefaultTensorType.h
+    // Resolve the default backend in order of preference/availability
+    // See DefaultTensorType.h
 #if FL_DEFAULT_BACKEND_COMPILE_FLAG
-  creationFunc_ = std::make_unique<TensorCreatorImpl<DefaultTensorType_t>>();
+    creationFunc_ = std::make_unique<TensorCreatorImpl<DefaultTensorType_t>>();
 #else
-  throw std::runtime_error(
-      "Cannot construct DefaultTensorType singleton: Flashlight built "
-      "without an available tensor backend.");
+    throw std::runtime_error(
+        "Cannot construct DefaultTensorType singleton: Flashlight built "
+        "without an available tensor backend."
+    );
 
 #endif
 }
 
 std::unique_ptr<TensorCreator> DefaultTensorType::swap(
-    std::unique_ptr<TensorCreator> creator) noexcept {
-  std::unique_ptr<TensorCreator> old = std::move(creationFunc_);
-  creationFunc_ = std::move(creator);
-  return old;
+    std::unique_ptr<TensorCreator> creator
+) noexcept {
+    std::unique_ptr<TensorCreator> old = std::move(creationFunc_);
+    creationFunc_ = std::move(creator);
+    return old;
 }
 
 const TensorCreator& DefaultTensorType::getTensorCreator() const {
-  return *creationFunc_;
+    return *creationFunc_;
 }
 
 } // namespace fl

@@ -13,37 +13,39 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-class FullConnectionCriterion : public fl::BinaryModule {
- public:
-  explicit FullConnectionCriterion(
-      int N,
-      fl::lib::seq::CriterionScaleMode scalemode =
-          fl::lib::seq::CriterionScaleMode::NONE);
+        class FullConnectionCriterion : public fl::BinaryModule {
+        public:
+            explicit FullConnectionCriterion(
+                int N,
+                fl::lib::seq::CriterionScaleMode scalemode =
+                fl::lib::seq::CriterionScaleMode::NONE
+            );
 
-  std::unique_ptr<Module> clone() const override;
+            std::unique_ptr<Module> clone() const override;
 
-  fl::Variable forward(const fl::Variable& input, const fl::Variable& target)
-      override;
+            fl::Variable forward(const fl::Variable& input, const fl::Variable& target)
+            override;
 
-  std::string prettyString() const override;
+            std::string prettyString() const override;
 
- private:
-  friend class AutoSegmentationCriterion;
-  FullConnectionCriterion() = default;
+        private:
+            friend class AutoSegmentationCriterion;
+            FullConnectionCriterion() = default;
 
-  int N_;
-  fl::lib::seq::CriterionScaleMode scaleMode_;
+            int N_;
+            fl::lib::seq::CriterionScaleMode scaleMode_;
 
-  FL_SAVE_LOAD_WITH_BASE(
-      fl::BinaryModule,
-      fl::serializeAs<int64_t>(N_),
-      scaleMode_)
-};
+            FL_SAVE_LOAD_WITH_BASE(
+                fl::BinaryModule,
+                fl::serializeAs<int64_t>(N_),
+                scaleMode_
+            )
+        };
 
-typedef FullConnectionCriterion FCCLoss;
-} // namespace speech
+        typedef FullConnectionCriterion FCCLoss;
+    } // namespace speech
 } // namespace pkg
 } // namespace fl
 

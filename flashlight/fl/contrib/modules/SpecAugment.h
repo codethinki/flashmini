@@ -27,60 +27,62 @@ namespace fl {
  * Switchboard strong (SS)   40        27        2      70       0.2       2
  **/
 class FL_API SpecAugment : public UnaryModule {
- public:
-  enum class MaskingStrategy {
-    ZERO = 0,
-    GLOBAL_MEAN = 1,
-    // TODO - add support for mean along time, freq axes
-  };
+public:
+    enum class MaskingStrategy {
+        ZERO = 0,
+        GLOBAL_MEAN = 1,
+        // TODO - add support for mean along time, freq axes
+    };
 
-  SpecAugment(
-      int tWarpW,
-      int fMaskF,
-      int nFMask,
-      int tMaskT,
-      float tMaskP,
-      int nTMask,
-      MaskingStrategy mStrategy = MaskingStrategy::ZERO);
+    SpecAugment(
+        int tWarpW,
+        int fMaskF,
+        int nFMask,
+        int tMaskT,
+        float tMaskP,
+        int nTMask,
+        MaskingStrategy mStrategy = MaskingStrategy::ZERO
+    );
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  FL_SAVE_LOAD_WITH_BASE(
-      UnaryModule,
-      timeWarpW_,
-      freqMaskF_,
-      numFreqMask_,
-      timeMaskT_,
-      timeMaskP_,
-      numTimeMask_,
-      maskStrategy_)
+    FL_SAVE_LOAD_WITH_BASE(
+        UnaryModule,
+        timeWarpW_,
+        freqMaskF_,
+        numFreqMask_,
+        timeMaskT_,
+        timeMaskP_,
+        numTimeMask_,
+        maskStrategy_
+    )
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 
- private:
-  // Time Warping - NOT SUPPORTED CURRENTLY
-  //  Use timeWarpW_ = 0 to disable this
-  int timeWarpW_;
+private:
+    // Time Warping - NOT SUPPORTED CURRENTLY
+    // Use timeWarpW_ = 0 to disable this
+    int timeWarpW_;
 
-  // Frequency Masking
-  //  Use freqMaskF_ = 0 to disable this
-  int freqMaskF_;
-  int numFreqMask_;
+    // Frequency Masking
+    // Use freqMaskF_ = 0 to disable this
+    int freqMaskF_;
+    int numFreqMask_;
 
-  // Time Masking
-  //  Use timeMaskT_ = 0 to disable this
-  int timeMaskT_;
-  float timeMaskP_;
-  int numTimeMask_;
+    // Time Masking
+    // Use timeMaskT_ = 0 to disable this
+    int timeMaskT_;
+    float timeMaskP_;
+    int numTimeMask_;
 
-  std::mt19937 eng_{0};
-  MaskingStrategy maskStrategy_;
+    std::mt19937 eng_{0};
+    MaskingStrategy maskStrategy_;
 
-  int generateRandomInt(int low, int high);
+    int generateRandomInt(int low, int high);
 
-  SpecAugment() = default;
+    SpecAugment() = default;
 };
 
 } // namespace fl

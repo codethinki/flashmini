@@ -18,6 +18,6 @@
  * source paths can be freely specified.
  */
 extern "C" fl::Module* createModule(int64_t nFeature, int64_t nLabel) {
-  auto seq = std::make_unique<fl::Sequential>(); // placeholder
-  return seq.release();
+    auto seq = std::make_unique<fl::Sequential>(); // placeholder
+    return seq.release();
 }

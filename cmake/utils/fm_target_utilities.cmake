@@ -84,7 +84,7 @@ endfunction()
 
 #]]
 function(fm_glob_cpp OUT_VAR)
-    fm_glob(${OUT_VAR} ${ARGN} PATTERNS "*.cpp" "*.hpp" "*.inl")
+    fm_glob(${OUT_VAR} ${ARGN} PATTERNS "*.cpp" "*.hpp" "*.inl" "*.h" "*.cu" "*.cuh")
     set(${OUT_VAR} ${${OUT_VAR}} PARENT_SCOPE)
 endfunction()
 
@@ -366,58 +366,121 @@ endfunction()
 
    .. code-block:: cmake
 
-      fm_add_clang_format_target(<files...>)
+      fm_add_clang_format_target(<target_name> [OPTIONAL] <files...>)
 
-   Creates a custom target named "format" that runs clang-format on specified files.
+   Creates a custom target that runs clang-format on specified files.
+   If OPTIONAL is specified, does not error and skips target creation if clang-format is not found.
 
+   :param target_name: Name of the custom target to create
+   :param OPTIONAL: If specified, do not raise FATAL_ERROR if clang-format is not found
    :param files: List of source files to format
-   :type files: list of file paths
 
-   :pre: clang-format executable is available in PATH
-   :post: A custom target named "format" is created that formats the specified files in-place
+   :post: A custom target is created if found, or configuration terminates with FATAL_ERROR if not found (unless OPTIONAL)
 
    .. note::
       - The format target uses ``-i`` flag to format files in-place
       - The ``-style=file`` flag means clang-format will look for a .clang-format configuration file
       - Files are formatted relative to CMAKE_SOURCE_DIR
 
-   .. warning::
-      This function will fail if clang-format is not found in PATH.
-
-   **Example usage:**
-
-   .. code-block:: cmake
-
-      # Format specific files
-      fm_add_clang_format_target(
-          src/main.cpp
-          src/utils.cpp
-          include/header.hpp
-      )
-
-      # Then run: cmake --build . --target format
-
    .. seealso::
-      - ``fm_find_clang_format()`` from fm_tool_utilities to locate clang-format
-      - Create a .clang-format file in your project root to define formatting style
+      - ``fm_find_clang_format(OPTIONAL)`` from fm_tool_utilities to locate clang-format optionally
 
 #]]
 function(fm_add_clang_format_target TARGET_NAME)
-    fm_assert_not_empty(${TARGET_NAME} REASON "add_clang_format_target requires a target name")
+    cmake_parse_arguments(PARSE_ARGV 1 ARG "OPTIONAL" "" "")
+
+    # Use a different variable name to avoid conflicts with the parsed ARG_OPTIONAL boolean
+    if(ARG_OPTIONAL)
+        set(FIND_OPTIONAL_ARG "OPTIONAL")
+    else()
+        set(FIND_OPTIONAL_ARG "")
+    endif()
+
+    fm_assert_not_empty("${TARGET_NAME}" REASON "add_clang_format_target requires a target name")
+    
+    # Use ARG_UNPARSED_ARGUMENTS instead of ARGN so "OPTIONAL" isn't treated as a file
+    set(FILES_TO_FORMAT ${ARG_UNPARSED_ARGUMENTS})
+    fm_assert_not_empty("${FILES_TO_FORMAT}" REASON "no files provided")
 
     include(fm_tool_utilities)
-    fm_find_clang_format()
 
-    set(FILES_TO_FORMAT ${ARGN})
+    # Pass the safely stored string to the find function
+    fm_find_clang_format(${FIND_OPTIONAL_ARG})
+    if(NOT CLANG_FORMAT_EXECUTABLE)
+        return()
+    endif()
 
-    
-
+    set(FILE_LIST_PATH "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_files.txt")
+    string(REPLACE ";" "\n" FILES_TO_FORMAT_STR "${FILES_TO_FORMAT}")
+    file(WRITE "${FILE_LIST_PATH}" "${FILES_TO_FORMAT_STR}\n")
 
     add_custom_target(
         ${TARGET_NAME}
-        COMMAND ${CLANG_FORMAT_EXECUTABLE} -i -style=file ${FILES_TO_FORMAT}
+        COMMAND ${CLANG_FORMAT_EXECUTABLE} -i -style=file --files=${FILE_LIST_PATH}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Formatting all source files with clang-format..."
+        VERBATIM
+    )
+endfunction()
+
+#[[.rst:
+.. command:: fm_add_uncrustify_target
+
+   .. code-block:: cmake
+
+      fm_add_uncrustify_target(<target_name> [OPTIONAL] <files...>)
+
+   Creates a custom target that runs uncrustify on specified files.
+   If OPTIONAL is specified, does not error and skips target creation if uncrustify is not found.
+
+   :param target_name: Name of the custom target to create
+   :param OPTIONAL: If specified, do not raise FATAL_ERROR if uncrustify is not found
+   :param files: List of source files to format
+
+   :pre expects uncrustify.cfg in root directory
+   :post: A custom target is created if found, or configuration terminates with FATAL_ERROR if not found (unless OPTIONAL)
+
+   .. note::
+      - The format target uses ``--replace`` and ``--no-backup`` flags to format files in-place
+      - The ``-F`` flag is used to pass the text file containing the list of files to format
+      - Files are formatted relative to CMAKE_SOURCE_DIR
+      - Uncrustify will look for an uncrustify.cfg file in the working directory or rely on the UNCRUSTIFY_CONFIG environment variable.
+
+   .. seealso::
+      - ``fm_find_uncrustify(OPTIONAL)`` from fm_tool_utilities to locate uncrustify optionally
+
+#]]
+function(fm_add_uncrustify_target TARGET_NAME)
+    cmake_parse_arguments(PARSE_ARGV 1 ARG "OPTIONAL" "" "")
+
+    # Use a different variable name to avoid being overwritten by cmake_parse_arguments
+    if(ARG_OPTIONAL)
+        set(FIND_OPTIONAL_ARG "OPTIONAL")
+    else()
+        set(FIND_OPTIONAL_ARG "")
+    endif()
+
+    fm_assert_not_empty("${TARGET_NAME}" REASON "add_uncrustify_target requires a target name")
+    
+    set(FILES_TO_FORMAT ${ARG_UNPARSED_ARGUMENTS})
+    fm_assert_not_empty("${FILES_TO_FORMAT}" REASON "no files provided")
+
+    include(fm_tool_utilities)
+
+    fm_find_uncrustify(${FIND_OPTIONAL_ARG})
+    if(NOT UNCRUSTIFY_EXECUTABLE)
+        return()
+    endif()
+
+    set(FILE_LIST_PATH "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_files.txt")
+    string(REPLACE ";" "\n" FILES_TO_FORMAT_STR "${FILES_TO_FORMAT}")
+    file(WRITE "${FILE_LIST_PATH}" "${FILES_TO_FORMAT_STR}\n")
+
+    add_custom_target(
+        ${TARGET_NAME}
+        COMMAND ${UNCRUSTIFY_EXECUTABLE} --replace --no-backup -c uncrustify.cfg -q -F ${FILE_LIST_PATH}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Formatting all source files with uncrustify..."
         VERBATIM
     )
 endfunction()

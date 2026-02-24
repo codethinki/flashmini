@@ -16,6 +16,7 @@ namespace fl {
 
 FL_API double clipGradNorm(
     const std::vector<Variable>& parameters,
-    double max_norm);
+    double max_norm
+);
 
 }

@@ -34,71 +34,73 @@ namespace fl {
  * @param pLayerdrop layer dropout probability
  */
 class FL_API Conformer : public Container {
- public:
-  explicit Conformer(
-      int32_t modelDim,
-      int32_t headDim,
-      int32_t mlpDim,
-      int32_t nHeads,
-      int32_t posEmbContextSize,
-      int32_t convKernelSize,
-      float pDropout,
-      float pLayerDropout = 0.);
-  Conformer(const Conformer& other);
-  Conformer(Conformer&& other) = default;
+public:
+    explicit Conformer(
+        int32_t modelDim,
+        int32_t headDim,
+        int32_t mlpDim,
+        int32_t nHeads,
+        int32_t posEmbContextSize,
+        int32_t convKernelSize,
+        float pDropout,
+        float pLayerDropout = 0.
+    );
+    Conformer(const Conformer& other);
+    Conformer(Conformer&& other) = default;
 
-  Conformer& operator=(const Conformer& other);
-  Conformer& operator=(Conformer&& other) = default;
+    Conformer& operator=(const Conformer& other);
+    Conformer& operator=(Conformer&& other) = default;
 
-  std::vector<Variable> forward(const std::vector<Variable>& input) override;
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::vector<Variable> forward(const std::vector<Variable>& input) override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  int32_t nHeads_;
-  int32_t posEmbContextSize_;
-  int32_t convKernelSize_;
-  double pDropout_;
-  float pLayerDropout_;
+private:
+    int32_t nHeads_;
+    int32_t posEmbContextSize_;
+    int32_t convKernelSize_;
+    double pDropout_;
+    float pLayerDropout_;
 
-  std::shared_ptr<Linear> w11_, w12_, w21_, w22_, wq_, wk_, wv_, wf_, conv1_,
-      conv2_;
-  std::shared_ptr<LayerNorm> norm1_, norm2_, normMhsa_, normConv1_, normConv2_,
-      norm3_;
-  std::shared_ptr<Conv2D> convDepthWise_;
+    std::shared_ptr<Linear> w11_, w12_, w21_, w22_, wq_, wk_, wv_, wf_, conv1_,
+        conv2_;
+    std::shared_ptr<LayerNorm> norm1_, norm2_, normMhsa_, normConv1_, normConv2_,
+        norm3_;
+    std::shared_ptr<Conv2D> convDepthWise_;
 
-  void copy(const Conformer& other);
-  void createLayers();
-  static Variable conformerInitLinear(int32_t inDim, int32_t outDim);
-  Variable mhsa(const Variable& input, const Variable& inputPadMask);
-  Variable conv(const Variable& input);
+    void copy(const Conformer& other);
+    void createLayers();
+    static Variable conformerInitLinear(int32_t inDim, int32_t outDim);
+    Variable mhsa(const Variable& input, const Variable& inputPadMask);
+    Variable conv(const Variable& input);
 
-  Conformer() = default;
+    Conformer() = default;
 
-  FL_SAVE_LOAD_WITH_BASE(
-      Container,
-      w11_,
-      w12_,
-      w21_,
-      w22_,
-      wq_,
-      wk_,
-      wv_,
-      wf_,
-      normMhsa_,
-      norm1_,
-      norm2_,
-      norm3_,
-      normConv1_,
-      normConv2_,
-      conv1_,
-      conv2_,
-      convDepthWise_,
-      nHeads_,
-      pDropout_,
-      pLayerDropout_,
-      posEmbContextSize_,
-      convKernelSize_)
+    FL_SAVE_LOAD_WITH_BASE(
+        Container,
+        w11_,
+        w12_,
+        w21_,
+        w22_,
+        wq_,
+        wk_,
+        wv_,
+        wf_,
+        normMhsa_,
+        norm1_,
+        norm2_,
+        norm3_,
+        normConv1_,
+        normConv2_,
+        conv1_,
+        conv2_,
+        convDepthWise_,
+        nHeads_,
+        pDropout_,
+        pLayerDropout_,
+        posEmbContextSize_,
+        convKernelSize_
+    )
 };
 
 } // namespace fl

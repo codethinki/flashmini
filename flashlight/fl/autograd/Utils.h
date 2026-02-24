@@ -25,8 +25,7 @@ namespace fl {
  * @param absTolerance absolute tolerance allowed
  *
  */
-FL_API bool
-allClose(const Variable& a, const Variable& b, double absTolerance = 1e-5);
+FL_API bool allClose(const Variable& a, const Variable& b, double absTolerance = 1e-5);
 
 /** @} */
 

@@ -13,11 +13,11 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
-using batchFuncVar_t = Variable (*)(const Variable &, const Variable &);
+        using batchFuncVar_t = Variable (*)(const Variable&, const Variable&);
 
-using batchFuncArr_t = Tensor (*)(const Tensor &, const Tensor &);
+        using batchFuncArr_t = Tensor (*)(const Tensor&, const Tensor&);
 
 /**
  * Converts bounding box coordinates from center (x, y) coordinate, with width
@@ -26,7 +26,7 @@ using batchFuncArr_t = Tensor (*)(const Tensor &, const Tensor &);
  * boxes
  * @return a `Tensor` with transformed bboxes of same shape
  */
-Tensor cxcywh2xyxy(const Tensor& bboxes);
+        Tensor cxcywh2xyxy(const Tensor& bboxes);
 
 /**
  * Converts bounding box coordinates from center (x, y) coordinate, with width
@@ -35,7 +35,7 @@ Tensor cxcywh2xyxy(const Tensor& bboxes);
  * of boxes
  * @return a `fl::Variable` with transformed bboxes of same shape
  */
-fl::Variable cxcywh2xyxy(const fl::Variable& bboxes);
+        fl::Variable cxcywh2xyxy(const fl::Variable& bboxes);
 
 /**
  * Converts bounding box coordinates from  bottom left (x1, y1) top right
@@ -45,7 +45,7 @@ fl::Variable cxcywh2xyxy(const fl::Variable& bboxes);
  * boxes
  * @return a `Tensor` with transformed bboxes of same shape
  */
-Tensor xyxy2cxcywh(const Tensor& bboxes);
+        Tensor xyxy2cxcywh(const Tensor& bboxes);
 
 /**
  * A generalized function for getting the "cartesian" product of a function
@@ -58,8 +58,7 @@ Tensor xyxy2cxcywh(const Tensor& bboxes);
  * @return a fl::Variable of shape [ X x N X M X K ]
  *
  */
-fl::Variable
-cartesian(const fl::Variable& x, const fl::Variable& y, batchFuncVar_t fn);
+        fl::Variable cartesian(const fl::Variable& x, const fl::Variable& y, batchFuncVar_t fn);
 
 /**
  * A generalized function for getting the "cartesian" product of a function
@@ -72,7 +71,7 @@ cartesian(const fl::Variable& x, const fl::Variable& y, batchFuncVar_t fn);
  * @return a Tensor of shape [ X x N X M X K ]
  *
  */
-Tensor cartesian(const Tensor& x, const Tensor& y, batchFuncArr_t fn);
+        Tensor cartesian(const Tensor& x, const Tensor& y, batchFuncArr_t fn);
 
 /**
  * Flattens dimension between start and stop in an Tensor
@@ -81,7 +80,7 @@ Tensor cartesian(const Tensor& x, const Tensor& y, batchFuncArr_t fn);
  * @param stop an int, the end dimension to flatten
  * @return an Tensor with collasped dimensions
  */
-Tensor flatten(const Tensor& x, int start, int stop);
+        Tensor flatten(const Tensor& x, int start, int stop);
 
 /**
  * Flattens dimension between start and stop in an Tensor
@@ -90,7 +89,7 @@ Tensor flatten(const Tensor& x, int start, int stop);
  * @param stop an int, the end dimension to flatten
  * @return an fl::Variable with collasped dimensions
  */
-Variable flatten(const fl::Variable& x, int start, int stop);
+        Variable flatten(const fl::Variable& x, int start, int stop);
 
 /**
  * Computes the generalizedBoxIou pairwise across to arrays
@@ -100,7 +99,7 @@ Variable flatten(const fl::Variable& x, int start, int stop);
  * @return an Tensor of shape [N x M x B] where each entry represents
  * the giou between two boxes
  */
-Tensor generalizedBoxIou(const Tensor& bboxes1, const Tensor& bboxes2);
+        Tensor generalizedBoxIou(const Tensor& bboxes1, const Tensor& bboxes2);
 
 /**
  * Computes the generalizedBoxIou pairwise across to fl::Variables
@@ -110,7 +109,7 @@ Tensor generalizedBoxIou(const Tensor& bboxes1, const Tensor& bboxes2);
  * @return an fl::Variable of shape [N x M x B] where each entry represents
  * the giou between two boxes
  */
-Variable generalizedBoxIou(const Variable& bboxes1, const Variable& bboxes2);
+        Variable generalizedBoxIou(const Variable& bboxes1, const Variable& bboxes2);
 
 /**
  * Computes the iou pairwise across two arrays of bboxes
@@ -119,9 +118,10 @@ Variable generalizedBoxIou(const Variable& bboxes1, const Variable& bboxes2);
  * @return an tuple of Tensor of shape [N x M x B] where each entry
  * represents the iou and intersection between two boxes
  */
-std::tuple<Tensor, Tensor> boxIou(
-    const Tensor& bboxes1,
-    const Tensor& bboxes2);
+        std::tuple<Tensor, Tensor> boxIou(
+            const Tensor& bboxes1,
+            const Tensor& bboxes2
+        );
 
 /**
  * Computes the iou pairwise across to Variables of bboxes
@@ -130,9 +130,10 @@ std::tuple<Tensor, Tensor> boxIou(
  * @return an tuple of fl::Variable of shape [N x M x B] where each entry
  * represents the iou and intersection between two boxes
  */
-std::tuple<fl::Variable, fl::Variable> boxIou(
-    const fl::Variable& bboxes1,
-    const fl::Variable& bboxes2);
+        std::tuple<fl::Variable, fl::Variable> boxIou(
+            const fl::Variable& bboxes1,
+            const fl::Variable& bboxes2
+        );
 
 /**
  * Computes the l1_loss pairwise across two arrays of boxes
@@ -141,8 +142,8 @@ std::tuple<fl::Variable, fl::Variable> boxIou(
  * @return an tuple of fl::Variable of shape [N x M x B] where each entry
  * represents the l1Loss between two boxes
  */
-Variable l1Loss(const Variable& input, const Variable& target);
+        Variable l1Loss(const Variable& input, const Variable& target);
 
-} // namespace vision
+    } // namespace vision
 } // namespace pkg
 } // namespace fl

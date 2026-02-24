@@ -31,30 +31,30 @@ class Tensor;
  * \endcode
  */
 class FL_API TopKMeter {
- public:
-  /** Constructor of `TopKMeter`.
-   * @param k number of top predictions in order to be considered correct
-   * Will have two counters:
-   * - `correct`: total number of correct predictions
-   * - `n`: total number of of predictions
-   */
-  explicit TopKMeter(const int k);
+public:
+    /** Constructor of `TopKMeter`.
+     * @param k number of top predictions in order to be considered correct
+     * Will have two counters:
+     * - `correct`: total number of correct predictions
+     * - `n`: total number of of predictions
+     */
+    explicit TopKMeter(const int k);
 
-  void add(const Tensor& output, const Tensor& target);
+    void add(const Tensor& output, const Tensor& target);
 
-  void reset();
+    void reset();
 
-  // Used for distributed syncing
-  void set(int32_t correct, int32_t n);
+    // Used for distributed syncing
+    void set(int32_t correct, int32_t n);
 
-  std::pair<int32_t, int32_t> getStats();
+    std::pair<int32_t, int32_t> getStats();
 
-  double value() const;
+    double value() const;
 
- private:
-  int k_;
-  int32_t correct_;
-  int32_t n_;
+private:
+    int k_;
+    int32_t correct_;
+    int32_t n_;
 };
 
 } // namespace fl

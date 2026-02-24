@@ -13,33 +13,31 @@
 namespace fl {
 
 void shortFormatCount(std::stringstream& ss, size_t count) {
-  constexpr size_t stringLen = 5;
-  if (count >= 10e13) { // >= 10 trillion
-    ss << std::setw(stringLen - 1) << (count / (size_t)10e12) << 't';
-  } else if (count >= 10e10) { // >= 10 billion
-    ss << std::setw(stringLen - 1) << (count / (size_t)10e9) << 'b';
-  } else if (count >= 10e7) { // >= 10 million
-    ss << std::setw(stringLen - 1) << (count / (size_t)10e6) << 'm';
-  } else if (count >= 10e4) { // >= 10 thousand
-    ss << std::setw(stringLen - 1) << (count / (size_t)10e3) << 'k';
-  } else {
-    ss << std::setw(stringLen) << count;
-  }
+    constexpr size_t stringLen = 5;
+    if(count >= 10e13) // >= 10 trillion
+        ss << std::setw(stringLen - 1) << (count / (size_t) 10e12) << 't';
+    else if(count >= 10e10) // >= 10 billion
+        ss << std::setw(stringLen - 1) << (count / (size_t) 10e9) << 'b';
+    else if(count >= 10e7) // >= 10 million
+        ss << std::setw(stringLen - 1) << (count / (size_t) 10e6) << 'm';
+    else if(count >= 10e4) // >= 10 thousand
+        ss << std::setw(stringLen - 1) << (count / (size_t) 10e3) << 'k';
+    else
+        ss << std::setw(stringLen) << count;
 }
 
 void shortFormatMemory(std::stringstream& ss, size_t size) {
-  constexpr size_t stringLen = 5;
-  if (size >= (1ULL << 43)) { // >= 8TB
-    ss << std::setw(stringLen - 1) << (size >> 40) << "T";
-  } else if (size >= (1ULL << 33)) { // >= 8G B
-    ss << std::setw(stringLen - 1) << (size >> 30) << "G";
-  } else if (size >= (1ULL << 23)) { // >= 8M B
-    ss << std::setw(stringLen - 1) << (size >> 20) << "M";
-  } else if (size >= (1ULL << 13)) { // >= 8K B
-    ss << std::setw(stringLen - 1) << (size >> 10) << "K";
-  } else {
-    ss << std::setw(stringLen) << size;
-  }
+    constexpr size_t stringLen = 5;
+    if(size >= (1ULL << 43)) // >= 8TB
+        ss << std::setw(stringLen - 1) << (size >> 40) << "T";
+    else if(size >= (1ULL << 33)) // >= 8G B
+        ss << std::setw(stringLen - 1) << (size >> 30) << "G";
+    else if(size >= (1ULL << 23)) // >= 8M B
+        ss << std::setw(stringLen - 1) << (size >> 20) << "M";
+    else if(size >= (1ULL << 13)) // >= 8K B
+        ss << std::setw(stringLen - 1) << (size >> 10) << "K";
+    else
+        ss << std::setw(stringLen) << size;
 }
 
 } // namespace fl

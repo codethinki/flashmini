@@ -13,15 +13,14 @@
 namespace fl {
 namespace detail {
 
-void advancedIndex(
-    const af::array& inp,
-    const af::dim4& idxStart,
-    const af::dim4& idxEnd,
-    const af::dim4& outDims,
-    const std::vector<af::array>& idxArr,
-    af::array& out) {
-  throw std::runtime_error("gradAdvancedIndex not implemented for cpu");
-}
+    void advancedIndex(
+        const af::array& inp,
+        const af::dim4& idxStart,
+        const af::dim4& idxEnd,
+        const af::dim4& outDims,
+        const std::vector<af::array>& idxArr,
+        af::array& out
+    ) { throw std::runtime_error("gradAdvancedIndex not implemented for cpu"); }
 
 } // namespace detail
 } // namespace fl

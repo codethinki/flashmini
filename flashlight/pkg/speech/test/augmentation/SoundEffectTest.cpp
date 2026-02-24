@@ -30,12 +30,12 @@ const size_t sampleRate = 16000;
  * it and verifies the result.
  */
 TEST(SoundEffect, ClampAmplitude) {
-  ClampAmplitude sfx;
-  const float amplitude = 2.0;
-  std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
-  sfx.apply(signal);
-  EXPECT_THAT(signal, Each(AllOf(Ge(-1.0), Le(1.0))));
+    ClampAmplitude sfx;
+    const float amplitude = 2.0;
+    std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    sfx.apply(signal);
+    EXPECT_THAT(signal, Each(AllOf(Ge(-1.0), Le(1.0))));
 }
 
 /**
@@ -44,12 +44,12 @@ TEST(SoundEffect, ClampAmplitude) {
  * then normalizes it and verifies the result.
  */
 TEST(SoundEffect, NormalizeTooHigh) {
-  Normalize sfx(/*onlyIfTooHigh=*/true);
-  const float amplitude = 2.0;
-  std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
-  sfx.apply(signal);
-  EXPECT_THAT(signal, Each(AllOf(Ge(-1.0), Le(1.0))));
+    Normalize sfx(/*onlyIfTooHigh=*/ true);
+    const float amplitude = 2.0;
+    std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    sfx.apply(signal);
+    EXPECT_THAT(signal, Each(AllOf(Ge(-1.0), Le(1.0))));
 }
 
 /**
@@ -57,13 +57,13 @@ TEST(SoundEffect, NormalizeTooHigh) {
  * unchanged when the input is in valid range
  */
 TEST(SoundEffect, NoNormalizeTooLow) {
-  Normalize sfx(/*onlyIfTooHigh=*/true);
-  const float amplitude = 0.5;
-  std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
-  std::vector<float> signalCopy = signal;
-  sfx.apply(signalCopy);
-  EXPECT_EQ(signal, signalCopy);
+    Normalize sfx(/*onlyIfTooHigh=*/ true);
+    const float amplitude = 0.5;
+    std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    std::vector<float> signalCopy = signal;
+    sfx.apply(signalCopy);
+    EXPECT_EQ(signal, signalCopy);
 }
 
 /**
@@ -71,14 +71,14 @@ TEST(SoundEffect, NoNormalizeTooLow) {
  * amplitude of sine-wave in range [-0.5, 0.5] to range [-1,1]
  */
 TEST(SoundEffect, NormalizeTooLow) {
-  Normalize sfx(/*onlyIfTooHigh=*/false);
-  const float amplitude = 0.5;
-  std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
-  sfx.apply(signal);
-  EXPECT_THAT(signal, Each(AllOf(Ge(-1.0f), Le(1.0f))));
-  EXPECT_THAT(signal, testing::Contains(-1.0f));
-  EXPECT_THAT(signal, testing::Contains(1.0f));
+    Normalize sfx(/*onlyIfTooHigh=*/ false);
+    const float amplitude = 0.5;
+    std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    sfx.apply(signal);
+    EXPECT_THAT(signal, Each(AllOf(Ge(-1.0f), Le(1.0f))));
+    EXPECT_THAT(signal, testing::Contains(-1.0f));
+    EXPECT_THAT(signal, testing::Contains(1.0f));
 }
 
 /**
@@ -89,35 +89,37 @@ TEST(SoundEffect, NormalizeTooLow) {
  * see maximum amplification that is at least half amp.ratioMax_
  */
 TEST(SoundEffect, Amplify) {
-  const float amplitude = 1.0;
-  Amplify::Config conf;
-  conf.ratioMin_ = amplitude / 10;
-  conf.ratioMax_ = amplitude * 10;
-  Amplify sfx(conf);
+    const float amplitude = 1.0;
+    Amplify::Config conf;
+    conf.ratioMin_ = amplitude / 10;
+    conf.ratioMax_ = amplitude * 10;
+    Amplify sfx(conf);
 
-  std::vector<float> sound =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    std::vector<float> sound =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
 
-  // get min/max amplification after 100 apply, each chooses a random value with
-  // in range.
-  float minMaxAbsAmp = conf.ratioMax_;
-  float maxMaxAbsAmp = 0;
-  for (int i = 0; i < 100; ++i) {
-    std::vector<float> soundCopy = sound;
-    sfx.apply(soundCopy);
-    // Ensure that current augmentation amplitude is within expected range.
-    EXPECT_THAT(
-        soundCopy, Each(AllOf(Ge(-conf.ratioMax_), Le(conf.ratioMax_))));
+    // get min/max amplification after 100 apply, each chooses a random value with
+    // in range.
+    float minMaxAbsAmp = conf.ratioMax_;
+    float maxMaxAbsAmp = 0;
+    for(int i = 0; i < 100; ++i) {
+        std::vector<float> soundCopy = sound;
+        sfx.apply(soundCopy);
+        // Ensure that current augmentation amplitude is within expected range.
+        EXPECT_THAT(
+            soundCopy,
+            Each(AllOf(Ge(-conf.ratioMax_), Le(conf.ratioMax_)))
+        );
 
-    for (auto amp : soundCopy) {
-      minMaxAbsAmp = std::min(std::fabs(amp), minMaxAbsAmp);
-      maxMaxAbsAmp = std::max(std::fabs(amp), maxMaxAbsAmp);
+        for(auto amp : soundCopy) {
+            minMaxAbsAmp = std::min(std::fabs(amp), minMaxAbsAmp);
+            maxMaxAbsAmp = std::max(std::fabs(amp), maxMaxAbsAmp);
+        }
     }
-  }
 
-  // Ensure that all random augmentations amplitudes are within expected
-  // random range.  EXPECT_LT(minMaxAbsAmp, amp.ratioMin_ * 2);
-  EXPECT_GT(maxMaxAbsAmp, conf.ratioMax_ / 2);
+    // Ensure that all random augmentations amplitudes are within expected
+    // random range.  EXPECT_LT(minMaxAbsAmp, amp.ratioMin_ * 2);
+    EXPECT_GT(maxMaxAbsAmp, conf.ratioMax_ / 2);
 }
 
 // Test that basic sound effect chain processes in the correct order.
@@ -125,27 +127,27 @@ TEST(SoundEffect, Amplify) {
 // range (-1..1) and multiply by amplitude. We expect that the result is
 // in the range of: -amplitude..amplitude.
 TEST(SoundEffect, SfxChain) {
-  const float amplitude = 2.0;
-  Amplify::Config amp1;
-  amp1.ratioMin_ = amplitude / 10;
-  amp1.ratioMax_ = amplitude * 10;
-  Amplify::Config amp2;
-  amp2.ratioMin_ = amplitude;
-  amp2.ratioMax_ = amplitude;
+    const float amplitude = 2.0;
+    Amplify::Config amp1;
+    amp1.ratioMin_ = amplitude / 10;
+    amp1.ratioMax_ = amplitude * 10;
+    Amplify::Config amp2;
+    amp2.ratioMin_ = amplitude;
+    amp2.ratioMax_ = amplitude;
 
-  auto sfxChain = std::make_shared<SoundEffectChain>();
-  sfxChain->add(std::make_shared<Amplify>(amp1));
-  sfxChain->add(std::make_shared<ClampAmplitude>());
-  sfxChain->add(std::make_shared<Amplify>(amp2));
+    auto sfxChain = std::make_shared<SoundEffectChain>();
+    sfxChain->add(std::make_shared<Amplify>(amp1));
+    sfxChain->add(std::make_shared<ClampAmplitude>());
+    sfxChain->add(std::make_shared<Amplify>(amp2));
 
-  std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
-  sfxChain->apply(signal);
-  EXPECT_THAT(signal, Each(AllOf(Ge(-amplitude), Le(amplitude))));
+    std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    sfxChain->apply(signal);
+    EXPECT_THAT(signal, Each(AllOf(Ge(-amplitude), Le(amplitude))));
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

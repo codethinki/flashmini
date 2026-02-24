@@ -15,16 +15,16 @@ namespace fl {
  * An abstraction for ArrayFire's CPU Stream with controlled creation methods.
  */
 class ArrayFireCPUStream : public SynchronousStream {
- public:
-  /**
-   * Creates an ArrayFireCPUStream and automatically register it with
-   * the active x64 device from DeviceManager.
-   *
-   * @return a shared pointer to the created ArrayFireCPUStream.
-   */
-  static std::shared_ptr<ArrayFireCPUStream> create();
+public:
+    /**
+     * Creates an ArrayFireCPUStream and automatically register it with
+     * the active x64 device from DeviceManager.
+     *
+     * @return a shared pointer to the created ArrayFireCPUStream.
+     */
+    static std::shared_ptr<ArrayFireCPUStream> create();
 
-  void sync() const override;
+    void sync() const override;
 };
 
 } // namespace fl

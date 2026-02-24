@@ -12,35 +12,32 @@
 
 namespace fl::lib::audio {
 
-PreEmphasis::PreEmphasis(float alpha, int N)
-    : preemCoef_(alpha), windowLength_(N) {
-  if (windowLength_ <= 1) {
-    throw std::invalid_argument("PreEmphasis: windowLength must be > 1");
-  }
-  if (preemCoef_ < 0.0 || preemCoef_ >= 1.0) {
-    throw std::invalid_argument("PreEmphasis: alpha must be in [0, 1)");
-  }
+PreEmphasis::PreEmphasis(float alpha, int N) : preemCoef_(alpha),
+                                               windowLength_(N) {
+    if(windowLength_ <= 1)
+        throw std::invalid_argument("PreEmphasis: windowLength must be > 1");
+    if(preemCoef_ < 0.0 || preemCoef_ >= 1.0)
+        throw std::invalid_argument("PreEmphasis: alpha must be in [0, 1)");
 };
 
 std::vector<float> PreEmphasis::apply(const std::vector<float>& input) const {
-  auto output(input);
-  applyInPlace(output);
-  return output;
+    auto output(input);
+    applyInPlace(output);
+    return output;
 }
 
 void PreEmphasis::applyInPlace(std::vector<float>& input) const {
-  if (input.size() % windowLength_ != 0) {
-    throw std::invalid_argument(
-        "PreEmphasis: input.size() not divisible by windowLength");
-  }
-  size_t nframes = input.size() / windowLength_;
-  for (size_t n = nframes; n > 0; --n) {
-    size_t e = n * windowLength_ - 1; // end of current frame
-    size_t s = (n - 1) * windowLength_; // start of current frame
-    for (size_t i = e; i > s; --i) {
-      input[i] -= (preemCoef_ * input[i - 1]);
+    if(input.size() % windowLength_ != 0)
+        throw std::invalid_argument(
+            "PreEmphasis: input.size() not divisible by windowLength"
+        );
+    size_t nframes = input.size() / windowLength_;
+    for(size_t n = nframes; n > 0; --n) {
+        size_t e = n * windowLength_ - 1; // end of current frame
+        size_t s = (n - 1) * windowLength_; // start of current frame
+        for(size_t i = e; i > s; --i)
+            input[i] -= (preemCoef_ * input[i - 1]);
+        input[s] *= (1 - preemCoef_);
     }
-    input[s] *= (1 - preemCoef_);
-  }
 }
 } // namespace fl

@@ -12,18 +12,18 @@
 using fl::DeviceType;
 
 TEST(DeviceTypeTest, getAllDeviceTypes) {
-  const auto& allDevices = fl::getDeviceTypes();
-  ASSERT_TRUE(allDevices.contains(DeviceType::x64));
-  ASSERT_TRUE(allDevices.contains(DeviceType::CUDA));
-  ASSERT_EQ(allDevices.size(), 2);
+    const auto& allDevices = fl::getDeviceTypes();
+    ASSERT_TRUE(allDevices.contains(DeviceType::x64));
+    ASSERT_TRUE(allDevices.contains(DeviceType::CUDA));
+    ASSERT_EQ(allDevices.size(), 2);
 }
 
 TEST(DeviceTypeTest, deviceTypeToString) {
-  ASSERT_EQ(deviceTypeToString(DeviceType::x64), "x64");
-  ASSERT_EQ(deviceTypeToString(DeviceType::CUDA), "CUDA");
+    ASSERT_EQ(deviceTypeToString(DeviceType::x64), "x64");
+    ASSERT_EQ(deviceTypeToString(DeviceType::CUDA), "CUDA");
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

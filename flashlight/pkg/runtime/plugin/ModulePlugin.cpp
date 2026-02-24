@@ -10,13 +10,12 @@
 namespace fl::pkg::runtime {
 
 ModulePlugin::ModulePlugin(const std::string& name) : fl::Plugin(name) {
-  arch_ = getSymbol<w2l_module_plugin_t>("createModule");
+    arch_ = getSymbol<w2l_module_plugin_t>("createModule");
 }
 
 std::shared_ptr<fl::Module> ModulePlugin::arch(
     int64_t nFeatures,
-    int64_t nClasses) {
-  return std::shared_ptr<fl::Module>(arch_(nFeatures, nClasses));
-}
+    int64_t nClasses
+) { return std::shared_ptr<fl::Module>(arch_(nFeatures, nClasses)); }
 
 } // namespace fl

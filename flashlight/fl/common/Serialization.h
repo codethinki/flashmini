@@ -54,7 +54,7 @@ namespace fl {
  * @param filepath the file path to save to
  * @param args the objects to save (e.g. shared_ptr to Module)
  */
-template <typename... Args>
+template<typename... Args>
 void save(const fs::path& filepath, const Args&... args);
 
 /**
@@ -62,7 +62,7 @@ void save(const fs::path& filepath, const Args&... args);
  * @param ostr output stream
  * @param args the objects to save (e.g. shared_ptr to Module)
  */
-template <typename... Args>
+template<typename... Args>
 void save(std::ostream& ostr, const Args&... args);
 
 /**
@@ -70,16 +70,14 @@ void save(std::ostream& ostr, const Args&... args);
  * @param filepath the file path to load from
  * @param args the objects to load (expects default-constructed)
  */
-template <typename... Args>
-void load(const fs::path& filepath, Args&... args);
+template<typename... Args> void load(const fs::path& filepath, Args & ... args);
 
 /**
  * Load (deserialize) the specified args from a binary file (via Cereal).
  * @param istr input stream
  * @param args the objects to load (expects default-constructed)
  */
-template <typename... Args>
-void load(std::istream& istr, Args&... args);
+template<typename... Args> void load(std::istream& istr, Args & ... args);
 
 /** @} */
 } // namespace fl
@@ -98,16 +96,14 @@ void load(std::istream& istr, Args&... args);
  * Supports the common case when one adds fields to a class, which should be
  * conditionally loaded for newer file versions. See `fl::versioned()`.
  */
-#define FL_SAVE_LOAD(...)                                   \
-  friend class cereal::access;                              \
-  template <class Archive>                                  \
-  void save(Archive& ar, const uint32_t version) const {    \
-    ::fl::detail::applyArchive(ar, version, ##__VA_ARGS__); \
-  }                                                         \
-  template <class Archive>                                  \
-  void load(Archive& ar, const uint32_t version) {          \
-    ::fl::detail::applyArchive(ar, version, ##__VA_ARGS__); \
-  }
+#define FL_SAVE_LOAD(...)                                                               \
+        friend class cereal::access;                                                    \
+        template<class Archive> void save(Archive & ar, const uint32_t version) const { \
+            ::fl::detail::applyArchive(ar, version, ## __VA_ARGS__);                    \
+        }                                                                               \
+        template<class Archive> void load(Archive & ar, const uint32_t version) {       \
+            ::fl::detail::applyArchive(ar, version, ## __VA_ARGS__);                    \
+        }
 
 /**
  * Like `FL_SAVE_LOAD`, but also serializes the base class, which must
@@ -117,7 +113,7 @@ void load(std::istream& istr, Args&... args);
  * using this macro. However you will still need `CEREAL_REGISTER_TYPE`.
  */
 #define FL_SAVE_LOAD_WITH_BASE(Base, ...) \
-  FL_SAVE_LOAD(cereal::base_class<Base>(this), ##__VA_ARGS__)
+        FL_SAVE_LOAD(cereal::base_class<Base>(this), ## __VA_ARGS__)
 
 /**
  * Declaration-only. Intended to reduce clutter in class definitions.
@@ -125,26 +121,24 @@ void load(std::istream& istr, Args&... args);
  * The method must be defined later (outside the class).
  * Do not use this macro if you want your class to be unversioned.
  */
-#define FL_SAVE_LOAD_DECLARE()                          \
-  friend class cereal::access;                          \
-  template <class Archive>                              \
-  void save(Archive& ar, const uint32_t version) const; \
-  template <class Archive>                              \
-  void load(Archive& ar, const uint32_t version);
+#define FL_SAVE_LOAD_DECLARE()                                                         \
+        friend class cereal::access;                                                   \
+        template<class Archive> void save(Archive & ar, const uint32_t version) const; \
+        template<class Archive> void load(Archive & ar, const uint32_t version);
 
 /** @} */
 
 namespace fl {
 namespace detail {
 
-template <typename T>
-struct Versioned;
+    template<typename T>
+    struct Versioned;
 
-template <typename S, typename T>
-struct SerializeAs;
+    template<typename S, typename T>
+    struct SerializeAs;
 
-template <typename T>
-struct CerealSave;
+    template<typename T>
+    struct CerealSave;
 
 } // namespace detail
 
@@ -160,9 +154,8 @@ struct CerealSave;
  * Example: if we have field `x` in version 0, and add field `y` in version 1,
  * we might write: `FL_SAVE_LOAD(x, fl::versioned(y, 1))`.
  */
-template <typename T>
-detail::Versioned<T>
-versioned(T&& t, uint32_t minVersion, uint32_t maxVersion = UINT32_MAX);
+template<typename T>
+detail::Versioned<T> versioned(T&& t, uint32_t minVersion, uint32_t maxVersion = UINT32_MAX);
 
 /**
  * Serialize an object of type T as another type S using static_cast on-the-fly.
@@ -170,7 +163,7 @@ versioned(T&& t, uint32_t minVersion, uint32_t maxVersion = UINT32_MAX);
  *
  * Example: `FL_SAVE_LOAD(fl::serializeAs<double>(x))`
  */
-template <typename S, typename T>
+template<typename S, typename T>
 detail::SerializeAs<S, T> serializeAs(T&& t);
 
 /**
@@ -186,31 +179,32 @@ detail::SerializeAs<S, T> serializeAs(T&& t);
  *
  * Example: please see tests/common/SerializationTest.cpp
  */
-template <typename S, typename T, typename SaveConvFn, typename LoadConvFn>
-detail::SerializeAs<S, T>
-serializeAs(T&& t, SaveConvFn saveConverter, LoadConvFn loadConverter);
+template<typename S, typename T, typename SaveConvFn, typename LoadConvFn>
+detail::SerializeAs<S, T> serializeAs(T&& t, SaveConvFn saveConverter, LoadConvFn loadConverter);
 
 /** @} */
 } // namespace fl
 
 namespace cereal {
 
-template <class Archive>
+template<class Archive>
 void save(
     Archive& ar,
     const fl::detail::CerealSave<fl::Shape>& dims,
-    const uint32_t /* version */);
+    const uint32_t /* version */
+);
 
-template <class Archive>
+template<class Archive>
 void load(Archive& ar, fl::Shape& dims, const uint32_t /* version */);
 
-template <class Archive>
+template<class Archive>
 void save(
     Archive& ar,
     const fl::detail::CerealSave<fl::Tensor>& tensor,
-    const uint32_t /* version */);
+    const uint32_t /* version */
+);
 
-template <class Archive>
+template<class Archive>
 void load(Archive& ar, fl::Tensor& tensor, const uint32_t /* version */);
 
 } // namespace cereal

@@ -14,19 +14,17 @@
 namespace fl {
 
 class FL_API Plugin {
- public:
-  explicit Plugin(const std::string& name);
-  ~Plugin();
+public:
+    explicit Plugin(const std::string& name);
+    ~Plugin();
 
- protected:
-  template <typename T>
-  T getSymbol(const std::string& symbol) {
-    return (T)getRawSymbol(symbol);
-  }
+protected:
+    template<typename T>
+    T getSymbol(const std::string& symbol) { return (T) getRawSymbol(symbol); }
 
- private:
-  void* getRawSymbol(const std::string& symbol);
-  std::string name_;
-  void* handle_;
+private:
+    void* getRawSymbol(const std::string& symbol);
+    std::string name_;
+    void* handle_;
 };
 } // namespace fl

@@ -20,137 +20,144 @@
 namespace {
 
 class DynamicBenchmark : public ::testing::Test {
- protected:
-  void SetUp() override {
-    fl::DynamicBenchmark::setBenchmarkMode(true);
-  }
+protected:
+    void SetUp() override {
+        fl::DynamicBenchmark::setBenchmarkMode(true);
+    }
 };
 
 } // namespace
 
 TEST_F(DynamicBenchmark, OptionsStateBasic) {
-  size_t maxCount = 5;
-  std::vector<int> ops = {1, 2, 3, 4, 5};
-  auto options =
-      std::make_shared<fl::DynamicBenchmarkOptions<int>>(ops, maxCount);
+    size_t maxCount = 5;
+    std::vector<int> ops = {1, 2, 3, 4, 5};
+    auto options =
+        std::make_shared<fl::DynamicBenchmarkOptions<int>>(ops, maxCount);
 
-  ASSERT_FALSE(options->timingsComplete());
-  ASSERT_EQ(options->currentOption(), 1);
-  for (size_t i = 0; i < maxCount * ops.size(); ++i) {
-    options->accumulateTimeToCurrentOption(1);
-  }
-  ASSERT_TRUE(options->timingsComplete());
-  ASSERT_EQ(options->currentOption(), 1); // best idx should never have changed
+    ASSERT_FALSE(options->timingsComplete());
+    ASSERT_EQ(options->currentOption(), 1);
+    for(size_t i = 0; i < maxCount * ops.size(); ++i)
+        options->accumulateTimeToCurrentOption(1);
+    ASSERT_TRUE(options->timingsComplete());
+    ASSERT_EQ(options->currentOption(), 1); // best idx should never have changed
 }
 
 TEST_F(DynamicBenchmark, OptionscurrentOptionUnchangedWithNoCountIncrement) {
-  std::vector<int> ops = {1, 2, 3, 4, 5};
-  auto options = std::make_shared<fl::DynamicBenchmarkOptions<int>>(
-      ops, /* maxCount = */ 3);
+    std::vector<int> ops = {1, 2, 3, 4, 5};
+    auto options = std::make_shared<fl::DynamicBenchmarkOptions<int>>(
+        ops, /* maxCount = */
+        3
+    );
 
-  auto state = options->currentOption();
-  options->accumulateTimeToCurrentOption(3, /* incrementCount = */ false);
-  options->accumulateTimeToCurrentOption(4, /* incrementCount = */ false);
-  ASSERT_EQ(state, options->currentOption());
+    auto state = options->currentOption();
+    options->accumulateTimeToCurrentOption(3, /* incrementCount = */ false);
+    options->accumulateTimeToCurrentOption(4, /* incrementCount = */ false);
+    ASSERT_EQ(state, options->currentOption());
 }
 
 TEST_F(DynamicBenchmark, OptionsStateTimed) {
-  size_t maxCount = 5;
-  std::unordered_set<int> ops = {1, 2, 3, 4, 5};
-  auto options =
-      std::make_shared<fl::DynamicBenchmarkOptions<int>>(ops, maxCount);
+    size_t maxCount = 5;
+    std::unordered_set<int> ops = {1, 2, 3, 4, 5};
+    auto options =
+        std::make_shared<fl::DynamicBenchmarkOptions<int>>(ops, maxCount);
 
-  for (size_t i = 0; i < maxCount * ops.size(); ++i) {
-    // option 4 is faster
-    if (options->currentOption() == 4) {
-      options->accumulateTimeToCurrentOption(1);
-    } else {
-      options->accumulateTimeToCurrentOption(
-          10 * (i + 1), /* incrementCount = */ false);
-      options->accumulateTimeToCurrentOption(10 * (i + 1));
+    for(size_t i = 0; i < maxCount * ops.size(); ++i) {
+        // option 4 is faster
+        if(options->currentOption() == 4)
+            options->accumulateTimeToCurrentOption(1);
+        else {
+            options->accumulateTimeToCurrentOption(
+                10 * (i + 1), /* incrementCount = */
+                false
+            );
+            options->accumulateTimeToCurrentOption(10 * (i + 1));
+        }
     }
-  }
-  ASSERT_TRUE(options->timingsComplete());
-  ASSERT_EQ(options->currentOption(), 4); // fastest
-  ASSERT_EQ(options->currentOption(), 4);
+    ASSERT_TRUE(options->timingsComplete());
+    ASSERT_EQ(options->currentOption(), 4); // fastest
+    ASSERT_EQ(options->currentOption(), 4);
 }
 
 TEST_F(DynamicBenchmark, DynamicBenchmarkSimple) {
-  size_t maxCount = 5;
-  std::vector<int> sleepTimes = {30, 16, 40}; //min 16ms (win)
+    size_t maxCount = 5;
+    std::vector<int> sleepTimes = {30, 16, 40}; // min 16ms (win)
 
-  auto options =
-      std::make_shared<fl::DynamicBenchmarkOptions<int>>(sleepTimes, maxCount);
-  auto dynamicBench = std::make_shared<fl::DynamicBenchmark>(options);
+    auto options =
+        std::make_shared<fl::DynamicBenchmarkOptions<int>>(sleepTimes, maxCount);
+    auto dynamicBench = std::make_shared<fl::DynamicBenchmark>(options);
 
-  for (size_t i = 0; i < maxCount * sleepTimes.size(); ++i) {
-    std::chrono::milliseconds sleepTime(options->currentOption());
-    dynamicBench->audit(
-        [sleepTime]() { std::this_thread::sleep_for(sleepTime); });
-  }
-  ASSERT_TRUE(options->timingsComplete());
-  // sleeping for fewer miliseconds is faster
-  ASSERT_EQ(options->currentOption(), sleepTimes[1]);
+    for(size_t i = 0; i < maxCount * sleepTimes.size(); ++i) {
+        std::chrono::milliseconds sleepTime(options->currentOption());
+        dynamicBench->audit(
+            [sleepTime]() { std::this_thread::sleep_for(sleepTime); });
+    }
+    ASSERT_TRUE(options->timingsComplete());
+    // sleeping for fewer miliseconds is faster
+    ASSERT_EQ(options->currentOption(), sleepTimes[1]);
 }
 
 TEST_F(DynamicBenchmark, DynamicBenchmarkDisjointLambdas) {
-  size_t maxCount = 5;
-  std::vector<int> sleepTimes = {30, 16, 40};
+    size_t maxCount = 5;
+    std::vector<int> sleepTimes = {30, 16, 40};
 
-  auto options =
-      std::make_shared<fl::DynamicBenchmarkOptions<int>>(sleepTimes, maxCount);
-  auto dynamicBench = std::make_shared<fl::DynamicBenchmark>(options);
+    auto options =
+        std::make_shared<fl::DynamicBenchmarkOptions<int>>(sleepTimes, maxCount);
+    auto dynamicBench = std::make_shared<fl::DynamicBenchmark>(options);
 
-  for (size_t i = 0; i < maxCount * sleepTimes.size(); ++i) {
-    std::chrono::milliseconds sleepTime(options->currentOption());
-    dynamicBench->audit(
-        [sleepTime]() { std::this_thread::sleep_for(sleepTime); },
-        /* incrementCount = */ false);
+    for(size_t i = 0; i < maxCount * sleepTimes.size(); ++i) {
+        std::chrono::milliseconds sleepTime(options->currentOption());
+        dynamicBench->audit(
+            [sleepTime]() { std::this_thread::sleep_for(sleepTime); },
+            /* incrementCount = */ false
+        );
 
-    // intermediate sleep is inversely proportional to the audit sleep time:
-    // 4, 2, 6 --> 18, 24, 12
-    // total duration disregarding the audit is therefore:
-    // 18 + 2 * 4, 24 + 2 * 2, 12 + 2 * 6 ---> 26, 28, 24
-    std::chrono::milliseconds intermediateSleepTime(
-        30 - (3 * options->currentOption()));
-    std::this_thread::sleep_for(intermediateSleepTime);
+        // intermediate sleep is inversely proportional to the audit sleep time:
+        // 4, 2, 6 --> 18, 24, 12
+        // total duration disregarding the audit is therefore:
+        // 18 + 2 * 4, 24 + 2 * 2, 12 + 2 * 6 ---> 26, 28, 24
+        std::chrono::milliseconds intermediateSleepTime(
+            30 - (3 * options->currentOption()));
+        std::this_thread::sleep_for(intermediateSleepTime);
 
-    dynamicBench->audit(
-        [sleepTime]() { std::this_thread::sleep_for(sleepTime); });
-  }
-  ASSERT_TRUE(options->timingsComplete());
-  // option 2 is still fastest disregarding intermediate time
-  ASSERT_EQ(options->currentOption(), sleepTimes[1]);
+        dynamicBench->audit(
+            [sleepTime]() { std::this_thread::sleep_for(sleepTime); });
+    }
+    ASSERT_TRUE(options->timingsComplete());
+    // option 2 is still fastest disregarding intermediate time
+    ASSERT_EQ(options->currentOption(), sleepTimes[1]);
 }
 
 TEST_F(DynamicBenchmark, DynamicBenchmarkMatmul) {
-  size_t maxCount = 5;
-  // n x n arrays of different sizes
-  std::vector<int> arraySizes = {256, 8, 2048};
+    size_t maxCount = 5;
+    // n x n arrays of different sizes
+    std::vector<int> arraySizes = {256, 8, 2048};
 
-  auto options =
-      std::make_shared<fl::DynamicBenchmarkOptions<int>>(arraySizes, maxCount);
-  auto dynamicBench = std::make_shared<fl::DynamicBenchmark>(options);
+    auto options =
+        std::make_shared<fl::DynamicBenchmarkOptions<int>>(arraySizes, maxCount);
+    auto dynamicBench = std::make_shared<fl::DynamicBenchmark>(options);
 
-  for (size_t i = 0; i < maxCount * arraySizes.size(); ++i) {
-    auto size = dynamicBench->getOptions<fl::DynamicBenchmarkOptions<int>>()
-                    ->currentOption();
-    dynamicBench->audit([size]() {
-      auto a = fl::rand({size, size});
-      auto b = fl::rand({size, size});
-      auto c = fl::matmul(a, b);
-      fl::eval(c);
-    });
-  }
-  auto ops = dynamicBench->getOptions<fl::DynamicBenchmarkOptions<int>>();
-  ASSERT_TRUE(ops->timingsComplete());
-  ASSERT_EQ(
-      ops->currentOption(),
-      *std::min_element(arraySizes.begin(), arraySizes.end()));
+    for(size_t i = 0; i < maxCount * arraySizes.size(); ++i) {
+        auto size = dynamicBench->getOptions<fl::DynamicBenchmarkOptions<int>>()
+            ->currentOption();
+        dynamicBench->audit(
+            [size]() {
+                auto a = fl::rand({size, size});
+                auto b = fl::rand({size, size});
+                auto c = fl::matmul(a, b);
+                fl::eval(c);
+            }
+        );
+    }
+    auto ops = dynamicBench->getOptions<fl::DynamicBenchmarkOptions<int>>();
+    ASSERT_TRUE(ops->timingsComplete());
+    ASSERT_EQ(
+        ops->currentOption(),
+        *std::min_element(arraySizes.begin(), arraySizes.end())
+    );
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

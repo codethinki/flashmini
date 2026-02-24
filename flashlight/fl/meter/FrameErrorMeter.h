@@ -30,32 +30,32 @@ class Tensor;
  * \endcode
  */
 class FL_API FrameErrorMeter {
- public:
-  /** Constructor of `FrameErrorMeter`. Flag `accuracy` indicates if the meter
-   * computes and returns accuracy or error rate instead. An instance will
-   * maintain two counters initialized to 0:
-   * - `n`: total samples
-   * - `sum`: total mismatches
-   */
-  explicit FrameErrorMeter(bool accuracy = false);
+public:
+    /** Constructor of `FrameErrorMeter`. Flag `accuracy` indicates if the meter
+     * computes and returns accuracy or error rate instead. An instance will
+     * maintain two counters initialized to 0:
+     * - `n`: total samples
+     * - `sum`: total mismatches
+     */
+    explicit FrameErrorMeter(bool accuracy = false);
 
-  /** Computes frame-level mismatch between two arrayfire arrays `output` and
-   * `target` and updates the counters. Note that the shape of the two input
-   * arrays should be identical.
-   */
-  void add(const Tensor& output, const Tensor& target);
+    /** Computes frame-level mismatch between two arrayfire arrays `output` and
+     * `target` and updates the counters. Note that the shape of the two input
+     * arrays should be identical.
+     */
+    void add(const Tensor& output, const Tensor& target);
 
-  /** Returns a single value in percentage. If `accuracy` is `True`, the value
-   * returned is accuracy, error otherwise.
-   */
-  double value() const;
+    /** Returns a single value in percentage. If `accuracy` is `True`, the value
+     * returned is accuracy, error otherwise.
+     */
+    double value() const;
 
-  /** Sets all the counters to 0. */
-  void reset();
+    /** Sets all the counters to 0. */
+    void reset();
 
- private:
-  std::int64_t n_;
-  std::int64_t sum_;
-  bool accuracy_;
+private:
+    std::int64_t n_;
+    std::int64_t sum_;
+    bool accuracy_;
 };
 } // namespace fl

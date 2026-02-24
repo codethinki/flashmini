@@ -23,38 +23,39 @@ namespace fl {
  * where `merge` concatenates the `std::vector<Tensor>` from each dataset.
  *
  * Example:
-  \code{.cpp}
-  // Make two datasets
-  auto makeDataset = []() {
+   \code{.cpp}
+   // Make two datasets
+   auto makeDataset = []() {
     auto tensor = fl::rand({5, 4, 10});
     std::vector<Tensor> fields{tensor};
     return std::make_shared<TensorDataset>(fields);
-  };
-  auto ds1 = makeDataset();
-  auto ds2 = makeDataset();
+   };
+   auto ds1 = makeDataset();
+   auto ds2 = makeDataset();
 
-  // Merge them
-  MergeDataset mergeds({ds1, ds2});
-  std::cout << mergeds.size() << "\n"; // 10
-  std::cout << allClose(mergeds.get(5)[0], ds1->get(5)[0]) << "\n"; // 1
-  std::cout << allClose(mergeds.get(5)[1], ds2->get(5)[0]) << "\n"; // 1
-  \endcode
+   // Merge them
+   MergeDataset mergeds({ds1, ds2});
+   std::cout << mergeds.size() << "\n"; // 10
+   std::cout << allClose(mergeds.get(5)[0], ds1->get(5)[0]) << "\n"; // 1
+   std::cout << allClose(mergeds.get(5)[1], ds2->get(5)[0]) << "\n"; // 1
+   \endcode
  */
 class FL_API MergeDataset : public Dataset {
- public:
-  /**
-   * Creates a MergeDataset.
-   * @param[in] datasets The underlying datasets.
-   */
-  explicit MergeDataset(
-      const std::vector<std::shared_ptr<const Dataset>>& datasets);
+public:
+    /**
+     * Creates a MergeDataset.
+     * @param[in] datasets The underlying datasets.
+     */
+    explicit MergeDataset(
+        const std::vector<std::shared_ptr<const Dataset>>& datasets
+    );
 
-  int64_t size() const override;
+    int64_t size() const override;
 
-  std::vector<Tensor> get(const int64_t idx) const override;
+    std::vector<Tensor> get(const int64_t idx) const override;
 
- private:
-  std::vector<std::shared_ptr<const Dataset>> datasets_;
-  int64_t size_;
+private:
+    std::vector<std::shared_ptr<const Dataset>> datasets_;
+    int64_t size_;
 };
 } // namespace fl

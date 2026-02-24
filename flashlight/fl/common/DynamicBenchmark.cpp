@@ -15,36 +15,33 @@ bool DynamicBenchmark::benchmarkMode_ = false;
 
 void DynamicBenchmark::audit(
     const std::function<void()>& function,
-    bool incrementCount) {
-  // Only run the benchmarking components if some options are yet to be
-  // fully-timed and benchmark mode is on - otherwise, only run the passed
-  // lambda
-  if (options_->timingsComplete() || !benchmarkMode_) {
-    function();
-  } else {
-    start();
-    function();
-    stop(incrementCount);
-  }
+    bool incrementCount
+) {
+    // Only run the benchmarking components if some options are yet to be
+    // fully-timed and benchmark mode is on - otherwise, only run the passed
+    // lambda
+    if(options_->timingsComplete() || !benchmarkMode_)
+        function();
+    else {
+        start();
+        function();
+        stop(incrementCount);
+    }
 }
 
 void DynamicBenchmark::start() {
-  fl::sync();
-  currentTimer_ = fl::Timer::start();
+    fl::sync();
+    currentTimer_ = fl::Timer::start();
 }
 
 void DynamicBenchmark::stop(bool incrementCount) {
-  fl::sync();
-  auto elapsedTime = fl::Timer::stop(currentTimer_);
-  options_->accumulateTimeToCurrentOption(elapsedTime, incrementCount);
+    fl::sync();
+    auto elapsedTime = fl::Timer::stop(currentTimer_);
+    options_->accumulateTimeToCurrentOption(elapsedTime, incrementCount);
 }
 
-void DynamicBenchmark::setBenchmarkMode(bool mode) {
-  benchmarkMode_ = mode;
-}
+void DynamicBenchmark::setBenchmarkMode(bool mode) { benchmarkMode_ = mode; }
 
-bool DynamicBenchmark::getBenchmarkMode() {
-  return benchmarkMode_;
-}
+bool DynamicBenchmark::getBenchmarkMode() { return benchmarkMode_; }
 
 } // namespace fl

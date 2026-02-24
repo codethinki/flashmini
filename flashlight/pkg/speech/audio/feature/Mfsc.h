@@ -15,32 +15,32 @@
 
 namespace fl {
 namespace lib {
-namespace audio {
+    namespace audio {
 
 // Computes MFSC features for a speech signal.
 
-class Mfsc : public PowerSpectrum {
- public:
-  explicit Mfsc(const FeatureParams& params);
+        class Mfsc : public PowerSpectrum {
+        public:
+            explicit Mfsc(const FeatureParams& params);
 
-  virtual ~Mfsc() override {}
+            virtual ~Mfsc() override {}
 
-  // input - input speech signal (T)
-  // Returns - MFSC feature (Col Major : FEAT X FRAMESZ)
-  std::vector<float> apply(const std::vector<float>& input) override;
+            // input - input speech signal (T)
+            // Returns - MFSC feature (Col Major : FEAT X FRAMESZ)
+            std::vector<float> apply(const std::vector<float>& input) override;
 
-  int outputSize(int inputSz) override;
+            int outputSize(int inputSz) override;
 
- protected:
-  // Helper function which takes input as signal after dividing the signal into
-  // frames. Main purpose of this function is to reuse it in MFCC code
-  std::vector<float> mfscImpl(std::vector<float>& frames);
-  void validateMfscParams() const;
+        protected:
+            // Helper function which takes input as signal after dividing the signal into
+            // frames. Main purpose of this function is to reuse it in MFCC code
+            std::vector<float> mfscImpl(std::vector<float>& frames);
+            void validateMfscParams() const;
 
- private:
-  TriFilterbank triFltBank_;
-  Derivatives derivatives_;
-};
-} // namespace audio
+        private:
+            TriFilterbank triFltBank_;
+            Derivatives derivatives_;
+        };
+    } // namespace audio
 } // namespace lib
 } // namespace fl

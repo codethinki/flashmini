@@ -17,16 +17,16 @@ namespace fl {
  * `Variable`: \f[\text{sigmoid}(x) = \frac{1}{1 + e^{-x}}\f]
  */
 class FL_API Sigmoid : public UnaryModule {
- public:
-  Sigmoid();
+public:
+    Sigmoid();
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 };
 
 /**
@@ -34,16 +34,16 @@ class FL_API Sigmoid : public UnaryModule {
  * element-wise to a `Variable`.
  */
 class FL_API Log : public UnaryModule {
- public:
-  Log();
+public:
+    Log();
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 };
 
 /**
@@ -53,16 +53,16 @@ class FL_API Log : public UnaryModule {
  *\f[\text{tanh}(x) = \frac{e^x - e^{-x}}{e^x +  e^{-x}}\f]
  */
 class FL_API Tanh : public UnaryModule {
- public:
-  Tanh();
+public:
+    Tanh();
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 };
 
 /**
@@ -76,16 +76,16 @@ class FL_API Tanh : public UnaryModule {
     \f]
  */
 class FL_API HardTanh : public UnaryModule {
- public:
-  HardTanh();
+public:
+    HardTanh();
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 };
 
 /**
@@ -95,16 +95,16 @@ class FL_API HardTanh : public UnaryModule {
  * \f[ ReLU(x) = \max(0, x) \f]
  */
 class FL_API ReLU : public UnaryModule {
- public:
-  ReLU();
+public:
+    ReLU();
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 };
 
 /**
@@ -114,16 +114,16 @@ class FL_API ReLU : public UnaryModule {
  * function element-wise to a `Variable`: \f[ ReLU6(x) = \min(\max(0, x), 6) \f]
  */
 class FL_API ReLU6 : public UnaryModule {
- public:
-  ReLU6();
+public:
+    ReLU6();
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+private:
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 };
 
 /**
@@ -144,24 +144,24 @@ class FL_API ReLU6 : public UnaryModule {
  * be multiplied if less than zero.
  */
 class FL_API LeakyReLU : public UnaryModule {
- private:
-  double mSlope_;
+private:
+    double mSlope_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, mSlope_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, mSlope_)
 
- public:
-  /**
-   * Creates a `LeakyReLU` with the specified slope
-   *
-   * @param slope a constant by which the input will be multiplied if less than
-   * 0
-   */
-  LeakyReLU(double slope = 0.0);
+public:
+    /**
+     * Creates a `LeakyReLU` with the specified slope
+     *
+     * @param slope a constant by which the input will be multiplied if less than
+     * 0
+     */
+    LeakyReLU(double slope = 0.0);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -182,36 +182,36 @@ class FL_API LeakyReLU : public UnaryModule {
  * tuned.
  */
 class FL_API PReLU : public UnaryModule {
- private:
-  PReLU() = default; // Intentionally private
+private:
+    PReLU() = default; // Intentionally private
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule)
 
- public:
-  /**
-   * Creates a `PReLU` with the specified value and input size
-   *
-   * @param value a constant by which the input will be multiplied if less than
-   * 0
-   * @param size the number of learnable parameters. The size must be a multiple
-   * of the first dimension of the input
-   */
-  explicit PReLU(int size, double value = 0.25);
+public:
+    /**
+     * Creates a `PReLU` with the specified value and input size
+     *
+     * @param value a constant by which the input will be multiplied if less than
+     * 0
+     * @param size the number of learnable parameters. The size must be a multiple
+     * of the first dimension of the input
+     */
+    explicit PReLU(int size, double value = 0.25);
 
-  /**
-   * Creates a `PReLU` with a custom tensor; if the input is less than zero, the
-   * output is equal to the tensor product of the input and this tensor. The
-   * initialization for the learned tensor can be smaller than the input; it
-   * will be broadcast in order to compute the product.
-   *
-   * @param w the tensor initializing the learned \f$\text{value}\f$ parameter
-   */
-  explicit PReLU(const Variable& w);
+    /**
+     * Creates a `PReLU` with a custom tensor; if the input is less than zero, the
+     * output is equal to the tensor product of the input and this tensor. The
+     * initialization for the learned tensor can be smaller than the input; it
+     * will be broadcast in order to compute the product.
+     *
+     * @param w the tensor initializing the learned \f$\text{value}\f$ parameter
+     */
+    explicit PReLU(const Variable& w);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -230,18 +230,18 @@ class FL_API PReLU : public UnaryModule {
  * where \f$\alpha\f$ is a tunable parameter.
  */
 class FL_API ELU : public UnaryModule {
- private:
-  double mAlpha_;
+private:
+    double mAlpha_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, mAlpha_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, mAlpha_)
 
- public:
-  ELU(double alpha = 1.0);
+public:
+    ELU(double alpha = 1.0);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -258,23 +258,23 @@ class FL_API ELU : public UnaryModule {
  * where \f$\text{threshold}\f$ is a tunable parameter.
  */
 class FL_API ThresholdReLU : public UnaryModule {
- private:
-  double mThreshold_;
+private:
+    double mThreshold_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, mThreshold_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, mThreshold_)
 
- public:
-  /**
-   * Creates a `ThresholdReLU` with the specified threshold.
-   *
-   * @param threshold the threshold value above which the unit returns the input
-   */
-  ThresholdReLU(double threshold = 1.0);
+public:
+    /**
+     * Creates a `ThresholdReLU` with the specified threshold.
+     *
+     * @param threshold the threshold value above which the unit returns the input
+     */
+    ThresholdReLU(double threshold = 1.0);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -287,24 +287,24 @@ class FL_API ThresholdReLU : public UnaryModule {
  * \f$\sigma(x)\f$ is the sigmoid function.
  */
 class FL_API GatedLinearUnit : public UnaryModule {
- private:
-  int dim_;
+private:
+    int dim_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, dim_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, dim_)
 
- public:
-  /**
-   * Creates a `GatedLinearUnit`.
-   *
-   * @param dim the dimension along which the GLU will cut the input in half.
-   * This dimension must be even in size in the input tensor.
-   */
-  GatedLinearUnit(int dim = 0);
+public:
+    /**
+     * Creates a `GatedLinearUnit`.
+     *
+     * @param dim the dimension along which the GLU will cut the input in half.
+     * This dimension must be even in size in the input tensor.
+     */
+    GatedLinearUnit(int dim = 0);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -315,23 +315,23 @@ class FL_API GatedLinearUnit : public UnaryModule {
    \f]
  */
 class FL_API LogSoftmax : public UnaryModule {
- private:
-  int dim_;
+private:
+    int dim_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, dim_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, dim_)
 
- public:
-  /**
-   * Creates a `LogSoftmax`.
-   *
-   * @param dim the dimension along which to apply the LogSoftmax.
-   */
-  LogSoftmax(int dim = 0);
+public:
+    /**
+     * Creates a `LogSoftmax`.
+     *
+     * @param dim the dimension along which to apply the LogSoftmax.
+     */
+    LogSoftmax(int dim = 0);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 };
 
 /**
@@ -342,24 +342,24 @@ class FL_API LogSoftmax : public UnaryModule {
  * where \f$\beta\f$ is a constant, often is 1.
  */
 class FL_API Swish : public UnaryModule {
- public:
-  /**
-   * Creates a `Swish` with the specified beta
-   *
-   * @param beta a constant by which the input will be multiplied in the x *
-   * sigma(beta * x)
-   */
-  Swish(double beta = 1.0);
+public:
+    /**
+     * Creates a `Swish` with the specified beta
+     *
+     * @param beta a constant by which the input will be multiplied in the x *
+     * sigma(beta * x)
+     */
+    Swish(double beta = 1.0);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
-  std::string prettyString() const override;
+    std::unique_ptr<Module> clone() const override;
+    std::string prettyString() const override;
 
- private:
-  double beta_;
+private:
+    double beta_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, beta_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, beta_)
 };
 
 } // namespace fl

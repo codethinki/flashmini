@@ -13,50 +13,48 @@
 namespace fl {
 
 void deviceImplTypeCheck(DeviceType expect, DeviceType actual) {
-  if (expect != actual) {
-    std::ostringstream oss;
-    oss << "[fl::Device::impl] "
-        << "specified device type: [" << expect << "] "
-        << "doesn't match actual device type: [" << actual << "]";
-    throw std::invalid_argument(oss.str());
-  }
+    if(expect != actual) {
+        std::ostringstream oss;
+        oss << "[fl::Device::impl] "
+            << "specified device type: [" << expect << "] "
+            << "doesn't match actual device type: [" << actual << "]";
+        throw std::invalid_argument(oss.str());
+    }
 }
 
 const std::unordered_set<std::shared_ptr<Stream>>& Device::getStreams() const {
-  return streams_;
+    return streams_;
 }
 
 void Device::addStream(std::shared_ptr<Stream> stream) {
-  if (&stream->device() != this) {
-    throw std::runtime_error(
-      "[Device::addStream] Must add stream to owner device");
-  }
-  streams_.insert(stream);
+    if(&stream->device() != this)
+        throw std::runtime_error(
+            "[Device::addStream] Must add stream to owner device"
+        );
+    streams_.insert(stream);
 }
 
 void Device::sync() const {
-  for (const auto& stream : streams_) {
-    stream->sync();
-  }
+    for(const auto& stream : streams_)
+        stream->sync();
 }
 
 void Device::addSetActiveCallback(std::function<void(int)> callback) {
-  setActiveCallbacks_.push_back(std::move(callback));
+    setActiveCallbacks_.push_back(std::move(callback));
 }
 
 void Device::setActive() const {
-  setActiveImpl();
-  for (auto& callback : setActiveCallbacks_) {
-    callback(nativeId());
-  }
+    setActiveImpl();
+    for(auto& callback : setActiveCallbacks_)
+        callback(nativeId());
 }
 
 int X64Device::nativeId() const {
-  return fl::kX64DeviceId;
+    return fl::kX64DeviceId;
 }
 
 void X64Device::setActiveImpl() const {
-  // no op, CPU device is always active
+    // no op, CPU device is always active
 }
 
 } // namespace fl

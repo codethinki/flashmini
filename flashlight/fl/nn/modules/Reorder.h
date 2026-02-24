@@ -26,27 +26,27 @@ namespace fl {
  * \endcode
  */
 class FL_API Reorder : public UnaryModule {
- private:
-  Reorder() = default;
+private:
+    Reorder() = default;
 
-  Shape shape_;
+    Shape shape_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, shape_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, shape_)
 
- public:
-  /**
-   * Construct a Reorder layer. The dimension values must not repeat and must
-   * be between 0 and 3 inclusive.
-   *
-   * @param shape The shape to which the input will be reshaped.
-   */
-  explicit Reorder(Shape shape);
+public:
+    /**
+     * Construct a Reorder layer. The dimension values must not repeat and must
+     * be between 0 and 3 inclusive.
+     *
+     * @param shape The shape to which the input will be reshaped.
+     */
+    explicit Reorder(Shape shape);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 } // namespace fl

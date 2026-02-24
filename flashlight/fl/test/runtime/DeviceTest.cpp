@@ -14,76 +14,61 @@ using fl::DeviceManager;
 using fl::DeviceType;
 
 TEST(DeviceTest, type) {
-  auto& manager = DeviceManager::getInstance();
-  for (auto type : fl::getDeviceTypes()) {
-    if (manager.isDeviceTypeAvailable(type)) {
-      for (auto* device : manager.getDevicesOfType(type)) {
-        ASSERT_EQ(device->type(), type);
-      }
-    }
-  }
+    auto& manager = DeviceManager::getInstance();
+    for(auto type : fl::getDeviceTypes())
+        if(manager.isDeviceTypeAvailable(type))
+            for(auto* device : manager.getDevicesOfType(type))
+                ASSERT_EQ(device->type(), type);
 }
 
 TEST(DeviceTest, nativeId) {
-  const auto& manager = DeviceManager::getInstance();
-  for (const auto* device : manager.getDevicesOfType(DeviceType::x64)) {
-    ASSERT_EQ(device->nativeId(), fl::kX64DeviceId);
-  }
+    const auto& manager = DeviceManager::getInstance();
+    for(const auto* device : manager.getDevicesOfType(DeviceType::x64))
+        ASSERT_EQ(device->nativeId(), fl::kX64DeviceId);
 }
 
 TEST(DeviceTest, setActive) {
-  auto& manager = DeviceManager::getInstance();
-  for (auto type : fl::getDeviceTypes()) {
-    if (manager.isDeviceTypeAvailable(type)) {
-      for (auto* device : manager.getDevicesOfType(type)) {
-        device->setActive();
-        ASSERT_EQ(&manager.getActiveDevice(type), device);
-      }
-    }
-  }
+    auto& manager = DeviceManager::getInstance();
+    for(auto type : fl::getDeviceTypes())
+        if(manager.isDeviceTypeAvailable(type))
+            for(auto* device : manager.getDevicesOfType(type)) {
+                device->setActive();
+                ASSERT_EQ(&manager.getActiveDevice(type), device);
+            }
 }
 
 TEST(DeviceTest, addSetActiveCallback) {
-  auto& manager = DeviceManager::getInstance();
-  for (const auto type : fl::getDeviceTypes()) {
-    if (manager.isDeviceTypeAvailable(type)) {
-      for (auto* device : manager.getDevicesOfType(type)) {
-        int count = 0;
-        auto incCount = [&count](int){ count++; };
-        device->addSetActiveCallback(incCount);
-        device->setActive();
-        ASSERT_EQ(count, 1);
-      }
-    }
-  }
+    auto& manager = DeviceManager::getInstance();
+    for(const auto type : fl::getDeviceTypes())
+        if(manager.isDeviceTypeAvailable(type))
+            for(auto* device : manager.getDevicesOfType(type)) {
+                int count = 0;
+                auto incCount = [&count](int) { count++; };
+                device->addSetActiveCallback(incCount);
+                device->setActive();
+                ASSERT_EQ(count, 1);
+            }
 }
 
 TEST(DeviceTest, sync) {
-  const auto& manager = DeviceManager::getInstance();
-  for (const auto type : fl::getDeviceTypes()) {
-    if (manager.isDeviceTypeAvailable(type)) {
-      for (const auto* device : manager.getDevicesOfType(type)) {
-        ASSERT_NO_THROW(device->sync());
-      }
-    }
-  }
+    const auto& manager = DeviceManager::getInstance();
+    for(const auto type : fl::getDeviceTypes())
+        if(manager.isDeviceTypeAvailable(type))
+            for(const auto* device : manager.getDevicesOfType(type))
+                ASSERT_NO_THROW(device->sync());
 }
 
 TEST(DeviceTest, getStream) {
-  auto& manager = DeviceManager::getInstance();
-  for (const auto type : fl::getDeviceTypes()) {
-    if (manager.isDeviceTypeAvailable(type)) {
-      for (const auto* device : manager.getDevicesOfType(type)) {
-        for (const auto& stream : device->getStreams()) {
-          ASSERT_EQ(&stream->device(), device);
-        }
-      }
-    }
-  }
+    auto& manager = DeviceManager::getInstance();
+    for(const auto type : fl::getDeviceTypes())
+        if(manager.isDeviceTypeAvailable(type))
+            for(const auto* device : manager.getDevicesOfType(type))
+                for(const auto& stream : device->getStreams())
+                    ASSERT_EQ(&stream->device(), device);
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

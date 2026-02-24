@@ -27,79 +27,80 @@ namespace fl {
  * active ArrayFire memory manager even if its installer has been destroyed.
  */
 class MemoryManagerInstaller {
- public:
-  /**
-   * Creates a new instance using a `MemoryManagerAdapter`. Uses the adapter's
-   * underlying `af_memory_manager` handle and performs the following setup:
-   * - Sets all function pointers using the Array/Fire C memory management API
-   *   on the underlying `af_memory_manager` handle to point to closures which
-   *   call the installed `MemoryManagerAdapter`'s instance methods.
-   * - Sets the closures on the adapter's `MemoryManagerDeviceInterface` to call
-   *   ArrayFire C-API native device memory management functions which
-   *   automatically delegate to the proper backend and are use pre-defined
-   *   implementations in ArrayFire internals.
-   *
-   * @param[in] managerImpl a pointer to the `MemoryManagerAdapter` to be
-   * installed.
-   */
-  explicit MemoryManagerInstaller(
-      std::shared_ptr<MemoryManagerAdapter> managerImpl);
-  ~MemoryManagerInstaller() = default;
+public:
+    /**
+     * Creates a new instance using a `MemoryManagerAdapter`. Uses the adapter's
+     * underlying `af_memory_manager` handle and performs the following setup:
+     * - Sets all function pointers using the Array/Fire C memory management API
+     *   on the underlying `af_memory_manager` handle to point to closures which
+     *   call the installed `MemoryManagerAdapter`'s instance methods.
+     * - Sets the closures on the adapter's `MemoryManagerDeviceInterface` to call
+     *   ArrayFire C-API native device memory management functions which
+     *   automatically delegate to the proper backend and are use pre-defined
+     *   implementations in ArrayFire internals.
+     *
+     * @param[in] managerImpl a pointer to the `MemoryManagerAdapter` to be
+     * installed.
+     */
+    explicit MemoryManagerInstaller(
+        std::shared_ptr<MemoryManagerAdapter> managerImpl
+    );
+    ~MemoryManagerInstaller() = default;
 
-  /**
-   * Gets the memory manager adapter used in this instance.
-   *
-   * @return a pointer to some derived type of `MemoryManagerAdapter`
-   */
-  template <typename T>
-  std::shared_ptr<T> getMemoryManager() const {
-    return std::dynamic_pointer_cast<T>(impl_);
-  }
+    /**
+     * Gets the memory manager adapter used in this instance.
+     *
+     * @return a pointer to some derived type of `MemoryManagerAdapter`
+     */
+    template<typename T>
+    std::shared_ptr<T> getMemoryManager() const {
+        return std::dynamic_pointer_cast<T>(impl_);
+    }
 
-  /**
-   * Sets this `MemoryManagerInstaller`'s `MemoryManagerAdapter` to be the
-   * active memory manager in ArrayFire.
-   */
-  void setAsMemoryManager();
+    /**
+     * Sets this `MemoryManagerInstaller`'s `MemoryManagerAdapter` to be the
+     * active memory manager in ArrayFire.
+     */
+    void setAsMemoryManager();
 
-  /**
-   * Sets this `MemoryManagerInstaller`'s `MemoryManagerAdapter` to be the
-   * active memory manager for pinned memory operations in ArrayFire.
-   */
-  void setAsMemoryManagerPinned();
+    /**
+     * Sets this `MemoryManagerInstaller`'s `MemoryManagerAdapter` to be the
+     * active memory manager for pinned memory operations in ArrayFire.
+     */
+    void setAsMemoryManagerPinned();
 
-  /**
-   * Returns an adapter given a handle. Used to construct C++-style callbacks
-   * inside lambdas set on the ArrayFire C memory management API.
-   */
-  static MemoryManagerAdapter* getImpl(af_memory_manager manager);
+    /**
+     * Returns an adapter given a handle. Used to construct C++-style callbacks
+     * inside lambdas set on the ArrayFire C memory management API.
+     */
+    static MemoryManagerAdapter* getImpl(af_memory_manager manager);
 
-  /**
-   * Returns the currently installed custom memory manager, or null if none is
-   * installed.
-   */
-  static MemoryManagerAdapter* currentlyInstalledMemoryManager();
+    /**
+     * Returns the currently installed custom memory manager, or null if none is
+     * installed.
+     */
+    static MemoryManagerAdapter* currentlyInstalledMemoryManager();
 
-  /**
-   * Initializes and installs the memory manager defaulted to on startup.
-   *
-   * Uses a `CachingMemoryManager` by default. Only sets the memory manager -
-   * doesn't set an AF pinned memory manager.
-   */
-  static void installDefaultMemoryManager();
+    /**
+     * Initializes and installs the memory manager defaulted to on startup.
+     *
+     * Uses a `CachingMemoryManager` by default. Only sets the memory manager -
+     * doesn't set an AF pinned memory manager.
+     */
+    static void installDefaultMemoryManager();
 
-  /**
-   * Unsets the currently-set custom ArrayFire memory manager. If no custom
-   * memory manager is set, results in a noop, since the default memory manager
-   * is set, and unsetting it would result in shutdown/destruction.
-   */
-  static void unsetMemoryManager();
+    /**
+     * Unsets the currently-set custom ArrayFire memory manager. If no custom
+     * memory manager is set, results in a noop, since the default memory manager
+     * is set, and unsetting it would result in shutdown/destruction.
+     */
+    static void unsetMemoryManager();
 
- private:
-  // The given memory manager implementation
-  std::shared_ptr<MemoryManagerAdapter> impl_;
-  // Points to the impl_ of the most recently installed manager.
-  static std::shared_ptr<MemoryManagerAdapter> currentlyInstalledMemoryManager_;
+private:
+    // The given memory manager implementation
+    std::shared_ptr<MemoryManagerAdapter> impl_;
+    // Points to the impl_ of the most recently installed manager.
+    static std::shared_ptr<MemoryManagerAdapter> currentlyInstalledMemoryManager_;
 };
 
 } // namespace fl

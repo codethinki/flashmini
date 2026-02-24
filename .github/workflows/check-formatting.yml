@@ -1,0 +1,40 @@
+name: Uncrustify Format
+
+on:
+  push: { branches: ["master", "_master/add_ci"] }
+  pull_request: { branches: ["master"] }
+
+permissions: { contents: read }
+
+# ---------------------------------------------------------
+# CONFIG
+# ---------------------------------------------------------
+env:
+  UNCRUSTIFY_CONFIG: "uncrustify.cfg"
+  CHECK_PATH: "flashlight"
+  FILE_EXTENSIONS: "c|cpp|h|hpp|cu"
+
+# ---------------------------------------------------------
+# JOB
+# ---------------------------------------------------------
+jobs:
+  formatting-check:
+    name: Format check
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+    - name: Install Git and Uncrustify
+      run: pacman -Syu --noconfirm git uncrustify
+      
+    - uses: actions/checkout@v4
+      
+    - name: Run uncrustify style check
+      run: |
+        # Print the version to confirm you are on the absolute latest version
+        uncrustify --version 
+        
+        find ${{ env.CHECK_PATH }} \
+          -type f \
+          -regextype posix-extended \
+          -regex ".*\.(${{ env.FILE_EXTENSIONS }})$" \
+          | uncrustify -q -c ${{ env.UNCRUSTIFY_CONFIG }} --check -F -

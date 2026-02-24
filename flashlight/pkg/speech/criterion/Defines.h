@@ -11,12 +11,12 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
 // sampling strategy to use in decoder in place of teacher forcing
-constexpr const char* kModelSampling = "model";
-constexpr const char* kRandSampling = "rand";
-constexpr const char* kGumbelSampling = "gumbel";
-} // namespace speech
+        constexpr const char* kModelSampling = "model";
+        constexpr const char* kRandSampling = "rand";
+        constexpr const char* kGumbelSampling = "gumbel";
+    } // namespace speech
 } // namespace pkg
 } // namespace fl

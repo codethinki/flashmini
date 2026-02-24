@@ -19,54 +19,54 @@ namespace fl {
 PositionEmbedding::PositionEmbedding(
     int32_t layerDim,
     int32_t maxLen,
-    double dropout)
-    : dropout_(dropout) {
-  auto embeddings = uniform(layerDim, maxLen, -0.1, 0.1, fl::dtype::f32, true);
-  params_ = {embeddings};
+    double dropout
+) : dropout_(dropout) {
+    auto embeddings = uniform(layerDim, maxLen, -0.1, 0.1, fl::dtype::f32, true);
+    params_ = {embeddings};
 }
 
-PositionEmbedding::PositionEmbedding(const PositionEmbedding& other)
-    : Module(other.copyParams()), dropout_(other.dropout_) {
-  train_ = other.train_;
+PositionEmbedding::PositionEmbedding(const PositionEmbedding& other) : Module(other.copyParams()),
+                                                                       dropout_(other.dropout_) {
+    train_ = other.train_;
 }
 
 PositionEmbedding& PositionEmbedding::operator=(
-    const PositionEmbedding& other) {
-  params_ = other.copyParams();
-  train_ = other.train_;
-  dropout_ = other.dropout_;
-  return *this;
+    const PositionEmbedding& other
+) {
+    params_ = other.copyParams();
+    train_ = other.train_;
+    dropout_ = other.dropout_;
+    return *this;
 }
 
 std::vector<Variable> PositionEmbedding::forward(
-    const std::vector<Variable>& input) {
-  if (input[0].ndim() != 3) {
-    throw std::invalid_argument(
-        "PositionEmbedding::forward - expect a tensor with "
-        "3 dimensions - C x T x B");
-  }
+    const std::vector<Variable>& input
+) {
+    if(input[0].ndim() != 3)
+        throw std::invalid_argument(
+            "PositionEmbedding::forward - expect a tensor with "
+            "3 dimensions - C x T x B"
+        );
 
-  int n = input[0].dim(1);
-  Variable posEmb = tileAs(
-      params_[0].astype(input[0].type())(fl::span, fl::range(0, n)), input[0]);
-  if (dropout_ > 0.0 && train_) {
-    return {input[0] + dropout(posEmb, dropout_)};
-  } else {
-    return {input[0] + posEmb};
-  }
+    int n = input[0].dim(1);
+    Variable posEmb = tileAs(
+        params_[0].astype(input[0].type())(fl::span, fl::range(0, n)), input[0]);
+        if(dropout_ > 0.0 && train_)
+            return {input[0] + dropout(posEmb, dropout_)};
+        else
+            return {input[0] + posEmb};
 }
 
 std::vector<Variable> PositionEmbedding::operator()(
-    const std::vector<Variable>& input) {
-  return forward(input);
-}
+    const std::vector<Variable>& input
+) { return forward(input); }
 
 std::unique_ptr<Module> PositionEmbedding::clone() const {
-  return std::make_unique<PositionEmbedding>(*this);
+    return std::make_unique<PositionEmbedding>(*this);
 }
 
 std::string PositionEmbedding::prettyString() const {
-  return "Position Embedding Layer";
+    return "Position Embedding Layer";
 }
 
 PositionEmbedding::PositionEmbedding() = default;

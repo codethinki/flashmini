@@ -23,65 +23,67 @@ namespace fl::lib::audio {
 
 std::vector<float> frameSignal(
     const std::vector<float>& input,
-    const FeatureParams& params) {
-  auto frameSize = params.numFrameSizeSamples();
-  auto frameStride = params.numFrameStrideSamples();
-  int numframes = params.numFrames(input.size());
-  // HTK: Values coming out of rasta treat samples as integers,
-  // not range -1..1, hence scale up here to match (approx)
-  float scale = 32768.0;
-  std::vector<float> frames(numframes * frameSize);
-  for (size_t f = 0; f < numframes; ++f) {
-    for (size_t i = 0; i < frameSize; ++i) {
-      frames[f * frameSize + i] = scale * input[f * frameStride + i];
-    }
-  }
-  return frames;
+    const FeatureParams& params
+) {
+    auto frameSize = params.numFrameSizeSamples();
+    auto frameStride = params.numFrameStrideSamples();
+    int numframes = params.numFrames(input.size());
+    // HTK: Values coming out of rasta treat samples as integers,
+    // not range -1..1, hence scale up here to match (approx)
+    float scale = 32768.0;
+    std::vector<float> frames(numframes * frameSize);
+    for(size_t f = 0; f < numframes; ++f)
+        for(size_t i = 0; i < frameSize; ++i)
+            frames[f * frameSize + i] = scale * input[f * frameStride + i];
+    return frames;
 }
 
 std::vector<float> cblasGemm(
     const std::vector<float>& matA,
     const std::vector<float>& matB,
     int n,
-    int k) {
-  if (n <= 0 || k <= 0 || matA.empty() || (matA.size() % k != 0) ||
-      (matB.size() != n * k)) {
-    throw std::invalid_argument("cblasGemm: invalid arguments");
-  }
+    int k
+) {
+    if(
+        n <= 0 || k <= 0 || matA.empty() || (matA.size() % k != 0)
+        || (matB.size() != n * k)
+    )
+        throw std::invalid_argument("cblasGemm: invalid arguments");
 
-  int m = matA.size() / k;
+    int m = matA.size() / k;
 
-  std::vector<float> matC(m * n);
+    std::vector<float> matC(m * n);
 
 #if FL_USE_MKL
-  auto prevMaxThreads = mkl_get_max_threads();
-  mkl_set_num_threads_local(1);
+    auto prevMaxThreads = mkl_get_max_threads();
+    mkl_set_num_threads_local(1);
 #else
 // TODO: to be tested
 #endif
 
-  cblas_sgemm(
-      CblasRowMajor,
-      CblasNoTrans,
-      CblasNoTrans,
-      m,
-      n,
-      k,
-      1.0, // alpha
-      matA.data(),
-      k,
-      matB.data(),
-      n,
-      0.0, // beta
-      matC.data(),
-      n);
+    cblas_sgemm(
+        CblasRowMajor,
+        CblasNoTrans,
+        CblasNoTrans,
+        m,
+        n,
+        k,
+        1.0, // alpha
+        matA.data(),
+        k,
+        matB.data(),
+        n,
+        0.0, // beta
+        matC.data(),
+        n
+    );
 
 #if FL_USE_MKL
-  mkl_set_num_threads_local(prevMaxThreads);
+    mkl_set_num_threads_local(prevMaxThreads);
 #else
 // TODO: to be tested
 #endif
 
-  return matC;
+    return matC;
 };
 } // namespace fl

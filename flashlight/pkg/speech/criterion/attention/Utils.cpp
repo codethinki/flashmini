@@ -14,25 +14,25 @@
 namespace fl::pkg::speech {
 
 Variable maskAttention(const Variable& input, const Variable& sizes) {
-  int B = input.dim(2);
-  int T = input.dim(1);
-  // xEncodedSizes is (1, B) size
-  Tensor inputNotPaddedSize =
-      fl::ceil(sizes.tensor() / fl::amax(sizes.tensor()).asScalar<float>() * T);
-  Tensor padMask =
-      fl::iota({T, 1}, {1, B}) >= fl::tile(inputNotPaddedSize, {T, 1});
-  padMask = fl::tile(fl::reshape(padMask, {1, T, B}), {input.dim(0), 1, 1});
+    int B = input.dim(2);
+    int T = input.dim(1);
+    // xEncodedSizes is (1, B) size
+    Tensor inputNotPaddedSize =
+        fl::ceil(sizes.tensor() / fl::amax(sizes.tensor()).asScalar<float>() * T);
+    Tensor padMask =
+        fl::iota({T, 1}, {1, B}) >= fl::tile(inputNotPaddedSize, {T, 1});
+    padMask = fl::tile(fl::reshape(padMask, {1, T, B}), {input.dim(0), 1, 1});
 
-  Tensor output = input.tensor();
-  output(padMask) = kAttentionMaskValue;
+    Tensor output = input.tensor();
+    output(padMask) = kAttentionMaskValue;
 
-  auto gradFunc =
-      [padMask](std::vector<Variable>& inputs, const Variable& gradOutput) {
-        Tensor gradArray = gradOutput.tensor();
-        gradArray(padMask) = 0.;
-        inputs[0].addGrad(Variable(gradArray, false));
-      };
-  return Variable(output, {input.withoutData()}, gradFunc);
+    auto gradFunc =
+        [padMask](std::vector<Variable>& inputs, const Variable& gradOutput) {
+            Tensor gradArray = gradOutput.tensor();
+            gradArray(padMask) = 0.;
+            inputs[0].addGrad(Variable(gradArray, false));
+        };
+    return Variable(output, {input.withoutData()}, gradFunc);
 }
 
 } // namespace fl

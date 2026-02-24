@@ -21,59 +21,57 @@ NovogradOptimizer::NovogradOptimizer(
     float beta1 /* = 0.9 */,
     float beta2 /* = 0.999 */,
     float epsilon /* = 1e-8 */,
-    float weightDecay /* = 0 */)
-    : FirstOrderOptimizer(parameters, learningRate),
-      beta1_(beta1),
-      beta2_(beta2),
-      eps_(epsilon),
-      wd_(weightDecay),
-      accGradNorm_(),
-      accGrad_() {
-  accGradNorm_.reserve(1);
-  accGrad_.reserve(parameters.size());
+    float weightDecay /* = 0 */
+) : FirstOrderOptimizer(parameters, learningRate),
+    beta1_(beta1),
+    beta2_(beta2),
+    eps_(epsilon),
+    wd_(weightDecay),
+    accGradNorm_(),
+    accGrad_() {
+    accGradNorm_.reserve(1);
+    accGrad_.reserve(parameters.size());
 
-  for (const auto& parameter : parameters_) {
-    accGradNorm_.emplace_back(0.0);
-    accGrad_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
+    for(const auto& parameter : parameters_) {
+        accGradNorm_.emplace_back(0.0);
+        accGrad_.emplace_back(fl::full(parameter.shape(), 0, parameter.type()));
 
-    fl::eval(accGrad_.back());
-  }
+        fl::eval(accGrad_.back());
+    }
 }
 
 void NovogradOptimizer::step() {
-  for (size_t i = 0; i < parameters_.size(); i++) {
-    if (!parameters_[i].isGradAvailable()) {
-      continue;
+    for(size_t i = 0; i < parameters_.size(); i++) {
+        if(!parameters_[i].isGradAvailable())
+            continue;
+
+        const Tensor& grad = parameters_[i].grad().tensor();
+        Tensor& data = parameters_[i].tensor();
+        Tensor& accGrad = accGrad_[i];
+
+        double gradNorm = fl::sum(grad * grad).asScalar<double>();
+
+        accGradNorm_[i] = beta2_ * accGradNorm_[i] + (1 - beta2_) * gradNorm;
+        accGrad = beta1_ * accGrad
+            + (1 - beta1_)
+            * (grad / (static_cast<float>(std::sqrt(accGradNorm_[i]) + eps_))
+                + wd_ * data);
+        fl::eval(accGrad);
+
+        data = data - (lr_ * accGrad);
+
+        fl::eval(data);
     }
-
-    const Tensor& grad = parameters_[i].grad().tensor();
-    Tensor& data = parameters_[i].tensor();
-    Tensor& accGrad = accGrad_[i];
-
-    double gradNorm = fl::sum(grad * grad).asScalar<double>();
-
-    accGradNorm_[i] = beta2_ * accGradNorm_[i] + (1 - beta2_) * gradNorm;
-    accGrad = beta1_ * accGrad +
-        (1 - beta1_) *
-            (grad / (static_cast<float>(std::sqrt(accGradNorm_[i]) + eps_)) +
-             wd_ * data);
-    fl::eval(accGrad);
-
-    data = data - (lr_ * accGrad);
-
-    fl::eval(data);
-  }
 }
 
 std::string NovogradOptimizer::prettyString() const {
-  std::ostringstream ss;
-  ss << "Novograd";
+    std::ostringstream ss;
+    ss << "Novograd";
 
-  if (wd_ != 0) {
-    ss << " (weight decay=" << wd_ << ")";
-  }
+    if(wd_ != 0)
+        ss << " (weight decay=" << wd_ << ")";
 
-  return ss.str();
+    return ss.str();
 }
 
 } // namespace fl

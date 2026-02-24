@@ -9,7 +9,7 @@
 
 namespace fl {
 namespace lib {
-namespace set {
+    namespace set {
 
 /*
  * Performs linear sum assignment
@@ -21,15 +21,14 @@ namespace set {
  * rowIdxs will contain the row idx for each assignment
  * and colIdxs wiill contain the colIdx for each assignment
  */
-void hungarian(float* costs, int* rowIdxs, int* colIdxs, int M, int N);
-
+        void hungarian(float* costs, int* rowIdxs, int* colIdxs, int M, int N);
 
 /*
  * Same as above except it will output an M X N assignment matrix where
  * assignments[m][n] == 1 means m and n are assigned.
  */
- void hungarian(float* costs, int* assignments, int M, int N);
+        void hungarian(float* costs, int* assignments, int M, int N);
 
-} // namespace set
+    } // namespace set
 } // namespace lib
 } // namespace fl

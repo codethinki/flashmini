@@ -9,16 +9,14 @@
 
 namespace fl {
 
-std::vector<Variable> Identity::forward(const std::vector<Variable>& inputs) {
-  return inputs;
-};
+std::vector<Variable> Identity::forward(const std::vector<Variable>& inputs) { return inputs; };
 
 std::unique_ptr<Module> Identity::clone() const {
-  return std::make_unique<Identity>(*this);
+    return std::make_unique<Identity>(*this);
 }
 
 std::string Identity::prettyString() const {
-  return "Identity";
+    return "Identity";
 };
 
 } // namespace fl

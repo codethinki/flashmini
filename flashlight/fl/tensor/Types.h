@@ -15,18 +15,18 @@
 namespace fl {
 
 enum class dtype {
-  f16 = 0, // 16-bit float
-  f32 = 1, // 32-bit float
-  f64 = 2, // 64-bit float
-  b8 = 3, // 8-bit boolean
-  s16 = 4, // 16-bit signed integer
-  s32 = 5, // 32-bit signed integer
-  s64 = 6, // 64-bit signed integer
-  u8 = 7, // 8-bit unsigned integer
-  u16 = 8, // 16-bit unsigned integer
-  u32 = 9, // 32-bit unsigned integer
-  u64 = 10 // 64-bit unsigned integer
-  // TODO: add support for complex-valued tensors? (AF)
+    f16 = 0, // 16-bit float
+    f32 = 1, // 32-bit float
+    f64 = 2, // 64-bit float
+    b8 = 3, // 8-bit boolean
+    s16 = 4, // 16-bit signed integer
+    s32 = 5, // 32-bit signed integer
+    s64 = 6, // 64-bit signed integer
+    u8 = 7, // 8-bit unsigned integer
+    u16 = 8, // 16-bit unsigned integer
+    u32 = 9, // 32-bit unsigned integer
+    u64 = 10 // 64-bit unsigned integer
+        // TODO: add support for complex-valued tensors? (AF)
 };
 
 /**
@@ -55,19 +55,19 @@ FL_API fl::dtype stringToDtype(const std::string& string);
  */
 FL_API std::ostream& operator<<(std::ostream& ostr, const dtype& s);
 
-template <typename T>
+template<typename T>
 struct dtype_traits;
 
-#define FL_TYPE_TRAIT(BASE_TYPE, DTYPE, CONSTANT_TYPE, STRING_NAME)    \
-  template <>                                                          \
-  struct FL_API dtype_traits<BASE_TYPE> {                                     \
-    static const dtype fl_type = DTYPE; /* corresponding dtype */      \
-    static const dtype ctype = CONSTANT_TYPE; /* constant init type */ \
-    typedef BASE_TYPE base_type;                                       \
-    static const char* getName() {                                     \
-      return STRING_NAME;                                              \
-    }                                                                  \
-  }
+#define FL_TYPE_TRAIT(BASE_TYPE, DTYPE, CONSTANT_TYPE, STRING_NAME)            \
+        template<>                                                             \
+        struct FL_API dtype_traits<BASE_TYPE> {                                \
+            static const dtype fl_type = DTYPE; /* corresponding dtype */      \
+            static const dtype ctype = CONSTANT_TYPE; /* constant init type */ \
+            typedef BASE_TYPE base_type;                                       \
+            static const char* getName() {                                     \
+                return STRING_NAME;                                            \
+            }                                                                  \
+        }
 
 FL_TYPE_TRAIT(float, dtype::f32, dtype::f32, "float");
 FL_TYPE_TRAIT(double, dtype::f64, dtype::f32, "double");

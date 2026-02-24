@@ -37,37 +37,38 @@ FL_API int64_t numTotalParams(std::shared_ptr<fl::Module> module);
  * @param absTolerance absolute tolerance allowed
  *
  */
-FL_API bool
-allParamsClose(const Module& a, const Module& b, double absTolerance = 1e-5);
+FL_API bool allParamsClose(const Module& a, const Module& b, double absTolerance = 1e-5);
 
 namespace detail {
 
-FL_API int64_t getNumRnnParams(
-    int input_size,
-    int hidden_size,
-    int num_layers,
-    RnnMode mode,
-    bool bidirectional);
+    FL_API int64_t getNumRnnParams(
+        int input_size,
+        int hidden_size,
+        int num_layers,
+        RnnMode mode,
+        bool bidirectional
+    );
 
 /// used for Conv2D and Pool2D params
-struct IntOrPadMode {
-  /* implicit */ IntOrPadMode(int val) : padVal(val) {}
-  /* implicit */ IntOrPadMode(PaddingMode mode)
-      : padVal(static_cast<int>(mode)) {}
-  const int padVal;
-};
+    struct IntOrPadMode {
+        /* implicit */
+        IntOrPadMode(int val) : padVal(val) {}
+        /* implicit */ IntOrPadMode(PaddingMode mode)
+            : padVal(static_cast<int>(mode)) {}
+        const int padVal;
+    };
 
 } // namespace detail
 
-FL_API int
-derivePadding(int inSz, int filterSz, int stride, int pad, int dilation);
+FL_API int derivePadding(int inSz, int filterSz, int stride, int pad, int dilation);
 
 /// packs a list of arrays (possibly of different dimensions) to a single array
 /// by padding them to same dimensions
 FL_API Tensor join(
     const std::vector<Tensor>& inputs,
     double padValue = 0.0,
-    int batchDim = -1);
+    int batchDim = -1
+);
 
 /** @} */
 

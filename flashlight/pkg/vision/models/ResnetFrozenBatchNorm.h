@@ -12,7 +12,7 @@
 
 namespace fl {
 namespace pkg {
-namespace vision {
+    namespace vision {
 
 // Note these are identical to those in Resnet.h. There are a number of ways to
 // refactor and consolidate including passing norm factory functions to the
@@ -20,86 +20,95 @@ namespace vision {
 // the default Resnet implementation dead simple, we are recreating a lot
 // of functionality here.
 
-class ConvFrozenBatchNormActivation : public fl::Sequential {
- public:
-  ConvFrozenBatchNormActivation(
-      const int inChannels,
-      const int outChannels,
-      const int kw,
-      const int kh,
-      const int sx = 1,
-      const int sy = 1,
-      bool bn = true,
-      bool act = true);
+        class ConvFrozenBatchNormActivation : public fl::Sequential {
+        public:
+            ConvFrozenBatchNormActivation(
+                const int inChannels,
+                const int outChannels,
+                const int kw,
+                const int kh,
+                const int sx = 1,
+                const int sy = 1,
+                bool bn = true,
+                bool act = true
+            );
 
- private:
-  ConvFrozenBatchNormActivation();
-  FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
-};
+        private:
+            ConvFrozenBatchNormActivation();
+            FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
+        };
 
-class ResNetBlockFrozenBatchNorm : public fl::Container {
- private:
-  ResNetBlockFrozenBatchNorm();
-  FL_SAVE_LOAD_WITH_BASE(fl::Container)
- public:
-  ResNetBlockFrozenBatchNorm(
-      const int inChannels,
-      const int outChannels,
-      const int stride = 1);
+        class ResNetBlockFrozenBatchNorm : public fl::Container {
+        private:
+            ResNetBlockFrozenBatchNorm();
+            FL_SAVE_LOAD_WITH_BASE(fl::Container)
 
-  std::vector<fl::Variable> forward(
-      const std::vector<fl::Variable>& inputs) override;
+        public:
+            ResNetBlockFrozenBatchNorm(
+                const int inChannels,
+                const int outChannels,
+                const int stride = 1
+            );
 
-  std::string prettyString() const override;
+            std::vector<fl::Variable> forward(
+                const std::vector<fl::Variable>& inputs
+            ) override;
 
-  FL_BASIC_CONTAINER_CLONING(ResNetBlockFrozenBatchNorm)
-};
+            std::string prettyString() const override;
 
-class ResNetBottleneckBlockFrozenBatchNorm : public fl::Container {
- private:
-  ResNetBottleneckBlockFrozenBatchNorm();
-  FL_SAVE_LOAD_WITH_BASE(fl::Container)
- public:
-  ResNetBottleneckBlockFrozenBatchNorm(
-      const int inChannels,
-      const int outChannels,
-      const int stride = 1);
+            FL_BASIC_CONTAINER_CLONING(ResNetBlockFrozenBatchNorm)
+        };
 
-  std::vector<fl::Variable> forward(
-      const std::vector<fl::Variable>& inputs) override;
+        class ResNetBottleneckBlockFrozenBatchNorm : public fl::Container {
+        private:
+            ResNetBottleneckBlockFrozenBatchNorm();
+            FL_SAVE_LOAD_WITH_BASE(fl::Container)
 
-  std::string prettyString() const override;
+        public:
+            ResNetBottleneckBlockFrozenBatchNorm(
+                const int inChannels,
+                const int outChannels,
+                const int stride = 1
+            );
 
-  FL_BASIC_CONTAINER_CLONING(ResNetBottleneckBlockFrozenBatchNorm)
-};
+            std::vector<fl::Variable> forward(
+                const std::vector<fl::Variable>& inputs
+            ) override;
 
-class ResNetBottleneckStageFrozenBatchNorm : public fl::Sequential {
- public:
-  ResNetBottleneckStageFrozenBatchNorm(
-      const int inChannels,
-      const int outChannels,
-      const int numBlocks,
-      const int stride);
+            std::string prettyString() const override;
 
- private:
-  ResNetBottleneckStageFrozenBatchNorm();
-  FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
-};
+            FL_BASIC_CONTAINER_CLONING(ResNetBottleneckBlockFrozenBatchNorm)
+        };
 
-class ResNetStageFrozenBatchNorm : public fl::Sequential {
- public:
-  ResNetStageFrozenBatchNorm(
-      const int inChannels,
-      const int outChannels,
-      const int numBlocks,
-      const int stride);
+        class ResNetBottleneckStageFrozenBatchNorm : public fl::Sequential {
+        public:
+            ResNetBottleneckStageFrozenBatchNorm(
+                const int inChannels,
+                const int outChannels,
+                const int numBlocks,
+                const int stride
+            );
 
- private:
-  ResNetStageFrozenBatchNorm();
-  FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
-};
+        private:
+            ResNetBottleneckStageFrozenBatchNorm();
+            FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
+        };
 
-} // namespace vision
+        class ResNetStageFrozenBatchNorm : public fl::Sequential {
+        public:
+            ResNetStageFrozenBatchNorm(
+                const int inChannels,
+                const int outChannels,
+                const int numBlocks,
+                const int stride
+            );
+
+        private:
+            ResNetStageFrozenBatchNorm();
+            FL_SAVE_LOAD_WITH_BASE(fl::Sequential)
+        };
+
+    } // namespace vision
 } // namespace pkg
 } // namespace fl
 CEREAL_REGISTER_TYPE(fl::pkg::vision::ConvFrozenBatchNormActivation)

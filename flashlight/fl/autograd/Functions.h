@@ -22,71 +22,73 @@ class Variable;
 
 namespace detail {
 
-struct ConvBenchmarks;
+    struct ConvBenchmarks;
 
-struct AutogradPayload;
+    struct AutogradPayload;
 
-FL_API Tensor tileAs(const Tensor& input, const Shape& rdims);
+    FL_API Tensor tileAs(const Tensor& input, const Shape& rdims);
 
-FL_API Tensor sumAs(const Tensor& input, const Shape& rdims);
+    FL_API Tensor sumAs(const Tensor& input, const Shape& rdims);
 
 /* Reshape a tensor to the dims it had before a reduction over the given axes.
  * - This is a no-op if keepDims is true.
  */
-FL_API Shape expandedShapeFromReducedDims(
-    const Tensor& input,
-    const std::vector<int>& axes,
-    bool keepDims = false);
+    FL_API Shape expandedShapeFromReducedDims(
+        const Tensor& input,
+        const std::vector<int>& axes,
+        bool keepDims = false
+    );
 
-FL_API bool areVariableTypesEqual(const Variable& a, const Variable& b);
+    FL_API bool areVariableTypesEqual(const Variable& a, const Variable& b);
 
-template <typename... Args>
-bool areVariableTypesEqual(
-    const Variable& a,
-    const Variable& b,
-    const Args&... args) {
-  return areVariableTypesEqual(a, b) && areVariableTypesEqual(a, args...) &&
-      areVariableTypesEqual(b, args...);
-}
+    template<typename... Args>
+    bool areVariableTypesEqual(
+        const Variable& a,
+        const Variable& b,
+        const Args&... args
+    ) {
+        return areVariableTypesEqual(a, b) && areVariableTypesEqual(a, args...)
+               && areVariableTypesEqual(b, args...);
+    }
 
 /**
  * Performs type conversion based on the optim level. Operations that lack
  * sufficient precision are automatically upcast to f32 before computation.
  * These are typically operations that require accumulations or reductions.
  */
-template <typename T>
-T adjustInputType(const T& in, const char* funcname) {
-  OptimLevel optimLevel = OptimMode::get().getOptimLevel();
-  // Fastpath - DEFAULT mode never casts tensors
-  if (optimLevel == OptimLevel::DEFAULT) {
-    return in;
-  }
+    template<typename T>
+    T adjustInputType(const T& in, const char* funcname) {
+        OptimLevel optimLevel = OptimMode::get().getOptimLevel();
+        // Fastpath - DEFAULT mode never casts tensors
+        if(optimLevel == OptimLevel::DEFAULT)
+            return in;
 
-  T res;
-  auto& funcs = kOptimLevelTypeExclusionMappings.find(optimLevel)->second;
-  // TODO: tiny, but this lookup incurs an extra alloc from char* to string
-  if (funcs.find(std::string(funcname)) == funcs.end() &&
-      optimLevel != OptimLevel::DEFAULT) {
-    // Not in the excluded list - cast to f16
-    res = in.astype(fl::dtype::f16);
-  } else {
-    // Upcast to f32 only if we have an f16 input - otherwise, leave as is
-    if (in.type() == fl::dtype::f16) {
-      res = in.astype(fl::dtype::f32);
-    } else {
-      res = in;
+        T res;
+        auto& funcs = kOptimLevelTypeExclusionMappings.find(optimLevel)->second;
+        // TODO: tiny, but this lookup incurs an extra alloc from char* to string
+        if(
+            funcs.find(std::string(funcname)) == funcs.end()
+            && optimLevel != OptimLevel::DEFAULT
+        )
+            // Not in the excluded list - cast to f16
+            res = in.astype(fl::dtype::f16);
+        else {
+            // Upcast to f32 only if we have an f16 input - otherwise, leave as is
+            if(in.type() == fl::dtype::f16)
+                res = in.astype(fl::dtype::f32);
+            else
+                res = in;
+        }
+
+        return res;
     }
-  }
 
-  return res;
-}
-
-template <typename H, typename... T>
-std::shared_ptr<AutogradPayload> createAutogradPayload(H head, T... tail) {
-  return (head.isCalcGrad() || ... || tail.isCalcGrad())
-      ? std::make_shared<AutogradPayload>()
-      : nullptr;
-}
+    template<typename H, typename... T>
+    std::shared_ptr<AutogradPayload> createAutogradPayload(H head, T... tail) {
+        return (head.isCalcGrad() || ... || tail.isCalcGrad())
+               ? std::make_shared<AutogradPayload>()
+               : nullptr;
+    }
 
 } // namespace detail
 
@@ -99,13 +101,14 @@ std::shared_ptr<AutogradPayload> createAutogradPayload(H head, T... tail) {
 /**
  * Checks if a variadic number of Variables have the same types.
  */
-#define FL_VARIABLE_DTYPES_MATCH_CHECK(...)              \
-  if (!detail::areVariableTypesEqual(__VA_ARGS__)) {     \
-    throw std::invalid_argument(                         \
-        std::string(__func__) +                          \
-        " doesn't support binary "                       \
-        "operations with Variables of different types"); \
-  }
+#define FL_VARIABLE_DTYPES_MATCH_CHECK(...)               \
+        if(!detail::areVariableTypesEqual(__VA_ARGS__)) { \
+            throw std::invalid_argument(                  \
+    std::string(__func__) +                               \
+    " doesn't support binary "                            \
+    "operations with Variables of different types"        \
+            );                                            \
+        }
 
 /**
  * \defgroup autograd_functions Autograd Functions
@@ -337,8 +340,7 @@ FL_API Variable tanh(const Variable& input);
  *     \text{max} & \text{if } x_i > \text{max}
  *     \end{cases}\end{split} \f]
  */
-FL_API Variable
-clamp(const Variable& input, const double min, const double max);
+FL_API Variable clamp(const Variable& input, const double min, const double max);
 
 /**
  * Computes sigmoid of each element in a Variable.
@@ -447,8 +449,7 @@ FL_API Variable concatenate(const std::vector<Variable>& concatInputs, int dim);
  * divisible, last chunk of smaller splitSize will be included.
  * @param dim dimension along which to split the Variable
  */
-FL_API std::vector<Variable>
-split(const Variable& input, long splitSize, int dim);
+FL_API std::vector<Variable> split(const Variable& input, long splitSize, int dim);
 
 /**
  * Splits a Variable into smaller chunks.
@@ -457,8 +458,7 @@ split(const Variable& input, long splitSize, int dim);
  * @param splitSizes vector of integers specifying the sizes for each split
  * @param dim dimension along which to split the Variable
  */
-FL_API std::vector<Variable>
-split(const Variable& input, const std::vector<long>& splitSizes, int dim);
+FL_API std::vector<Variable> split(const Variable& input, const std::vector<long>& splitSizes, int dim);
 
 /**
  * Repeats the tensor `input` along specific dimensions. The number of
@@ -475,15 +475,13 @@ FL_API Variable tile(const Variable& input, const Shape& dims);
  * applied on parameters and the results will be used in a half precision
  * arithmetic.
  */
-FL_API Variable
-tile(const Variable& input, const Shape& dims, const fl::dtype precision);
+FL_API Variable tile(const Variable& input, const Shape& dims, const fl::dtype precision);
 
 /**
  * Sums up the tensors `input` along dimensions specified in descriptor `axes`.
  * If `axes` has size greater than 1, reduce over all of them.
  */
-FL_API Variable
-sum(const Variable& input, const std::vector<int>& axes, bool keepDims = false);
+FL_API Variable sum(const Variable& input, const std::vector<int>& axes, bool keepDims = false);
 
 /**
  * Computes the mean of the tensor `input` along dimensions specified in
@@ -493,7 +491,8 @@ sum(const Variable& input, const std::vector<int>& axes, bool keepDims = false);
 FL_API Variable mean(
     const Variable& input,
     const std::vector<int>& axes,
-    bool keepDims = false);
+    bool keepDims = false
+);
 
 /**
  * Lp-norm computation, reduced over specified dimensions.
@@ -506,7 +505,8 @@ FL_API Variable norm(
     const Variable& input,
     const std::vector<int>& axes,
     double p = 2,
-    bool keepDims = false);
+    bool keepDims = false
+);
 
 /**
  * Lp norm normalization of values across the given dimensions.
@@ -520,7 +520,8 @@ FL_API Variable normalize(
     const Variable& input,
     const std::vector<int>& axes,
     double p = 2,
-    double eps = 1e-12);
+    double eps = 1e-12
+);
 
 /**
  * Computes variance of the tensor `input` along dimensions specified in
@@ -534,11 +535,12 @@ FL_API Variable normalize(
  * ArrayFire before v3.7.0, the reverse is true.
  * TODO:{fl::Tensor} -- make this behavior consistent
  */
-FL_API Variable
-var(const Variable& input,
+FL_API Variable var(
+    const Variable& input,
     const std::vector<int>& axes,
     const bool isbiased = false,
-    bool keepDims = false);
+    bool keepDims = false
+);
 
 /**
  * Conducts matrix-matrix multiplication on two Variables. This is a batched
@@ -616,8 +618,7 @@ FL_API Variable linear(const Variable& input, const Variable& weight);
  * @param bias a Variable with shape [\f$K\f$]
  * @return a Variable with shape [\f$K\f$, \f$M\f$, \f$B_1\f$, \f$B_2\f$]
  */
-FL_API Variable
-linear(const Variable& input, const Variable& weight, const Variable& bias);
+FL_API Variable linear(const Variable& input, const Variable& weight, const Variable& bias);
 
 /**
  * Applies a 2D convolution over an input signal given filter weights. In the
@@ -661,7 +662,8 @@ FL_API Variable conv2d(
     int dx = 1,
     int dy = 1,
     int groups = 1,
-    std::shared_ptr<detail::ConvBenchmarks> benchmarks = nullptr);
+    std::shared_ptr<detail::ConvBenchmarks> benchmarks = nullptr
+);
 
 /**
  * Applies a 2D convolution over an input signal given filter weights and
@@ -708,7 +710,8 @@ FL_API Variable conv2d(
     int dx = 1,
     int dy = 1,
     int groups = 1,
-    std::shared_ptr<detail::ConvBenchmarks> benchmarks = nullptr);
+    std::shared_ptr<detail::ConvBenchmarks> benchmarks = nullptr
+);
 
 /**
  * Applies a 2D pooling over an input signal composed of several input planes.
@@ -735,7 +738,8 @@ FL_API Variable pool2d(
     int sy = 1,
     int px = 0,
     int py = 0,
-    PoolingMode mode = PoolingMode::MAX);
+    PoolingMode mode = PoolingMode::MAX
+);
 
 /**
  * Applies a softmax function on Variable `input` along dimension `dim`, so that
@@ -765,8 +769,7 @@ FL_API Variable logSoftmax(const Variable& input, const int dim);
  * @param inputs a tensor with the predicted values
  * @param targets a tensor with the target values
  */
-FL_API Variable
-binaryCrossEntropy(const Variable& inputs, const Variable& targets);
+FL_API Variable binaryCrossEntropy(const Variable& inputs, const Variable& targets);
 
 /**
  * Computes the categorical cross entropy loss. The input is expected to
@@ -802,7 +805,8 @@ FL_API Variable categoricalCrossEntropy(
     const Variable& input,
     const Variable& targets,
     ReduceMode reduction = ReduceMode::MEAN,
-    int ignoreIndex = -1);
+    int ignoreIndex = -1
+);
 
 /**
  * Computes the weighted cross entropy loss. The input is expected to
@@ -827,7 +831,8 @@ FL_API Variable weightedCategoricalCrossEntropy(
     const Variable& input,
     const Variable& targets,
     const Variable& weight,
-    int ignoreIndex);
+    int ignoreIndex
+);
 
 /**
  * The gated linear unit.
@@ -871,7 +876,7 @@ FL_API Variable gatedlinearunit(const Variable& input, const int dim);
  *  - LSTM
  *  - GRU
  * @param bidirectional if `True`, becomes a bidirectional RNN, unidirectional
- otherwise
+   otherwise
  * @param dropout if non-zero, introduces a `Dropout` layer on the outputs of
  * each RNN layer except the last one, with dropout probability equal to dropout
 
@@ -890,7 +895,8 @@ FL_API std::tuple<Variable, Variable, Variable> rnn(
     int numLayers,
     RnnMode mode,
     bool bidirectional,
-    float dropout);
+    float dropout
+);
 
 /**
  * Looks up embeddings in a fixed dictionary and size.
@@ -941,7 +947,8 @@ FL_API Variable batchnorm(
     const std::vector<int>& axes,
     bool train,
     double momentum,
-    double epsilon);
+    double epsilon
+);
 
 /**
  * Applies asymmetric padding on a Variable `input`.
@@ -954,7 +961,8 @@ FL_API Variable batchnorm(
 FL_API Variable padding(
     const Variable& input,
     std::vector<std::pair<int, int>> pad,
-    double val);
+    double val
+);
 
 /**
  * Applies dropout on a Variable `input`.
@@ -1011,7 +1019,8 @@ FL_API Variable multiheadAttention(
     const Variable& padMask,
     const int32_t nHeads,
     const double pDropout,
-    const int32_t offset = 0);
+    const int32_t offset = 0
+);
 
 /** @} */
 

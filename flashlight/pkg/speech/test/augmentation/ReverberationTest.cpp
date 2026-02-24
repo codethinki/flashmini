@@ -22,9 +22,9 @@ const size_t sampleRate = 16000;
 const float amplitude = 1.0;
 
 MATCHER_P(FloatNearPointwise, tol, "Out of range") {
-  return (
-      std::get<0>(arg) > std::get<1>(arg) - tol &&
-      std::get<0>(arg) < std::get<1>(arg) + tol);
+    return
+        std::get<0>(arg) > std::get<1>(arg) - tol
+        && std::get<0>(arg) < std::get<1>(arg) + tol;
 }
 
 /**
@@ -45,78 +45,81 @@ MATCHER_P(FloatNearPointwise, tol, "Out of range") {
  * simpler.
  */
 TEST(ReverbEcho, SinWaveReverb) {
-  // Make the reverb start at the center of the sample vector.
-  const size_t firstReverbIdx = numSamples / 2;
-  const float firstDelay =
-      static_cast<float>(firstReverbIdx) / static_cast<float>(sampleRate);
+    // Make the reverb start at the center of the sample vector.
+    const size_t firstReverbIdx = numSamples / 2;
+    const float firstDelay =
+        static_cast<float>(firstReverbIdx) / static_cast<float>(sampleRate);
 
-  ReverbEcho::Config conf;
-  conf.proba_ = 1.0f; // revern every sample
-  // Force delay to a specific period
-  conf.firstDelayMin_ = firstDelay;
-  conf.firstDelayMax_ = firstDelay;
-  // No jitter so delay is deterministic
-  conf.jitter_ = 0;
-  // Make very long rt60 so attenuation over the period of the signal is nearly
-  // zero.
-  conf.rt60Min_ = firstDelay * 100;
-  conf.rt60Min_ = firstDelay * 100;
-  conf.repeat_ = 3;
-  // Keep inital echo aplitude same as orig.
-  conf.initialMin_ = 1;
-  conf.initialMax_ = 1;
+    ReverbEcho::Config conf;
+    conf.proba_ = 1.0f; // revern every sample
+    // Force delay to a specific period
+    conf.firstDelayMin_ = firstDelay;
+    conf.firstDelayMax_ = firstDelay;
+    // No jitter so delay is deterministic
+    conf.jitter_ = 0;
+    // Make very long rt60 so attenuation over the period of the signal is nearly
+    // zero.
+    conf.rt60Min_ = firstDelay * 100;
+    conf.rt60Min_ = firstDelay * 100;
+    conf.repeat_ = 3;
+    // Keep inital echo aplitude same as orig.
+    conf.initialMin_ = 1;
+    conf.initialMax_ = 1;
 
-  std::vector<float> signal =
-      genTestSinWave(numSamples, freq, sampleRate, amplitude);
+    std::vector<float> signal =
+        genTestSinWave(numSamples, freq, sampleRate, amplitude);
 
-  std::vector<float> input = signal;
-  std::vector<float> inpuBeforeDelay(
-      signal.begin(), signal.begin() + firstReverbIdx - 1);
-  std::vector<float> inpuAfterDelay(
-      signal.begin() + firstReverbIdx, signal.end());
+    std::vector<float> input = signal;
+    std::vector<float> inpuBeforeDelay(
+        signal.begin(), signal.begin() + firstReverbIdx - 1);
+    std::vector<float> inpuAfterDelay(
+        signal.begin() + firstReverbIdx, signal.end());
 
-  ReverbEcho sfx(conf);
-  sfx.apply(signal);
+    ReverbEcho sfx(conf);
+    sfx.apply(signal);
 
-  std::vector<float> outputBeforeDelay(
-      signal.begin(), signal.begin() + firstReverbIdx - 1);
-  std::vector<float> outputAfterDelay(
-      signal.begin() + firstReverbIdx, signal.end());
+    std::vector<float> outputBeforeDelay(
+        signal.begin(), signal.begin() + firstReverbIdx - 1);
+    std::vector<float> outputAfterDelay(
+        signal.begin() + firstReverbIdx, signal.end());
 
-  EXPECT_EQ(inpuBeforeDelay, outputBeforeDelay);
-  EXPECT_NE(inpuAfterDelay, outputAfterDelay);
+    EXPECT_EQ(inpuBeforeDelay, outputBeforeDelay);
+    EXPECT_NE(inpuAfterDelay, outputAfterDelay);
 
-  // Extract the noise and compare with input that is the source of that noise.
-  std::vector<float> noise(firstReverbIdx);
-  for (int k = firstReverbIdx; k < signal.size(); ++k) {
-    noise[k - firstReverbIdx] = signal[k] - input[k];
-  }
-  // Because we use very long rt60 and we use multiple repeasts, the reverb sum
-  // can get to very high values. We normalize by mean of the abs diffs.
-  float noiseSum = 0;
-  float inputSum = 0;
-  for (int j = firstReverbIdx; j < signal.size(); ++j) {
-    noiseSum += std::abs(signal[j] - input[j]);
-    inputSum += std::abs(input[j - firstReverbIdx]);
-  }
-  float norm = noiseSum / inputSum;
-  std::transform(
-      noise.begin(), noise.end(), noise.begin(), [norm](float x) -> float {
-        return x / norm;
-      });
+    // Extract the noise and compare with input that is the source of that noise.
+    std::vector<float> noise(firstReverbIdx);
+    for(int k = firstReverbIdx; k < signal.size(); ++k)
+        noise[k - firstReverbIdx] = signal[k] - input[k];
+    // Because we use very long rt60 and we use multiple repeasts, the reverb sum
+    // can get to very high values. We normalize by mean of the abs diffs.
+    float noiseSum = 0;
+    float inputSum = 0;
+    for(int j = firstReverbIdx; j < signal.size(); ++j) {
+        noiseSum += std::abs(signal[j] - input[j]);
+        inputSum += std::abs(input[j - firstReverbIdx]);
+    }
+    float norm = noiseSum / inputSum;
+    std::transform(
+        noise.begin(),
+        noise.end(),
+        noise.begin(),
+        [norm](float x) -> float {
+            return x / norm;
+        }
+    );
 
-  // To reduce test flakiness, we trim the edges of the noise and compare only
-  // with the part in the input that is the source of this reverb noise.
-  std::vector<float> noiseMain(noise.begin() + 10, noise.end() - 10);
-  std::vector<float> noiseSrc(
-      input.begin() + 9, input.begin() + firstReverbIdx - 11);
+    // To reduce test flakiness, we trim the edges of the noise and compare only
+    // with the part in the input that is the source of this reverb noise.
+    std::vector<float> noiseMain(noise.begin() + 10, noise.end() - 10);
+    std::vector<float> noiseSrc(
+        input.begin() + 9, input.begin() + firstReverbIdx - 11);
 
-  EXPECT_EQ(noiseMain.size(), noiseSrc.size());
-  EXPECT_THAT(noiseMain, Pointwise(FloatNearPointwise(0.1), noiseSrc));
+    EXPECT_EQ(noiseMain.size(), noiseSrc.size());
+    EXPECT_THAT(noiseMain, Pointwise(FloatNearPointwise(0.1), noiseSrc));
 }
 
 int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  fl::init();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    fl::init();
+    return RUN_ALL_TESTS();
 }

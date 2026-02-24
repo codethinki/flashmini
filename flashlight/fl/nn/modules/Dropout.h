@@ -22,24 +22,24 @@ namespace fl {
  * evaluating the module gives the identity.
  */
 class FL_API Dropout : public UnaryModule {
- private:
-  double ratio_;
+private:
+    double ratio_;
 
-  FL_SAVE_LOAD_WITH_BASE(UnaryModule, ratio_)
+    FL_SAVE_LOAD_WITH_BASE(UnaryModule, ratio_)
 
- public:
-  /**
-   * Creates a `Dropout` layer.
-   *
-   * @param drop_ratio the probability that a weight will be set to zero
-   */
-  Dropout(double drop_ratio = 0.5);
+public:
+    /**
+     * Creates a `Dropout` layer.
+     *
+     * @param drop_ratio the probability that a weight will be set to zero
+     */
+    Dropout(double drop_ratio = 0.5);
 
-  Variable forward(const Variable& input) override;
+    Variable forward(const Variable& input) override;
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 } // namespace fl

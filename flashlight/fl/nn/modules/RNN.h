@@ -41,127 +41,134 @@ namespace fl {
  * assumed to be zero.
  */
 class FL_API RNN : public Module {
- private:
-  RNN() = default; // Intentionally private
+private:
+    RNN() = default; // Intentionally private
 
-  int inputSize_;
-  int hiddenSize_;
-  int numLayers_;
-  RnnMode mode_;
-  bool bidirectional_;
-  float dropProb_;
+    int inputSize_;
+    int hiddenSize_;
+    int numLayers_;
+    RnnMode mode_;
+    bool bidirectional_;
+    float dropProb_;
 
-  FL_SAVE_LOAD_WITH_BASE(
-      Module,
-      inputSize_,
-      hiddenSize_,
-      numLayers_,
-      mode_,
-      bidirectional_,
-      dropProb_)
+    FL_SAVE_LOAD_WITH_BASE(
+        Module,
+        inputSize_,
+        hiddenSize_,
+        numLayers_,
+        mode_,
+        bidirectional_,
+        dropProb_
+    )
 
-  void initialize();
+    void initialize();
 
- public:
-  /** Construct an RNN layer.
-   * @param input_size The dimension of the input (e.g. \f$X_{in}\f$)
-   * @param hidden_size The hidden dimension of the RNN.
-   * @param num_layers The number of recurrent layers.
-   * @param mode The RNN mode to use. Can be any of:
-   * - RELU
-   * - TANH
-   * - LSTM
-   * - GRU
-   * @param bidirectional Whether or not the RNN is bidirectional. If `true` the
-   * output dimension will be doubled.
-   * @param drop_prob The probability of dropout after each RNN layer except the
-   * last layer.
-   */
-  RNN(int input_size,
-      int hidden_size,
-      int num_layers,
-      RnnMode mode,
-      bool bidirectional = false,
-      float drop_prob = 0.0);
+public:
+    /** Construct an RNN layer.
+     * @param input_size The dimension of the input (e.g. \f$X_{in}\f$)
+     * @param hidden_size The hidden dimension of the RNN.
+     * @param num_layers The number of recurrent layers.
+     * @param mode The RNN mode to use. Can be any of:
+     * - RELU
+     * - TANH
+     * - LSTM
+     * - GRU
+     * @param bidirectional Whether or not the RNN is bidirectional. If `true` the
+     * output dimension will be doubled.
+     * @param drop_prob The probability of dropout after each RNN layer except the
+     * last layer.
+     */
+    RNN(
+        int input_size,
+        int hidden_size,
+        int num_layers,
+        RnnMode mode,
+        bool bidirectional = false,
+        float drop_prob = 0.0
+    );
 
-  /**
-   * Constructs an RNN module from another, performing a copy of the
-   * parameters.
-   *
-   * @param other The RNN module to copy from.
-   */
-  RNN(const RNN& other);
+    /**
+     * Constructs an RNN module from another, performing a copy of the
+     * parameters.
+     *
+     * @param other The RNN module to copy from.
+     */
+    RNN(const RNN& other);
 
-  /**
-   * Constructs an RNN module from another, performing a copy of the
-   * parameters.
-   *
-   * @param other The RNN module to copy from.
-   */
-  RNN& operator=(const RNN& other);
+    /**
+     * Constructs an RNN module from another, performing a copy of the
+     * parameters.
+     *
+     * @param other The RNN module to copy from.
+     */
+    RNN& operator=(const RNN& other);
 
-  RNN(RNN&& other) = default;
+    RNN(RNN&& other) = default;
 
-  RNN& operator=(RNN&& other) = default;
+    RNN& operator=(RNN&& other) = default;
 
-  std::vector<Variable> forward(const std::vector<Variable>& inputs) override;
+    std::vector<Variable> forward(const std::vector<Variable>& inputs) override;
 
-  using Module::operator();
+    using Module::operator();
 
-  /** Forward the RNN Layer.
-   * @param input Should be of shape [\f$X_{in}\f$, \f$N\f$, \f$T\f$]
-   * @returns a single output Variable with shape [\f$X_{out}\f$, \f$N\f$,
-   * \f$T\f$]
-   */
-  Variable forward(const Variable& input);
+    /** Forward the RNN Layer.
+     * @param input Should be of shape [\f$X_{in}\f$, \f$N\f$, \f$T\f$]
+     * @returns a single output Variable with shape [\f$X_{out}\f$, \f$N\f$,
+     * \f$T\f$]
+     */
+    Variable forward(const Variable& input);
 
-  Variable operator()(const Variable& input);
+    Variable operator()(const Variable& input);
 
-  /** Forward the RNN Layer.
-   * @param input Should be of shape [\f$X_{in}\f$, \f$N\f$, \f$T\f$]
-   * @param hidden_state Should be of shape [\f$X_{out}\f$, \f$N\f$]. If an
-   * empty Variable is passed in then the hidden state is assumed zero.
-   * @returns An tuple of output Variables.
-   *  - The first element is the output of the RNN of shape [\f$X_{out}\f$,
-   *  \f$N\f$, \f$T\f$]
-   *  - The second element is the hidden state of the RNN of shape
-   *  [\f$X_{out}\f$, \f$N\f$]
-   */
-  std::tuple<Variable, Variable> forward(
-      const Variable& input,
-      const Variable& hidden_state);
+    /** Forward the RNN Layer.
+     * @param input Should be of shape [\f$X_{in}\f$, \f$N\f$, \f$T\f$]
+     * @param hidden_state Should be of shape [\f$X_{out}\f$, \f$N\f$]. If an
+     * empty Variable is passed in then the hidden state is assumed zero.
+     * @returns An tuple of output Variables.
+     *  - The first element is the output of the RNN of shape [\f$X_{out}\f$,
+     *  \f$N\f$, \f$T\f$]
+     *  - The second element is the hidden state of the RNN of shape
+     *  [\f$X_{out}\f$, \f$N\f$]
+     */
+    std::tuple<Variable, Variable> forward(
+        const Variable& input,
+        const Variable& hidden_state
+    );
 
-  std::tuple<Variable, Variable> operator()(
-      const Variable& input,
-      const Variable& hidden_state);
+    std::tuple<Variable, Variable> operator()(
+        const Variable& input,
+        const Variable& hidden_state
+    );
 
-  /** Forward the RNN Layer.
-   * @param input Should be of shape [\f$X_{in}\f$, \f$N\f$, \f$T\f$]
-   * @param hidden_state Should be of shape [\f$X_{out}\f$, \f$N\f$]. If an
-   * empty Variable is passed in then the hidden state is assumed zero.
-   * @param cell_state Should be of shape [\f$X_{out}\f$, \f$N\f$]. If an empty
-   * Variable is passed in then the hidden state is assumed zero.
-   * @returns An tuple of output Variables.
-   *  - The first element is the output of the RNN of shape [\f$X_{out}\f$,
-   *  \f$N\f$, \f$T\f$]
-   *  - The second element is the hidden state of the RNN of shape
-   *  [\f$X_{out}\f$, \f$N\f$]
-   *  - The third element is the cell state of the RNN of shape [\f$X_{out}\f$,
-   *  \f$N\f$]
-   */
-  std::tuple<Variable, Variable, Variable> forward(
-      const Variable& input,
-      const Variable& hidden_state,
-      const Variable& cell_state);
+    /** Forward the RNN Layer.
+     * @param input Should be of shape [\f$X_{in}\f$, \f$N\f$, \f$T\f$]
+     * @param hidden_state Should be of shape [\f$X_{out}\f$, \f$N\f$]. If an
+     * empty Variable is passed in then the hidden state is assumed zero.
+     * @param cell_state Should be of shape [\f$X_{out}\f$, \f$N\f$]. If an empty
+     * Variable is passed in then the hidden state is assumed zero.
+     * @returns An tuple of output Variables.
+     *  - The first element is the output of the RNN of shape [\f$X_{out}\f$,
+     *  \f$N\f$, \f$T\f$]
+     *  - The second element is the hidden state of the RNN of shape
+     *  [\f$X_{out}\f$, \f$N\f$]
+     *  - The third element is the cell state of the RNN of shape [\f$X_{out}\f$,
+     *  \f$N\f$]
+     */
+    std::tuple<Variable, Variable, Variable> forward(
+        const Variable& input,
+        const Variable& hidden_state,
+        const Variable& cell_state
+    );
 
-  std::tuple<Variable, Variable, Variable> operator()(
-      const Variable& input,
-      const Variable& hidden_state,
-      const Variable& cell_state);
+    std::tuple<Variable, Variable, Variable> operator()(
+        const Variable& input,
+        const Variable& hidden_state,
+        const Variable& cell_state
+    );
 
-  std::unique_ptr<Module> clone() const override;
+    std::unique_ptr<Module> clone() const override;
 
-  std::string prettyString() const override;
+    std::string prettyString() const override;
 };
 
 } // namespace fl

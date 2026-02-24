@@ -14,10 +14,10 @@
  * Conditionally include autograd extensions
  */
 #if FL_USE_CUDNN
-  #include "flashlight/fl/autograd/tensor/backend/cudnn/CudnnAutogradExtension.h"
+#include "flashlight/fl/autograd/tensor/backend/cudnn/CudnnAutogradExtension.h"
 #endif // FL_USE_CUDNN
 #if FL_USE_ONEDNN
-  #include "flashlight/fl/autograd/tensor/backend/onednn/OneDnnAutogradExtension.h"
+#include "flashlight/fl/autograd/tensor/backend/onednn/OneDnnAutogradExtension.h"
 #endif // FL_USE_ONEDNN
 
 namespace fl {
@@ -26,15 +26,15 @@ namespace fl {
 
 // TODO{fl::Tensor} -- improve macros based on compute envs
 #if FL_USE_CUDNN
-  #if FL_USE_ARRAYFIRE && FL_ARRAYFIRE_USE_CUDA
+#if FL_USE_ARRAYFIRE && FL_ARRAYFIRE_USE_CUDA
 FL_REGISTER_TENSOR_EXTENSION(CudnnAutogradExtension, ArrayFire);
-  #endif // FL_USE_ARRAYFIRE && FL_ARRAYFIRE_USE_CUDA
+#endif // FL_USE_ARRAYFIRE && FL_ARRAYFIRE_USE_CUDA
 #endif // FL_USE_CUDNN
 
 #if FL_USE_ONEDNN
-  #if FL_USE_ARRAYFIRE && (FL_ARRAYFIRE_USE_CPU || FL_ARRAYFIRE_USE_OPENCL)
+#if FL_USE_ARRAYFIRE && (FL_ARRAYFIRE_USE_CPU || FL_ARRAYFIRE_USE_OPENCL)
 FL_REGISTER_TENSOR_EXTENSION(OneDnnAutogradExtension, ArrayFire);
-  #endif 
+#endif
 #endif // FL_USE_ONEDNN
 
 } // namespace fl

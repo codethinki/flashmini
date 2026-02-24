@@ -17,33 +17,36 @@
 
 namespace fl {
 namespace pkg {
-namespace speech {
+    namespace speech {
 
-std::vector<std::string> wrd2Target(
-    const std::string& word,
-    const lib::text::LexiconMap& lexicon,
-    const lib::text::Dictionary& dict,
-    const std::string& wordSeparator = "",
-    float targetSamplePct = 0,
-    bool fallback2LtrWordSepLeft = false,
-    bool fallback2LtrWordSepRight = false,
-    bool skipUnk = false);
+        std::vector<std::string> wrd2Target(
+            const std::string& word,
+            const lib::text::LexiconMap& lexicon,
+            const lib::text::Dictionary& dict,
+            const std::string& wordSeparator = "",
+            float targetSamplePct = 0,
+            bool fallback2LtrWordSepLeft = false,
+            bool fallback2LtrWordSepRight = false,
+            bool skipUnk = false
+        );
 
-std::vector<std::string> wrd2Target(
-    const std::vector<std::string>& words,
-    const lib::text::LexiconMap& lexicon,
-    const lib::text::Dictionary& dict,
-    const std::string& wordSeparator = "",
-    float targetSamplePct = 0,
-    bool fallback2LtrWordSepLeft = false,
-    bool fallback2LtrWordSepRight = false,
-    bool skipUnk = false);
+        std::vector<std::string> wrd2Target(
+            const std::vector<std::string>& words,
+            const lib::text::LexiconMap& lexicon,
+            const lib::text::Dictionary& dict,
+            const std::string& wordSeparator = "",
+            float targetSamplePct = 0,
+            bool fallback2LtrWordSepLeft = false,
+            bool fallback2LtrWordSepRight = false,
+            bool skipUnk = false
+        );
 
-std::pair<int, FeatureType> getFeatureType(
-    const std::string& featuresType,
-    int channels,
-    const fl::lib::audio::FeatureParams& featParams);
+        std::pair<int, FeatureType> getFeatureType(
+            const std::string& featuresType,
+            int channels,
+            const fl::lib::audio::FeatureParams& featParams
+        );
 
-} // namespace speech
+    } // namespace speech
 } // namespace pkg
 } // namespace fl
