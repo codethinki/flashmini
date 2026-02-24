@@ -70,8 +70,10 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputSingleAxis) {
 
         auto expectedOut = (thisInput - thisMean) / std::sqrt(thisVar + 1E-5);
         expectedOut = expectedOut * thisWeight + thisBias;
-        ASSERT_TRUE(allClose(
-            out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1E-5));
+        ASSERT_TRUE(
+            allClose(
+                out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1E-5)
+            );
     }
 
     // test on empty weigts and bias
@@ -93,8 +95,10 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputSingleAxis) {
         auto thisVar = runningVar.tensor().flatten()(i).scalar<float>();
 
         auto expectedOut = (thisInput - thisMean) / std::sqrt(thisVar + 1E-5);
-        ASSERT_TRUE(allClose(
-            out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1E-5));
+        ASSERT_TRUE(
+            allClose(
+                out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1E-5)
+            );
     }
 }
 
@@ -123,9 +127,7 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputMultipleAxis) {
         1E-5
     ));
     for(int i = 0; i < nfeatures; ++i) {
-        std::array<fl::Index, 4> sel = {
-            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span
-        };
+        std::array<fl::Index, 4> sel = {i % 13, (i / 13) % 13, (i / 13) / 13, fl::span};
         auto thisInput = input.tensor()(sel[0], sel[1], sel[2], sel[3]);
         auto thisMean = runningMean.tensor().flatten()(i).scalar<float>();
         auto thisVar = runningVar.tensor().flatten()(i).scalar<float>();
@@ -135,8 +137,10 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputMultipleAxis) {
         auto expectedOut = (thisInput - thisMean) / std::sqrt(thisVar + 1e-5);
         expectedOut = expectedOut * thisWeight + thisBias;
 
-        ASSERT_TRUE(allClose(
-            out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1e-4));
+        ASSERT_TRUE(
+            allClose(
+                out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1e-4)
+            );
     }
 
     // test on empty weigts and bias
@@ -153,15 +157,20 @@ TEST(AutogradNormalizationTest, BatchNormEvalModeOutputMultipleAxis) {
     ));
     for(int i = 0; i < nfeatures; ++i) {
         std::array<fl::Index, 4> sel = {
-            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span
+            i % 13,
+            (i / 13) % 13,
+            (i / 13) / 13,
+            fl::span
         };
         auto thisInput = input.tensor()(sel[0], sel[1], sel[2], sel[3]);
         auto thisMean = runningMean.tensor().flatten()(i).scalar<float>();
         auto thisVar = runningVar.tensor().flatten()(i).scalar<float>();
 
         auto expectedOut = (thisInput - thisMean) / std::sqrt(thisVar + 1e-5);
-        ASSERT_TRUE(allClose(
-            out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 5e-5));
+        ASSERT_TRUE(
+            allClose(
+                out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 5e-5)
+            );
     }
 }
 
@@ -230,7 +239,10 @@ TEST(AutogradNormalizationTest, BatchNormTrainModeOutputMultipleAxis) {
 
     for(int i = 0; i < nfeatures; ++i) {
         std::array<fl::Index, 4> sel = {
-            i % 13, (i / 13) % 13, (i / 13) / 13, fl::span
+            i % 13,
+            (i / 13) % 13,
+            (i / 13) / 13,
+            fl::span
         };
         auto thisInput = input.tensor()(sel[0], sel[1], sel[2], sel[3]);
         auto thisMean = avg.tensor().flatten()(i).scalar<float>();
@@ -240,8 +252,10 @@ TEST(AutogradNormalizationTest, BatchNormTrainModeOutputMultipleAxis) {
 
         auto expectedOut = (thisInput - thisMean) / std::sqrt(thisVar + 1e-5);
         expectedOut = expectedOut * thisWeight + thisBias;
-        ASSERT_TRUE(allClose(
-            out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1e-5));
+        ASSERT_TRUE(
+            allClose(
+                out.tensor()(sel[0], sel[1], sel[2], sel[3]), expectedOut, 1e-5)
+            );
     }
 }
 
@@ -528,8 +542,7 @@ TEST_F(AutogradTestF16, LayerNormJacobianF16) {
 
     std::vector<int> featAxes = {0, 1, 2, 3};
     const float inputScale = 4.0; // scale the input to prevent grad underflow
-    auto input =
-        Variable(inputScale * fl::rand({2, 2, 2, 4}, fl::dtype::f16), true);
+    auto input = Variable(inputScale * fl::rand({2, 2, 2, 4}, fl::dtype::f16), true);
     auto nfeatures = 1;
     for(auto ax : featAxes)
         nfeatures *= input.dim(ax);
