@@ -8,12 +8,16 @@ message(STATUS "---- fm_cmake toolchain ----")
 #append cmake dir to module path
 set(FM_CMAKE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-list(APPEND CMAKE_MODULE_PATH "${FM_CMAKE_LIBRARY_DIR}")
-message(STATUS "appended cmake/utils/ to cmake module path")
+set(FM_CMAKE_UTILITY_DIR "${FM_CMAKE_LIBRARY_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${FM_CMAKE_UTILITY_DIR}")
+message(VERBOSE "appended utility dir to cmake module path (${FM_CMAKE_UTILITY_DIR})")
 
 list(APPEND CMAKE_MODULE_PATH "${FM_CMAKE_LIBRARY_DIR}/../")
-message(STATUS "appended (${FM_CMAKE_LIBRARY_DIR}/../) cmake/ to cmake module path")
+message(VERBOSE "appended (${FM_CMAKE_LIBRARY_DIR}/../) cmake/ to cmake module path")
 
+set(FM_CMAKE_FIND_SCRIPT_DIR "${FM_CMAKE_LIBRARY_DIR}/../find/")
+list(APPEND CMAKE_MODULE_PATH "${FM_CMAKE_FIND_SCRIPT_DIR}")
+message(VERBOSE "appended find scripts to module path (${FM_CMAKE_FIND_SCRIPT_DIR})")
 
 
 include(fm_assertions)

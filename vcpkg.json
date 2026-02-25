@@ -6,14 +6,39 @@
     "gtest"
   ],
   "features": {
-    "cuda": {
-      "description": "Dependencies for gpu backend",
+    "distributed": {
+      "description": "Dependencies for distributed backend",
+      "dependencies": [
+        "mpi"
+      ]
+    },
+    "runtime": {
+      "description": "flashmini runtime helpers",
+      "dependencies": [
+        "glog",
+        "gflags"
+      ]
+    },
+    "vision": {
+      "description": "vision pkg",
+      "dependencies": [
+        "opencv",
+        "stb"
+      ]
+    },
+    "text": {
+      "description": "text pkg",
       "dependencies": []
     },
-    "cpu": {
-      "description": "Dependencies for cpu backend",
+    "speech": {
+      "description": "speech pkg",
       "dependencies": [
-        "onednn"
+        "libsndfile",
+        "libogg",
+        "libvorbis",
+        "libflac",
+        "fftw3",
+        "openblas"
       ]
     }
   }
