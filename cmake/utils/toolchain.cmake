@@ -15,7 +15,7 @@ message(VERBOSE "appended utility dir to cmake module path (${FM_CMAKE_UTILITY_D
 list(APPEND CMAKE_MODULE_PATH "${FM_CMAKE_LIBRARY_DIR}/../")
 message(VERBOSE "appended (${FM_CMAKE_LIBRARY_DIR}/../) cmake/ to cmake module path")
 
-set(FM_CMAKE_FIND_SCRIPT_DIR "${FM_CMAKE_LIBRARY_DIR}/../find/")
+set(FM_CMAKE_FIND_SCRIPT_DIR "${FM_CMAKE_LIBRARY_DIR}/../dependencies/")
 list(APPEND CMAKE_MODULE_PATH "${FM_CMAKE_FIND_SCRIPT_DIR}")
 message(VERBOSE "appended find scripts to module path (${FM_CMAKE_FIND_SCRIPT_DIR})")
 
