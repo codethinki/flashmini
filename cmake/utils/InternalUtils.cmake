@@ -9,7 +9,8 @@ function(add_coverage_to_target)
       -O0 # TODO: reconcile this with CMake modes for something cleaner
       -g
       $<$<COMPILE_LANGUAGE:CXX>:--coverage>
-      )
+    )
+
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
       target_link_options(${add_coverage_to_target_TARGET}
         PUBLIC
@@ -28,7 +29,8 @@ function(setup_install_targets)
     "${multiValueArgs}" ${ARGN})
 
   list(LENGTH setup_install_targets_INSTALL_TARGETS TARGETS_LENGTH)
-  if (${TARGETS_LENGTH} EQUAL 0)
+
+  if(${TARGETS_LENGTH} EQUAL 0)
     message(FATAL_ERROR "Flashlight setup_install_targets called with "
       "empty targets list.")
   endif()
@@ -44,7 +46,7 @@ function(setup_install_targets)
     ARCHIVE DESTINATION ${FL_INSTALL_LIB_DIR}
     FRAMEWORK DESTINATION framework
     INCLUDES DESTINATION ${FL_INSTALL_INC_DIR}
-    )
+  )
 
   # Write and install targets file
   install(
@@ -52,44 +54,43 @@ function(setup_install_targets)
     NAMESPACE flashlight::
     DESTINATION ${FL_INSTALL_CMAKE_DIR}
     COMPONENT flashlight
-    )
+  )
 
   # Write config file (used by projects including fl, such as examples)
   include(CMakePackageConfigHelpers)
   set(INCLUDE_DIRS include)
   set(CMAKE_DIR ${FL_INSTALL_CMAKE_DIR})
   configure_package_config_file(
-    ${PROJECT_SOURCE_DIR}/cmake/flashlightConfig.cmake.in
+    ${PROJECT_SOURCE_DIR}/cmake/utils/flashlightConfig.cmake.in
     cmake/install/${FL_CONFIG_CMAKE_BUILD_DIR}/flashlightConfig.cmake
     INSTALL_DESTINATION
     ${FL_INSTALL_CMAKE_DIR}
     PATH_VARS INCLUDE_DIRS CMAKE_DIR
-    )
+  )
   write_basic_package_version_file(
     cmake/install/${FL_CONFIG_CMAKE_BUILD_DIR}/flashlightConfigVersion.cmake
     COMPATIBILITY SameMajorVersion
-    )
+  )
   install(FILES
     ${PROJECT_BINARY_DIR}/cmake/install/flashlightConfig.cmake
     ${PROJECT_BINARY_DIR}/cmake/install/flashlightConfigVersion.cmake
     DESTINATION ${FL_INSTALL_CMAKE_DIR}
     COMPONENT flashlight
-    )
+  )
   set_target_properties(${setup_install_targets_INSTALL_TARGETS} PROPERTIES
     VERSION "${flashlight_VERSION}"
     SOVERSION "${flashlight_VERSION_MAJOR}")
 endfunction(setup_install_targets)
 
 function(setup_install_headers HEADER_DIR DEST_DIR)
-
   # Move headers
   install(
     DIRECTORY ${HEADER_DIR}
     COMPONENT headers
     DESTINATION ${DEST_DIR}
     FILES_MATCHING # preserve directory structure
-    PATTERN  "*.h"
-    PATTERN  "*.hpp"
+    PATTERN "*.h"
+    PATTERN "*.hpp"
     PATTERN "*.cuh" # TODO: make this conditional, e.g. $<IF:FLASHLIGHT_USE_CUDA,"*.cuh","a^">
     PATTERN "test*" EXCLUDE
     PATTERN "tests" EXCLUDE
@@ -103,17 +104,17 @@ function(setup_install_headers HEADER_DIR DEST_DIR)
     PATTERN "experimental" EXCLUDE
     PATTERN "plugincompiler" EXCLUDE
     PATTERN ".git" EXCLUDE
-    )
+  )
 endfunction(setup_install_headers)
 
 function(setup_install_find_module CONFIG_PATH)
   # Only actually move module files if doing a standalone install; otherwise,
   # assume we're being installed by a package manager
-  if (FL_BUILD_STANDALONE)
+  if(FL_BUILD_STANDALONE)
     install(
       FILES ${CONFIG_PATH}
       DESTINATION ${FL_INSTALL_CMAKE_DIR}
-      )
+    )
   endif()
 endfunction()
 
@@ -121,7 +122,7 @@ function(set_executable_output_directory EXEC_TARGET DIRECTORY)
   set_target_properties(${EXEC_TARGET} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
     ${DIRECTORY}
-    )
+  )
 endfunction()
 
 # Small utility function which wraps cmake_dependent options and throws an error if the user
@@ -143,5 +144,6 @@ function(fl_dependent_option)
       message(FATAL_ERROR "${_dep} Required to build ${_option}")
     endif()
   endforeach()
+
   cmake_dependent_option(${_option} ${_text} "${_val}" "${_deps}" ${_frce})
 endfunction()

@@ -167,15 +167,12 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::rnn(
 
     TensorDescriptor cyDesc(x.type(), hDims);
 
-    size_t workspaceSize =
-        getWorkspaceSize(handle, rnnDesc, seqLength, xDescs);
-    size_t reserveSize =
-        getReserveSize(handle, rnnDesc, seqLength, xDescs);
+    size_t workspaceSize = getWorkspaceSize(handle, rnnDesc, seqLength, xDescs);
+    size_t reserveSize = getReserveSize(handle, rnnDesc, seqLength, xDescs);
 
     Tensor workspace({static_cast<long long>(workspaceSize)}, fl::dtype::b8);
     // Space must be reused between forward and backward for cuDNN
-    payload->reserveSpace =
-        Tensor({static_cast<long long>(reserveSize)}, fl::dtype::b8);
+    payload->reserveSpace = Tensor({static_cast<long long>(reserveSize)}, fl::dtype::b8);
 
     {
         auto contiguousX = x.asContiguousTensor();
@@ -265,8 +262,7 @@ std::tuple<Tensor, Tensor, Tensor, Tensor> CudnnAutogradExtension::rnnBackward(
     int outSize = hiddenSize * (bidirectional ? 2 : 1);
 
     DropoutDescriptor dropout(dropProb);
-    RNNDescriptor rnnDesc(
-        input.type(), hiddenSize, numLayers, mode, bidirectional, dropout);
+    RNNDescriptor rnnDesc(input.type(), hiddenSize, numLayers, mode, bidirectional, dropout);
     setCudnnRnnMathType(input, rnnDesc);
 
     TensorDescriptorArray yDesc(seqLength, y.type(), {1, 1, outSize, batchSize});

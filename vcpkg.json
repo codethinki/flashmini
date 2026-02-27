@@ -15,6 +15,41 @@
       "dependencies": [
         "onednn"
       ]
+    },
+    "distributed": {
+      "description": "Dependencies for distributed backend",
+      "dependencies": [
+        "mpi"
+      ]
+    },
+    "runtime": {
+      "description": "flashmini runtime helpers",
+      "dependencies": [
+        "glog",
+        "gflags"
+      ]
+    },
+    "vision": {
+      "description": "vision pkg",
+      "dependencies": [
+        "opencv",
+        "stb"
+      ]
+    },
+    "text": {
+      "description": "text pkg",
+      "dependencies": []
+    },
+    "speech": {
+      "description": "speech pkg",
+      "dependencies": [
+        "libsndfile",
+        "libogg",
+        "libvorbis",
+        "libflac",
+        "fftw3",
+        "openblas"
+      ]
     }
   }
 }
