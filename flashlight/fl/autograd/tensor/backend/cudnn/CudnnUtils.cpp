@@ -25,16 +25,16 @@ struct DeviceHandle {
     std::shared_ptr<fl::CUDAStream> stream;
 
     explicit DeviceHandle(std::shared_ptr<fl::CUDAStream> _stream) : cudnnHandle(nullptr),
-                                                                     stream(_stream) {
+        stream(_stream) {
         CUDNN_CHECK_ERR(cudnnCreate(&cudnnHandle));
         CUDNN_CHECK_ERR(cudnnSetStream(cudnnHandle, stream->handle()));
     }
 
     ~DeviceHandle() {
         if(cudnnHandle) {
-// See https://git.io/fNQnM - sometimes, at exit, the CUDA context
-// (or something) is already destroyed by the time a handle gets destroyed
-// because of an issue with the destruction order.
+            // See https://git.io/fNQnM - sometimes, at exit, the CUDA context
+            // (or something) is already destroyed by the time a handle gets destroyed
+            // because of an issue with the destruction order.
 #ifdef NO_CUDNN_DESTROY_HANDLE
 #else
             CUDNN_CHECK_ERR(cudnnDestroy(cudnnHandle));
@@ -43,16 +43,16 @@ struct DeviceHandle {
     }
 };
 
-const float kFloatZero = 0.0;
-const float kFloatOne = 1.0;
+constexpr float kFloatZero = 0.0;
+constexpr float kFloatOne = 1.0;
 
-const double kDoubleZero = 0.0;
-const double kDoubleOne = 1.0;
+constexpr double kDoubleZero = 0.0;
+constexpr double kDoubleOne = 1.0;
 
 // TODO: move this to CudnnAutogradExtension if we make it a singleton
 std::unordered_map<int, DeviceHandle> handles;
 
-const DeviceHandle& getActiveDeviceHandle() {
+DeviceHandle const& getActiveDeviceHandle() {
     auto& manager = fl::DeviceManager::getInstance();
     auto& cudaDevice =
         manager.getActiveDevice(fl::DeviceType::CUDA).impl<fl::CUDADevice>();
@@ -88,57 +88,42 @@ namespace fl {
 void cudnnCheckErr(cudnnStatus_t status) {
     if(status == CUDNN_STATUS_SUCCESS)
         return;
-    const char* err = cudnnGetErrorString(status);
+    char const* err = cudnnGetErrorString(status);
     switch(status) {
-        case CUDNN_STATUS_BAD_PARAM:
-            throw std::invalid_argument(err);
-        default:
-            throw std::runtime_error(err);
+        case CUDNN_STATUS_BAD_PARAM: throw std::invalid_argument(err);
+        default: throw std::runtime_error(err);
     }
 }
 
-cudnnDataType_t cudnnMapToType(const fl::dtype& t) {
+cudnnDataType_t cudnnMapToType(fl::dtype const& t) {
     switch(t) {
-        case fl::dtype::f16:
-            return CUDNN_DATA_HALF;
-        case fl::dtype::f32:
-            return CUDNN_DATA_FLOAT;
-        case fl::dtype::f64:
-            return CUDNN_DATA_DOUBLE;
-        default:
-            throw std::invalid_argument("unsupported data type for cuDNN");
+        case fl::dtype::f16: return CUDNN_DATA_HALF;
+        case fl::dtype::f32: return CUDNN_DATA_FLOAT;
+        case fl::dtype::f64: return CUDNN_DATA_DOUBLE;
+        default: throw std::invalid_argument("unsupported data type for cuDNN");
     }
 }
 
-cudnnPoolingMode_t cudnnMapToPoolingMode(const PoolingMode mode) {
+cudnnPoolingMode_t cudnnMapToPoolingMode(PoolingMode const mode) {
     switch(mode) {
-        case PoolingMode::MAX:
-            return CUDNN_POOLING_MAX;
-        case PoolingMode::AVG_INCLUDE_PADDING:
-            return CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
-        case PoolingMode::AVG_EXCLUDE_PADDING:
-            return CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
-        default:
-            throw std::invalid_argument("unsupported pooling mode for cuDNN");
+        case PoolingMode::MAX: return CUDNN_POOLING_MAX;
+        case PoolingMode::AVG_INCLUDE_PADDING: return CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
+        case PoolingMode::AVG_EXCLUDE_PADDING: return CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
+        default: throw std::invalid_argument("unsupported pooling mode for cuDNN");
     }
 }
 
-cudnnRNNMode_t cudnnMapToRNNMode(const RnnMode mode) {
+cudnnRNNMode_t cudnnMapToRNNMode(RnnMode const mode) {
     switch(mode) {
-        case RnnMode::RELU:
-            return CUDNN_RNN_RELU;
-        case RnnMode::TANH:
-            return CUDNN_RNN_TANH;
-        case RnnMode::LSTM:
-            return CUDNN_LSTM;
-        case RnnMode::GRU:
-            return CUDNN_GRU;
-        default:
-            throw std::invalid_argument("unsupported RNN mode for cuDNN");
+        case RnnMode::RELU: return CUDNN_RNN_RELU;
+        case RnnMode::TANH: return CUDNN_RNN_TANH;
+        case RnnMode::LSTM: return CUDNN_LSTM;
+        case RnnMode::GRU: return CUDNN_GRU;
+        default: throw std::invalid_argument("unsupported RNN mode for cuDNN");
     }
 }
 
-TensorDescriptor::TensorDescriptor(const fl::dtype type, const Shape& flDims) {
+TensorDescriptor::TensorDescriptor(fl::dtype const type, Shape const& flDims) {
     CUDNN_CHECK_ERR(cudnnCreateTensorDescriptor(&descriptor));
     cudnnDataType_t cudnntype = cudnnMapToType(type);
 
@@ -165,7 +150,7 @@ TensorDescriptor::TensorDescriptor(const fl::dtype type, const Shape& flDims) {
     );
 }
 
-TensorDescriptor::TensorDescriptor(const Tensor& input) {
+TensorDescriptor::TensorDescriptor(Tensor const& input) {
     CUDNN_CHECK_ERR(cudnnCreateTensorDescriptor(&descriptor));
     cudnnDataType_t cudnntype = cudnnMapToType(input.type());
 
@@ -194,21 +179,19 @@ TensorDescriptor::TensorDescriptor(const Tensor& input) {
     );
 }
 
-TensorDescriptor::~TensorDescriptor() {
-    CUDNN_CHECK_ERR(cudnnDestroyTensorDescriptor(descriptor));
-}
+TensorDescriptor::~TensorDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyTensorDescriptor(descriptor)); }
 
 TensorDescriptorArray::TensorDescriptorArray(
     int size,
-    const fl::dtype type,
-    const Shape& dims
+    fl::dtype const type,
+    Shape const& dims
 ) {
-    desc_vec.reserve(size);
+    _descVec.reserve(size);
     for(int i = 0; i < size; i++) {
-        desc_vec.emplace_back(type, dims);
-        desc_raw_vec.push_back(desc_vec.back().descriptor);
+        _descVec.emplace_back(type, dims);
+        _descRawVec.push_back(_descVec.back().descriptor);
     }
-    descriptors = desc_raw_vec.data();
+    descriptors = _descRawVec.data();
 }
 
 TensorDescriptorArray::~TensorDescriptorArray() = default;
@@ -241,11 +224,9 @@ PoolingDescriptor::PoolingDescriptor(
     );
 }
 
-PoolingDescriptor::~PoolingDescriptor() {
-    CUDNN_CHECK_ERR(cudnnDestroyPoolingDescriptor(descriptor));
-}
+PoolingDescriptor::~PoolingDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyPoolingDescriptor(descriptor)); }
 
-FilterDescriptor::FilterDescriptor(const Tensor& input) {
+FilterDescriptor::FilterDescriptor(Tensor const& input) {
     CUDNN_CHECK_ERR(cudnnCreateFilterDescriptor(&descriptor));
     cudnnDataType_t cudnntype = cudnnMapToType(input.type());
 
@@ -267,120 +248,145 @@ FilterDescriptor::FilterDescriptor(const Tensor& input) {
     );
 }
 
-FilterDescriptor::~FilterDescriptor() {
-    CUDNN_CHECK_ERR(cudnnDestroyFilterDescriptor(descriptor));
-}
+FilterDescriptor::~FilterDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyFilterDescriptor(descriptor)); }
 
-DropoutDescriptor::DropoutDescriptor(float drop_prob) {
+DropoutDescriptor::DropoutDescriptor(float dropProb) {
     CUDNN_CHECK_ERR(cudnnCreateDropoutDescriptor(&descriptor));
-    auto cudnnHandle = getCudnnHandle();
-    unsigned long long seed = 0;
-    size_t state_size;
-    CUDNN_CHECK_ERR(cudnnDropoutGetStatesSize(cudnnHandle, &state_size));
-    auto& dropout_states = getDropoutStates();
-    if(dropout_states.isEmpty()) {
-        dropout_states =
-            Tensor({static_cast<long long>(state_size)}, fl::dtype::b8);
-        DevicePtr statesraw(dropout_states);
+
+    auto const cudnnHandle = getCudnnHandle();
+    constexpr unsigned long long seed = 0;
+    size_t stateSize;
+
+    CUDNN_CHECK_ERR(cudnnDropoutGetStatesSize(cudnnHandle, &stateSize));
+
+    auto& dropoutStates = getDropoutStates();
+
+    if(dropoutStates.isEmpty()) {
+        dropoutStates =
+            Tensor{{static_cast<long long>(stateSize)}, fl::dtype::b8};
+        DevicePtr statesraw(dropoutStates);
         CUDNN_CHECK_ERR(
             cudnnSetDropoutDescriptor(
                 descriptor,
                 cudnnHandle,
-                drop_prob,
+                dropProb,
                 statesraw.get(),
-                state_size,
+                stateSize,
                 seed
             )
         );
-    } else {
-        DevicePtr statesraw(dropout_states);
-// See https://git.io/fp9oo for an explanation.
-#if CUDNN_VERSION >= 7000
+    }
+    else {
+        DevicePtr statesraw(dropoutStates);
         CUDNN_CHECK_ERR(
             cudnnRestoreDropoutDescriptor(
                 descriptor,
                 cudnnHandle,
-                drop_prob,
+                dropProb,
                 statesraw.get(),
-                state_size,
+                stateSize,
                 seed
             )
         );
-#else
-        auto dropout_struct = reinterpret_cast<CudnnDropoutStruct*>(descriptor);
-        dropout_struct->dropout = drop_prob;
-        dropout_struct->nstates = state_size;
-        dropout_struct->states = statesraw.get();
-#endif
     }
 }
 
-DropoutDescriptor::~DropoutDescriptor() {
-    CUDNN_CHECK_ERR(cudnnDestroyDropoutDescriptor(descriptor));
-}
+DropoutDescriptor::~DropoutDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyDropoutDescriptor(descriptor)); }
 
 Tensor& DropoutDescriptor::getDropoutStates() {
-    thread_local Tensor dropout_states;
-    return dropout_states;
+    thread_local Tensor dropoutStates;
+    return dropoutStates;
 }
 
 RNNDescriptor::RNNDescriptor(
     fl::dtype type,
-    int hidden_size,
-    int num_layers,
+    int inputSize,
+    int hiddenSize,
+    int numLayers,
     RnnMode mode,
     bool bidirectional,
     DropoutDescriptor& dropout
 ) {
-    CUDNN_CHECK_ERR(cudnnCreateRNNDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreateRNNDescriptor(&_handle));
 
-    auto cudnnHandle = getCudnnHandle();
+    constexpr auto inMode = CUDNN_LINEAR_INPUT;
+    constexpr auto algo = CUDNN_RNN_ALGO_STANDARD;
 
-    cudnnRNNInputMode_t in_mode = CUDNN_LINEAR_INPUT;
+    auto const dir = bidirectional ? CUDNN_BIDIRECTIONAL : CUDNN_UNIDIRECTIONAL;
 
-    cudnnDirectionMode_t dir =
-        bidirectional ? CUDNN_BIDIRECTIONAL : CUDNN_UNIDIRECTIONAL;
+    auto const cell = cudnnMapToRNNMode(mode);
+    auto const dataType = cudnnMapToType(type);
 
-    cudnnRNNMode_t cell = cudnnMapToRNNMode(mode);
-    cudnnRNNAlgo_t algo = CUDNN_RNN_ALGO_STANDARD;
-    cudnnDataType_t cudnntype = cudnnMapToType(type);
-
-#if CUDNN_VERSION >= 7000 && CUDNN_VERSION < 8000
     CUDNN_CHECK_ERR(
-        cudnnSetRNNDescriptor(
-            cudnnHandle,
-            descriptor,
-            hidden_size,
-            num_layers,
-            dropout.descriptor,
-            in_mode,
-            dir,
-            cell,
+        //https://docs.nvidia.com/deeplearning/cudnn/archives/cudnn-892/api/index.html#cudnnSetRNNDescriptor_v8
+        cudnnSetRNNDescriptor_v8(
+            _handle,
             algo,
-            cudnntype
+            cell,
+            CUDNN_RNN_DOUBLE_BIAS, //TODO review; double is default for old cudnn
+            dir,
+            inMode,
+            dataType,
+            dataType, // math precision
+            mathType(type),
+            inputSize,
+            hiddenSize,
+            hiddenSize, //projection size (unused)
+            numLayers,
+            dropout.descriptor,
+            0
         )
     );
-#else
-    CUDNN_CHECK_ERR(
-        cudnnSetRNNDescriptor_v6(
-            cudnnHandle,
-            descriptor,
-            hidden_size,
-            num_layers,
-            dropout.descriptor,
-            in_mode,
-            dir,
-            cell,
-            algo,
-            cudnntype
-        )
-    );
-#endif
 }
 
-RNNDescriptor::~RNNDescriptor() {
-    CUDNN_CHECK_ERR(cudnnDestroyRNNDescriptor(descriptor));
+RNNDescriptor::~RNNDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyRNNDescriptor(_handle)); }
+
 }
+
+namespace fl {
+
+
+RNNDataDescriptor::RNNDataDescriptor(fl::dtype type, Shape const& dims) {
+    create();
+    auto const inputSize = dims.ndim() > 0 ? static_cast<int>(dims[0]) : 1;
+    auto const batchSize = dims.ndim() > 1 ? static_cast<int>(dims[1]) : 1;
+    auto const maxSeqSize = dims.ndim() > 2 ? static_cast<int>(dims[2]) : 1;
+
+    std::vector seqSizes(batchSize, maxSeqSize);
+
+    set(
+        type,
+        inputSize,
+        maxSeqSize,
+        seqSizes
+    );
+}
+
+RNNDataDescriptor::~RNNDataDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyRNNDataDescriptor(_handle)); }
+void RNNDataDescriptor::create() { CUDNN_CHECK_ERR(cudnnCreateRNNDataDescriptor(&_handle)); }
+void RNNDataDescriptor::set(
+    fl::dtype type,
+    int inputSize,
+    int maxSeqSize,
+    std::span<int const> sequenceSizes
+) const {
+    CUDNN_CHECK_ERR(
+        cudnnSetRNNDataDescriptor(
+            _handle,
+            cudnnMapToType(type),
+            CUDNN_RNN_DATA_LAYOUT_SEQ_MAJOR_UNPACKED,
+            maxSeqSize,
+            sequenceSizes.size(), //batch size
+            inputSize,
+            sequenceSizes.data(),
+            nullptr //no padding
+        )
+    );
+}
+
+}
+
+namespace fl {
 
 ConvDescriptor::ConvDescriptor(
     fl::dtype type,
@@ -413,35 +419,27 @@ ConvDescriptor::ConvDescriptor(
     CUDNN_CHECK_ERR(cudnnSetConvolutionGroupCount(descriptor, groups));
 }
 
-ConvDescriptor::~ConvDescriptor() {
-    CUDNN_CHECK_ERR(cudnnDestroyConvolutionDescriptor(descriptor));
-}
+ConvDescriptor::~ConvDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyConvolutionDescriptor(descriptor)); }
 
 cudnnHandle_t getCudnnHandle() { return getActiveDeviceHandle().cudnnHandle; }
 
-const CUDAStream& getCudnnStream() { return *getActiveDeviceHandle().stream; }
+CUDAStream const& getCudnnStream() { return *getActiveDeviceHandle().stream; }
 
-const void* kOne(const fl::dtype t) {
+void const* kOne(fl::dtype const t) {
     switch(t) {
         case fl::dtype::f16:
-        case fl::dtype::f32:
-            return &kFloatOne;
-        case fl::dtype::f64:
-            return &kDoubleOne;
-        default:
-            throw std::invalid_argument("unsupported data type for cuDNN");
+        case fl::dtype::f32: return &kFloatOne;
+        case fl::dtype::f64: return &kDoubleOne;
+        default: throw std::invalid_argument("unsupported data type for cuDNN");
     }
 }
 
-const void* kZero(const fl::dtype t) {
+void const* kZero(fl::dtype const t) {
     switch(t) {
         case fl::dtype::f16:
-        case fl::dtype::f32:
-            return &kFloatZero;
-        case fl::dtype::f64:
-            return &kDoubleZero;
-        default:
-            throw std::invalid_argument("unsupported data type for cuDNN");
+        case fl::dtype::f32: return &kFloatZero;
+        case fl::dtype::f64: return &kDoubleZero;
+        default: throw std::invalid_argument("unsupported data type for cuDNN");
     }
 }
 

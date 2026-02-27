@@ -48,15 +48,15 @@ namespace {
 
         if(minAxis == 0) {
             modeOut = CUDNN_BATCHNORM_PER_ACTIVATION;
-            inDescDimsOut = Shape(
+            inDescDimsOut = Shape{
                 {
                     1,
                     1,
                     nfeatures,
                     static_cast<long long>(input.elements() / nfeatures)
                 }
-            );
-            wtDescDimsOut = Shape({1, 1, nfeatures});
+            };
+            wtDescDimsOut = Shape{1, 1, nfeatures};
         } else {
             modeOut = CUDNN_BATCHNORM_SPATIAL;
 #if CUDNN_VERSION >= 7003
@@ -67,15 +67,15 @@ namespace {
             int batchsz = 1;
             for(int i = maxAxis + 1; i < input.ndim(); ++i)
                 batchsz *= input.dim(i);
-            inDescDimsOut = Shape(
+            inDescDimsOut = Shape{
                 {
                     1,
                     static_cast<long long>(input.elements() / (nfeatures * batchsz)),
                     nfeatures,
                     batchsz,
                 }
-            );
-            wtDescDimsOut = Shape({1, 1, nfeatures});
+            };
+            wtDescDimsOut = Shape{1, 1, nfeatures};
         }
     }
 
@@ -101,7 +101,7 @@ Tensor CudnnAutogradExtension::batchnorm(
         );
     FL_TENSOR_DTYPES_MATCH_CHECK(weight, bias, runningMean, runningVar);
 
-    auto output = Tensor(input.shape(), input.type());
+    auto output = Tensor{input.shape(), input.type()};
 
     cudnnBatchNormMode_t mode;
     Shape inDescDims, wtDescDims;
@@ -122,8 +122,8 @@ Tensor CudnnAutogradExtension::batchnorm(
     fl::dtype scalarsType =
         input.type() == fl::dtype::f16 ? fl::dtype::f32 : input.type();
 
-    auto inDesc = TensorDescriptor(input.type(), inDescDims);
-    auto wtDesc = TensorDescriptor(weightArray.type(), wtDescDims);
+    auto inDesc = TensorDescriptor{input.type(), inDescDims};
+    auto wtDesc = TensorDescriptor{weightArray.type(), wtDescDims};
 
     {
         DevicePtr inRaw(input);
@@ -140,8 +140,8 @@ Tensor CudnnAutogradExtension::batchnorm(
         );
 
         if(train) {
-            saveMean = Tensor({wtDescDims[2]}, scalarsType);
-            saveVar = Tensor({wtDescDims[2]}, scalarsType);
+            saveMean = Tensor{{wtDescDims[2]}, scalarsType};
+            saveVar = Tensor{{wtDescDims[2]}, scalarsType};
 
             DevicePtr saveMeanRaw(saveMean);
             DevicePtr saveVarRaw(saveVar);
@@ -223,13 +223,13 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::batchnormBackward(
     const void* one1 = kOne(scalarsType);
     const void* zero0 = kZero(scalarsType);
 
-    auto iDesc = TensorDescriptor(input.type(), inDescDims);
-    auto wDesc = TensorDescriptor(wt.type(), wtDescDims);
+    auto iDesc = TensorDescriptor{input.type(), inDescDims};
+    auto wDesc = TensorDescriptor{wt.type(), wtDescDims};
     // CuDNN doesn't support calculating only the gradients
     // required for batchnorm
-    auto gradIn = Tensor(input.shape(), input.type());
-    auto gradWt = Tensor(wt.shape(), wt.type());
-    auto gradBs = Tensor(wt.shape(), wt.type());
+    auto gradIn = Tensor{input.shape(), input.type()};
+    auto gradWt = Tensor{wt.shape(), wt.type()};
+    auto gradBs = Tensor{wt.shape(), wt.type()};
     {
         DevicePtr iRaw(input);
         DevicePtr wRaw(wt);

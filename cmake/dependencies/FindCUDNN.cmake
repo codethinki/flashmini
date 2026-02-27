@@ -76,4 +76,8 @@ if(CUDNN_FOUND)
   endif()
 endif()
 
+if (CUDNN_FOUND AND CUDNN_VERSION VERSION_LESS "8.0")
+  message(FATAL_ERROR "Flashlight requires cuDNN >= 8.0, found ${CUDNN_VERSION}")
+endif()
+
 mark_as_advanced(CUDNN_ROOT CUDNN_INCLUDE_DIR CUDNN_LIBRARY CUDNN_VERSION)
