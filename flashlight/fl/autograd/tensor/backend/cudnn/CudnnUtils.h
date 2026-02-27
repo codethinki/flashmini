@@ -13,13 +13,15 @@
 #include "flashlight/fl/runtime/CUDAStream.h"
 #include "flashlight/fl/tensor/TensorBase.h"
 
+#include <span>
+
 namespace fl {
 
 class TensorDescriptor {
 public:
-    explicit TensorDescriptor(const Tensor& a);
+    explicit TensorDescriptor(Tensor const& a);
 
-    TensorDescriptor(const fl::dtype type, const Shape& af_dims);
+    TensorDescriptor(fl::dtype const type, Shape const& afDims);
 
     cudnnTensorDescriptor_t descriptor;
     ~TensorDescriptor();
@@ -27,19 +29,19 @@ public:
 
 class TensorDescriptorArray {
 public:
-    TensorDescriptorArray(int size, const fl::dtype type, const Shape& dims);
+    TensorDescriptorArray(int size, fl::dtype const type, Shape const& dims);
 
     cudnnTensorDescriptor_t* descriptors;
     ~TensorDescriptorArray();
 
 private:
-    std::vector<TensorDescriptor> desc_vec;
-    std::vector<cudnnTensorDescriptor_t> desc_raw_vec;
+    std::vector<TensorDescriptor> _descVec;
+    std::vector<cudnnTensorDescriptor_t> _descRawVec;
 };
 
 class FilterDescriptor {
 public:
-    explicit FilterDescriptor(const Tensor& a);
+    explicit FilterDescriptor(Tensor const& input);
     cudnnFilterDescriptor_t descriptor;
     ~FilterDescriptor();
 };
@@ -77,7 +79,7 @@ public:
 
 class DropoutDescriptor {
 public:
-    explicit DropoutDescriptor(float drop_prob);
+    explicit DropoutDescriptor(float dropProb);
     cudnnDropoutDescriptor_t descriptor;
     ~DropoutDescriptor();
 
@@ -88,28 +90,65 @@ class RNNDescriptor {
 public:
     RNNDescriptor(
         fl::dtype type,
-        int hidden_size,
-        int num_layers,
+        int inputSize,
+        int hiddenSize,
+        int numLayers,
         RnnMode mode,
         bool bidirectional,
         DropoutDescriptor& dropout
     );
-    cudnnRNNDescriptor_t descriptor;
     ~RNNDescriptor();
+
+private:
+    cudnnRNNDescriptor_t _handle = nullptr;
+
+    static constexpr auto mathType(fl::dtype type) {
+        return type == fl::dtype::f16 ? CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION : CUDNN_DEFAULT_MATH;
+    }
+
+public:
+    /**
+     * @return descriptor handle
+     */
+    constexpr auto get() const { return _handle; }
 };
+
+
+class RNNDataDescriptor {
+public:
+    RNNDataDescriptor(
+        fl::dtype type,
+        Shape const& dims
+    );
+
+    ~RNNDataDescriptor();
+
+private:
+    void create();
+    void set(dtype type, int inputSize, int maxSeqSize, std::span<int const> sequenceSizes) const;
+
+    cudnnRNNDataDescriptor_t _handle = nullptr;
+
+public:
+    /**
+     * @return descriptor handle
+     */
+    constexpr auto get() const { return _handle; }
+};
+
 
 #define CUDNN_CHECK_ERR(expr) ::fl::cudnnCheckErr((expr))
 
 void cudnnCheckErr(cudnnStatus_t status);
 
-cudnnDataType_t cudnnMapToType(const fl::dtype& t);
+cudnnDataType_t cudnnMapToType(fl::dtype const& t);
 
-const void* kOne(const fl::dtype t);
+void const* kOne(fl::dtype const t);
 
-const void* kZero(const fl::dtype t);
+void const* kZero(fl::dtype const t);
 
 // TODO: move this to CudnnAutogradExtension if we make it a singleton
 cudnnHandle_t getCudnnHandle();
-const CUDAStream& getCudnnStream();
+CUDAStream const& getCudnnStream();
 
 } // namespace fl
