@@ -6,6 +6,16 @@
     "gtest"
   ],
   "features": {
+    "cuda": {
+      "description": "Dependencies for gpu backend",
+      "dependencies": []
+    },
+    "cpu": {
+      "description": "Dependencies for cpu backend",
+      "dependencies": [
+        "onednn"
+      ]
+    },
     "distributed": {
       "description": "Dependencies for distributed backend",
       "dependencies": [
