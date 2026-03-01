@@ -16,11 +16,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# The CUDA standard is still C++14 to enable interopability with
-# slightly older and still well-supported versions of CUDA/nvcc
-# (e.g. CUDA < 11). This will be bumped to 17 once CUDA 11 is
-# required.
-set(CMAKE_CUDA_STANDARD 14)
+set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 # no modules in this library

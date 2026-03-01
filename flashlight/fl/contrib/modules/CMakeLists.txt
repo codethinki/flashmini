@@ -13,4 +13,4 @@ target_sources(
   ${CMAKE_CURRENT_LIST_DIR}/Transformer.cpp
   ${CMAKE_CURRENT_LIST_DIR}/TDSBlock.cpp
   ${CMAKE_CURRENT_LIST_DIR}/SpecAugment.cpp
-  )
+)
