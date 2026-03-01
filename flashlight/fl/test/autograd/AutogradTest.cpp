@@ -40,113 +40,96 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
 
     // Binary operators
     EXPECT_THROW(
-        {
-            auto res = f16 + f32;
-        },
+        {auto res = f16 + f32;},
         std::invalid_argument
     ); // +
     EXPECT_THROW(
-        {
-            auto res = f16 - f32;
-        },
+        {auto res = f16 - f32;},
         std::invalid_argument
     ); // -
     EXPECT_THROW(
-        {
-            auto res = f16 * f32;
-        },
+        {auto res = f16 * f32;},
         std::invalid_argument
     ); // *
     EXPECT_THROW(
-        {
-            auto res = f16 / f32;
-        },
+        {auto res = f16 / f32;},
         std::invalid_argument
     ); ///
     EXPECT_THROW(
-        {
-            auto res = f16 > f32;
-        },
+        {auto res = f16 > f32;},
         std::invalid_argument
     ); // >
     EXPECT_THROW(
-        {
-            auto res = f16 < f32;
-        },
+        {auto res = f16 < f32;},
         std::invalid_argument
     ); // <
+    EXPECT_THROW({auto res = f16 >= f32;}, std::invalid_argument); // >=
     EXPECT_THROW(
         {
-            auto res = f16 >= f32;
-        },
-        std::invalid_argument
-    ); // >=
-    EXPECT_THROW(
-        {
-            auto res = f16 <= f32;
+        auto res = f16 <= f32;
         },
         std::invalid_argument
     ); // <=
     EXPECT_THROW(
         {
-            auto res = f16 && f32;
+        auto res = f16 && f32;
         },
         std::invalid_argument
     ); // &&
     EXPECT_THROW(
         {
-            max(f16, f32);
+        max(f16, f32);
         },
         std::invalid_argument
     ); // max
     EXPECT_THROW(
         {
-            min(f16, f32);
+        min(f16, f32);
         },
         std::invalid_argument
     ); // min
     EXPECT_THROW(
         {
-            matmul(f16, f32);
+        matmul(f16, f32);
         },
         std::invalid_argument
     ); // matmul
     EXPECT_THROW(
         {
-            matmulTN(f16, f32);
+        matmulTN(f16, f32);
         },
         std::invalid_argument
     ); // matmulTN
     EXPECT_THROW(
         {
-            matmulNT(f16, f32);
+        matmulNT(f16, f32);
         },
         std::invalid_argument
     ); // matmulNT
     EXPECT_NO_THROW(
         {
-            binaryCrossEntropy(f16, f32);
+        binaryCrossEntropy(f16, f32);
         }
     );
     EXPECT_NO_THROW(
         {
-            categoricalCrossEntropy(
-                Variable(fl::rand({7, 10, 4}, fl::dtype::f16), true),
-                Variable(
-                    (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
-                    false
-                )
-            );
+        categoricalCrossEntropy(
+            Variable(fl::rand({7, 10, 4}, fl::dtype::f16), true),
+            Variable(
+                (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
+                false
+            )
+        );
         }
     );
     EXPECT_NO_THROW(
         {
-            pool2d(f16, 1, 1, 1, 1, 1, 1);
+        pool2d(f16, 1, 1, 1, 1, 1, 1);
         }
     );
     EXPECT_NO_THROW(
         {
-            embedding(f16, f32);
+        embedding(f16, f32);
         }
     ); // lookup is of a different type
     // Ternary operators
@@ -154,13 +137,13 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     auto f16_2 = Variable(fl::rand({2, 2}, fl::dtype::f16), true);
     EXPECT_THROW(
         {
-            linear(f16, f32, f16_2);
+        linear(f16, f32, f16_2);
         },
         std::invalid_argument
     ); // linear
     EXPECT_THROW(
         {
-            linear(f16, f32, f32_2);
+        linear(f16, f32, f32_2);
         },
         std::invalid_argument
     ); // linear
@@ -168,19 +151,19 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     auto b = Variable(fl::rand({1}, fl::dtype::f32), true);
     EXPECT_THROW(
         {
-            batchnorm(f16, f32, f32_2, w, b, {1}, true, 0.01, 0.01);
+        batchnorm(f16, f32, f32_2, w, b, {1}, true, 0.01, 0.01);
         },
         std::invalid_argument
     );
     EXPECT_THROW(
         {
-            batchnorm(f16, f32, f16_2, w, b, {1}, true, 0.01, 0.01);
+        batchnorm(f16, f32, f16_2, w, b, {1}, true, 0.01, 0.01);
         },
         std::invalid_argument
     );
     EXPECT_THROW(
         {
-            conv2d(f16, f32, f16_2, 1, 1, 0, 0, 1, 1);
+        conv2d(f16, f32, f16_2, 1, 1, 0, 0, 1, 1);
         },
         std::invalid_argument
     );
@@ -189,17 +172,17 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     auto f16_4 = Variable(fl::rand({50}, fl::dtype::f16), false);
     EXPECT_THROW(
         {
-            rnn(
-                f16_3,
-                Variable(Tensor(fl::dtype::f32), false),
-                Variable(Tensor(fl::dtype::f32), false),
-                f16_4,
-                2,
-                2,
-                RnnMode::LSTM,
-                true,
-                0.0
-            );
+        rnn(
+            f16_3,
+            Variable(Tensor(fl::dtype::f32), false),
+            Variable(Tensor(fl::dtype::f32), false),
+            f16_4,
+            2,
+            2,
+            RnnMode::LSTM,
+            true,
+            0.0
+        );
         },
         std::invalid_argument
     );
@@ -207,7 +190,7 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     std::vector<Variable> concatInputs = {f16, f32, f16_2, f32_2};
     EXPECT_THROW(
         {
-            concatenate(concatInputs, 0);
+        concatenate(concatInputs, 0);
         },
         std::invalid_argument
     );
@@ -222,7 +205,7 @@ TEST(AutogradTest, CastingAsDifferentGradTypes) {
     // Computing gradients with mixed types fails when the op is applied
     ASSERT_THROW(
         {
-            f32 + f16;
+        f32 + f16;
         },
         std::invalid_argument
     );
@@ -311,14 +294,10 @@ TEST(AutogradTest, Concatenate) {
 
     ASSERT_EQ(output.shape(), Shape({2, 3, 12, 2}));
 
-    auto funcConcatenateT1 = [x2, x3, x4](Variable& in) {
-            return concatenate({in, x2, x3, x4}, 2);
-        };
+    auto funcConcatenateT1 = [x2, x3, x4](Variable& in) { return concatenate({in, x2, x3, x4}, 2); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT1, x1, 1E-5, 1E-4, {&x2, &x3, &x4}));
 
-    auto funcConcatenateT2 = [x1, x2, x4](Variable& in) {
-            return concatenate({x1, x2, in, x4}, 2);
-        };
+    auto funcConcatenateT2 = [x1, x2, x4](Variable& in) { return concatenate({x1, x2, in, x4}, 2); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT2, x3, 1E-5, 1E-4, {&x1, &x2, &x4}));
 }
 
@@ -421,34 +400,24 @@ TEST(AutogradTest, Indexing) {
     auto funcRow = [](Variable& input) { return input(4); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRow, x));
 
-    auto funcSlice = [](Variable& input) {
-            return input(fl::span, fl::span, 4);
-        };
+    auto funcSlice = [](Variable& input) { return input(fl::span, fl::span, 4); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcSlice, x));
 
-    auto funcCols = [](Variable& input) {
-            return input(fl::span, fl::range(2, 5));
-        };
+    auto funcCols = [](Variable& input) { return input(fl::span, fl::range(2, 5)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcCols, x));
 
     auto funcRows = [](Variable& input) { return input(fl::range(2, 5)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRows, x));
 
-    auto funcSlices = [](Variable& input) {
-            return input(fl::span, fl::span, fl::range(2, 5));
-        };
+    auto funcSlices = [](Variable& input) { return input(fl::span, fl::span, fl::range(2, 5)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcSlices, x));
-    auto funcFlat = [](Variable& input) {
-            return input.flat(fl::range(4, 100));
-        };
+    auto funcFlat = [](Variable& input) { return input.flat(fl::range(4, 100)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcFlat, x));
 }
 
 TEST(AutogradTest, Padding) {
     auto in = Variable(fl::rand({3, 3}, fl::dtype::f32), true);
-    auto funcPad = [&](Variable& input) {
-            return padding(input, {{1, 2}, {0, 1}}, -1);
-        };
+    auto funcPad = [&](Variable& input) { return padding(input, {{1, 2}, {0, 1}}, -1); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPad, in, 1E-3));
 }
 
@@ -470,18 +439,16 @@ TEST_F(AutogradTestF16, PoolingF16) {
 
 TEST(AutogradTest, Reorder) {
     auto in = Variable(fl::rand({3, 1, 4, 1}, fl::dtype::f32) * 2, true);
-    auto funcReorder = [&](Variable& input) {
-            return reorder(input, {2, 0, 3, 1});
-        };
+    auto funcReorder = [&](Variable& input) { return reorder(input, {2, 0, 3, 1}); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcReorder, in, 1E-3));
 }
 
 TEST(AutogradTest, Embedding) {
     int nWords = 10;
-    auto input =
-        Variable((fl::rand({4, 2}) * nWords).astype(fl::dtype::f32), false);
+    auto input = Variable((fl::rand({4, 2}) * nWords).astype(fl::dtype::f32), false);
     auto weights = Variable(fl::randn({4, nWords}, fl::dtype::f64), true);
     auto funcEmbed = [&](Variable& w) { return embedding(input, w); };
+
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcEmbed, weights, 1E-5));
 }
 
@@ -491,7 +458,10 @@ TEST(AutogradTest, GetAdvancedIndex) {
         GTEST_SKIP()
             << "Advanced indexing operator unsupported for non-CUDA backends";
     std::vector<fl::dtype> validIndexTypes = {
-        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64
+        fl::dtype::s32,
+        fl::dtype::s64,
+        fl::dtype::u32,
+        fl::dtype::u64
     };
     for(const auto& dtype : validIndexTypes) {
         auto x = Variable(fl::rand({20, 50, 40, 30}, fl::dtype::f32), true);
@@ -523,7 +493,10 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
     std::vector<fl::dtype> validIndexTypes = {
-        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64
+        fl::dtype::s32,
+        fl::dtype::s64,
+        fl::dtype::u32,
+        fl::dtype::u64
     };
     for(const auto& dtype : validIndexTypes) {
         auto x = Variable(fl::rand({20, 50, 40, 30}, fl::dtype::f16), true);

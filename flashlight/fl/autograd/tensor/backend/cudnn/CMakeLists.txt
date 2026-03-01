@@ -8,6 +8,8 @@ target_sources(
   ${CMAKE_CURRENT_LIST_DIR}/Conv2D.cpp
   ${CMAKE_CURRENT_LIST_DIR}/CudnnUtils.h
   ${CMAKE_CURRENT_LIST_DIR}/CudnnUtils.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/CudnnRnnUtils.h
+  ${CMAKE_CURRENT_LIST_DIR}/CudnnRnnUtils.cpp
   ${CMAKE_CURRENT_LIST_DIR}/Pool2D.cpp
   ${CMAKE_CURRENT_LIST_DIR}/RNN.cpp
   )

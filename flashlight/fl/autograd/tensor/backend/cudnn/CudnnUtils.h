@@ -1,10 +1,9 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
-
 #pragma once
 
 #include <cudnn.h>
@@ -22,9 +21,13 @@ public:
     explicit TensorDescriptor(Tensor const& a);
 
     TensorDescriptor(fl::dtype const type, Shape const& afDims);
-
-    cudnnTensorDescriptor_t descriptor;
     ~TensorDescriptor();
+
+private:
+    cudnnTensorDescriptor_t _handle;
+
+public:
+    [[nodiscard]] constexpr auto get() const { return _handle; }
 };
 
 class TensorDescriptorArray {
@@ -42,8 +45,13 @@ private:
 class FilterDescriptor {
 public:
     explicit FilterDescriptor(Tensor const& input);
-    cudnnFilterDescriptor_t descriptor;
     ~FilterDescriptor();
+
+private:
+    cudnnFilterDescriptor_t _handle;
+
+public:
+    [[nodiscard]] constexpr auto get() const { return _handle; }
 };
 
 class ConvDescriptor {
@@ -58,8 +66,13 @@ public:
         int dy,
         int groups = 1
     );
-    cudnnConvolutionDescriptor_t descriptor;
     ~ConvDescriptor();
+
+private:
+    cudnnConvolutionDescriptor_t _handle;
+
+public:
+    [[nodiscard]] constexpr auto get() const { return _handle; }
 };
 
 class PoolingDescriptor {
@@ -73,17 +86,28 @@ public:
         int py,
         PoolingMode mode
     );
-    cudnnPoolingDescriptor_t descriptor;
     ~PoolingDescriptor();
+
+private:
+    cudnnPoolingDescriptor_t _handle;
+
+public:
+    [[nodiscard]] constexpr auto get() const { return _handle; }
 };
 
 class DropoutDescriptor {
 public:
     explicit DropoutDescriptor(float dropProb);
-    cudnnDropoutDescriptor_t descriptor;
     ~DropoutDescriptor();
 
     Tensor& getDropoutStates();
+
+private:
+    cudnnDropoutDescriptor_t _handle;
+
+public:
+    [[nodiscard]] constexpr auto get() const { return _handle; }
+
 };
 
 class RNNDescriptor {
@@ -136,6 +160,9 @@ public:
     constexpr auto get() const { return _handle; }
 };
 
+}
+
+namespace fl {
 
 #define CUDNN_CHECK_ERR(expr) ::fl::cudnnCheckErr((expr))
 
@@ -151,4 +178,7 @@ void const* kZero(fl::dtype const t);
 cudnnHandle_t getCudnnHandle();
 CUDAStream const& getCudnnStream();
 
+
 } // namespace fl
+
+

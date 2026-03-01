@@ -1,8 +1,8 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
 
 #include "flashlight/fl/autograd/tensor/backend/cudnn/CudnnAutogradExtension.h"
@@ -270,7 +270,7 @@ namespace {
     ) {
         CUDNN_CHECK_ERR(
             cudnnSetConvolutionMathType(
-                cDesc.descriptor,
+                cDesc.get(),
                 kKernelModesToCudnnMathType.at(kernelOptions->currentOption())
             )
         );
@@ -280,13 +280,13 @@ namespace {
         if(input.type() == fl::dtype::f16)
             CUDNN_CHECK_ERR(
                 cudnnSetConvolutionMathType(
-                    cDesc.descriptor,
+                    cDesc.get(),
                     CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
                 )
             );
         else
             CUDNN_CHECK_ERR(
-                cudnnSetConvolutionMathType(cDesc.descriptor, CUDNN_DEFAULT_MATH)
+                cudnnSetConvolutionMathType(cDesc.get(), CUDNN_DEFAULT_MATH)
             );
     }
 
@@ -320,21 +320,21 @@ Tensor CudnnAutogradExtension::conv2d(
     if(input.type() == fl::dtype::f16)
         CUDNN_CHECK_ERR(
             cudnnSetConvolutionMathType(
-                convDesc.descriptor,
+                convDesc.get(),
                 CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION
             )
         );
     else
         CUDNN_CHECK_ERR(
-            cudnnSetConvolutionMathType(convDesc.descriptor, CUDNN_DEFAULT_MATH)
+            cudnnSetConvolutionMathType(convDesc.get(), CUDNN_DEFAULT_MATH)
         );
 
     std::array<int, 4> odims;
     CUDNN_CHECK_ERR(
         cudnnGetConvolutionNdForwardOutputDim(
-            convDesc.descriptor,
-            inDesc.descriptor,
-            wtDesc.descriptor,
+            convDesc.get(),
+            inDesc.get(),
+            wtDesc.get(),
             4,
             odims.data()
         )
@@ -346,10 +346,10 @@ Tensor CudnnAutogradExtension::conv2d(
     const auto& cudnnStream = getCudnnStream();
 
     auto fwdAlgoBestPerf = getFwdAlgo(
-        inDesc.descriptor,
-        wtDesc.descriptor,
-        convDesc.descriptor,
-        outDesc.descriptor,
+        inDesc.get(),
+        wtDesc.get(),
+        convDesc.get(),
+        outDesc.get(),
         input.type()
     );
 
@@ -363,10 +363,10 @@ Tensor CudnnAutogradExtension::conv2d(
         CUDNN_CHECK_ERR(
             cudnnGetConvolutionForwardWorkspaceSize(
                 handle,
-                inDesc.descriptor,
-                wtDesc.descriptor,
-                convDesc.descriptor,
-                outDesc.descriptor,
+                inDesc.get(),
+                wtDesc.get(),
+                convDesc.get(),
+                outDesc.get(),
                 fwdAlgoBestPerf.algo,
                 &fwdAlgoBestPerf.memory
             )
@@ -390,16 +390,16 @@ Tensor CudnnAutogradExtension::conv2d(
             cudnnConvolutionForward(
                 handle,
                 one,
-                inDesc.descriptor,
+                inDesc.get(),
                 inPtr.get(),
-                wtDesc.descriptor,
+                wtDesc.get(),
                 wtPtr.get(),
-                convDesc.descriptor,
+                convDesc.get(),
                 fwdAlgoBestPerf.algo,
                 wspacePtr.get(),
                 fwdAlgoBestPerf.memory,
                 zero,
-                outDesc.descriptor,
+                outDesc.get(),
                 outPtr.get()
             )
         );
@@ -413,10 +413,10 @@ Tensor CudnnAutogradExtension::conv2d(
                 cudnnAddTensor(
                     handle,
                     one,
-                    bsDesc.descriptor,
+                    bsDesc.get(),
                     bsPtr.get(),
                     one,
-                    outDesc.descriptor,
+                    outDesc.get(),
                     outPtr.get()
                 )
             );
@@ -481,10 +481,10 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
             relativeSync(cudnnStream, {wtTensor});
             bool isStrided = (dx * dy) > 1;
             auto bwdDataAlgoBestPerf = getBwdDataAlgo(
-                iDesc.descriptor,
-                wDesc.descriptor,
-                cDesc.descriptor,
-                oDesc.descriptor,
+                iDesc.get(),
+                wDesc.get(),
+                cDesc.get(),
+                oDesc.get(),
                 isStrided,
                 inTensor.type()
             );
@@ -500,10 +500,10 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
                 CUDNN_CHECK_ERR(
                     cudnnGetConvolutionBackwardDataWorkspaceSize(
                         hndl,
-                        wDesc.descriptor,
-                        oDesc.descriptor,
-                        cDesc.descriptor,
-                        iDesc.descriptor,
+                        wDesc.get(),
+                        oDesc.get(),
+                        cDesc.get(),
+                        iDesc.get(),
                         bwdDataAlgoBestPerf.algo,
                         &bwdDataAlgoBestPerf.memory
                     )
@@ -525,16 +525,16 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
                     cudnnConvolutionBackwardData(
                         hndl,
                         oneg,
-                        wDesc.descriptor,
+                        wDesc.get(),
                         wPtr.get(),
-                        oDesc.descriptor,
+                        oDesc.get(),
                         gradResultPtr.get(),
-                        cDesc.descriptor,
+                        cDesc.get(),
                         bwdDataAlgoBestPerf.algo,
                         wsPtr.get(),
                         bwdDataAlgoBestPerf.memory,
                         zerog,
-                        iDesc.descriptor,
+                        iDesc.get(),
                         gradInputPtr.get()
                     )
                 );
@@ -699,10 +699,10 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
             // ensure cudnn compute stream waits on stream of input tensor
             relativeSync(cudnnStream, {inTensor});
             auto bwdFilterAlgoBestPerf = getBwdFilterAlgo(
-                iDesc.descriptor,
-                wDesc.descriptor,
-                cDesc.descriptor,
-                oDesc.descriptor,
+                iDesc.get(),
+                wDesc.get(),
+                cDesc.get(),
+                oDesc.get(),
                 inTensor.type()
             );
 
@@ -717,10 +717,10 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                 CUDNN_CHECK_ERR(
                     cudnnGetConvolutionBackwardFilterWorkspaceSize(
                         hndl,
-                        iDesc.descriptor,
-                        oDesc.descriptor,
-                        cDesc.descriptor,
-                        wDesc.descriptor,
+                        iDesc.get(),
+                        oDesc.get(),
+                        cDesc.get(),
+                        wDesc.get(),
                         bwdFilterAlgoBestPerf.algo,
                         &bwdFilterAlgoBestPerf.memory
                     )
@@ -742,16 +742,16 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                     cudnnConvolutionBackwardFilter(
                         hndl,
                         oneg,
-                        iDesc.descriptor,
+                        iDesc.get(),
                         iPtr.get(),
-                        oDesc.descriptor,
+                        oDesc.get(),
                         gradResultPtr.get(),
-                        cDesc.descriptor,
+                        cDesc.get(),
                         bwdFilterAlgoBestPerf.algo,
                         wsPtr.get(),
                         bwdFilterAlgoBestPerf.memory,
                         zerog,
-                        wDesc.descriptor,
+                        wDesc.get(),
                         gradWeightPtr.get()
                     )
                 );
@@ -871,10 +871,10 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                     cudnnConvolutionBackwardBias(
                         hndl,
                         oneg,
-                        oDesc.descriptor,
+                        oDesc.get(),
                         gradResultPtr.get(),
                         zerog,
-                        bDesc.descriptor,
+                        bDesc.get(),
                         gradBiasPtr.get()
                     )
                 );

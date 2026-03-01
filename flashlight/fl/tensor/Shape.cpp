@@ -1,8 +1,8 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
 
 #include "flashlight/fl/tensor/Shape.h"
@@ -15,68 +15,58 @@
 
 namespace fl {
 
-Shape::Shape(std::vector<Dim> d) : dims_(std::move(d)) {}
+Shape::Shape(std::vector<Dim> d) : _dims(std::move(d)) {}
 Shape::Shape(std::initializer_list<Dim> d) : Shape(std::vector<Dim>(d)) {}
 
-const Dim kEmptyShapeNumberOfElements = 1;
+Dim const kEmptyShapeNumberOfElements = 1;
 
-void Shape::checkDimsOrThrow(const size_t dim) const {
+void Shape::checkDimsOrThrow(size_t const dim) const {
     if(dim > ndim() - 1) {
         std::stringstream ss;
         ss << "Shape index " << std::to_string(dim)
-           << " out of bounds for shape with " << std::to_string(dims_.size())
-           << " dimensions.";
+            << " out of bounds for shape with " << std::to_string(_dims.size())
+            << " dimensions.";
         throw std::invalid_argument(ss.str());
     }
 }
 
 Dim Shape::elements() const {
-    if(dims_.empty())
+    if(_dims.empty())
         return kEmptyShapeNumberOfElements;
-    return std::accumulate(dims_.begin(), dims_.end(), static_cast<Dim>(1), std::multiplies<Dim>());
+    return std::accumulate(_dims.begin(), _dims.end(), static_cast<Dim>(1), std::multiplies<Dim>());
 }
 
-int Shape::ndim() const {
-    return dims_.size();
-}
+int Shape::ndim() const { return _dims.size(); }
 
-Dim Shape::dim(const size_t dim) const {
+Dim Shape::dim(size_t const dim) const {
     checkDimsOrThrow(dim);
-    return dims_[dim];
+    return _dims[dim];
 }
 
-Dim& Shape::operator[](const size_t dim) {
+Dim& Shape::operator[](size_t const dim) {
     checkDimsOrThrow(dim);
-    return dims_[dim];
+    return _dims[dim];
 }
 
-const Dim& Shape::operator[](const size_t dim) const {
+Dim const& Shape::operator[](size_t const dim) const {
     checkDimsOrThrow(dim);
-    return dims_[dim];
+    return _dims[dim];
 }
 
-bool Shape::operator==(const Shape& other) const {
-    return dims_ == other.dims_;
+bool Shape::operator==(Shape const& other) const { return _dims == other._dims; }
+
+bool Shape::operator!=(Shape const& other) const { return !(this->operator==(other)); }
+
+bool Shape::operator==(std::initializer_list<Dim> const& other) const {
+    return _dims.size() == other.size()
+        && std::equal(std::begin(_dims), std::end(_dims), std::begin(other));
 }
 
-bool Shape::operator!=(const Shape& other) const {
-    return !(this->operator==(other));
-}
+bool Shape::operator!=(std::initializer_list<Dim> const& other) const { return !(this->operator==(other)); }
 
-bool Shape::operator==(const std::initializer_list<Dim>& other) const {
-    return dims_.size() == other.size()
-           && std::equal(std::begin(dims_), std::end(dims_), std::begin(other));
-}
+std::vector<Dim> const& Shape::get() const { return _dims; }
 
-bool Shape::operator!=(const std::initializer_list<Dim>& other) const {
-    return !(this->operator==(other));
-}
-
-const std::vector<Dim>& Shape::get() const {
-    return dims_;
-}
-
-std::vector<Dim>& Shape::get() { return dims_; };
+std::vector<Dim>& Shape::get() { return _dims; };
 
 std::string Shape::toString() const {
     std::stringstream ss;
@@ -87,7 +77,7 @@ std::string Shape::toString() const {
     return ss.str();
 }
 
-std::ostream& operator<<(std::ostream& ostr, const Shape& s) {
+std::ostream& operator<<(std::ostream& ostr, Shape const& s) {
     ostr << s.toString();
     return ostr;
 }

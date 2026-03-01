@@ -60,12 +60,12 @@ Tensor CudnnAutogradExtension::pool2d(
         CUDNN_CHECK_ERR(
             cudnnPoolingForward(
                 handle,
-                poolDesc.descriptor,
+                poolDesc.get(),
                 one,
-                inDesc.descriptor,
+                inDesc.get(),
                 inputraw.get(),
                 zero,
-                outDesc.descriptor,
+                outDesc.get(),
                 resultraw.get()
             )
         );
@@ -112,16 +112,16 @@ Tensor CudnnAutogradExtension::pool2dBackward(
         CUDNN_CHECK_ERR(
             cudnnPoolingBackward(
                 hndl,
-                p_desc.descriptor,
+                p_desc.get(),
                 oneg,
-                o_desc.descriptor,
+                o_desc.get(),
                 outraw.get(),
-                o_desc.descriptor,
+                o_desc.get(),
                 gradresultraw.get(),
-                i_desc.descriptor,
+                i_desc.get(),
                 inraw.get(),
                 zerog,
-                i_desc.descriptor,
+                i_desc.get(),
                 gradinputraw.get()
             )
         );

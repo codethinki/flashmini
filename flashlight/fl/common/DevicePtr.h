@@ -1,8 +1,8 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
 
 #pragma once
@@ -68,7 +68,7 @@ public:
 
     template<typename T>
     T* getAs() const {
-        return reinterpret_cast<T*>(ptr_);
+        return static_cast<T*>(ptr_);
     }
 
 protected:

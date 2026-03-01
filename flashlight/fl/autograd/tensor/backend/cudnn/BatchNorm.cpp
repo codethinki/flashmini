@@ -1,8 +1,8 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
 
 #include "flashlight/fl/autograd/tensor/backend/cudnn/CudnnAutogradExtension.h"
@@ -153,11 +153,11 @@ Tensor CudnnAutogradExtension::batchnorm(
                     mode,
                     kOne(scalarsType),
                     kZero(scalarsType),
-                    inDesc.descriptor,
+                    inDesc.get(),
                     inRaw.get(),
-                    inDesc.descriptor,
+                    inDesc.get(),
                     outRaw.get(),
-                    wtDesc.descriptor,
+                    wtDesc.get(),
                     wtRaw.get(),
                     bsRaw.get(),
                     momentum,
@@ -175,11 +175,11 @@ Tensor CudnnAutogradExtension::batchnorm(
                     mode,
                     kOne(scalarsType),
                     kZero(scalarsType),
-                    inDesc.descriptor,
+                    inDesc.get(),
                     inRaw.get(),
-                    inDesc.descriptor,
+                    inDesc.get(),
                     outRaw.get(),
-                    wtDesc.descriptor,
+                    wtDesc.get(),
                     wtRaw.get(),
                     bsRaw.get(),
                     runMeanRaw.get(),
@@ -257,13 +257,13 @@ std::tuple<Tensor, Tensor, Tensor> CudnnAutogradExtension::batchnormBackward(
                 zero0,
                 one1,
                 zero0,
-                iDesc.descriptor,
+                iDesc.get(),
                 iRaw.get(),
-                iDesc.descriptor,
+                iDesc.get(),
                 gradOpRaw.get(),
-                iDesc.descriptor,
+                iDesc.get(),
                 gradInRaw.get(),
-                wDesc.descriptor,
+                wDesc.get(),
                 wRaw.get(),
                 gradWtRaw.get(),
                 gradBsRaw.get(),

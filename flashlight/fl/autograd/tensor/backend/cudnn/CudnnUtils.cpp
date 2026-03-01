@@ -1,8 +1,8 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
 
 #include "flashlight/fl/autograd/tensor/backend/cudnn/CudnnUtils.h"
@@ -124,7 +124,7 @@ cudnnRNNMode_t cudnnMapToRNNMode(RnnMode const mode) {
 }
 
 TensorDescriptor::TensorDescriptor(fl::dtype const type, Shape const& flDims) {
-    CUDNN_CHECK_ERR(cudnnCreateTensorDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreateTensorDescriptor(&_handle));
     cudnnDataType_t cudnntype = cudnnMapToType(type);
 
     std::array<int, 4> dims = {1, 1, 1, 1};
@@ -141,7 +141,7 @@ TensorDescriptor::TensorDescriptor(fl::dtype const type, Shape const& flDims) {
 
     CUDNN_CHECK_ERR(
         cudnnSetTensorNdDescriptor(
-            descriptor,
+            _handle,
             cudnntype,
             dims.size(),
             dims.data(),
@@ -151,7 +151,7 @@ TensorDescriptor::TensorDescriptor(fl::dtype const type, Shape const& flDims) {
 }
 
 TensorDescriptor::TensorDescriptor(Tensor const& input) {
-    CUDNN_CHECK_ERR(cudnnCreateTensorDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreateTensorDescriptor(&_handle));
     cudnnDataType_t cudnntype = cudnnMapToType(input.type());
 
     auto flStrides = input.strides();
@@ -170,7 +170,7 @@ TensorDescriptor::TensorDescriptor(Tensor const& input) {
 
     CUDNN_CHECK_ERR(
         cudnnSetTensorNdDescriptor(
-            descriptor /* descriptor handle */,
+            _handle /* descriptor handle */,
             cudnntype /* = dataType */,
             4,
             dims.data(),
@@ -179,7 +179,7 @@ TensorDescriptor::TensorDescriptor(Tensor const& input) {
     );
 }
 
-TensorDescriptor::~TensorDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyTensorDescriptor(descriptor)); }
+TensorDescriptor::~TensorDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyTensorDescriptor(_handle)); }
 
 TensorDescriptorArray::TensorDescriptorArray(
     int size,
@@ -189,7 +189,7 @@ TensorDescriptorArray::TensorDescriptorArray(
     _descVec.reserve(size);
     for(int i = 0; i < size; i++) {
         _descVec.emplace_back(type, dims);
-        _descRawVec.push_back(_descVec.back().descriptor);
+        _descRawVec.push_back(_descVec.back().get());
     }
     descriptors = _descRawVec.data();
 }
@@ -205,7 +205,7 @@ PoolingDescriptor::PoolingDescriptor(
     int py,
     PoolingMode mode
 ) {
-    CUDNN_CHECK_ERR(cudnnCreatePoolingDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreatePoolingDescriptor(&_handle));
     std::array<int, 2> window = {static_cast<int>(wy), static_cast<int>(wx)};
     std::array<int, 2> padding = {static_cast<int>(py), static_cast<int>(px)};
     std::array<int, 2> stride = {static_cast<int>(sy), static_cast<int>(sx)};
@@ -213,7 +213,7 @@ PoolingDescriptor::PoolingDescriptor(
     auto cudnnpoolingmode = cudnnMapToPoolingMode(mode);
     CUDNN_CHECK_ERR(
         cudnnSetPoolingNdDescriptor(
-            descriptor,
+            _handle,
             cudnnpoolingmode,
             CUDNN_PROPAGATE_NAN,
             2,
@@ -224,10 +224,10 @@ PoolingDescriptor::PoolingDescriptor(
     );
 }
 
-PoolingDescriptor::~PoolingDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyPoolingDescriptor(descriptor)); }
+PoolingDescriptor::~PoolingDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyPoolingDescriptor(_handle)); }
 
 FilterDescriptor::FilterDescriptor(Tensor const& input) {
-    CUDNN_CHECK_ERR(cudnnCreateFilterDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreateFilterDescriptor(&_handle));
     cudnnDataType_t cudnntype = cudnnMapToType(input.type());
 
     auto flDims = input.shape();
@@ -239,7 +239,7 @@ FilterDescriptor::FilterDescriptor(Tensor const& input) {
 
     CUDNN_CHECK_ERR(
         cudnnSetFilterNdDescriptor(
-            descriptor,
+            _handle,
             cudnntype,
             CUDNN_TENSOR_NCHW,
             4,
@@ -248,10 +248,10 @@ FilterDescriptor::FilterDescriptor(Tensor const& input) {
     );
 }
 
-FilterDescriptor::~FilterDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyFilterDescriptor(descriptor)); }
+FilterDescriptor::~FilterDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyFilterDescriptor(_handle)); }
 
 DropoutDescriptor::DropoutDescriptor(float dropProb) {
-    CUDNN_CHECK_ERR(cudnnCreateDropoutDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreateDropoutDescriptor(&_handle));
 
     auto const cudnnHandle = getCudnnHandle();
     constexpr unsigned long long seed = 0;
@@ -267,7 +267,7 @@ DropoutDescriptor::DropoutDescriptor(float dropProb) {
         DevicePtr statesraw(dropoutStates);
         CUDNN_CHECK_ERR(
             cudnnSetDropoutDescriptor(
-                descriptor,
+                _handle,
                 cudnnHandle,
                 dropProb,
                 statesraw.get(),
@@ -280,7 +280,7 @@ DropoutDescriptor::DropoutDescriptor(float dropProb) {
         DevicePtr statesraw(dropoutStates);
         CUDNN_CHECK_ERR(
             cudnnRestoreDropoutDescriptor(
-                descriptor,
+                _handle,
                 cudnnHandle,
                 dropProb,
                 statesraw.get(),
@@ -291,7 +291,7 @@ DropoutDescriptor::DropoutDescriptor(float dropProb) {
     }
 }
 
-DropoutDescriptor::~DropoutDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyDropoutDescriptor(descriptor)); }
+DropoutDescriptor::~DropoutDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyDropoutDescriptor(_handle)); }
 
 Tensor& DropoutDescriptor::getDropoutStates() {
     thread_local Tensor dropoutStates;
@@ -333,7 +333,7 @@ RNNDescriptor::RNNDescriptor(
             hiddenSize,
             hiddenSize, //projection size (unused)
             numLayers,
-            dropout.descriptor,
+            dropout.get(),
             0
         )
     );
@@ -348,18 +348,16 @@ namespace fl {
 
 RNNDataDescriptor::RNNDataDescriptor(fl::dtype type, Shape const& dims) {
     create();
-    auto const inputSize = dims.ndim() > 0 ? static_cast<int>(dims[0]) : 1;
-    auto const batchSize = dims.ndim() > 1 ? static_cast<int>(dims[1]) : 1;
-    auto const maxSeqSize = dims.ndim() > 2 ? static_cast<int>(dims[2]) : 1;
+
+    auto sizes = max(dims, {1, 1, 1});
+
+    auto const inputSize = static_cast<int>(sizes[0]);
+    auto const batchSize = static_cast<int>(sizes[1]);
+    auto const maxSeqSize = static_cast<int>(sizes[2]);
 
     std::vector seqSizes(batchSize, maxSeqSize);
 
-    set(
-        type,
-        inputSize,
-        maxSeqSize,
-        seqSizes
-    );
+    set(type, inputSize, maxSeqSize, seqSizes);
 }
 
 RNNDataDescriptor::~RNNDataDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyRNNDataDescriptor(_handle)); }
@@ -398,7 +396,7 @@ ConvDescriptor::ConvDescriptor(
     int dy,
     int groups
 ) {
-    CUDNN_CHECK_ERR(cudnnCreateConvolutionDescriptor(&descriptor));
+    CUDNN_CHECK_ERR(cudnnCreateConvolutionDescriptor(&_handle));
     cudnnDataType_t cudnntype = cudnnMapToType(type);
     std::array<int, 2> padding = {static_cast<int>(py), static_cast<int>(px)};
     std::array<int, 2> stride = {static_cast<int>(sy), static_cast<int>(sx)};
@@ -406,7 +404,7 @@ ConvDescriptor::ConvDescriptor(
 
     CUDNN_CHECK_ERR(
         cudnnSetConvolutionNdDescriptor(
-            descriptor,
+            _handle,
             2,
             padding.data(),
             stride.data(),
@@ -416,10 +414,13 @@ ConvDescriptor::ConvDescriptor(
         )
     );
 
-    CUDNN_CHECK_ERR(cudnnSetConvolutionGroupCount(descriptor, groups));
+    CUDNN_CHECK_ERR(cudnnSetConvolutionGroupCount(_handle, groups));
 }
 
-ConvDescriptor::~ConvDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyConvolutionDescriptor(descriptor)); }
+ConvDescriptor::~ConvDescriptor() { CUDNN_CHECK_ERR(cudnnDestroyConvolutionDescriptor(_handle)); }
+}
+
+namespace fl {
 
 cudnnHandle_t getCudnnHandle() { return getActiveDeviceHandle().cudnnHandle; }
 
