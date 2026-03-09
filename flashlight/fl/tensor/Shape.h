@@ -18,7 +18,8 @@
 namespace fl {
 
 // The type of a dimension.
-using Dim = long long;
+using dim_t = int64_t;
+using Dim = dim_t;
 
 /**
  * An object describing the dimensions of a tensor.

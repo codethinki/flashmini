@@ -116,7 +116,7 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
         categoricalCrossEntropy(
             Variable(fl::rand({7, 10, 4}, fl::dtype::f16), true),
             Variable(
-                (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
+                (fl::rand({10, 4}, fl::dtype::u32) % 7).asType(fl::dtype::s32),
                 false
             )
         );
@@ -216,10 +216,10 @@ TEST(AutogradTest, CastingAs) {
         GTEST_SKIP() << "Half-precision not supported on this device";
 
     auto var = Variable(fl::rand({5, 5}), true);
-    auto varF16 = var.astype(fl::dtype::f16);
+    auto varF16 = var.asType(fl::dtype::f16);
     ASSERT_EQ(var.type(), fl::dtype::f32);
     ASSERT_EQ(varF16.type(), fl::dtype::f16);
-    ASSERT_TRUE(allClose(varF16.tensor(), var.astype(fl::dtype::f16).tensor()));
+    ASSERT_TRUE(allClose(varF16.tensor(), var.asType(fl::dtype::f16).tensor()));
 }
 
 TEST(AutogradTest, CastingAsBackward) {
@@ -232,7 +232,7 @@ TEST(AutogradTest, CastingAsBackward) {
     c.backward();
     ASSERT_EQ(a.grad().type(), fl::dtype::f16);
     ASSERT_EQ(a.grad().type(), fl::dtype::f16);
-    a = a.astype(fl::dtype::f32);
+    a = a.asType(fl::dtype::f32);
     ASSERT_FALSE(a.isGradAvailable());
 }
 
@@ -241,21 +241,21 @@ TEST(AutogradTest, CastingAsGrad) {
         GTEST_SKIP() << "Half-precision not supported on this device";
 
     // compare to f32 case
-    auto x = Variable(fl::full({5}, 2.0), true);
-    auto y = Variable(fl::full({5}, 3.0), true);
+    auto x = Variable(fl::full({5}, 2.f), true);
+    auto y = Variable(fl::full({5}, 3.f), true);
     auto z = x * x + x * y + y * y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable(fl::full({5}, 1.f), false);
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
 
     // f16 -- cast gradients in both directions
-    auto x32 = Variable(fl::full({5}, 2.0), true);
-    auto y32 = Variable(fl::full({5}, 3.0), true);
-    auto xf16 = x32.astype(fl::dtype::f16);
-    auto yf16 = y32.astype(fl::dtype::f16);
+    auto x32 = Variable(fl::full({5}, 2.f), true);
+    auto y32 = Variable(fl::full({5}, 3.f), true);
+    auto xf16 = x32.asType(fl::dtype::f16);
+    auto yf16 = y32.asType(fl::dtype::f16);
     auto zf16 = xf16 * xf16 + xf16 * yf16 + yf16 * yf16;
-    auto zf32 = zf16.astype(fl::dtype::f32);
+    auto zf32 = zf16.asType(fl::dtype::f32);
     zf32.backward(dz);
 
     ASSERT_EQ(xf16.grad().type(), fl::dtype::f16);
@@ -264,10 +264,10 @@ TEST(AutogradTest, CastingAsGrad) {
     ASSERT_EQ(x32.grad().type(), fl::dtype::f32);
     ASSERT_EQ(y32.grad().type(), fl::dtype::f32);
     ASSERT_TRUE(
-        allClose(dx.tensor(), xf16.grad().tensor().astype(fl::dtype::f32))
+        allClose(dx.tensor(), xf16.grad().tensor().asType(fl::dtype::f32))
     );
     ASSERT_TRUE(
-        allClose(dy.tensor(), y32.grad().tensor().astype(fl::dtype::f32))
+        allClose(dy.tensor(), y32.grad().tensor().asType(fl::dtype::f32))
     );
     ASSERT_TRUE(allClose(dx.tensor(), x32.grad().tensor()));
     ASSERT_TRUE(allClose(dy.tensor(), y32.grad().tensor()));
@@ -277,7 +277,7 @@ TEST(AutogradTest, NoCalcGrad) {
     auto x = Variable(fl::rand({5}), false);
     auto y = Variable(fl::rand({5}), true);
     auto z = x * x + x * y + y * y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable(fl::full({5}, 1.f), false);
     z.backward(dz);
     auto dy = y.grad();
     ASSERT_TRUE(allClose(dy.tensor(), 2 * y.tensor() + x.tensor()));
@@ -303,20 +303,20 @@ TEST(AutogradTest, Concatenate) {
 
 TEST(AutogradTest, Split) {
     // check output
-    auto x = Variable(fl::arange({7, 2}), true);
+    auto x = Variable(fl::arrange({7, 2}), true);
     auto yVec = split(x, 1, 0);
     ASSERT_EQ(yVec.size(), 7);
     ASSERT_EQ(yVec[0].shape(), Shape({1, 2}));
     ASSERT_EQ(yVec[2].shape(), Shape({1, 2}));
     ASSERT_TRUE(fl::all(yVec[6].tensor() == 6).scalar<char>());
 
-    auto a = Variable(fl::arange({5, 3}, 1), true);
+    auto a = Variable(fl::arrange({5, 3}, 1), true);
     auto bVec = split(a, {2, 1}, 1);
     ASSERT_EQ(bVec.size(), 2);
     ASSERT_EQ(bVec[0].shape(), Shape({5, 2}));
     ASSERT_EQ(bVec[1].shape(), Shape({5, 1}));
     ASSERT_TRUE(
-        fl::all(bVec[0].tensor() == fl::arange({5, 2}, 1)).scalar<char>()
+        fl::all(bVec[0].tensor() == fl::arrange({5, 2}, 1)).scalar<char>()
     );
     ASSERT_TRUE(fl::all(bVec[1].tensor() == 2).scalar<char>());
 
@@ -333,7 +333,7 @@ TEST(AutogradTest, Tile) {
     auto x = Variable(fl::rand({6}), true);
     auto y = Variable(fl::rand({6, 3}), true);
     auto z = y * tile(x, {1, 3});
-    auto dz = Variable(fl::full({6, 3}, 1.0), false);
+    auto dz = Variable(fl::full({6, 3}, 1.f), false);
     z.backward(dz);
     auto dy = y.grad();
     auto dx = x.grad();
@@ -350,7 +350,7 @@ TEST(AutogradTest, TileAs) {
     auto x = Variable(fl::rand({5}), true);
     auto y = Variable(fl::rand({5, 2}), true);
     auto z = y * tileAs(x, y);
-    auto dz = Variable(fl::full({5, 2}, 1.0), false);
+    auto dz = Variable(fl::full({5, 2}, 1.f), false);
     z.backward(dz);
     auto dy = y.grad();
     auto dx = x.grad();
@@ -366,29 +366,29 @@ TEST_F(AutogradTestF16, TileAsF16) {
     auto y = Variable(fl::rand({5, 2}, fl::dtype::f16), true);
     auto z = y * tileAs(x, y);
     ASSERT_EQ(x.type(), z.type());
-    auto dz = Variable(fl::full({5, 2}, 1.0, fl::dtype::f16), false);
+    auto dz = Variable(fl::full({5, 2}, 1.f, fl::dtype::f16), false);
     z.backward(dz);
     auto dy = y.grad();
     auto dx = x.grad();
     ASSERT_TRUE(
         allClose(
             dy.tensor(),
-            fl::tile(x.tensor(), {1, 2}).astype(dx.type()),
+            fl::tile(x.tensor(), {1, 2}).asType(dx.type()),
             1e-2
         )
     );
     ASSERT_TRUE(
-        allClose(dx.tensor(), fl::sum(y.tensor(), {1}).astype(dx.type()), 1e-2)
+        allClose(dx.tensor(), fl::sum(y.tensor(), {1}).asType(dx.type()), 1e-2)
     );
 }
 
 TEST(AutogradTest, TileAs2) {
     auto x = Variable(fl::rand({10}), true);
     auto z = tileAs(x, Shape({10, 3}));
-    auto dz = Variable(fl::full({10, 3}, 1.0), false);
+    auto dz = Variable(fl::full({10, 3}, 1.f), false);
     z.backward(dz);
     auto dx = x.grad();
-    ASSERT_TRUE(allClose(dx.tensor(), fl::full(x.shape(), 3.0)));
+    ASSERT_TRUE(allClose(dx.tensor(), fl::full(x.shape(), 3.f)));
 }
 
 TEST(AutogradTest, Indexing) {
@@ -431,10 +431,10 @@ TEST_F(AutogradTestF16, PoolingF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    const float inputScale = 2.0; // scale the input to prevent grad underflow
+    float const inputScale = 2.f; // scale the input to prevent grad underflow
     auto in = Variable(inputScale * fl::rand({3, 3, 1, 1}, fl::dtype::f16), true);
     auto funcPool = [&](Variable& input) { return pool2d(input, 2, 2, 1, 1); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPool, in, 1e1, 1e-1)); // TODO: investigate
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPool, in, 1e-2, 1e-1)); // TODO: investigate
 }
 
 TEST(AutogradTest, Reorder) {
@@ -445,11 +445,12 @@ TEST(AutogradTest, Reorder) {
 
 TEST(AutogradTest, Embedding) {
     int nWords = 10;
-    auto input = Variable((fl::rand({4, 2}) * nWords).astype(fl::dtype::f32), false);
-    auto weights = Variable(fl::randn({4, nWords}, fl::dtype::f64), true);
-    auto funcEmbed = [&](Variable& w) { return embedding(input, w); };
+    auto input = Variable((fl::rand({4, 2}) * nWords).asType(fl::dtype::s32), false);
 
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcEmbed, weights, 1E-5));
+    auto weights = Variable(fl::randn({4, nWords}, fl::dtype::f64), true); 
+    auto func_embed = [&](Variable& w) { return embedding(input, w); };
+
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(func_embed, weights, 1E-5));
 }
 
 TEST(AutogradTest, GetAdvancedIndex) {

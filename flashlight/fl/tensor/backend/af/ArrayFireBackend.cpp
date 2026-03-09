@@ -36,8 +36,8 @@ namespace fl {
 
 namespace {
 
-// Get the stream associated with given device in the given map; if it's not in
-// the map, initialize it (by wrapping or creating) and put it into the map.
+    // Get the stream associated with given device in the given map; if it's not in
+    // the map, initialize it (by wrapping or creating) and put it into the map.
     const Stream& getOrWrapAfDeviceStream(
         const int afId,
         const int nativeId,
@@ -97,12 +97,12 @@ ArrayFireBackend::ArrayFireBackend() {
     // Capturing by value to avoid destructor race hazard for static objects.
     const auto setActiveCallback = [nativeIdToId = nativeIdToId_,
             afIdToStream = afIdToStream_](int nativeId) {
-            auto afId = nativeIdToId.at(nativeId);
-            af::setDevice(afId);
-            // this is the latest point we can lazily wrap the AF stream, which may get
-            // lazily intialized anytime in AF internally, e.g., via tensor computation.
-            getOrWrapAfDeviceStream(afId, nativeId, *afIdToStream);
-        };
+        auto afId = nativeIdToId.at(nativeId);
+        af::setDevice(afId);
+        // this is the latest point we can lazily wrap the AF stream, which may get
+        // lazily intialized anytime in AF internally, e.g., via tensor computation.
+        getOrWrapAfDeviceStream(afId, nativeId, *afIdToStream);
+    };
 #if FL_ARRAYFIRE_USE_CPU
     auto& device = manager.getActiveDevice(DeviceType::x64);
     device.addSetActiveCallback(setActiveCallback);
@@ -127,9 +127,7 @@ ArrayFireBackend& ArrayFireBackend::getInstance() {
     return instance;
 }
 
-TensorBackendType ArrayFireBackend::backendType() const {
-    return TensorBackendType::ArrayFire;
-}
+TensorBackendType ArrayFireBackend::backendType() const { return TensorBackendType::ArrayFire; }
 
 /* -------------------------- Compute Functions -------------------------- */
 
@@ -150,13 +148,11 @@ const Stream& ArrayFireBackend::getStreamOfArray(
 
 bool ArrayFireBackend::supportsDataType(const fl::dtype& dtype) const {
     switch(dtype) {
-        case fl::dtype::f16:
-            return af::isHalfAvailable(af::getDevice())
-                   && // f16 isn't [yet] supported with the CPU backend per onednn
-                      // limitations
-                   !FL_BACKEND_CPU;
-        default:
-            return true;
+        case fl::dtype::f16: return af::isHalfAvailable(af::getDevice())
+                && // f16 isn't [yet] supported with the CPU backend per onednn
+                // limitations
+                !FL_BACKEND_CPU;
+        default: return true;
     }
 }
 
@@ -259,7 +255,8 @@ AF_BACKEND_CREATE_FUN_LITERAL_DEF(const unsigned short&);
 
 Tensor ArrayFireBackend::identity(const Dim dim, const dtype type) {
     return toTensor<ArrayFireTensor>(
-        af::identity({dim, dim}, detail::flToAfType(type)), /* numDims = */
+        af::identity({dim, dim}, detail::flToAfType(type)),
+        /* numDims = */
         2
     );
 }
@@ -286,7 +283,8 @@ Tensor ArrayFireBackend::iota(
             detail::flToAfDims(tileDims),
             detail::flToAfType(type)
         ),
-        /* numDims = */ std::max(dims.ndim(), tileDims.ndim())
+        /* numDims = */
+        std::max(dims.ndim(), tileDims.ndim())
     );
 }
 

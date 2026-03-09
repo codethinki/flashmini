@@ -80,9 +80,9 @@ std::vector<Variable> RNN::forward(const std::vector<Variable>& inputs) {
     auto rnnRes =
         rnn(
             input,
-            hiddenState.astype(input.type()),
-            cellState.astype(input.type()),
-            params_[0].astype(input.type()),
+            hiddenState.asType(input.type()),
+            cellState.asType(input.type()),
+            params_[0].asType(input.type()),
             hiddenSize_,
             numLayers_,
             mode_,

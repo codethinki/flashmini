@@ -172,7 +172,7 @@ std::vector<Variable> Seq2SeqCriterion::forward(
         size_t nClass = out.dim(0);
         auto targetTiled = fl::tile(
             fl::reshape(target.tensor(), {1, target.dim(0), target.dim(1)}),
-            {static_cast<long long>(nClass)}
+            {static_cast<int64_t>(nClass)}
         );
         out = applySeq2SeqMask(out, targetTiled, pad_);
         auto smoothLoss = moddims(sum(out, {0, 1}), {-1});
@@ -209,11 +209,11 @@ std::pair<Variable, Variable> Seq2SeqCriterion::vectorizedDecoder(
                 );
             else if(samplingStrategy_ == fl::pkg::speech::kRandSampling) {
                 auto mask = Variable(
-                    (fl::rand(y.shape()) * 100 <= pctTeacherForcing_).astype(y.type()),
+                    (fl::rand(y.shape()) * 100 <= pctTeacherForcing_).asType(y.type()),
                     false
                 );
                 auto samples = Variable(
-                    (fl::rand(y.shape()) * (nClass_ - 1)).astype(y.type()),
+                    (fl::rand(y.shape()) * (nClass_ - 1)).asType(y.type()),
                     false
                 );
 
@@ -285,7 +285,7 @@ std::pair<Variable, Variable> Seq2SeqCriterion::decoder(
             y = Variable(maxIdx, false);
         } else if(samplingStrategy_ == fl::pkg::speech::kRandSampling)
             y = Variable(
-                (fl::rand({1, target.dim(1)}) * (nClass_ - 1)).astype(fl::dtype::s32),
+                (fl::rand({1, target.dim(1)}) * (nClass_ - 1)).asType(fl::dtype::s32),
                 false
             );
         else
@@ -414,7 +414,7 @@ std::vector<Seq2SeqCriterion::CandidateHypo> Seq2SeqCriterion::beamSearch(
         ox = fl::reorder(ox, {0, 2, 1});
 
         auto scoreArr = Tensor::fromBuffer(
-            {1, static_cast<long long>(beam.size()), 1},
+            {1, static_cast<int64_t>(beam.size()), 1},
             prevScoreVec.data(),
             MemoryLocation::Host
         );

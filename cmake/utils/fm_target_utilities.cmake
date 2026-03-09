@@ -53,10 +53,17 @@ function(fm_glob OUT_VAR)
         set(GLOB_PATTERNS ${ARG_PATTERNS})
     endif()
 
-    if(GLOB_PATTERNS)
+    # Normalize paths to prevent CONFIGURE_DEPENDS cache mismatch issues on Windows
+    set(NORMALIZED_PATTERNS "")
+    foreach(PATTERN IN LISTS GLOB_PATTERNS)
+        cmake_path(ABSOLUTE_PATH PATTERN NORMALIZE OUTPUT_VARIABLE NORMALIZED)
+        list(APPEND NORMALIZED_PATTERNS "${NORMALIZED}")
+    endforeach()
+
+    if(NORMALIZED_PATTERNS)
         file(GLOB_RECURSE FOUND_FILES
             CONFIGURE_DEPENDS
-            ${GLOB_PATTERNS}
+            ${NORMALIZED_PATTERNS}
         )
         set(${OUT_VAR} ${${OUT_VAR}} ${FOUND_FILES} PARENT_SCOPE)
     endif()

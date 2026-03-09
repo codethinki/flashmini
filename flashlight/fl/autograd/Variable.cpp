@@ -95,13 +95,13 @@ Variable Variable::copy() const {
     return Variable(sharedData_->data, sharedGrad_->calcGrad);
 }
 
-Variable Variable::astype(fl::dtype newType) const {
-    auto output = tensor().astype(newType);
+Variable Variable::asType(fl::dtype newType) const {
+    auto output = tensor().asType(newType);
     auto gradFunc = [](std::vector<Variable>& inputs,
         const Variable& gradOutput) {
             auto& input = inputs[0];
             // Cast the grad output to match the type of the input's grad
-            input.addGrad(Variable(gradOutput.tensor().astype(input.type()), false));
+            input.addGrad(Variable(gradOutput.tensor().asType(input.type()), false));
         };
     return Variable(output, {this->withoutData()}, gradFunc);
 }

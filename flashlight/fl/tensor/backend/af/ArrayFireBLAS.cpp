@@ -20,7 +20,7 @@ Tensor ArrayFireBackend::matmul(
     MatrixProperty lhsProp,
     MatrixProperty rhsProp
 ) {
-    unsigned numDims = std::max(lhs.ndim(), rhs.ndim());
+    auto numDims = std::max(lhs.ndim(), rhs.ndim());
     if((lhs.ndim() == 1 || rhs.ndim() == 1) && numDims > 1)
         numDims -= 1;
 

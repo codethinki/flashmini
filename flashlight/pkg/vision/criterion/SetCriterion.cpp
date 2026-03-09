@@ -97,8 +97,9 @@ Tensor ravelIndices(
 Tensor index(const Tensor& in, const std::vector<Tensor>& idxs) {
     auto linearIndices = ravelIndices(idxs, in.shape());
     Tensor output = fl::full(linearIndices.shape(), 0., in.type());
-    output.flat(fl::range(static_cast<long long>(linearIndices.elements()))) =
-        in.flatten()(linearIndices);
+    output.flat(
+        fl::range(static_cast<int64_t>(linearIndices.elements()))
+    ) = in.flatten()(linearIndices);
     return output;
 }
 
@@ -116,7 +117,7 @@ fl::Variable index(const fl::Variable& in, std::vector<Tensor> idxs) {
             auto grad = fl::Variable(fl::full(idims, 0, inputs[0].type()), false);
             auto linearIndices = ravelIndices(idxs, idims);
             grad.tensor()(linearIndices) = grad_output.tensor()(
-                fl::range(static_cast<long long>(linearIndices.elements())));
+                fl::range(static_cast<int64_t>(linearIndices.elements())));
             // TODO Can parallize this if needed but does not work for duplicate keys
             // for(int i = 0; i < linearIndices.elements(); i++) {
             // Tensor index = linearIndices(i);
@@ -283,8 +284,8 @@ SetCriterion::LossDict SetCriterion::lossLabels(
         target_classes_full(srcIdxs, i) =
             fl::reshape(
                 targetClasses[i].tensor()(targetIdxs),
-                {static_cast<long long>(srcIdxs.elements()), 1})
-                .astype(target_classes_full.type());
+                {static_cast<int64_t>(srcIdxs.elements()), 1})
+                .asType(target_classes_full.type());
                 i += 1;
     }
 
@@ -294,7 +295,7 @@ SetCriterion::LossDict SetCriterion::lossLabels(
     auto weightVar = Variable(weight, false);
     auto lossCe = weightedCategoricalCrossEntropy(
         softmaxed,
-        fl::Variable(target_classes_full.astype(fl::dtype::f32), false),
+        fl::Variable(target_classes_full.asType(fl::dtype::f32), false),
         weightVar,
         -1
     );
@@ -306,7 +307,7 @@ std::unordered_map<std::string, float> SetCriterion::getWeightDict() { return we
 std::pair<Tensor, Tensor> SetCriterion::getTgtPermutationIdx(
     const std::vector<std::pair<Tensor, Tensor>>& indices
 ) {
-    long batchSize = static_cast<long>(indices.size());
+    auto batchSize = static_cast<int64_t>(indices.size());
     auto batchIdxs = fl::full({1, 1, 1, batchSize}, -1);
     auto first = indices[0].first;
     auto dims = first.shape();

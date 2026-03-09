@@ -357,7 +357,7 @@ Tensor CudnnAutogradExtension::conv2d(
 
     try {
         wspace =
-            Tensor{{static_cast<long long>(fwdAlgoBestPerf.memory)}, fl::dtype::b8};
+            Tensor{{static_cast<int64_t>(fwdAlgoBestPerf.memory)}, fl::dtype::b8};
     } catch(const std::exception&) {
         fwdAlgoBestPerf.algo = kFwdDefaultAlgo;
         CUDNN_CHECK_ERR(
@@ -372,7 +372,7 @@ Tensor CudnnAutogradExtension::conv2d(
             )
         );
         wspace =
-            Tensor{{static_cast<long long>(fwdAlgoBestPerf.memory)}, fl::dtype::b8};
+            Tensor{{static_cast<int64_t>(fwdAlgoBestPerf.memory)}, fl::dtype::b8};
     }
     {
         DevicePtr inPtr(input);
@@ -492,7 +492,7 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
             Tensor ws;
             try {
                 ws = Tensor{
-                    {static_cast<long long>(bwdDataAlgoBestPerf.memory)},
+                    {static_cast<int64_t>(bwdDataAlgoBestPerf.memory)},
                     fl::dtype::b8
                 };
             } catch(const std::exception&) {
@@ -509,7 +509,7 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
                     )
                 );
                 ws = Tensor{
-                    {static_cast<long long>(bwdDataAlgoBestPerf.memory)},
+                    {static_cast<int64_t>(bwdDataAlgoBestPerf.memory)},
                     fl::dtype::b8
                 };
             }
@@ -570,9 +570,9 @@ Tensor CudnnAutogradExtension::conv2dBackwardData(
                 &wtTensorF32,
                 &gradOutput,
                 &gradOutputTensorF32]() {
-                    inTensorF32 = input.astype(fl::dtype::f32);
-                    wtTensorF32 = weight.astype(fl::dtype::f32);
-                    gradOutputTensorF32 = gradOutput.astype(fl::dtype::f32);
+                    inTensorF32 = input.asType(fl::dtype::f32);
+                    wtTensorF32 = weight.asType(fl::dtype::f32);
+                    gradOutputTensorF32 = gradOutput.asType(fl::dtype::f32);
                 },
                 /* incrementCount = */ false
             );
@@ -709,7 +709,7 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
             Tensor ws;
             try {
                 ws = Tensor{
-                    {static_cast<long long>(bwdFilterAlgoBestPerf.memory)},
+                    {static_cast<int64_t>(bwdFilterAlgoBestPerf.memory)},
                     fl::dtype::b8
                 };
             } catch(const std::exception&) {
@@ -726,7 +726,7 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                     )
                 );
                 ws = Tensor{
-                    {static_cast<long long>(bwdFilterAlgoBestPerf.memory)},
+                    {static_cast<int64_t>(bwdFilterAlgoBestPerf.memory)},
                     fl::dtype::b8
                 };
             }
@@ -787,9 +787,9 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                 &wtTensorF32,
                 &gradOutput,
                 &gradOutputTensorF32]() {
-                    inTensorF32 = input.astype(fl::dtype::f32);
-                    wtTensorF32 = weight.astype(fl::dtype::f32);
-                    gradOutputTensorF32 = gradOutput.astype(fl::dtype::f32);
+                    inTensorF32 = input.asType(fl::dtype::f32);
+                    wtTensorF32 = weight.asType(fl::dtype::f32);
+                    gradOutputTensorF32 = gradOutput.asType(fl::dtype::f32);
                 },
                 /* incrementCount = */ false
             );
@@ -906,8 +906,8 @@ std::pair<Tensor, Tensor> CudnnAutogradExtension::conv2dBackwardFilterBias(
                 // Time cast bias and grad output if benchmarking
                 biasGradBenchmark->audit(
                     [&bias, &gradOutput, &biasF32, &gradOutputF32]() {
-                        biasF32 = bias.astype(fl::dtype::f32);
-                        gradOutputF32 = gradOutput.astype(fl::dtype::f32);
+                        biasF32 = bias.asType(fl::dtype::f32);
+                        gradOutputF32 = gradOutput.asType(fl::dtype::f32);
                     },
                     /* incrementCount = */ false
                 );

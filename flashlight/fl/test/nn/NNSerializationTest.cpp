@@ -238,7 +238,7 @@ TEST(NNSerializationTest, PrettyString) {
         "(0): Conv2D (3->64, 5x5, 1, 1, 0, 0, 1, 1) (with bias)"
         "(1): Pool2D-max (3x3, 2,2, 1,1)"
         "(2): ReLU"
-        "(3): Dropout (0.400000)"
+        "(3): Dropout (0.4)"
         "(4): Linear (5->10) (without bias)"
         "(5): Tanh"
         "(6): LeakyReLU (0.200000)";

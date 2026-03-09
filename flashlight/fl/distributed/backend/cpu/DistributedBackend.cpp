@@ -110,7 +110,7 @@ void allReduce(fl::Tensor& tensor, bool async /* = false */) {
     size_t tensorSize = tensor.elements() * fl::getTypeSize(tensor.type());
     if(tensorSize > cacheTensor_.elements())
         cacheTensor_ =
-            fl::Tensor({static_cast<long long>(tensorSize)}, fl::dtype::b8);
+            fl::Tensor({static_cast<int64_t>(tensorSize)}, fl::dtype::b8);
     DevicePtr tensorPtr(tensor);
     DevicePtr cacheTensorPtr(cacheTensor_);
     memcpy(cacheTensorPtr.get(), tensorPtr.get(), tensorSize);

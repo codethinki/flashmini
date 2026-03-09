@@ -52,13 +52,13 @@ Tensor allreduceGet(fl::AverageValueMeter& mtr) {
 
 Tensor allreduceGet(fl::EditDistanceMeter& mtr) {
     auto mtrVal0 = mtr.value();
-    std::vector<long long> mtrVal(mtrVal0.begin(), mtrVal0.end());
+    std::vector<int64_t> mtrVal(mtrVal0.begin(), mtrVal0.end());
     return Tensor::fromVector(mtrVal);
 }
 
 Tensor allreduceGet(fl::CountMeter& mtr) {
     auto mtrVal0 = mtr.value();
-    std::vector<long long> mtrVal(mtrVal0.begin(), mtrVal0.end());
+    std::vector<int64_t> mtrVal(mtrVal0.begin(), mtrVal0.end());
     return Tensor::fromVector(mtrVal);
 }
 
@@ -81,7 +81,7 @@ void allreduceSet(fl::AverageValueMeter& mtr, Tensor& val) {
 
 void allreduceSet(fl::EditDistanceMeter& mtr, Tensor& val) {
     mtr.reset();
-    auto valVec = val.toHostVector<long long>();
+    auto valVec = val.toHostVector<int64_t>();
     mtr.add(
         static_cast<int64_t>(valVec[1]),
         static_cast<int64_t>(valVec[2]),
@@ -92,7 +92,7 @@ void allreduceSet(fl::EditDistanceMeter& mtr, Tensor& val) {
 
 void allreduceSet(fl::CountMeter& mtr, Tensor& val) {
     mtr.reset();
-    auto valVec = val.toHostVector<long long>();
+    auto valVec = val.toHostVector<int64_t>();
     for(size_t i = 0; i < valVec.size(); ++i)
         mtr.add(i, valVec[i]);
 }

@@ -9,16 +9,7 @@
 
 namespace fl {
 
-std::string deviceTypeToString(const DeviceType type) {
-    switch(type) {
-        case DeviceType::x64: return "x64";
-        case DeviceType::CUDA: return "CUDA";
-    }
-}
-
-std::ostream& operator<<(std::ostream& os, const DeviceType& type) { return os << deviceTypeToString(type); }
-
-const std::unordered_set<DeviceType>& getDeviceTypes() {
+std::unordered_set<DeviceType> const& getDeviceTypes() {
     static std::unordered_set<DeviceType> types = {
         DeviceType::x64,
         DeviceType::CUDA

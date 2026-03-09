@@ -94,7 +94,7 @@ Tensor ArrayFireBackend::concatenate(
     af::array out;
     switch(tensors.size()) {
         case 0:
-            return toTensor<ArrayFireTensor>(ArrayFireTensor()); // empty tensor
+            return toTensor<ArrayFireTensor>(ArrayFireTensor{}); // empty tensor
         case 1:
             return tensors.front();
         case 2:

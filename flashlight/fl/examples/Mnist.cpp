@@ -221,7 +221,7 @@ int read_int(std::ifstream& f) {
 template<typename T>
 Tensor load_data(
     const std::string& im_file,
-    const std::vector<long long int>& dims
+    const std::vector<int64_t>& dims
 ) {
     std::ifstream file(im_file, std::ios::binary);
     if(!file.is_open())
@@ -243,7 +243,7 @@ Tensor load_data(
         data.push_back(tmp);
     }
 
-    std::vector<long long int> rdims(dims.rbegin(), dims.rend());
+    std::vector rdims(dims.rbegin(), dims.rend());
     // af is column-major
     return Tensor::fromBuffer(Shape(rdims), data.data(), MemoryLocation::Host);
 }

@@ -254,7 +254,7 @@ DropoutDescriptor::DropoutDescriptor(float dropProb) {
     CUDNN_CHECK_ERR(cudnnCreateDropoutDescriptor(&_handle));
 
     auto const cudnnHandle = getCudnnHandle();
-    constexpr unsigned long long seed = 0;
+    constexpr int64_t seed = 0;
     size_t stateSize;
 
     CUDNN_CHECK_ERR(cudnnDropoutGetStatesSize(cudnnHandle, &stateSize));
@@ -263,7 +263,7 @@ DropoutDescriptor::DropoutDescriptor(float dropProb) {
 
     if(dropoutStates.isEmpty()) {
         dropoutStates =
-            Tensor{{static_cast<long long>(stateSize)}, fl::dtype::b8};
+            Tensor{{static_cast<Dim>(stateSize)}, fl::dtype::b8};
         DevicePtr statesraw(dropoutStates);
         CUDNN_CHECK_ERR(
             cudnnSetDropoutDescriptor(

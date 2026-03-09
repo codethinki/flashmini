@@ -166,12 +166,12 @@ Variable AdaptiveSoftMaxLoss::forward(
     // Tail forwawrd
     for(int i = 0; i < cutoff.size() - 1; i++) {
         auto mask = (target >= cutoff[i]) && (target < cutoff[i + 1]);
-        if(!fl::any(mask.tensor()).scalar<char>())
+        if(!fl::any_of(mask.tensor()).scalar<char>())
             continue;
 
         auto indicesArray = fl::nonzero(mask.tensor());
         headTarget =
-            headTarget + (mask * (cutoff[0] + i)).astype(headTarget.type());
+            headTarget + (mask * (cutoff[0] + i)).asType(headTarget.type());
         auto tailTarget = target(indicesArray) - cutoff[i];
         auto selectedInput = embedding(Variable(indicesArray, false), input);
         auto tailOutput = matmul(params_[1 + i * 2], selectedInput);

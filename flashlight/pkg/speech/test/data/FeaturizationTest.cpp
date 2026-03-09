@@ -430,7 +430,7 @@ TEST(FeaturizationTest, targetFeaturizer) {
 
     auto tgtArray = targetFeaturizer(
         targets[0].data(),
-        {static_cast<long long>(targets[0].size())},
+        {static_cast<int64_t>(targets[0].size())},
         fl::dtype::b8
     );
     int tgtLen = 5;
@@ -459,7 +459,7 @@ TEST(FeaturizationTest, targetFeaturizer) {
     targetFeaturizer = targetFeatures(tokenDict, lexicon, targetGenConfigEos);
     tgtArray = targetFeaturizer(
         targets[1].data(),
-        {static_cast<long long>(targets[1].size())},
+        {static_cast<int64_t>(targets[1].size())},
         fl::dtype::b8
     );
     tgtLen = 5;

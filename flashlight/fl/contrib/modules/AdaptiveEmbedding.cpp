@@ -83,7 +83,7 @@ Variable AdaptiveEmbedding::forward(const Variable& input) {
     for(int tailIdx = 1; tailIdx < cutoff_.size(); tailIdx++) {
         Tensor tailMask = flatInput.tensor() < cutoff_[tailIdx]
             && flatInput.tensor() >= cutoff_[tailIdx - 1];
-        if(fl::any(tailMask).asScalar<bool>()) {
+        if(fl::any_of(tailMask).asScalar<bool>()) {
             auto tailEmbedding = embedding(
                 flatInput(tailMask) - cutoff_[tailIdx - 1],
                 reorder(params_[tailIdx * 2], {1, 0})

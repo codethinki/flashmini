@@ -157,7 +157,7 @@ TEST_F(ModuleTestF16, LinearFwdF16) {
             {n_in, x, batchsize},
             {6, 2, 1, 4, 8, 2, 7, 1, 10, 7, 3, 7, 5, 9, 2, 4}
         )
-        .astype(fl::dtype::f16)
+        .asType(fl::dtype::f16)
     );
 
     auto expected_outVar = Variable(
@@ -168,7 +168,7 @@ TEST_F(ModuleTestF16, LinearFwdF16) {
                 150, 55, 41, 94, 41, 27, 130, 55, 37, 56, 24, 16
             }
         )
-        .astype(fl::dtype::f16),
+        .asType(fl::dtype::f16),
         true
     );
 
@@ -187,7 +187,7 @@ TEST_F(ModuleTestF16, LinearFwdF16) {
                 151, 57, 44, 95, 43, 30, 131, 57, 40, 57, 26, 19
             }
         )
-        .astype(inVar.type()),
+        .asType(inVar.type()),
         true
     );
 
@@ -197,7 +197,7 @@ TEST_F(ModuleTestF16, LinearFwdF16) {
     ASSERT_TRUE(allClose(resultBias, expected_outVar, 1E-3));
 
     // OptimLevel::O3 is active with this fixture
-    ASSERT_EQ(linBias.forward(inVar.astype(fl::dtype::f32)).type(), fl::dtype::f16);
+    ASSERT_EQ(linBias.forward(inVar.asType(fl::dtype::f32)).type(), fl::dtype::f16);
 }
 
 TEST(ModuleTest, ConvPadding) {
@@ -265,13 +265,13 @@ TEST_F(ModuleTestF16, GLUFwdF16) {
 
     auto inVar = Variable(
         Tensor::fromVector<float>({3, 2}, {0.8, 0.2, 0.2, 0.1, 0.5, 0.3})
-        .astype(fl::dtype::f16),
+        .asType(fl::dtype::f16),
         true
     );
 
     auto expected_outVar = Variable(
         Tensor::fromVector<float>({3, 1}, {0.419983, 0.124492, 0.114888})
-        .astype(fl::dtype::f16),
+        .asType(fl::dtype::f16),
         true
     );
 
@@ -282,7 +282,7 @@ TEST_F(ModuleTestF16, GLUFwdF16) {
 
     // test batching
     int batchsize = 5;
-    inVar = Variable(fl::rand({10, 7, batchsize}).astype(fl::dtype::f16), true);
+    inVar = Variable(fl::rand({10, 7, batchsize}).asType(fl::dtype::f16), true);
     glu = GatedLinearUnit(0);
 
     auto batchOutVar = glu(inVar);
@@ -346,7 +346,7 @@ TEST_F(ModuleTestF16, LogSoftmaxFwdF16) {
 
     auto inVar = Variable(
         Tensor::fromVector<float>({3, 2}, {0.8, 0.2, 0.2, 0.1, 0.5, 0.3})
-        .astype(fl::dtype::f16),
+        .asType(fl::dtype::f16),
         true
     );
 
@@ -671,7 +671,7 @@ TEST_F(ModuleTestF16, RNNFwdF16) {
         ),
         true
     );
-    ASSERT_TRUE(allClose(out, expected_outVar.astype(in.type()), 5E-2));
+    ASSERT_TRUE(allClose(out, expected_outVar.asType(in.type()), 5E-2));
 }
 
 TEST(ModuleTest, ViewFwd) {
@@ -708,7 +708,7 @@ TEST_F(ModuleTestF16, DropoutFwdF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    auto module = Dropout(0.5);
+    auto module = Dropout(0.5f);
     // Train Mode
     module.train();
     auto in = Variable(fl::rand({1000, 1000}, fl::dtype::f16), true);
@@ -723,7 +723,7 @@ TEST_F(ModuleTestF16, DropoutFwdF16) {
 
     ASSERT_GT(
         fl::amax(out.tensor()).asScalar<float>(),
-        1.5
+        1.5f
     ); // Check input is scaled
 
     // Eval Mode
@@ -806,8 +806,8 @@ TEST_F(ModuleTestF16, LayerNormFwdF16) {
 
     auto sample_mean = mean(input, {3});
     auto sample_var = var(input, {3}, true);
-    auto true_out = (input - tileAs(sample_mean, input).astype(input.type()))
-        / tileAs(fl::sqrt(sample_var + eps), input).astype(input.type());
+    auto true_out = (input - tileAs(sample_mean, input).asType(input.type()))
+        / tileAs(fl::sqrt(sample_var + eps), input).asType(input.type());
 
     // no affine transform
     auto module1 = LayerNorm(feat_axes, eps, false);
@@ -815,13 +815,13 @@ TEST_F(ModuleTestF16, LayerNormFwdF16) {
     module1.train();
     auto out = module1.forward(input);
 
-    ASSERT_TRUE(allClose(out, true_out.astype(out.type()), eps));
+    ASSERT_TRUE(allClose(out, true_out.asType(out.type()), eps));
 
     module1.eval();
     out = module1.forward(input);
 
     ASSERT_TRUE(
-        allClose(out.tensor(), true_out.tensor().astype(out.type()), eps)
+        allClose(out.tensor(), true_out.tensor().asType(out.type()), eps)
     );
 
     // with affine transform
@@ -863,12 +863,12 @@ TEST(ModuleTest, PrecisionCastFwd) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half precision not available on this device";
 
-    auto in = Variable(fl::full({3, 3}, 1.0), true);
+    auto in = Variable(fl::full({3, 3}, 1.f), true);
     auto precisionCast = PrecisionCast(fl::dtype::f16);
     auto out = precisionCast.forward(in);
 
     ASSERT_EQ(out.type(), fl::dtype::f16);
-    ASSERT_TRUE(allClose(in.tensor(), out.astype(fl::dtype::f32).tensor()));
+    ASSERT_TRUE(allClose(in.tensor(), out.asType(fl::dtype::f32).tensor()));
 }
 
 TEST(ModuleTest, ContainerReplaceParam) {
@@ -912,7 +912,7 @@ TEST(ModuleTest, AdaptiveSoftMaxPredict) {
 
     auto x = input(fl::rand({N, T, B}, fl::dtype::f32));
     auto y = Variable(
-        (fl::rand({T, B}, fl::dtype::u32) % C).astype(fl::dtype::s32),
+        (fl::rand({T, B}, fl::dtype::u32) % C).asType(fl::dtype::s32),
         false
     );
 
@@ -935,7 +935,7 @@ TEST(ModuleTest, AdaptiveSoftMaxLossBatchFwd) {
 
     auto x = input(fl::rand({N, T, B}, fl::dtype::f32));
     auto y = Variable(
-        (fl::rand({T, B}, fl::dtype::u32) % C).astype(fl::dtype::s32),
+        (fl::rand({T, B}, fl::dtype::u32) % C).asType(fl::dtype::s32),
         false
     );
 
@@ -966,7 +966,7 @@ TEST(ModuleTest, AdaptiveSoftMaxLossIgnoreIndex) {
 
     auto x = input(fl::rand({N, T, B}, fl::dtype::f32));
     auto y = Variable(
-        (fl::rand({T, B}, fl::dtype::u32) % C).astype(fl::dtype::s32),
+        (fl::rand({T, B}, fl::dtype::u32) % C).asType(fl::dtype::s32),
         false
     );
     auto ignoreIdx = y(0, 0).scalar<int>();

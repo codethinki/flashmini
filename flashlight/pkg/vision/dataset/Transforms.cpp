@@ -170,8 +170,8 @@ Tensor posterize(const Tensor& input, const int bitsToKeep) {
     if(bitsToKeep < 1 || bitsToKeep > 8)
         throw std::invalid_argument("bitsToKeep needs to be in [1, 8]");
     uint8_t mask = ~((1 << (8 - bitsToKeep)) - 1);
-    auto res = input.astype(fl::dtype::u8) && mask;
-    return res.astype(input.type());
+    auto res = input.asType(fl::dtype::u8) && mask;
+    return res.asType(input.type());
 }
 
 Tensor sharpnessEnhance(const Tensor& input, const float enhance) {
@@ -312,7 +312,7 @@ ImageTransform randomHorizontalFlipTransform(const float p) {
     return [p](const Tensor& in) {
                Tensor out = in;
                if(static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) > p) {
-                   const long long w = in.dim(0);
+                   auto const w = in.dim(0);
                    // reverse indices - w --> 0 - TODO: use fl::flip?
                    out = out(fl::range(w - 1, 1, -1));
                }
@@ -382,7 +382,7 @@ ImageTransform normalizeImage(
     const Tensor mean = Tensor::fromVector({1, 1, 3}, meanVector);
     const Tensor std = Tensor::fromVector({1, 1, 3}, stdVector);
     return [mean, std](const Tensor& in) {
-               Tensor out = in.astype(fl::dtype::f32) / 255.f;
+               Tensor out = in.asType(fl::dtype::f32) / 255.f;
                out = out - mean;
                out = out / std;
                return out;
@@ -519,7 +519,7 @@ ImageTransform randomAugmentationDeitTransform(
 
                        res = sharpnessEnhance(res, enhance);
                    }
-                   res = fl::clip(res, 0., 255.).astype(res.type());
+                   res = fl::clip(res, 0., 255.).asType(res.type());
                }
                return res;
            };

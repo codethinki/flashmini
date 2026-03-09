@@ -16,7 +16,7 @@
 namespace fl {
 
 namespace detail {
-
+    // TODO remove, somebody smoked something before writing this
 /**
  * Precision specifications for autograd operators based on optimization level.
  */

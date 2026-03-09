@@ -79,8 +79,8 @@ std::vector<Variable> SinusoidalPositionEmbedding::forward(
     // Generate the embedding transformation with the precomputed scale and shift
     // factors.
     positions = fl::sin(
-        positions * fl::tile(scale_.astype(numType), {1, nPositions})
-        + fl::tile(cosShifts_.astype(numType), {1, nPositions})
+        positions * fl::tile(scale_.asType(numType), {1, nPositions})
+        + fl::tile(cosShifts_.asType(numType), {1, nPositions})
     );
     // Convert the positional embedding into a variable (for gradient tracking).
     Variable embeddingsPos = Variable(positions, false);

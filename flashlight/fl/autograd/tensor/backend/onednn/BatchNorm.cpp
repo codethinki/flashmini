@@ -49,7 +49,7 @@ namespace {
                     1,
                     1,
                     nfeatures,
-                    static_cast<long long>(input.elements() / nfeatures)
+                    static_cast<int64_t>(input.elements() / nfeatures)
                 }
             );
         else {
@@ -59,7 +59,7 @@ namespace {
             inDescDims = Shape(
                 {
                     1,
-                    static_cast<long long>(input.elements() / (nfeatures * batchsz)),
+                    static_cast<int64_t>(input.elements() / (nfeatures * batchsz)),
                     nfeatures,
                     batchsz
                 }

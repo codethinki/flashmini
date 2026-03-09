@@ -42,7 +42,7 @@ TEST(AutogradUnaryOpsTest, Glu) {
 TEST(AutogradUnaryOpsTest, Sigmoid) {
     auto x = Variable(fl::rand({5}), true);
     auto y = sigmoid(x);
-    auto dy = Variable(fl::full({5}, 1.0), false);
+    auto dy = Variable(fl::full({5}, 1.f), false);
     y.backward(dy);
     auto dx = x.grad();
     ASSERT_TRUE(allClose(dx.tensor(), (y.tensor() * (1 - y.tensor()))));
@@ -59,7 +59,7 @@ TEST(AutogradUnaryOpsTest, Erf) {
     auto y = erf(x);
     ASSERT_TRUE(allClose(fl::erf(x.tensor()), y.tensor()));
 
-    auto dy = Variable(fl::full({5}, 1.0), false);
+    auto dy = Variable(fl::full({5}, 1.f), false);
     y.backward(dy);
     auto targetGrads = 2 / std::sqrt(M_PI) * exp(negate(x * x));
     auto dx = x.grad();
@@ -72,7 +72,7 @@ TEST(AutogradUnaryOpsTest, Erf) {
 TEST(AutogradUnaryOpsTest, Tanh) {
     auto x = Variable(fl::rand({5}), true);
     auto y = tanh(x);
-    auto dy = Variable(fl::full({5}, 1.0), false);
+    auto dy = Variable(fl::full({5}, 1.f), false);
     y.backward(dy);
     auto dx = x.grad();
     ASSERT_TRUE(allClose(dx.tensor(), (1 - y.tensor() * y.tensor())));
@@ -105,7 +105,7 @@ TEST(AutogradUnaryOpsTest, Transpose) {
 TEST(AutogradUnaryOpsTest, Exp) {
     auto x = Variable(fl::rand({5}), true);
     auto y = exp(x);
-    auto dy = Variable(fl::full({5}, 1.0), false);
+    auto dy = Variable(fl::full({5}, 1.f), false);
     y.backward(dy);
     auto dx = x.grad();
     ASSERT_TRUE(allClose(dx.tensor(), (fl::exp(x.tensor()))));
@@ -164,7 +164,7 @@ TEST(AutogradUnaryOpsTest, Pow) {
     {
         auto x = Variable(fl::rand({5}), true);
         auto y = pow(x, 2);
-        auto dy = Variable(fl::full({5}, 2.0), false);
+        auto dy = Variable(fl::full({5}, 2.f), false);
         y.backward(dy);
         auto dx = x.grad();
         ASSERT_TRUE(allClose(dx.tensor(), (2 * 2 * x.tensor())));
@@ -172,7 +172,7 @@ TEST(AutogradUnaryOpsTest, Pow) {
     {
         auto x = Variable(fl::rand({5}), true);
         auto y = pow(x, 3);
-        auto dy = Variable(fl::full({5}, 1.0), false);
+        auto dy = Variable(fl::full({5}, 1.f), false);
         y.backward(dy);
         auto dx = x.grad();
         ASSERT_TRUE(allClose(dx.tensor(), (3 * fl::power(x.tensor(), 2))));

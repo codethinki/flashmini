@@ -91,7 +91,7 @@ Variable ForceAlignmentCriterion::forward(
     const auto& trans = transVar.tensor();
     Tensor loss({B}, fl::dtype::f32);
     Tensor workspace(
-        {static_cast<long long>(FAC::getWorkspaceSize(B, T, N, L))},
+        {static_cast<int64_t>(FAC::getWorkspaceSize(B, T, N, L))},
         fl::dtype::u8);
 
     {
@@ -155,7 +155,7 @@ Tensor ForceAlignmentCriterion::viterbiPath(
     const auto& trans = transVar.tensor();
     Tensor bestPathsVar({T, B}, fl::dtype::s32);
     Tensor workspace(
-        {static_cast<long long>(FAC::getWorkspaceSize(B, T, N, L))},
+        {static_cast<int64_t>(FAC::getWorkspaceSize(B, T, N, L))},
         fl::dtype::u8);
 
     {

@@ -144,8 +144,8 @@ TEST(TensorBaseTest, fromScalar) {
 TEST(TensorBaseTest, string) {
     // Different backends might print tensors differently - check for consistency
     // across two identical tensors
-    auto a = fl::full({3, 4, 5}, 6.);
-    auto b = fl::full({3, 4, 5}, 6.);
+    auto a = fl::full({3, 4, 5}, 6.f);
+    auto b = fl::full({3, 4, 5}, 6.f);
     ASSERT_EQ(a.toString(), b.toString());
 
     std::stringstream ssa, ssb;
@@ -155,43 +155,43 @@ TEST(TensorBaseTest, string) {
 }
 
 TEST(TensorBaseTest, AssignmentOperators) {
-    auto a = fl::full({3, 3}, 1.);
+    auto a = fl::full({3, 3}, 1.f);
     a += 2;
-    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 3.)));
+    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 3.f)));
     a -= 1;
-    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 2.)));
+    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 2.f)));
     a *= 8;
-    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 16.)));
+    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 16.f)));
     a /= 4;
-    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 4.)));
+    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 4.f)));
 
-    a = fl::full({4, 4}, 7.);
-    ASSERT_TRUE(allClose(a, fl::full({4, 4}, 7.)));
+    a = fl::full({4, 4}, 7.f);
+    ASSERT_TRUE(allClose(a, fl::full({4, 4}, 7.f)));
     auto b = a;
-    ASSERT_TRUE(allClose(b, fl::full({4, 4}, 7.)));
+    ASSERT_TRUE(allClose(b, fl::full({4, 4}, 7.f)));
     a = 6.;
-    ASSERT_TRUE(allClose(a, fl::full({4, 4}, 6.)));
+    ASSERT_TRUE(allClose(a, fl::full({4, 4}, 6.f)));
 
-    a = fl::full({5, 6, 7}, 8.);
-    ASSERT_TRUE(allClose(a, fl::full({5, 6, 7}, 8.)));
+    a = fl::full({5, 6, 7}, 8.f);
+    ASSERT_TRUE(allClose(a, fl::full({5, 6, 7}, 8.f)));
 }
 
 TEST(TensorBaseTest, CopyOperators) {
-    auto a = fl::full({3, 3}, 1.);
+    auto a = fl::full({3, 3}, 1.f);
     auto b = a;
     a += 1;
-    ASSERT_TRUE(allClose(b, fl::full({3, 3}, 1.)));
-    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 2.)));
+    ASSERT_TRUE(allClose(b, fl::full({3, 3}, 1.f)));
+    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 2.f)));
 
     auto c = a.copy();
     a += 1;
-    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 3.)));
-    ASSERT_TRUE(allClose(c, fl::full({3, 3}, 2.)));
+    ASSERT_TRUE(allClose(a, fl::full({3, 3}, 3.f)));
+    ASSERT_TRUE(allClose(c, fl::full({3, 3}, 2.f)));
 }
 
 TEST(TensorBaseTest, ConstructFromData) {
     // Tensor::fromVector
-    float val = 3.;
+    float val = 3.f;
     std::vector<float> vec(100, val);
     fl::Shape s = {10, 10};
     ASSERT_TRUE(allClose(fl::Tensor::fromVector(s, vec), fl::full(s, val)));
@@ -240,7 +240,7 @@ TEST(TensorBaseTest, ConstructFromData) {
 }
 
 TEST(TensorBaseTest, reshape) {
-    auto a = fl::full({4, 4}, 3.);
+    auto a = fl::full({4, 4}, 3.f);
     auto b = fl::reshape(a, Shape({8, 2}));
     ASSERT_EQ(b.shape(), Shape({8, 2}));
     ASSERT_TRUE(allClose(a, fl::reshape(b, {4, 4})));
@@ -251,12 +251,12 @@ TEST(TensorBaseTest, reshape) {
 TEST(TensorBaseTest, transpose) {
     // TODO: expand to check els
     ASSERT_TRUE(
-        allClose(fl::transpose(fl::full({3, 4}, 3.)), fl::full({4, 3}, 3.))
+        allClose(fl::transpose(fl::full({3, 4}, 3.f)), fl::full({4, 3}, 3.f))
     );
     ASSERT_TRUE(
         allClose(
-            fl::transpose(fl::full({4, 5, 6, 7}, 3.), {2, 0, 1, 3}),
-            fl::full({6, 4, 5, 7}, 3.)
+            fl::transpose(fl::full({4, 5, 6, 7}, 3.f), {2, 0, 1, 3}),
+            fl::full({6, 4, 5, 7}, 3.f)
         )
     );
     ASSERT_THROW(fl::transpose(fl::rand({3, 4, 5}), {0, 1}), std::exception);
@@ -282,10 +282,10 @@ TEST(TensorBaseTest, transpose) {
 }
 
 TEST(TensorBaseTest, tile) {
-    auto a = fl::full({4, 4}, 3.);
+    auto a = fl::full({4, 4}, 3.f);
     auto tiled = fl::tile(a, {2, 2});
     ASSERT_EQ(tiled.shape(), Shape({8, 8}));
-    ASSERT_TRUE(allClose(tiled, fl::full({8, 8}, 3.)));
+    ASSERT_TRUE(allClose(tiled, fl::full({8, 8}, 3.f)));
     ASSERT_EQ(fl::tile(a, {}).shape(), a.shape());
 
     auto s = fl::fromScalar(3.14);
@@ -294,9 +294,9 @@ TEST(TensorBaseTest, tile) {
 }
 
 TEST(TensorBaseTest, concatenate) {
-    auto a = fl::full({3, 3}, 1.);
-    auto b = fl::full({3, 3}, 2.);
-    auto c = fl::full({3, 3}, 3.);
+    auto a = fl::full({3, 3}, 1.f);
+    auto b = fl::full({3, 3}, 2.f);
+    auto c = fl::full({3, 3}, 3.f);
     ASSERT_TRUE(
         allClose(fl::concatenate(0, a, b, c), fl::concatenate({a, b, c}))
     );
@@ -346,10 +346,10 @@ TEST(TensorBaseTest, nonzero) {
 
 TEST(TensorBaseTest, flatten) {
     unsigned s = 6;
-    auto a = fl::full({s, s, s}, 2.);
+    auto a = fl::full({s, s, s}, 2.f);
     auto flat = a.flatten();
     ASSERT_EQ(flat.shape(), Shape({s * s * s}));
-    ASSERT_TRUE(allClose(flat, fl::full({s * s * s}, 2.)));
+    ASSERT_TRUE(allClose(flat, fl::full({s * s * s}, 2.f)));
 }
 
 TEST(TensorBaseTest, pad) {
@@ -357,9 +357,9 @@ TEST(TensorBaseTest, pad) {
     auto zeroPadded = fl::pad(t, {{1, 2}, {3, 4}});
     auto zeroTest = fl::concatenate(
         1,
-        fl::full({8, 3}, 0.),
-        fl::concatenate(0, fl::full({1, 2}, 0.), t, fl::full({2, 2}, 0.)),
-        fl::full({8, 4}, 0.)
+        fl::full({8, 3}, 0.f),
+        fl::concatenate(0, fl::full({1, 2}, 0.f), t, fl::full({2, 2}, 0.f)),
+        fl::full({8, 4}, 0.f)
     );
     ASSERT_TRUE(allClose(zeroPadded, zeroTest));
 
@@ -403,7 +403,7 @@ TEST(TensorBaseTest, pad) {
 TEST(TensorBaseTest, astype) {
     auto a = fl::rand({3, 3});
     ASSERT_EQ(a.type(), dtype::f32);
-    ASSERT_EQ(a.astype(dtype::f64).type(), dtype::f64);
+    ASSERT_EQ(a.asType(dtype::f64).type(), dtype::f64);
 }
 
 TEST(TensorBaseTest, where) {
@@ -420,13 +420,13 @@ TEST(TensorBaseTest, where) {
 
     // non b8-type vector throws
     EXPECT_THROW(
-        fl::where((a < 5).astype(fl::dtype::f32), a, a * 10),
+        fl::where((a < 5).asType(fl::dtype::f32), a, a * 10),
         std::exception
     );
 }
 
 TEST(TensorBaseTest, topk) {
-    auto a = fl::arange({10, 2});
+    auto a = fl::arrange({10, 2});
     Tensor values;
     Tensor indices;
     fl::topk(values, indices, a, /* k = */ 3, /* axis = */ 0); // descending sort
@@ -452,7 +452,7 @@ TEST(TensorBaseTest, topk) {
 
 TEST(TensorBaseTest, sort) {
     Shape dims({10, 2});
-    auto a = fl::arange(dims);
+    auto a = fl::arrange(dims);
     auto sorted = fl::sort(a, /* axis = */ 0, SortMode::Descending);
 
     Tensor expected({dims[0]}, a.type());
@@ -476,7 +476,7 @@ TEST(TensorBaseTest, sort) {
 
 TEST(TensorBaseTest, argsort) {
     Shape dims({10, 2});
-    auto a = fl::arange(dims);
+    auto a = fl::arrange(dims);
     auto sorted = fl::argsort(a, /* axis = */ 0, SortMode::Descending);
 
     Tensor expected({dims[0]}, fl::dtype::u32);
@@ -616,47 +616,47 @@ TEST(TensorBaseTest, toHostVector) {
 TEST(TensorBaseTest, arange) {
     // Range/step overload
     ASSERT_TRUE(
-        allClose(fl::arange(2, 10, 2), Tensor::fromVector<int>({2, 4, 6, 8}))
+        allClose(fl::arrange(2, 10, 2), Tensor::fromVector<int>({2, 4, 6, 8}))
     );
     ASSERT_TRUE(
-        allClose(fl::arange(0, 6), Tensor::fromVector<int>({0, 1, 2, 3, 4, 5}))
+        allClose(fl::arrange(0, 6), Tensor::fromVector<int>({0, 1, 2, 3, 4, 5}))
     );
     ASSERT_TRUE(
         allClose(
-            fl::arange(0., 1.22, 0.25),
-            Tensor::fromVector<float>({0., 0.25, 0.5, 0.75})
+            fl::arrange(0.f, 1.22f, 0.25f),
+            Tensor::fromVector<float>({0.f, 0.25f, 0.5f, 0.75f})
         )
     );
     ASSERT_TRUE(
         allClose(
-            fl::arange(0., 4.1),
-            Tensor::fromVector<float>({0., 1., 2., 3.})
+            fl::arrange(0.f, 4.1f),
+            Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f})
         )
     );
 
     // Shape overload
-    auto v = Tensor::fromVector<float>({0., 1., 2., 3.});
-    ASSERT_TRUE(allClose(fl::arange({4}), v));
+    auto v = Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f});
+    ASSERT_TRUE(allClose(fl::arrange({4}), v));
 
-    ASSERT_TRUE(allClose(fl::arange({4, 5}), fl::tile(v, {1, 5})));
-    ASSERT_EQ(fl::arange({4, 5}, 1).shape(), Shape({4, 5}));
+    ASSERT_TRUE(allClose(fl::arrange({4, 5}), fl::tile(v, {1, 5})));
+    ASSERT_EQ(fl::arrange({4, 5}, 1).shape(), Shape({4, 5}));
     ASSERT_TRUE(
         allClose(
-            fl::arange({4, 5}, 1),
+            fl::arrange({4, 5}, 1),
             fl::tile(
-                fl::reshape(Tensor::fromVector<float>({0., 1., 2., 3., 4.}), {1, 5}),
+                fl::reshape(Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f, 4.f}), {1, 5}),
                 {4}
             )
         )
     );
-    ASSERT_EQ(fl::arange({2, 6}, 0, fl::dtype::f64).type(), fl::dtype::f64);
+    ASSERT_EQ(fl::arrange({2, 6}, 0, fl::dtype::f64).type(), fl::dtype::f64);
 }
 
 TEST(TensorBaseTest, iota) {
     ASSERT_TRUE(
         allClose(
             fl::iota({5, 3}, {1, 2}),
-            fl::tile(fl::reshape(fl::arange({15}), {5, 3}), {1, 2})
+            fl::tile(fl::reshape(fl::arrange({15}), {5, 3}), {1, 2})
         )
     );
     ASSERT_EQ(fl::iota({2, 2}, {2, 2}, fl::dtype::f64).type(), fl::dtype::f64);

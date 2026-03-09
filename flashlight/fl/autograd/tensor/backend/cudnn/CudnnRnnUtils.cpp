@@ -88,10 +88,10 @@ void cudnn_rnn_forward(
 
     auto [workspaceSize, reserveSize] = rnn_temp_space_sizes(handle, rnnDesc, xDesc, forwardMode);
 
-    Tensor workspace({static_cast<long long>(workspaceSize)}, fl::dtype::b8);
+    Tensor workspace({static_cast<int64_t>(workspaceSize)}, fl::dtype::b8);
     // Space must be reused between forward and backward for cuDNN
 
-    reserveSpace = Tensor{{static_cast<long long>(reserveSize)}, fl::dtype::b8};
+    reserveSpace = Tensor{{static_cast<int64_t>(reserveSize)}, fl::dtype::b8};
 
     auto devSeqLengths = create_dev_seq_lengths(batchSize, seqLength);
 
@@ -200,7 +200,7 @@ void cudnn_rnn_backward(
     size_t weightSpaceSize = rnn_weight_space_size(handle, rnnDesc);
     auto [workspaceSize, reserveSize] = rnn_temp_space_sizes(handle, rnnDesc, xDesc, CUDNN_FWD_MODE_TRAINING);
 
-    Tensor workspace({static_cast<long long>(workspaceSize)}, fl::dtype::b8);
+    Tensor workspace({static_cast<int64_t>(workspaceSize)}, fl::dtype::b8);
 
     auto devSeqLengths = create_dev_seq_lengths(batchSize, seqLength);
 

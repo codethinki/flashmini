@@ -27,7 +27,7 @@ void TopKMeter::add(const Tensor& output, const Tensor& target) {
     Tensor maxVals, maxIds, match;
     topk(maxVals, maxIds, output, k_, 0);
     match = maxIds == fl::reshape(target, {1, target.dim(0), 1, 1});
-    const Tensor correct = fl::any(match, {0});
+    const Tensor correct = fl::any_of(match, {0});
 
     correct_ += fl::countNonzero(correct).asScalar<int32_t>();
     const int batchsize = target.dim(0);

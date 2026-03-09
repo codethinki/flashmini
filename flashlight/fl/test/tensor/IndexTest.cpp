@@ -91,27 +91,27 @@ TEST(IndexTest, IndexAssignment) {
     t /= 7;
     ASSERT_TRUE(allClose(t, fl::full({4, 4}, 1)));
 
-    auto a = fl::full({6, 6}, 0.);
+    auto a = fl::full({6, 6}, 0.f);
     a(3, 4) = 4.;
-    ASSERT_TRUE(allClose(a(3, 4), fl::full({1}, 4.)));
+    ASSERT_TRUE(allClose(a(3, 4), fl::full({1}, 4.f)));
     a(2) = fl::full({6}, 8.);
-    ASSERT_TRUE(allClose(a(2), fl::full({6}, 8.)));
+    ASSERT_TRUE(allClose(a(2), fl::full({6}, 8.f)));
 
-    auto b = fl::full({3, 3}, 1.);
+    auto b = fl::full({3, 3}, 1.f);
     auto c = b;
     b += 1;
-    ASSERT_TRUE(allClose(b, fl::full({3, 3}, 2.)));
-    ASSERT_TRUE(allClose(c, fl::full({3, 3}, 1.)));
+    ASSERT_TRUE(allClose(b, fl::full({3, 3}, 2.f)));
+    ASSERT_TRUE(allClose(c, fl::full({3, 3}, 1.f)));
 
-    auto q = fl::full({4, 4}, 2.);
-    auto r = fl::full({4}, 3.);
+    auto q = fl::full({4, 4}, 2.f);
+    auto r = fl::full({4}, 3.f);
     q(0) = r;
     ASSERT_TRUE(allClose(q(0), r));
-    ASSERT_TRUE(allClose(q(fl::range(1, fl::end)), fl::full({3, 4}, 2.)));
+    ASSERT_TRUE(allClose(q(fl::range(1, fl::end)), fl::full({3, 4}, 2.f)));
 
     auto k = fl::rand({100, 200});
-    k(3) = fl::full({200}, 0.);
-    ASSERT_TRUE(allClose(k(3), fl::full({200}, 0.)));
+    k(3) = fl::full({200}, 0.f);
+    ASSERT_TRUE(allClose(k(3), fl::full({200}, 0.f)));
 
     // Weak ref
     auto g = fl::rand({3, 4, 5});
@@ -122,29 +122,29 @@ TEST(IndexTest, IndexAssignment) {
     ASSERT_TRUE(allClose(gC(fl::span, fl::range(0, 3)), gI));
 
     auto x = fl::rand({5, 6, 7, 8});
-    x(3) = fl::full({6, 7, 8}, 0.);
-    ASSERT_TRUE(allClose(x(3), fl::full({6, 7, 8}, 0.)));
-    x(fl::span, fl::span, 2) = fl::full({5, 6, 8}, 3.);
-    ASSERT_TRUE(allClose(x(fl::span, fl::span, 2), fl::full({5, 6, 8}, 3.)));
+    x(3) = fl::full({6, 7, 8}, 0.f);
+    ASSERT_TRUE(allClose(x(3), fl::full({6, 7, 8}, 0.f)));
+    x(fl::span, fl::span, 2) = fl::full({5, 6, 8}, 3.f);
+    ASSERT_TRUE(allClose(x(fl::span, fl::span, 2), fl::full({5, 6, 8}, 3.f)));
     ASSERT_THROW(
         x(fl::span, fl::span, 4) -= fl::rand({5, 6, 1, 8}),
         std::invalid_argument
     );
 
-    x(fl::span, fl::range(1, 3), fl::span) = fl::full({5, 2, 7, 8}, 2.);
+    x(fl::span, fl::range(1, 3), fl::span) = fl::full({5, 2, 7, 8}, 2.f);
     ASSERT_TRUE(
         allClose(
             x(fl::span, fl::range(1, 3), fl::span),
-            fl::full({5, 2, 7, 8}, 2.)
+            fl::full({5, 2, 7, 8}, 2.f)
         )
     );
 
-    x(fl::span, fl::arange({5}), fl::span, fl::arange({5})) =
-        fl::full({5, 5, 7, 5}, 2.);
+    x(fl::span, fl::arrange({5}), fl::span, fl::arrange({5})) =
+        fl::full({5, 5, 7, 5}, 2.f);
     ASSERT_TRUE(
         allClose(
             x(fl::span, fl::range(1, 3), fl::span),
-            fl::full({5, 2, 7, 8}, 2.)
+            fl::full({5, 2, 7, 8}, 2.f)
         )
     );
 }
@@ -178,7 +178,7 @@ TEST(IndexTest, flat) {
     for(unsigned i = 0; i < n.elements(); ++i)
         ASSERT_TRUE(allClose(n.flat(i), n(i % 4, (i / 4) % 6, (i / (4 * 6)) % 8)));
 
-    auto a = fl::full({5, 6, 7, 8}, 9.);
+    auto a = fl::full({5, 6, 7, 8}, 9.f);
     std::vector<int> testIndices = {0, 1, 4, 11, 62, 104, 288};
     for(const int i : testIndices)
         ASSERT_EQ(a.flat(i).scalar<float>(), 9.);
@@ -197,10 +197,10 @@ TEST(IndexTest, flat) {
 
     // Tensor assignment
     a.flat(32) = fl::full({1}, 7.4);
-    ASSERT_TRUE(allClose(a.flatten()(32), fl::full({1}, 7.4)));
+    ASSERT_TRUE(allClose(a.flatten()(32), fl::full({1}, 7.4f)));
         // In-place
         a.flat(100) += 33;
-    ASSERT_TRUE(allClose(a.flatten()(100), fl::full({1}, 33 + 9.)));
+    ASSERT_TRUE(allClose(a.flatten()(100), fl::full({1}, 33 + 9.f)));
 
         // Tensor indexing
         auto indexer = Tensor::fromVector(testIndices);
@@ -223,8 +223,8 @@ TEST(IndexTest, flat) {
         // With leading singleton dims
         auto b = fl::rand({1, 1, 10});
         ASSERT_EQ(b.flat(fl::range(3)).shape(), Shape({3}));
-    b.flat(fl::range(3)) = fl::full({3}, 6.);
-    ASSERT_TRUE(allClose(b.flatten()(fl::range(3)), fl::full({3}, 6.)));
+    b.flat(fl::range(3)) = fl::full({3}, 6.f);
+    ASSERT_TRUE(allClose(b.flatten()(fl::range(3)), fl::full({3}, 6.f)));
 }
 
 TEST(IndexTest, TensorIndex) {
@@ -239,10 +239,10 @@ TEST(IndexTest, TensorIndex) {
         ASSERT_TRUE(allClose(indexed(i), a(idxs[i])));
 
     a(indices) = 5.;
-    ASSERT_TRUE(allClose(a(indices), fl::full({size}, 5.)));
+    ASSERT_TRUE(allClose(a(indices), fl::full({size}, 5.f)));
 
     // Out of range indices
-    auto i = fl::arange({10}, 0, fl::dtype::u32);
+    auto i = fl::arrange({10}, 0, fl::dtype::u32);
     auto b = fl::rand({20, 20});
     auto ref = b;
     ASSERT_EQ(b(i).shape(), b(fl::range(10)).shape());
@@ -251,13 +251,13 @@ TEST(IndexTest, TensorIndex) {
     b(i) += 3.;
     ASSERT_TRUE(allClose(b(i), b(fl::range(10))));
     ASSERT_TRUE(allClose(b(i), (ref + 3)(i)));
-    b(i) += fl::full({(Dim) i.elements(), b.dim(1)}, 10.);
+    b(i) += fl::full({(Dim) i.elements(), b.dim(1)}, 10.f);
     ASSERT_EQ(b(i).shape(), (ref + 13)(i).shape());
     ASSERT_TRUE(allClose(b(i), (ref + 13)(i)));
 
     // Tensor index a > 1D tensor
     auto c = fl::rand({10, 10, 10});
-    ASSERT_EQ(c(fl::arange({5})).shape(), Shape({5, 10, 10}));
+    ASSERT_EQ(c(fl::arrange({5})).shape(), Shape({5, 10, 10}));
 }
 
 TEST(IndexTest, ExpressionIndex) {

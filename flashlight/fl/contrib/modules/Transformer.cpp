@@ -129,7 +129,7 @@ Variable Transformer::selfAttention(const std::vector<Variable>& input) {
     Variable mask, posEmb;
     if(bptt_ > 0)
         posEmb =
-            tile(params_[0].astype(encoderInput.type()), {1, 1, nHeads_ * bsz});
+            tile(params_[0].asType(encoderInput.type()), {1, 1, nHeads_ * bsz});
     if(useMask_ && encoderInput.dim(1) > 1)
         // mask future if we use the previous state (then n is previous time)
         mask = getMask(n, input.size() == 3);
@@ -201,11 +201,11 @@ std::vector<Variable> Transformer::forward(const std::vector<Variable>& input) {
     if(train_ && (fl::rand({1}).scalar<float>() < pLayerdrop_))
         f = 0.0;
     if(preLN_) {
-        auto h = (f * (*norm1_)(selfAttention(input))).astype(x.type()) + x;
-        return {f* (*norm2_)(mlp(h)).astype(h.type()) + h};
+        auto h = (f * (*norm1_)(selfAttention(input))).asType(x.type()) + x;
+        return {f* (*norm2_)(mlp(h)).asType(h.type()) + h};
     } else {
-        auto h = (*norm1_)((f* selfAttention(input)).astype(x.type()) + x);
-        return {(*norm2_)((f* mlp(h)).astype(h.type()) + h)};
+        auto h = (*norm1_)((f* selfAttention(input)).asType(x.type()) + x);
+        return {(*norm2_)((f* mlp(h)).asType(h.type()) + h)};
     }
 }
 

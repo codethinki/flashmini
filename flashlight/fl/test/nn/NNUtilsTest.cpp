@@ -23,7 +23,7 @@ TEST(UtilsTest, Join) {
     // Single array
     auto i = fl::rand({50, 60, 70, 1});
     auto o = join({i}, -1, 3);
-    ASSERT_TRUE(fl::all(o == i).asScalar<bool>());
+    ASSERT_TRUE(fl::all_of(o == i).asScalar<bool>());
 
     // no dim for batching adds singleton dims
     ASSERT_EQ(
@@ -40,14 +40,14 @@ TEST(UtilsTest, Join) {
     auto o1 = join({a, b, c});
     ASSERT_EQ(o1.shape(), Shape({30, 1, 300, 3}));
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o1(fl::range(25), fl::range(0, 1), fl::range(300), fl::range(0, 1))
             == a
         )
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o1(
                 fl::range(25, 29),
                 fl::range(0, 1),
@@ -58,14 +58,14 @@ TEST(UtilsTest, Join) {
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o1(fl::range(20), fl::range(0, 1), fl::range(300), fl::range(1, 2))
             == b
         )
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o1(
                 fl::range(20, 29),
                 fl::range(0, 1),
@@ -76,7 +76,7 @@ TEST(UtilsTest, Join) {
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o1(fl::range(30), fl::range(0, 1), fl::range(300), fl::range(2, 3))
             == c
         )
@@ -86,14 +86,14 @@ TEST(UtilsTest, Join) {
     auto o2 = join({a, b, c}, -1);
     ASSERT_EQ(o2.shape(), Shape({30, 1, 300, 3}));
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o2(fl::range(25), fl::range(0, 1), fl::range(300), fl::range(0, 1))
             == a
         )
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o2(
                 fl::range(25, 29),
                 fl::range(0, 1),
@@ -104,14 +104,14 @@ TEST(UtilsTest, Join) {
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o2(fl::range(20), fl::range(0, 1), fl::range(300), fl::range(1, 2))
             == b
         )
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o2(
                 fl::range(20, 29),
                 fl::range(0, 1),
@@ -122,7 +122,7 @@ TEST(UtilsTest, Join) {
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(
+        fl::all_of(
             o2(fl::range(30), fl::range(0, 1), fl::range(300), fl::range(2, 3))
             == c
         )
@@ -132,23 +132,23 @@ TEST(UtilsTest, Join) {
     auto o3 = join({a, b, c}, -1, 1);
     ASSERT_EQ(o3.shape(), Shape({30, 3, 300, 1}));
     ASSERT_TRUE(
-        fl::all(o3(fl::range(25), fl::range(0, 1), fl::range(300)) == a)
+        fl::all_of(o3(fl::range(25), fl::range(0, 1), fl::range(300)) == a)
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(o3(fl::range(25, 29), fl::range(0, 1), fl::range(300)) == -1)
+        fl::all_of(o3(fl::range(25, 29), fl::range(0, 1), fl::range(300)) == -1)
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(o3(fl::range(20), fl::range(1, 2), fl::range(300)) == b)
+        fl::all_of(o3(fl::range(20), fl::range(1, 2), fl::range(300)) == b)
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(o3(fl::range(20, 29), fl::range(1, 2), fl::range(300)) == -1)
+        fl::all_of(o3(fl::range(20, 29), fl::range(1, 2), fl::range(300)) == -1)
         .asScalar<bool>()
     );
     ASSERT_TRUE(
-        fl::all(o3(fl::range(30), fl::range(2, 3), fl::range(300)) == c)
+        fl::all_of(o3(fl::range(30), fl::range(2, 3), fl::range(300)) == c)
         .asScalar<bool>()
     );
 }

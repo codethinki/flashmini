@@ -116,7 +116,7 @@ fl::Dataset::DataTransformFunction inputFeatures(
                else
                    output = normalize(output);
                return Tensor::fromBuffer(
-                   {static_cast<long long>(T), featSz, channels},
+                   {static_cast<int64_t>(T), featSz, channels},
                    output.data(),
                    MemoryLocation::Host
                );

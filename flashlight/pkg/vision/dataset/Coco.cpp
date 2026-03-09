@@ -39,13 +39,13 @@ std::pair<Tensor, Tensor> makeImageAndMaskBatch(
         maxH = std::max(h, maxH);
     }
 
-    Shape outDims = {maxW, maxH, 3, static_cast<long>(data.size())};
-    Shape maskDims = {maxW, maxH, 1, static_cast<long>(data.size())};
+    Shape outDims = {maxW, maxH, 3, static_cast<Dim>(data.size())};
+    Shape maskDims = {maxW, maxH, 1, static_cast<Dim>(data.size())};
 
     auto batcharr = fl::full(outDims, 0);
     auto maskarr = fl::full(maskDims, 0);
 
-    for(long i = 0; i < data.size(); ++i) {
+    for(Dim i = 0; i < data.size(); ++i) {
         Tensor sample = data[i];
         Shape dims = sample.shape();
         int w = dims[0];

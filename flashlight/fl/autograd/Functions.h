@@ -71,11 +71,11 @@ namespace detail {
             && optimLevel != OptimLevel::DEFAULT
         )
             // Not in the excluded list - cast to f16
-            res = in.astype(fl::dtype::f16);
+            res = in.asType(fl::dtype::f16);
         else {
             // Upcast to f32 only if we have an f16 input - otherwise, leave as is
             if(in.type() == fl::dtype::f16)
-                res = in.astype(fl::dtype::f32);
+                res = in.asType(fl::dtype::f32);
             else
                 res = in;
         }
@@ -449,7 +449,7 @@ FL_API Variable concatenate(const std::vector<Variable>& concatInputs, int dim);
  * divisible, last chunk of smaller splitSize will be included.
  * @param dim dimension along which to split the Variable
  */
-FL_API std::vector<Variable> split(const Variable& input, long splitSize, int dim);
+FL_API std::vector<Variable> split(const Variable& input, int64_t splitSize, int dim);
 
 /**
  * Splits a Variable into smaller chunks.
@@ -458,7 +458,7 @@ FL_API std::vector<Variable> split(const Variable& input, long splitSize, int di
  * @param splitSizes vector of integers specifying the sizes for each split
  * @param dim dimension along which to split the Variable
  */
-FL_API std::vector<Variable> split(const Variable& input, const std::vector<long>& splitSizes, int dim);
+FL_API std::vector<Variable> split(const Variable& input, std::vector<int64_t> const& splitSizes, int dim);
 
 /**
  * Repeats the tensor `input` along specific dimensions. The number of

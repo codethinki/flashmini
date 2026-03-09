@@ -245,7 +245,7 @@ TEST(AttentionTest, JacobianMaskAttention) {
     auto in = Variable(fl::rand({10, 9, 5}, fl::dtype::f32), true);
     std::vector<int> inpSzRaw = {1, 2, 4, 8, 16};
     Tensor inpSz = Tensor::fromVector(
-        {1, static_cast<long long>(inpSzRaw.size())},
+        {1, static_cast<int64_t>(inpSzRaw.size())},
         inpSzRaw
     );
     auto func_in = [&](Variable& input) {

@@ -53,7 +53,7 @@ namespace {
                     1,
                     1,
                     nfeatures,
-                    static_cast<long long>(input.elements() / nfeatures)
+                    static_cast<int64_t>(input.elements() / nfeatures)
                 }
             };
             wtDescDimsOut = Shape{1, 1, nfeatures};
@@ -70,7 +70,7 @@ namespace {
             inDescDimsOut = Shape{
                 {
                     1,
-                    static_cast<long long>(input.elements() / (nfeatures * batchsz)),
+                    static_cast<int64_t>(input.elements() / (nfeatures * batchsz)),
                     nfeatures,
                     batchsz,
                 }
@@ -115,9 +115,9 @@ Tensor CudnnAutogradExtension::batchnorm(
     // Weight, bias, and running mean/var arrays can't be fp16 (must be fp32)
     Tensor weightArray = weight.isEmpty()
         ? fl::full(wtDescDims, 1.0, fl::dtype::f32)
-        : weight.astype(fl::dtype::f32);
+        : weight.asType(fl::dtype::f32);
     Tensor biasArray = bias.isEmpty() ? fl::full(wtDescDims, 0.0, fl::dtype::f32)
-        : bias.astype(fl::dtype::f32);
+        : bias.asType(fl::dtype::f32);
 
     fl::dtype scalarsType =
         input.type() == fl::dtype::f16 ? fl::dtype::f32 : input.type();

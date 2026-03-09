@@ -125,7 +125,7 @@ std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
         "Error: get_workspace_size"
     );
 
-    Tensor workspace({static_cast<long long>(workspace_size)}, fl::dtype::b8);
+    Tensor workspace({static_cast<int64_t>(workspace_size)}, fl::dtype::b8);
 
     std::vector<float> costs(B, 0.0);
     {

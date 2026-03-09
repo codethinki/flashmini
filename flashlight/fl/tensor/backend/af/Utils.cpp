@@ -244,8 +244,8 @@ af_source flToAfLocation(Location location) {
 }
 
 af::array fromFlData(
-    const Shape& shape,
-    const void* ptr,
+    Shape const& shape,
+    void const* ptr,
     fl::dtype type,
     fl::Location memoryLocation
 ) {
@@ -260,29 +260,29 @@ af::array fromFlData(
     using af::dtype;
     switch(afType) {
         case f32:
-            return af::array(dims, reinterpret_cast<const float*>(ptr), loc);
+            return af::array(dims, static_cast<float const*>(ptr), loc);
         case f64:
-            return af::array(dims, reinterpret_cast<const double*>(ptr), loc);
+            return af::array(dims, static_cast<double const*>(ptr), loc);
         case s32:
-            return af::array(dims, reinterpret_cast<const int*>(ptr), loc);
+            return af::array(dims, static_cast<int const*>(ptr), loc);
         case u32:
-            return af::array(dims, reinterpret_cast<const unsigned*>(ptr), loc);
+            return af::array(dims, static_cast<unsigned const*>(ptr), loc);
         case s64:
-            return af::array(dims, reinterpret_cast<const long long*>(ptr), loc);
+            return af::array(dims, static_cast<long long const*>(ptr), loc);
         case u64:
             return af::array(
                 dims,
-                reinterpret_cast<const unsigned long long*>(ptr),
+                static_cast<unsigned long long const*>(ptr),
                 loc
             );
         case s16:
-            return af::array(dims, reinterpret_cast<const short*>(ptr), loc);
+            return af::array(dims, static_cast<short const*>(ptr), loc);
         case u16:
-            return af::array(dims, reinterpret_cast<const unsigned short*>(ptr), loc);
+            return af::array(dims, static_cast<unsigned short const*>(ptr), loc);
         case b8:
-            return af::array(dims, reinterpret_cast<const char*>(ptr), loc);
+            return af::array(dims, static_cast<char const*>(ptr), loc);
         case u8:
-            return af::array(dims, reinterpret_cast<const unsigned char*>(ptr), loc);
+            return af::array(dims, static_cast<unsigned char const*>(ptr), loc);
         default:
             throw std::invalid_argument(
                 "fromFlData: can't construct ArrayFire array from given type."

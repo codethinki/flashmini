@@ -27,36 +27,36 @@ TEST(TensorUnaryOpsTest, logicalNot) {
     ASSERT_TRUE(
         allClose(
             !fl::full({3, 3}, true),
-            fl::full({3, 3}, false).astype(dtype::b8)
+            fl::full({3, 3}, false).asType(dtype::b8)
         )
     );
 }
 
 TEST(TensorUnaryOpsTest, clip) {
-    float h = 3.;
-    float l = 2.;
+    float h = 3.f;
+    float l = 2.f;
     Shape s = {3, 3};
     auto high = fl::full(s, h);
     auto low = fl::full(s, l);
-    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.), low, high), high));
-    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.), l, high), high));
-    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.), low, h), high));
-    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.), l, h), high));
+    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.f), low, high), high));
+    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.f), l, high), high));
+    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.f), low, h), high));
+    ASSERT_TRUE(allClose(fl::clip(fl::full({3, 3}, 4.f), l, h), high));
 }
 
 TEST(TensorUnaryOpsTest, roll) {
-    auto t = fl::full({5, 5}, 4.);
+    auto t = fl::full({5, 5}, 4.f);
     ASSERT_TRUE(allClose(t, fl::roll(t, /* shift = */ 3, /* axis = */ 1)));
 
     Shape dims({4, 5});
-    auto r = fl::arange(dims);
+    auto r = fl::arrange(dims);
     auto result = fl::roll(r, /* shift = */ 1, /* axis = */ 0);
     ASSERT_EQ(r.shape(), result.shape());
     ASSERT_TRUE(allClose(result(0), fl::full({dims[1]}, dims[0] - 1, r.type())));
     ASSERT_TRUE(
         allClose(
             result(fl::range(1, fl::end)),
-            fl::arange({dims[0] - 1, dims[1]}, /* seqDim = */ 0, r.type())
+            fl::arrange({dims[0] - 1, dims[1]}, /* seqDim = */ 0, r.type())
         )
     );
 }
@@ -65,8 +65,8 @@ TEST(TensorUnaryOpsTest, isnan) {
     Shape s = {3, 3};
     ASSERT_TRUE(
         allClose(
-            fl::isnan(fl::full(s, 1.) / 3),
-            fl::full(s, false).astype(fl::dtype::b8)
+            fl::isnan(fl::full(s, 1.f) / 3),
+            fl::full(s, false).asType(fl::dtype::b8)
         )
     );
 }
@@ -75,14 +75,14 @@ TEST(TensorUnaryOpsTest, isinf) {
     Shape s = {3, 3};
     ASSERT_TRUE(
         allClose(
-            fl::isinf(fl::full(s, 1.) / 3),
-            fl::full(s, false).astype(fl::dtype::b8)
+            fl::isinf(fl::full(s, 1.f) / 3),
+            fl::full(s, false).asType(fl::dtype::b8)
         )
     );
     ASSERT_TRUE(
         allClose(
-            fl::isinf(fl::full(s, 1.) / 0.),
-            fl::full(s, true).astype(fl::dtype::b8)
+            fl::isinf(fl::full(s, 1.f) / 0.f),
+            fl::full(s, true).asType(fl::dtype::b8)
         )
     );
 }
@@ -102,7 +102,7 @@ TEST(TensorUnaryOpsTest, tril) {
         [](const Dim dim, const Tensor& res, const Tensor& in) {
             for(int i = 0; i < dim; ++i)
                 for(int j = i + 1; j < dim; ++j)
-                    ASSERT_EQ(res(i, j).scalar<float>(), 0.);
+                    ASSERT_EQ(res(i, j).scalar<float>(), 0.f);
             for(int i = 0; i < dim; ++i)
                 for(int j = 0; j < i; ++j)
                     ASSERT_TRUE(allClose(res(i, j), in(i, j)));
@@ -133,7 +133,7 @@ TEST(TensorUnaryOpsTest, triu) {
                     ASSERT_TRUE(allClose(res(i, j), in(i, j)));
             for(unsigned i = 0; i < dim; ++i)
                 for(unsigned j = 0; j < i; ++j)
-                    ASSERT_EQ(res(i, j).scalar<float>(), 0.);
+                    ASSERT_EQ(res(i, j).scalar<float>(), 0.f);
         };
 
     int dim = 10;
@@ -156,20 +156,20 @@ TEST(TensorUnaryOpsTest, triu) {
 
 TEST(TensorUnaryOpsTest, floor) {
     auto a = fl::rand({10, 10}) + 0.5;
-    ASSERT_TRUE(allClose((a >= 1.).astype(fl::dtype::f32), fl::floor(a)));
+    ASSERT_TRUE(allClose((a >= 1.).asType(fl::dtype::f32), fl::floor(a)));
 }
 
 TEST(TensorUnaryOpsTest, ceil) {
     auto a = fl::rand({10, 10}) + 0.5;
-    ASSERT_TRUE(allClose((a >= 1).astype(fl::dtype::f32), fl::ceil(a) - 1));
+    ASSERT_TRUE(allClose((a >= 1).asType(fl::dtype::f32), fl::ceil(a) - 1));
 }
 
 TEST(TensorUnaryOpsTest, rint) {
     Shape s = {10, 10};
     auto a = fl::rand(s) - 0.5;
-    ASSERT_TRUE(allClose(fl::rint(a), fl::full(s, 0.)));
+    ASSERT_TRUE(allClose(fl::rint(a), fl::full(s, 0.f)));
     auto b = fl::rand(s) + 0.5;
-    ASSERT_TRUE(allClose(fl::rint(b), fl::full(s, 1.)));
+    ASSERT_TRUE(allClose(fl::rint(b), fl::full(s, 1.f)));
 }
 
 TEST(TensorUnaryOpsTest, sigmoid) {
@@ -179,15 +179,15 @@ TEST(TensorUnaryOpsTest, sigmoid) {
 
 TEST(TensorUnaryOpsTest, flip) {
     const unsigned high = 10;
-    auto a = fl::arange({high});
+    auto a = fl::arrange({high});
     auto flipped = fl::flip(a, /* dim = */ 0);
     a *= -1;
     a += (high - 1);
     ASSERT_TRUE(allClose(a, flipped));
 
-    auto b = fl::arange({high, high}, /* seqDim = */ 0);
+    auto b = fl::arrange({high, high}, /* seqDim = */ 0);
     ASSERT_TRUE(allClose(fl::flip(b, 1), b));
-    auto c = fl::arange({high, high}, /* seqDim = */ 1);
+    auto c = fl::arrange({high, high}, /* seqDim = */ 1);
     ASSERT_TRUE(allClose(fl::flip(c, 0), c));
 }
 

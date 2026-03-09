@@ -159,7 +159,7 @@ std::vector<Tensor> TextDataset::get(const int64_t idx) const {
     }
     return {
         Tensor::fromVector(
-            {maxLength, static_cast<long long>(batch.size())},
+            {maxLength, static_cast<int64_t>(batch.size())},
             buffer
         )
     };
