@@ -71,7 +71,7 @@ function(build_test)
       GMOCK_LINKED_AS_SHARED_LIBRARY=$<BOOL:${BUILD_SHARED_LIBS}>
     )
   endif()
-  gtest_add_tests(TARGET ${target})
+  gtest_discover_tests(${target})
 
   if(WIN32)
     fm_target_copy_dependencies(${target})
