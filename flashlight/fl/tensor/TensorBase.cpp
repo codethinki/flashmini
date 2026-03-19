@@ -80,7 +80,7 @@ size_t Tensor::elements() const { return impl_->shape().elements(); }
 
 Dim Tensor::dim(size_t const dim) const { return shape().dim(dim); }
 
-int Tensor::ndim() const { return shape().ndim(); }
+Dim Tensor::ndim() const { return shape().ndim(); }
 
 bool Tensor::isEmpty() const { return elements() == 0; }
 
@@ -266,7 +266,7 @@ Tensor& Tensor::operator=(Tensor&& other) & {
 // Move assignment operator when `this` is a rvalue, e.g., `x(0) =
 // std::move(y)`. In such cases, we copy the data from `other` to `this`.
 Tensor& Tensor::operator=(Tensor&& other) && {
-    if(this == &other) 
+    if(this == &other)
         return *this;
 
     this->impl_->assign(other);
@@ -320,22 +320,34 @@ FL_CREATE_FUN_LITERAL_TYPE(const unsigned short&);
 
 Tensor identity(Dim const dim, dtype const type) { return defaultTensorBackend().identity(dim, type); }
 
-#define FL_ARRANGE_FUN_DEF(TYPE)                                                              \
-        template<> FL_API Tensor arrange(TYPE start, TYPE end, TYPE step, const dtype type) { \
-            return fl::arrange({static_cast<long>((end - start) / step)}, 0, type) *          \
-                   step +                                                                    \
-                   start;                                                                    \
-        }
-FL_ARRANGE_FUN_DEF(const double&);
-FL_ARRANGE_FUN_DEF(const float&);
-FL_ARRANGE_FUN_DEF(const int&);
-FL_ARRANGE_FUN_DEF(const unsigned&);
-FL_ARRANGE_FUN_DEF(const long&);
-FL_ARRANGE_FUN_DEF(const unsigned long&);
-FL_ARRANGE_FUN_DEF(const long long&);
-FL_ARRANGE_FUN_DEF(const unsigned long long&);
+namespace {
+    template<class T>
+    Tensor arangeImpl(T start, T end, T step, dtype type) {
+        return fl::dispatch_dtype<Tensor>(
+            type,
+            [&]<class U>() {
+                return fl::arange({static_cast<Dim>((end - start) / step)}, 0, type)
+                    * static_cast<U>(step)
+                    + static_cast<U>(start);
+            }
+        );
+    }
+} // namespace
 
-Tensor arrange(Shape const& shape, Dim const seqDim, dtype const type) {
+#define FL_ARANGE_FUN_DEF(TYPE)                                                              \
+        template<> FL_API Tensor arange(TYPE start, TYPE end, TYPE step, dtype type) { \
+            return arangeImpl(start, end, step, type);                                       \
+        }
+FL_ARANGE_FUN_DEF(const double&);
+FL_ARANGE_FUN_DEF(const float&);
+FL_ARANGE_FUN_DEF(const int&);
+FL_ARANGE_FUN_DEF(const unsigned&);
+FL_ARANGE_FUN_DEF(const long&);
+FL_ARANGE_FUN_DEF(const unsigned long&);
+FL_ARANGE_FUN_DEF(const long long&);
+FL_ARANGE_FUN_DEF(const unsigned long long&);
+
+Tensor arange(Shape const& shape, Dim const seqDim, dtype const type) {
     return defaultTensorBackend().arange(shape, seqDim, type);
 }
 
@@ -355,20 +367,19 @@ Tensor tile(Tensor const& tensor, Shape const& shape) { return tensor.backend().
 
 Tensor concatenate(std::vector<Tensor> const& tensors, unsigned const axis) {
     if(tensors.empty())
-        throw std::invalid_argument("concatenate: called on empty set of tensors");
+        throw std::invalid_argument{"concatenate: called on empty set of tensors"};
 
     // Check all backends match
     TensorBackendType const b = tensors.front().backendType();
     bool const matches =
-        std::all_of(
-            tensors.begin(),
-            tensors.end(),
+        std::ranges::all_of(
+            tensors,
             [b](Tensor const& t) { return t.backendType() == b; }
         );
     if(!matches)
-        throw std::invalid_argument(
+        throw std::invalid_argument{
             "concatenate: tried to concatenate tensors of different backends"
-        );
+        };
 
     return tensors.front().backend().concatenate(tensors, axis);
 }
@@ -377,7 +388,7 @@ Tensor nonzero(Tensor const& tensor) { return tensor.backend().nonzero(tensor); 
 
 Tensor pad(
     Tensor const& input,
-    std::vector<std::pair<int, int>> const& padWidths,
+    std::vector<std::pair<Dim, Dim>> const& padWidths,
     PadType const type
 ) { return input.backend().pad(input, padWidths, type); }
 

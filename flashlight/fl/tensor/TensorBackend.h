@@ -76,6 +76,7 @@ public:
 
     virtual Tensor identity(Dim dim, dtype type) = 0;
     virtual Tensor arange(Shape const& shape, Dim seqDim, dtype type) = 0;
+
     virtual Tensor iota(Shape const& dims, Shape const& tileDims, dtype type) = 0;
 
     /************************ Shaping and Indexing *************************/
@@ -92,7 +93,7 @@ public:
     virtual Tensor nonzero(Tensor const& tensor) = 0;
     virtual Tensor pad(
         Tensor const& input,
-        std::vector<std::pair<int, int>> const& padWidths,
+        std::vector<std::pair<Dim, Dim>> const& padWidths,
         PadType type
     ) = 0;
 
@@ -319,7 +320,8 @@ Tensor toTensorType(Tensor&& in) {
             in.shape(),
             in.type(),
             // TODO: use the void specialization instead of a reinterpret cast
-            reinterpret_cast<void*>(in.device<char>()), // expects contiguous memory
+            reinterpret_cast<void*>(in.device<char>()),
+            // expects contiguous memory
             in.location()
         )
     );
@@ -327,29 +329,29 @@ Tensor toTensorType(Tensor&& in) {
 
 namespace detail {
 
-/**
- * Compare the backends of two tensors.
- *
- * @return true if the backends of both tensors are the same, else false.
- */
+    /**
+     * Compare the backends of two tensors.
+     *
+     * @return true if the backends of both tensors are the same, else false.
+     */
     bool areBackendsEqual(const Tensor& a, const Tensor& b);
 
-/**
- * Compare the backends of multiple tensors.
- *
- * @return true if all tensors' backends are the same, false otherwise.
- */
+    /**
+     * Compare the backends of multiple tensors.
+     *
+     * @return true if all tensors' backends are the same, false otherwise.
+     */
     template<typename... Args>
     bool areBackendsEqual(const Tensor& a, const Tensor& b, const Args&... args) {
         return areBackendsEqual(a, b) && areBackendsEqual(a, args...)
-               && areBackendsEqual(b, args...);
+            && areBackendsEqual(b, args...);
     }
 
-/**
- *
- * @return a reference to a tensor backend instance descripting the default
-   backend.
- */
+    /**
+     *
+     * @return a reference to a tensor backend instance descripting the default
+       backend.
+     */
     TensorBackend& getDefaultBackend();
 
 } // namespace detail

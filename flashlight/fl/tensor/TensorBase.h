@@ -300,7 +300,7 @@ public:
      *
      * @return the number of dimensions
      */
-    int ndim() const;
+    Dim ndim() const;
 
     /**
      * Returns true if the tensor has zero elements, else false.
@@ -388,11 +388,11 @@ public:
      */
     template<typename... Ts>
     Tensor operator()(Ts const&... args) const {
-        // TODO: add this back if acceptable with C++ 17 ABIs and a nvcc
-        // static_assert(
-        // std::conjunction<std::is_constructible<Index, Ts>...>::value,
-        // "Tensor index operator can only take Index-compatible types - "
-        // "fl::range, fl::Tensor, fl::span, and integer types.");
+        static_assert(
+            (std::constructible_from<Index, Ts> && ...),
+            "Tensor index operator can only take Index-compatible types - "
+            "fl::range, fl::Tensor, fl::span, and integer types."
+        );
         std::vector<Index> indices{{args...}};
         return this->operator()(indices);
     }
@@ -674,17 +674,17 @@ FL_API Tensor identity(Dim dim, dtype type = dtype::f32);
 
 /**
  * Return evenly-spaced values in a given interval. Generate values in the
- * interval `[start, stop)` steppping each element by the passed step.
+ * interval `[begin, end)` stepping each element by the passed step.
  *
- * @param[in] start the start of the range
- * @param[in] end the end of the range, inclusive
+ * @param[in] start the start of the range (inclusive)
+ * @param[in] end the end of the range (exclusive)
  * @param[in] step the increment for each consecutive value in the range
  * @param[in] type the dtype of the resulting tensor
  *
  * @return a tensor containing the evenly-spaced values
  */
 template<typename T>
-FL_API Tensor arrange(
+FL_API Tensor arange(
     T const& start,
     T const& end,
     T const& step = 1,
@@ -703,7 +703,7 @@ FL_API Tensor arrange(
  * @return a tensor with the given shape with the sequence along the given
  * dimension, tiled along other dimensions.
  */
-FL_API Tensor arrange(Shape const& shape, Dim seqDim = 0, dtype type = dtype::f32);
+FL_API Tensor arange(Shape const& shape, Dim seqDim = 0, dtype type = dtype::f32);
 
 /**
  * Creates a sequence with the range `[0, dims.elements())` sequentially in the
@@ -804,15 +804,14 @@ enum class PadType {
  * Pad a tensor with zeros.
  *
  * @param[in] input the input tensor to pad
- * @param[in] padWidths a vector of tuples representing padding (before, after)
- * tuples for each axis
- * @param[in] type the padding mode with which to pad the tensor - see `PadType`
+ * @param[in] padWidths padding sizes for each axis with (prepended, appended) respectively
+ * @param[in] type the padding mode with which to pad the tensor - @ref PadType
  *
  * @return the padded tensor
  */
 FL_API Tensor pad(
     Tensor const& input,
-    std::vector<std::pair<int, int>> const& padWidths,
+    std::vector<std::pair<Dim, Dim>> const& padWidths,
     PadType type = PadType::Constant
 );
 
