@@ -264,9 +264,9 @@ namespace detail {
         unsigned long long>;
 }
 
-template<class R = void, class Func>
+template<class R = void, class Types = detail::fundamental_types, class Func>
 R dispatch_dtype(fl::dtype type, Func&& func) {
-    R result{};
+    std::conditional_t<std::same_as<R, void>, int, R> result{};
     bool found = false;
 
     auto try_dispatch = [&found, &result, type, &func]<class Type>() {
@@ -280,7 +280,7 @@ R dispatch_dtype(fl::dtype type, Func&& func) {
     };
 
     [&]<class... Ts>(std::tuple<Ts...>) { (try_dispatch.template operator()<Ts>(), ...); }(
-        detail::fundamental_types{}
+        Types{}
     );
 
     if(!found)
