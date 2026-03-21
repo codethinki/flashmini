@@ -19,6 +19,206 @@
 using namespace ::testing;
 using namespace fl;
 
+namespace {
+void print_2d_tensor(Tensor const& toPrint, std::string_view name) {
+    auto const dims = toPrint.ndim();
+
+    if(dims == 0)
+        std::cout << "[]\n";
+    if(dims > 2)
+        std::cout << std::format("can't print tensor [{}], has more than 2 dimensions\n", name);
+
+    auto adaptive_tensor_print_2d = [&]<class T>() {
+        std::span host{toPrint.host<T>(), toPrint.elements()};
+
+
+        std::cout << std::format("{}:\n", name);
+
+
+        auto const& shape = toPrint.shape();
+
+        auto const height = shape[0];
+        auto const width = dims == 1 ? 1 : shape[1];
+
+
+        std::vector<std::string> rows(height);
+
+        for(size_t x = 0; x < width; x++) {
+            for(size_t y = 0; y < height; y++) {
+                auto& row = rows[y];
+
+                size_t index = x * height + y;
+
+                if(x == width - 1)
+                    row += std::format("{}", host[index]);
+                else
+                    row += std::format("{}, ", host[index]);
+            }
+
+            size_t max = 0;
+            for(auto& row : rows)
+                max = std::max(row.size(), max);
+
+            for(auto& row : rows)
+                row.append(std::string(max - row.size(), ' '));
+        }
+
+        for(auto& row : rows)
+            std::cout << std::format("[{}]\n", row);
+
+        std::cout << '\n';
+    };
+
+    fl::dispatch_dtype(toPrint.type(), adaptive_tensor_print_2d);
+};
+}
+
+TEST(TensorBaseTest, FullTypeMismatch) {
+    Shape const shape{2, 2};
+
+    // Case where everything matches
+    auto const x0 = fl::full<double>(shape, 1.0, fl::dtype::f64);
+    ASSERT_EQ(x0.type(), fl::dtype::f64);
+    ASSERT_EQ(x0.shape(), shape);
+    ASSERT_EQ(x0.scalar<double>(), 1.0);
+
+    // Explicitly templating int literal while requesting double dtype
+    auto const x1 = fl::full<int>(shape, 0, fl::dtype::f64);
+
+    ASSERT_EQ(x1.type(), fl::dtype::f64);
+    ASSERT_EQ(x1.shape(), shape);
+    ASSERT_EQ(x1.scalar<double>(), 0);
+
+    // Test that explicitly templating the call to double while requesting an integer dtype
+    // constructs the requested type without relying on implicit literal casting.
+    auto const x2 = fl::full<double>(shape, 1.0, fl::dtype::s32);
+    ASSERT_EQ(x2.type(), fl::dtype::s32);
+    ASSERT_EQ(x2.shape(), shape);
+    ASSERT_EQ(x2.scalar<int>(), 1);
+}
+
+TEST(TensorBaseTest, ArangeTypeMismatch) {
+    // Case where everything matches
+    auto const y0 = fl::arange<double>(0.0, 4.0, 1.0, fl::dtype::f64);
+    ASSERT_EQ(y0.type(), fl::dtype::f64);
+    ASSERT_EQ(y0.shape(), Shape({4}));
+    ASSERT_EQ(y0.scalar<double>(), 0.0);
+
+    // Emitting int literals while requesting f64 tensor creation.
+    auto const y1 = fl::arange<int>(0, 4, 1, fl::dtype::f64);
+    ASSERT_EQ(y1.type(), fl::dtype::f64);
+    ASSERT_EQ(y1.shape(), Shape({4}));
+    ASSERT_EQ(y1.scalar<double>(), 0.0);
+
+    // Emitting double literals while requesting s32 tensor creation.
+    auto const y2 = fl::arange<double>(0.0, 4.0, 1.0, fl::dtype::s32);
+    ASSERT_EQ(y2.type(), fl::dtype::s32);
+    ASSERT_EQ(y2.shape(), Shape({4}));
+    ASSERT_EQ(y2.scalar<int>(), 0);
+}
+
+TEST(TensorBaseTest, Concatenate) {
+    auto a = fl::full({3, 3}, 1.f);
+    auto b = fl::full({3, 3}, 2.f);
+    auto c = fl::full({3, 3}, 3.f);
+    ASSERT_TRUE(
+        allClose(fl::concatenate(0, a, b, c), fl::concatenate({a, b, c}))
+    );
+    auto const out = fl::concatenate(0, a, b, c);
+    ASSERT_EQ(out.shape(), (Shape{9, 3}));
+
+    // Empty tenors
+    ASSERT_EQ(fl::concatenate(0, Tensor{}, Tensor{}).shape(), Shape{0});
+    ASSERT_EQ(fl::concatenate(2, Tensor{}, Tensor{}).shape(), (Shape{0, 1, 1}));
+    ASSERT_EQ(
+        fl::concatenate(1, fl::rand({5, 5}), Tensor{}).shape(),
+        (Shape{5, 5})
+    );
+}
+
+TEST(TensorBaseTest, ConcatenateMany) {
+    for(int n = 1; n <= 30; ++n) {
+        std::vector<Tensor> tensors{};
+        std::vector<int> expectedData{};
+        long long totalSize = 0;
+
+        for(size_t i = 0; i < n; ++i) {
+            // Variable width: i + 1 elements
+            auto const width = i + 1;
+
+            // Variable content: start at i * 10
+            auto const startVal = i * 10;
+            auto t = fl::arange<int>(startVal, startVal + width, 1, fl::dtype::s32);
+            tensors.push_back(t);
+
+            for(size_t j = 0; j < width; ++j)
+                expectedData.push_back(startVal + j);
+            totalSize += width;
+        }
+
+        auto result = fl::concatenate(tensors, /* axis = */ 0);
+        auto expectedTensor = Tensor::fromVector<int>({totalSize}, expectedData);
+
+        ASSERT_EQ(result.shape(), Shape({totalSize}));
+        ASSERT_TRUE(allClose(result, expectedTensor));
+    }
+}
+
+
+TEST(TensorBaseTest, DuplicateTensors) {
+    auto t1 = fl::full({2, 2}, 1.0f, fl::dtype::f32);
+    auto t2 = fl::full({2, 2}, 2.0f, fl::dtype::f32);
+
+    auto result = fl::concatenate({t1, t2, t1, t2}, /* axis = */ 1);
+    auto expected = fl::concatenate({t1.copy(), t2.copy(), t1.copy(), t2.copy()}, /* axis = */ 1);
+    
+    print_2d_tensor(result, "result");
+    print_2d_tensor(expected, "expected");
+
+    ASSERT_TRUE(allClose(result, expected));
+}
+
+TEST(TensorBaseTest, ConcatenateViews) {
+    std::vector const data{
+        0.1f,
+        0.2f,
+        0.3f,
+        0.4f,
+        0.5f,
+        1.1f,
+        1.2f,
+        1.3f,
+        1.4f,
+        1.5f
+    };
+    auto const t = fl::Tensor::fromVector({5, 2}, data);
+
+    auto const vertTiled = fl::concatenate(
+        0,
+        fl::reshape(t(0, fl::span), {1, 2}),
+        t,
+        fl::reshape(t(t.dim(0) - 1, fl::span), {1, 2})
+    );
+    auto vTiled0 = vertTiled(fl::span, 0);
+    auto vTiled1 = vertTiled(fl::span, 1);
+
+    auto const result = fl::concatenate({vTiled1, vTiled0, vTiled0, vTiled1, vTiled1, vTiled0}, 1);
+
+    auto const expectedSymmetricPad = fl::concatenate(
+        {vTiled1.copy(), vTiled0.copy(), vTiled0.copy(), vTiled1.copy(), vTiled1.copy(), vTiled0.copy()},
+        1
+    );
+
+    print_2d_tensor(vTiled0, "vTiled0");
+    print_2d_tensor(vTiled1, "vTiled1");
+    print_2d_tensor(result, "result (from views)");
+    print_2d_tensor(expectedSymmetricPad, "expected (from copies)");
+
+    ASSERT_TRUE(allClose(result, expectedSymmetricPad));
+}
+
+
+
 TEST(TensorBaseTest, DefaultConstruction) {
     Tensor t;
     ASSERT_EQ(t.shape(), Shape({0}));
