@@ -322,7 +322,7 @@ Tensor identity(Dim const dim, dtype const type) { return defaultTensorBackend()
 
 namespace {
     template<class T>
-    Tensor arangeImpl(T start, T end, T step, dtype type) {
+    Tensor arange_impl(T start, T end, T step, dtype type) {
         return fl::dispatch_dtype<Tensor>(
             type,
             [&]<class U>() {
@@ -336,7 +336,7 @@ namespace {
 
 #define FL_ARANGE_FUN_DEF(TYPE)                                                              \
         template<> FL_API Tensor arange(TYPE start, TYPE end, TYPE step, dtype type) { \
-            return arangeImpl(start, end, step, type);                                       \
+            return arange_impl(start, end, step, type);                                       \
         }
 FL_ARANGE_FUN_DEF(const double&);
 FL_ARANGE_FUN_DEF(const float&);

@@ -16,6 +16,8 @@
 #include "flashlight/fl/tensor/Random.h"
 #include "flashlight/fl/tensor/TensorBase.h"
 
+#include <format>
+
 using namespace ::testing;
 using namespace fl;
 
@@ -171,7 +173,7 @@ TEST(TensorBaseTest, DuplicateTensors) {
 
     auto result = fl::concatenate({t1, t2, t1, t2}, /* axis = */ 1);
     auto expected = fl::concatenate({t1.copy(), t2.copy(), t1.copy(), t2.copy()}, /* axis = */ 1);
-    
+
     print_2d_tensor(result, "result");
     print_2d_tensor(expected, "expected");
 
@@ -220,113 +222,134 @@ TEST(TensorBaseTest, ConcatenateViews) {
 
 
 TEST(TensorBaseTest, DefaultConstruction) {
-    Tensor t;
+    Tensor const t{};
     ASSERT_EQ(t.shape(), Shape({0}));
     ASSERT_EQ(t.type(), fl::dtype::f32);
 
-    Tensor u({1, 2, 3});
+    Tensor const u{{1, 2, 3}};
     ASSERT_EQ(u.shape(), Shape({1, 2, 3}));
     ASSERT_EQ(u.type(), fl::dtype::f32);
-    Tensor x({0, 3});
+    Tensor const x({0, 3});
     ASSERT_EQ(x.shape(), Shape({0, 3}));
 
-    Tensor q(fl::dtype::f64);
+    Tensor const q(fl::dtype::f64);
     ASSERT_EQ(q.shape(), Shape({0}));
     ASSERT_EQ(q.type(), fl::dtype::f64);
 
-    Tensor v({4, 5, 6}, fl::dtype::u64);
+    Tensor const v({4, 5, 6}, fl::dtype::u64);
     ASSERT_EQ(v.shape(), Shape({4, 5, 6}));
     ASSERT_EQ(v.type(), fl::dtype::u64);
 }
 
 TEST(TensorBaseTest, CopyConstruction) {
-    Shape shape{2, 2};
-    auto x = fl::full(shape, 0);
-    auto y = x; // actual copy (implementation may be CoW)
+    Shape const shape{2, 2};
+    constexpr auto initialValue = 0;
+    constexpr auto afterIncrement = 23;
 
-    ASSERT_TRUE(allClose(x, fl::full(shape, 0)));
-    ASSERT_TRUE(allClose(y, fl::full(shape, 0)));
-    x += 23; // affects both tensors
-    ASSERT_TRUE(allClose(x, fl::full(shape, 23)));
-    ASSERT_TRUE(allClose(y, fl::full(shape, 0)));
+    auto x = fl::full(shape, initialValue);
+    auto const y = x; // actual copy (implementation may be CoW)
+
+    ASSERT_TRUE(allClose(x, fl::full(shape, initialValue)));
+    ASSERT_TRUE(allClose(y, fl::full(shape, initialValue)));
+    x += afterIncrement; // affects both tensors
+    ASSERT_TRUE(allClose(x, fl::full(shape, afterIncrement)));
+    ASSERT_TRUE(allClose(y, fl::full(shape, initialValue)));
 }
 
 TEST(TensorBaseTest, MoveConstruction) {
-    Shape shape{2, 2};
-    auto x = fl::full(shape, 0);
-    auto y = x(span, span); // view of x
+    Shape const shape{2, 2};
+    constexpr auto initialValue = 0;
+    constexpr auto afterMove = 42;
+
+    auto x = fl::full(shape, initialValue);
+    auto const y = x(span, span); // view of x
 
     auto z = std::move(x); // `z` takes over `x`'s data
     // TODO the following line (or any read to `y`, as it seems) promotes view to
     // copy; to avoid this, we must update impl of `assign`
     // ASSERT_TRUE(allClose(y, fl::full(shape, 0)));
-    ASSERT_TRUE(allClose(z, fl::full(shape, 0)));
+    ASSERT_TRUE(allClose(z, fl::full(shape, initialValue)));
 
-    z += 42; // `y` is now a view of `z`, so it's affected
-    ASSERT_TRUE(allClose(y, fl::full(shape, 42)));
-    ASSERT_TRUE(allClose(z, fl::full(shape, 42)));
+    z += afterMove; // `y` is now a view of `z`, so it's affected
+    ASSERT_TRUE(allClose(y, fl::full(shape, afterMove)));
+    ASSERT_TRUE(allClose(z, fl::full(shape, afterMove)));
 }
 
 TEST(TensorBaseTest, AssignmentOperatorLvalueWithRvalue) {
-    Shape shape{2, 2};
-    auto x = fl::full({2, 2}, 0);
+    Shape const shape{2, 2};
+    constexpr auto initialValue = 0;
+    constexpr auto assignedValue = 42;
+    constexpr auto expectedAfterIncrement = 43;
+
+    auto const x = fl::full(shape, initialValue);
     auto y = x(span, span);
 
     // view as a lvalue cannot be used to update original tensor
-    y = fl::full({2, 2}, 42); // `x` isn't affected
+    y = fl::full(shape, assignedValue); // `x` isn't affected
     y += 1; // `x` isn't affected
-    ASSERT_TRUE(allClose(x, fl::full(shape, 0)));
-    ASSERT_TRUE(allClose(y, fl::full(shape, 43)));
+    ASSERT_TRUE(allClose(x, fl::full(shape, initialValue)));
+    ASSERT_TRUE(allClose(y, fl::full(shape, expectedAfterIncrement)));
 }
 
 TEST(TensorBaseTest, AssignmentOperatorLvalueWithLvalue) {
-    Shape shape{2, 2};
-    auto x = fl::full({2, 2}, 0);
+    Shape const shape{2, 2};
+    constexpr auto initialValue = 0;
+    constexpr auto value1 = 1;
+    constexpr auto expectedAfterAssignment = 2;
+
+    auto const x = fl::full(shape, initialValue);
     auto y = x(span, span);
-    auto z = fl::full({2, 2}, 1);
+    auto const z = fl::full(shape, value1);
 
     y = z; // `x` is a copy of `z` now (impl may be CoW)
-    y += 1; // `z` isn't affected
-    ASSERT_TRUE(allClose(x, fl::full(shape, 0)));
-    ASSERT_TRUE(allClose(y, fl::full(shape, 2)));
-    ASSERT_TRUE(allClose(z, fl::full(shape, 1)));
+    y += value1; // `z` isn't affected
+    ASSERT_TRUE(allClose(x, fl::full(shape, initialValue)));
+    ASSERT_TRUE(allClose(y, fl::full(shape, expectedAfterAssignment)));
+    ASSERT_TRUE(allClose(z, fl::full(shape, value1)));
 }
 
 TEST(TensorBaseTest, AssignmentOperatorRvalueWithRvalue) {
-    Shape shape{2, 2};
-    auto type = dtype::f32;
-    auto x = fl::full({2, 2}, 0, type);
-    auto y = x(span, span);
+    Shape const shape{2, 2};
+    constexpr auto initialValue = 0;
+    constexpr auto assignValue = 1;
 
-    x(0, span) = fl::full({2}, 1); // `x` is updated by copying from rhs data
-    auto res = fl::Tensor::fromVector<float>(shape, {1, 0, 1, 0}, type);
+    auto const type = dtype::f32;
+    auto const x = fl::full(shape, initialValue, type);
+    auto const y = x(span, span);
+
+    x(0, span) = fl::full({2}, assignValue); // `x` is updated by copying from rhs data
+    auto const res = fl::Tensor::fromVector<float>(shape, {1, 0, 1, 0}, type);
     ASSERT_TRUE(allClose(x, res));
     ASSERT_TRUE(allClose(y, res));
 }
 
 TEST(TensorBaseTest, AssignmentOperatorRvalueWithLvalue) {
-    Shape shape{2, 2};
-    auto type = dtype::f32;
-    auto x = fl::full(shape, 0, type);
-    auto y = x(span, span); // view of `x`
-    auto z = fl::full({2}, 1, type);
+    Shape const shape{2, 2};
+    constexpr auto initialValue = 0;
+    constexpr auto vectorValue = 1;
+    constexpr auto expectedAfterIncrement = 2;
+
+    auto const type = dtype::f32;
+    auto x = fl::full(shape, initialValue, type);
+    auto const y = x(span, span); // view of `x`
+    auto const z = fl::full({2}, vectorValue, type);
 
     x(span, 1) = z; // `x` is updated by copying from `z`'s data
-    x += 1; // `z` isn't affected
-    auto res = fl::Tensor::fromVector<float>(shape, {1, 1, 2, 2}, type);
+    x += vectorValue; // `z` isn't affected
+    auto const res = fl::Tensor::fromVector<float>(shape, {1, 1, 2, 2}, type);
     ASSERT_TRUE(allClose(x, res));
     ASSERT_TRUE(allClose(y, res));
-    ASSERT_TRUE(allClose(z, fl::full({2}, 1, type)));
+    ASSERT_TRUE(allClose(z, fl::full({2}, vectorValue, type)));
 }
 
 TEST(TensorBaseTest, Metadata) {
-    int s = 9;
-    auto t = fl::rand({s, s});
-    ASSERT_EQ(t.elements(), s * s);
+    int size = 9;
+    auto const t = fl::rand({size, size});
+    ASSERT_EQ(t.elements(), size * size);
     ASSERT_FALSE(t.isEmpty());
-    ASSERT_EQ(t.bytes(), s * s * sizeof(float));
+    ASSERT_EQ(t.bytes(), size * size * sizeof(float));
 
-    Tensor e;
+    Tensor const e;
     ASSERT_EQ(e.elements(), 0);
     ASSERT_TRUE(e.isEmpty());
     ASSERT_FALSE(e.isSparse());
@@ -334,7 +357,11 @@ TEST(TensorBaseTest, Metadata) {
 }
 
 TEST(TensorBaseTest, fromScalar) {
-    Tensor a = fromScalar(3.14, fl::dtype::f32);
+    constexpr auto scalarValue = 3.14;
+    auto const type = fl::dtype::f32;
+
+    Tensor const a = fromScalar(scalarValue, type);
+    ASSERT_EQ(a.type(), type);
     ASSERT_EQ(a.elements(), 1);
     ASSERT_EQ(a.ndim(), 0);
     ASSERT_FALSE(a.isEmpty());
@@ -344,8 +371,8 @@ TEST(TensorBaseTest, fromScalar) {
 TEST(TensorBaseTest, string) {
     // Different backends might print tensors differently - check for consistency
     // across two identical tensors
-    auto a = fl::full({3, 4, 5}, 6.f);
-    auto b = fl::full({3, 4, 5}, 6.f);
+    auto const a = fl::full({3, 4, 5}, 6.f);
+    auto const b = fl::full({3, 4, 5}, 6.f);
     ASSERT_EQ(a.toString(), b.toString());
 
     std::stringstream ssa, ssb;
@@ -367,7 +394,7 @@ TEST(TensorBaseTest, AssignmentOperators) {
 
     a = fl::full({4, 4}, 7.f);
     ASSERT_TRUE(allClose(a, fl::full({4, 4}, 7.f)));
-    auto b = a;
+    auto const b = a;
     ASSERT_TRUE(allClose(b, fl::full({4, 4}, 7.f)));
     a = 6.;
     ASSERT_TRUE(allClose(a, fl::full({4, 4}, 6.f)));
@@ -378,12 +405,12 @@ TEST(TensorBaseTest, AssignmentOperators) {
 
 TEST(TensorBaseTest, CopyOperators) {
     auto a = fl::full({3, 3}, 1.f);
-    auto b = a;
+    auto const b = a;
     a += 1;
     ASSERT_TRUE(allClose(b, fl::full({3, 3}, 1.f)));
     ASSERT_TRUE(allClose(a, fl::full({3, 3}, 2.f)));
 
-    auto c = a.copy();
+    auto const c = a.copy();
     a += 1;
     ASSERT_TRUE(allClose(a, fl::full({3, 3}, 3.f)));
     ASSERT_TRUE(allClose(c, fl::full({3, 3}, 2.f)));
@@ -391,15 +418,16 @@ TEST(TensorBaseTest, CopyOperators) {
 
 TEST(TensorBaseTest, ConstructFromData) {
     // Tensor::fromVector
-    float val = 3.f;
-    std::vector<float> vec(100, val);
-    fl::Shape s = {10, 10};
-    ASSERT_TRUE(allClose(fl::Tensor::fromVector(s, vec), fl::full(s, val)));
+    constexpr auto vectorSize = 100;
+    float fillValue = 3.f;
+    std::vector<float> vec(vectorSize, fillValue);
+    fl::Shape bigShape = {10, 10};
+    ASSERT_TRUE(allClose(fl::Tensor::fromVector(bigShape, vec), fl::full(bigShape, fillValue)));
 
     ASSERT_TRUE(
         allClose(
-            fl::Tensor::fromBuffer(s, vec.data(), fl::MemoryLocation::Host),
-            fl::full(s, val)
+            fl::Tensor::fromBuffer(bigShape, vec.data(), fl::MemoryLocation::Host),
+            fl::full(bigShape, fillValue)
         )
     );
 
@@ -440,8 +468,8 @@ TEST(TensorBaseTest, ConstructFromData) {
 }
 
 TEST(TensorBaseTest, reshape) {
-    auto a = fl::full({4, 4}, 3.f);
-    auto b = fl::reshape(a, Shape({8, 2}));
+    auto const a = fl::full({4, 4}, 3.f);
+    auto const b = fl::reshape(a, Shape({8, 2}));
     ASSERT_EQ(b.shape(), Shape({8, 2}));
     ASSERT_TRUE(allClose(a, fl::reshape(b, {4, 4})));
 
@@ -482,89 +510,72 @@ TEST(TensorBaseTest, transpose) {
 }
 
 TEST(TensorBaseTest, tile) {
-    auto a = fl::full({4, 4}, 3.f);
-    auto tiled = fl::tile(a, {2, 2});
+    auto const a = fl::full({4, 4}, 3.f);
+    auto const tiled = fl::tile(a, {2, 2});
     ASSERT_EQ(tiled.shape(), Shape({8, 8}));
     ASSERT_TRUE(allClose(tiled, fl::full({8, 8}, 3.f)));
     ASSERT_EQ(fl::tile(a, {}).shape(), a.shape());
-
-    auto s = fl::fromScalar(3.14);
+    
+    auto const s = fl::fromScalar(3.14f);
     ASSERT_EQ(fl::tile(s, {3, 3}).shape(), Shape({3, 3}));
     ASSERT_EQ(fl::tile(s, {}).shape(), s.shape());
 }
 
-TEST(TensorBaseTest, concatenate) {
-    auto a = fl::full({3, 3}, 1.f);
-    auto b = fl::full({3, 3}, 2.f);
-    auto c = fl::full({3, 3}, 3.f);
-    ASSERT_TRUE(
-        allClose(fl::concatenate(0, a, b, c), fl::concatenate({a, b, c}))
-    );
-    auto out = fl::concatenate(0, a, b, c);
-    ASSERT_EQ(out.shape(), Shape({9, 3}));
 
-    // Empty tenors
-    ASSERT_EQ(fl::concatenate(0, Tensor(), Tensor()).shape(), Shape({0}));
-    ASSERT_EQ(fl::concatenate(2, Tensor(), Tensor()).shape(), Shape({0, 1, 1}));
-    ASSERT_EQ(
-        fl::concatenate(1, fl::rand({5, 5}), Tensor()).shape(),
-        Shape({5, 5})
-    );
-
-    // More tensors
-    // TODO{fl::Tensor}{concat} just concat everything once we enforce
-    // arbitrarily-many tensors
-    const float val = 3.;
-    const int axis = 0;
-    auto t = fl::concatenate(
-        axis,
-        fl::full({4, 2}, val),
-        fl::full({4, 2}, val),
-        fl::full({4, 2}, val),
-        fl::concatenate(
-            axis,
-            fl::full({4, 2}, val),
-            fl::full({4, 2}, val),
-            fl::full({4, 2}, val)
-        )
-    );
-    ASSERT_EQ(t.shape(), Shape({24, 2}));
-    ASSERT_TRUE(allClose(t, fl::full({24, 2}, val)));
-}
 
 TEST(TensorBaseTest, nonzero) {
-    std::vector<int> idxs = {0, 1, 4, 9, 11, 23, 55, 82, 91};
-    auto a = fl::full({10, 10}, 1, fl::dtype::u32);
+    std::vector<int> const idxs = {0, 1, 4, 9, 11, 23, 55, 82, 91};
+    auto const a = fl::full({10, 10}, 1, fl::dtype::u32);
     for(const auto idx : idxs)
         a(idx / 10, idx % 10) = 0;
-    auto indices = fl::nonzero(a);
+    auto const indices = fl::nonzero(a);
     int nnz = a.elements() - idxs.size();
     ASSERT_EQ(indices.shape(), Shape({nnz}));
     ASSERT_TRUE(
-        allClose(a.flatten()(indices), fl::full({nnz}, 1, fl::dtype::u32)));
+        allClose(a.flatten()(indices), fl::full({nnz}, 1, fl::dtype::u32))
+    );
 }
 
 TEST(TensorBaseTest, flatten) {
-    unsigned s = 6;
-    auto a = fl::full({s, s, s}, 2.f);
-    auto flat = a.flatten();
-    ASSERT_EQ(flat.shape(), Shape({s * s * s}));
-    ASSERT_TRUE(allClose(flat, fl::full({s * s * s}, 2.f)));
+    int size = 6;
+    auto const a = fl::full({size, size, size}, 2.f);
+    auto const flat = a.flatten();
+    ASSERT_EQ(flat.shape(), Shape({size * size * size}));
+    ASSERT_TRUE(allClose(flat, fl::full({size * size * size}, 2.f)));
 }
 
 TEST(TensorBaseTest, pad) {
-    auto t = fl::rand({5, 2});
-    auto zeroPadded = fl::pad(t, {{1, 2}, {3, 4}});
-    auto zeroTest = fl::concatenate(
+    std::vector<float> data{
+        {
+            0.1f,
+            0.2f,
+            0.3f,
+            0.4f,
+            0.5f,
+            1.1f,
+            1.2f,
+            1.3f,
+            1.4f,
+            1.5f
+        }
+    };
+
+
+    auto const t = fl::Tensor::fromVector({5, 2}, data);
+    //auto const t = fl::rand({5, 2});
+    auto const actualZeroPad = fl::pad(t, {{1, 2}, {3, 4}});
+    auto const expectedZeroPad = fl::concatenate(
         1,
         fl::full({8, 3}, 0.f),
         fl::concatenate(0, fl::full({1, 2}, 0.f), t, fl::full({2, 2}, 0.f)),
         fl::full({8, 4}, 0.f)
     );
-    ASSERT_TRUE(allClose(zeroPadded, zeroTest));
 
-    auto edgePadded = fl::pad(t, {{1, 1}, {2, 2}}, PadType::Edge);
-    auto vertTiled = fl::concatenate(
+
+    ASSERT_TRUE(allClose(actualZeroPad, expectedZeroPad));
+
+    auto const actualEdgePad = fl::pad(t, {{1, 1}, {2, 2}}, PadType::Edge);
+    auto const vertTiled = fl::concatenate(
         0,
         fl::reshape(t(0, fl::span), {1, 2}),
         t,
@@ -572,98 +583,107 @@ TEST(TensorBaseTest, pad) {
     );
     auto vTiled0 = vertTiled(fl::span, 0);
     auto vTiled1 = vertTiled(fl::span, 1);
-    ASSERT_TRUE(
-        allClose(
-            edgePadded,
-            fl::concatenate(
-                1,
-                fl::tile(vTiled0, {1, 3}),
-                fl::tile(vTiled1, {1, 3})
-            )
-        )
+
+    auto const expectedEdgePad = fl::concatenate(
+        1,
+        fl::tile(vTiled0, {1, 3}),
+        fl::tile(vTiled1, {1, 3})
     );
 
-    auto symmetricPadded = fl::pad(t, {{1, 1}, {2, 2}}, PadType::Symmetric);
-    ASSERT_TRUE(
-        allClose(
-            symmetricPadded,
-            // TODO{fl::Tensor}{concat} just concat everything once we enforce
-            // arbitrarily-many tensors
-            fl::concatenate(
-                1,
-                vTiled1,
-                vTiled0,
-                vTiled0,
-                fl::concatenate(1, vTiled1, vTiled1, vTiled0)
-            )
-        )
+    ASSERT_TRUE(allClose(actualEdgePad, expectedEdgePad));
+
+
+    auto const actualSymmetricPad = fl::pad(t, {{1, 1}, {2, 2}}, PadType::Symmetric);
+    auto const expectedSymmetricPad = fl::concatenate(
+        {vTiled1, vTiled0, vTiled0, fl::concatenate(1, vTiled1, vTiled1, vTiled0)},
+        1
     );
+
+    ASSERT_TRUE(allClose(actualSymmetricPad, expectedSymmetricPad));
 }
 
-TEST(TensorBaseTest, astype) {
-    auto a = fl::rand({3, 3});
+TEST(TensorBaseTest, asType) {
+    auto const a = fl::rand({3, 3});
+    auto const size = 9;
+
     ASSERT_EQ(a.type(), dtype::f32);
-    ASSERT_EQ(a.asType(dtype::f64).type(), dtype::f64);
+
+    auto const aDouble = a.asType(dtype::f64);
+
+    ASSERT_EQ(aDouble.type(), dtype::f64);
+
+    auto const aData = a.host<float>();
+    auto const bData = aDouble.host<double>();
+
+    for(size_t i = 0; i < size; i++)
+        ASSERT_NEAR(aData[i], bData[i], 1e-6);
 }
 
 TEST(TensorBaseTest, where) {
-    auto a = Tensor::fromVector<int>({2, 5}, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-    auto out = fl::where(a < 5, a, a * 10);
-    a(a >= 5) *= 10;
+    constexpr auto threshold = 5;
+
+    auto const a = Tensor::fromVector<int>({2, 5}, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+    auto const out = fl::where(a < threshold, a, a * 10);
+    a(a >= threshold) *= 10;
     ASSERT_TRUE(allClose(out, a));
-    auto outC = fl::where(a < 5, a, 3);
-    a(a >= 5) = 3;
+    auto const outC = fl::where(a < threshold, a, 3);
+    a(a >= threshold) = 3;
     ASSERT_TRUE(allClose(outC, a));
-    auto outC2 = fl::where(a < 5, 3, a);
-    a(a < 5) = 3;
+    auto const outC2 = fl::where(a < threshold, 3, a);
+    a(a < threshold) = 3;
     ASSERT_TRUE(allClose(outC2, a));
 
     // non b8-type vector throws
     EXPECT_THROW(
-        fl::where((a < 5).asType(fl::dtype::f32), a, a * 10),
+        fl::where((a < threshold).asType(fl::dtype::f32), a, a * 10),
         std::exception
     );
 }
 
 TEST(TensorBaseTest, topk) {
-    auto a = fl::arrange({10, 2});
+    constexpr auto k = 3;
+    constexpr auto k4 = 4;
+
+    auto const a = fl::arange({10, 2});
     Tensor values;
     Tensor indices;
-    fl::topk(values, indices, a, /* k = */ 3, /* axis = */ 0); // descending sort
+    fl::topk(values, indices, a, /* k = */ k, /* axis = */ 0); // descending sort
     ASSERT_TRUE(
-        allClose(values, Tensor::fromVector<float>({3, 2}, {9, 8, 7, 9, 8, 7}))
+        allClose(values, Tensor::fromVector<float>({k, 2}, {9, 8, 7, 9, 8, 7}))
     );
 
     fl::topk(
         values,
         indices,
         a,
-        /* k = */ 4,
-        /* axis = */ 0,
+        /* k = */
+        k4,
+        /* axis = */
+        0,
         fl::SortMode::Ascending
     );
     ASSERT_TRUE(
         allClose(
             values,
-            Tensor::fromVector<float>({4, 2}, {0, 1, 2, 3, 0, 1, 2, 3})
+            Tensor::fromVector<float>({k4, 2}, {0, 1, 2, 3, 0, 1, 2, 3})
         )
     );
 }
 
 TEST(TensorBaseTest, sort) {
     Shape dims({10, 2});
-    auto a = fl::arrange(dims);
-    auto sorted = fl::sort(a, /* axis = */ 0, SortMode::Descending);
+    auto const a = fl::arange(dims);
+    auto const sorted = fl::sort(a, /* axis = */ 0, SortMode::Descending);
 
-    Tensor expected({dims[0]}, a.type());
+    Tensor const expected({dims[0]}, a.type());
     for(int i = 0; i < dims[0]; ++i)
         expected(i) = dims[0] - i - 1;
-    auto tiled = fl::tile(expected, {1, 2});
+    auto const tiled = fl::tile(expected, {1, 2});
     ASSERT_TRUE(allClose(sorted, tiled));
 
     ASSERT_TRUE(allClose(a, fl::sort(tiled, 0, SortMode::Ascending)));
 
-    auto b = fl::rand({10});
+    auto const b = fl::rand({10});
     Tensor values, indices;
     fl::sort(values, indices, b, /* axis = */ 0, SortMode::Descending);
     ASSERT_TRUE(
@@ -676,13 +696,13 @@ TEST(TensorBaseTest, sort) {
 
 TEST(TensorBaseTest, argsort) {
     Shape dims({10, 2});
-    auto a = fl::arrange(dims);
-    auto sorted = fl::argsort(a, /* axis = */ 0, SortMode::Descending);
+    auto const a = fl::arange(dims);
+    auto const sorted = fl::argsort(a, /* axis = */ 0, SortMode::Descending);
 
-    Tensor expected({dims[0]}, fl::dtype::u32);
+    Tensor const expected({dims[0]}, fl::dtype::u32);
     for(int i = 0; i < dims[0]; ++i)
         expected(i) = dims[0] - i - 1;
-    auto tiled = fl::tile(expected, {1, 2});
+    auto const tiled = fl::tile(expected, {1, 2});
     ASSERT_TRUE(allClose(sorted, tiled));
 
     ASSERT_TRUE(allClose(tiled, fl::argsort(tiled, 0, SortMode::Ascending)));
@@ -721,7 +741,7 @@ void assertScalarBehavior(fl::dtype type) {
 }
 
 TEST(TensorBaseTest, scalar) {
-    auto types = {
+    auto const types = {
         fl::dtype::b8,
         fl::dtype::u8,
         fl::dtype::s16,
@@ -734,7 +754,7 @@ TEST(TensorBaseTest, scalar) {
         fl::dtype::f32,
         fl::dtype::f64
     };
-    for(auto type : types) {
+    for(auto const type : types) {
         assertScalarBehavior<char>(type);
         assertScalarBehavior<unsigned char>(type);
         assertScalarBehavior<short>(type);
@@ -752,33 +772,33 @@ TEST(TensorBaseTest, scalar) {
 
 TEST(TensorBaseTest, isContiguous) {
     // Contiguous by default
-    auto a = fl::rand({10, 10});
+    auto const a = fl::rand({10, 10});
     ASSERT_TRUE(a.isContiguous());
 }
 
 TEST(TensorBaseTest, strides) {
-    auto t = fl::rand({10, 10});
+    auto const t = fl::rand({10, 10});
     ASSERT_EQ(t.strides(), Shape({1, 10}));
 }
 
 TEST(TensorBaseTest, stream) {
-    auto t1 = fl::rand({10, 10});
-    auto t2 = -t1;
-    auto t3 = t1 + t2;
+    auto const t1 = fl::rand({10, 10});
+    auto const t2 = -t1;
+    auto const t3 = t1 + t2;
     ASSERT_EQ(&t1.stream(), &t2.stream());
     ASSERT_EQ(&t1.stream(), &t3.stream());
 }
 
 TEST(TensorBaseTest, asContiguousTensor) {
-    auto t = fl::rand({5, 6, 7, 8});
-    auto indexed = t(
+    auto const t = fl::rand({5, 6, 7, 8});
+    auto const indexed = t(
         fl::range(1, 4, 2),
         fl::range(0, 6, 2),
-        fl::range(0, 6, 3),
+        fl::range(0, 7, 3),
         fl::range(0, 5, 3)
     );
 
-    auto contiguous = indexed.asContiguousTensor();
+    auto const contiguous = indexed.asContiguousTensor();
     std::vector<Dim> strides;
     unsigned stride = 1;
     for(unsigned i = 0; i < contiguous.ndim(); ++i) {
@@ -789,9 +809,9 @@ TEST(TensorBaseTest, asContiguousTensor) {
 }
 
 TEST(TensorBaseTest, host) {
-    auto a = fl::rand({10, 10});
+    auto const a = fl::rand({10, 10});
 
-    float* ptr = a.host<float>();
+    float const* ptr = a.host<float>();
     for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(ptr[i], a.flatten()(i).scalar<float>());
 
@@ -804,8 +824,8 @@ TEST(TensorBaseTest, host) {
 }
 
 TEST(TensorBaseTest, toHostVector) {
-    auto a = fl::rand({10, 10});
-    auto vec = a.toHostVector<float>();
+    auto const a = fl::rand({10, 10});
+    auto const vec = a.toHostVector<float>();
 
     for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(vec[i], a.flatten()(i).scalar<float>());
@@ -816,47 +836,47 @@ TEST(TensorBaseTest, toHostVector) {
 TEST(TensorBaseTest, arange) {
     // Range/step overload
     ASSERT_TRUE(
-        allClose(fl::arrange(2, 10, 2), Tensor::fromVector<int>({2, 4, 6, 8}))
+        allClose(fl::arange(2, 10, 2), Tensor::fromVector<int>({2, 4, 6, 8}))
     );
     ASSERT_TRUE(
-        allClose(fl::arrange(0, 6), Tensor::fromVector<int>({0, 1, 2, 3, 4, 5}))
+        allClose(fl::arange(0, 6), Tensor::fromVector<int>({0, 1, 2, 3, 4, 5}))
     );
     ASSERT_TRUE(
         allClose(
-            fl::arrange(0.f, 1.22f, 0.25f),
+            fl::arange(0.f, 1.22f, 0.25f),
             Tensor::fromVector<float>({0.f, 0.25f, 0.5f, 0.75f})
         )
     );
     ASSERT_TRUE(
         allClose(
-            fl::arrange(0.f, 4.1f),
+            fl::arange(0.f, 4.1f),
             Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f})
         )
     );
 
     // Shape overload
-    auto v = Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f});
-    ASSERT_TRUE(allClose(fl::arrange({4}), v));
+    auto const v = Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f});
+    ASSERT_TRUE(allClose(fl::arange({4}), v));
 
-    ASSERT_TRUE(allClose(fl::arrange({4, 5}), fl::tile(v, {1, 5})));
-    ASSERT_EQ(fl::arrange({4, 5}, 1).shape(), Shape({4, 5}));
+    ASSERT_TRUE(allClose(fl::arange({4, 5}), fl::tile(v, {1, 5})));
+    ASSERT_EQ(fl::arange({4, 5}, 1).shape(), Shape({4, 5}));
     ASSERT_TRUE(
         allClose(
-            fl::arrange({4, 5}, 1),
+            fl::arange({4, 5}, 1),
             fl::tile(
                 fl::reshape(Tensor::fromVector<float>({0.f, 1.f, 2.f, 3.f, 4.f}), {1, 5}),
                 {4}
             )
         )
     );
-    ASSERT_EQ(fl::arrange({2, 6}, 0, fl::dtype::f64).type(), fl::dtype::f64);
+    ASSERT_EQ(fl::arange({2, 6}, 0, fl::dtype::f64).type(), fl::dtype::f64);
 }
 
 TEST(TensorBaseTest, iota) {
     ASSERT_TRUE(
         allClose(
             fl::iota({5, 3}, {1, 2}),
-            fl::tile(fl::reshape(fl::arrange({15}), {5, 3}), {1, 2})
+            fl::tile(fl::reshape(fl::arange({15}), {5, 3}), {1, 2})
         )
     );
     ASSERT_EQ(fl::iota({2, 2}, {2, 2}, fl::dtype::f64).type(), fl::dtype::f64);

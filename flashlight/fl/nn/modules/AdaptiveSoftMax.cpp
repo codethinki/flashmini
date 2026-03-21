@@ -66,7 +66,7 @@ Variable AdaptiveSoftMax::getFullLogProb(
     Tensor output({outputSize, batchSize}, inputs.type());
 
     output(
-        fl::range(0, cutoff_[0] + static_cast<int64_t>(cutoff_.size()) - 1)
+        fl::range(0, cutoff_[0] + static_cast<Dim>(cutoff_.size()) - 1)
     ) =
         headOutput.tensor();
 

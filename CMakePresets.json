@@ -82,7 +82,7 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_CUDA_COMPILER": "nvcc",
-        "FL_USE_CUDNN": false,
+        "FL_USE_CUDNN": true,
         "CMAKE_CUDA_ARCHITECTURES": "native",
         "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler",
         "VCPKG_MANIFEST_FEATURES": "cuda"

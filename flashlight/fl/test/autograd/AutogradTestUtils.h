@@ -72,36 +72,6 @@ namespace detail {
             outD.tensor().flat(i) = 0;
         }
 
-
-        if(fwdJacobian.type() == dtype::f64 && fwdJacobian.elements() == 1280) {
-            auto const flat_tensor_print = [](Tensor t, std::string_view name) {
-                std::span host{t.host<double>(), t.elements()};
-
-
-                std::cout << std::format("{}:\n[", name);
-                for(size_t i = 0; i < host.size();) {
-                    size_t c = 1;
-                    while(i + c < host.size() && host[i] == host[i + c])
-                        c++;
-
-                    if(c == 1)
-                        std::cout << host[i];
-                    else
-                        std::cout << std::format("({})_{}", host[i], c);
-                    if(i + c < host.size() - 1)
-                        std::cout << ", ";
-
-                    i += c;
-                }
-
-                std::cout << "]\n\n\n";
-            };
-
-
-            flat_tensor_print(fwdJacobian, "fwd");
-            flat_tensor_print(bwdJacobian, "bwd");
-        }
-
         return allClose(fwdJacobian, bwdJacobian, precision);
     }
 

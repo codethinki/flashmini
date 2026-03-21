@@ -449,7 +449,7 @@ FL_API Variable concatenate(const std::vector<Variable>& concatInputs, int dim);
  * divisible, last chunk of smaller splitSize will be included.
  * @param dim dimension along which to split the Variable
  */
-FL_API std::vector<Variable> split(const Variable& input, int64_t splitSize, int dim);
+FL_API std::vector<Variable> split(const Variable& input, Dim splitSize, int dim);
 
 /**
  * Splits a Variable into smaller chunks.
@@ -458,7 +458,7 @@ FL_API std::vector<Variable> split(const Variable& input, int64_t splitSize, int
  * @param splitSizes vector of integers specifying the sizes for each split
  * @param dim dimension along which to split the Variable
  */
-FL_API std::vector<Variable> split(const Variable& input, std::vector<int64_t> const& splitSizes, int dim);
+FL_API std::vector<Variable> split(const Variable& input, std::vector<Dim> const& splitSizes, int dim);
 
 /**
  * Repeats the tensor `input` along specific dimensions. The number of

@@ -212,7 +212,7 @@ public:
     template<typename T>
     static Tensor fromVector(std::vector<T> v) {
         return Tensor(
-            {static_cast<int64_t>(v.size())},
+            {static_cast<Dim>(v.size())},
             fl::dtype_traits<T>::fl_type,
             v.data(),
             Location::Host
@@ -222,7 +222,7 @@ public:
     template<typename T, std::size_t S>
     static Tensor fromArray(std::array<T, S> a) {
         return Tensor(
-            {static_cast<int64_t>(a.size())},
+            {static_cast<Dim>(a.size())},
             fl::dtype_traits<T>::fl_type,
             a.data(),
             Location::Host

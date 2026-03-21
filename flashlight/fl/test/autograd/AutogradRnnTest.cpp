@@ -50,7 +50,7 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
     }
 
     auto w =
-        Variable(fl::rand({static_cast<int64_t>(nParams)}, precision), true);
+        Variable(fl::rand({static_cast<Dim>(nParams)}, precision), true);
 
     auto funcRnnIn = [&](Variable& input) -> Variable {
             return std::get<0>(

@@ -19,7 +19,7 @@ using namespace fl;
 TEST(TensorReductionTest, countNonzero) {
     std::vector<int> idxs = {0, 3, 4, 7, 24, 78};
     auto a = fl::full({10, 10}, 1, fl::dtype::u32);
-    for(const auto idx : idxs)
+    for(auto const idx : idxs)
         a(idx / 10, idx % 10) = 0;
 
     ASSERT_TRUE(
@@ -31,8 +31,8 @@ TEST(TensorReductionTest, countNonzero) {
 
     std::vector<unsigned> sizes(a.shape().dim(0));
     for(unsigned i = 0; i < a.shape().dim(0); ++i)
-        sizes[i] =
-            a.shape().dim(0) - fl::sum(a(fl::span, i) == 0, {0}).scalar<unsigned>();
+        sizes[i] = a.shape().dim(0) - fl::sum(a(fl::span, i) == 0, {0}).scalar<unsigned>();
+    
     ASSERT_TRUE(allClose(Tensor::fromVector(sizes), Tensor::fromVector(sizes)));
 
     auto b = fl::full({2, 2, 2}, 1, fl::dtype::u32);

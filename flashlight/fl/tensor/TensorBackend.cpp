@@ -72,26 +72,32 @@ Tensor TensorBackend::where(
 ) { return where(condition, full(condition.shape(), x, y.type()), y); }
 
 Tensor TensorBackend::minimum(Tensor const& lhs, double const& rhs) {
+        // TODO review, truncated to float in original impl
     return minimum(lhs, full(lhs.shape(), rhs, lhs.type()));
 }
 
 Tensor TensorBackend::minimum(double const& lhs, Tensor const& rhs) {
+        // TODO review, truncated to float in original impl
     return minimum(full(rhs.shape(), lhs, rhs.type()), rhs);
 }
 
 Tensor TensorBackend::maximum(Tensor const& lhs, double const& rhs) {
+        // TODO review, truncated to float in original impl
     return maximum(lhs, full(lhs.shape(), rhs, lhs.type()));
 }
 
 Tensor TensorBackend::maximum(double const& lhs, Tensor const& rhs) {
+        // TODO review, truncated to float in original impl
     return maximum(full(rhs.shape(), lhs, rhs.type()), rhs);
 }
 
 Tensor TensorBackend::power(Tensor const& lhs, double const& rhs) {
+        // TODO review, truncated to float in original impl
     return power(lhs, full(lhs.shape(), rhs, lhs.type()));
 }
 
 Tensor TensorBackend::power(double const& lhs, Tensor const& rhs) {
+        // TODO review, truncated to float in original impl
     return power(full(rhs.shape(), lhs, rhs.type()), rhs);
 }
 

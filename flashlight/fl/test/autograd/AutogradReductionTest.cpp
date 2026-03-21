@@ -40,7 +40,7 @@ TEST(AutogradReductionTest, Sum) {
         auto in = Variable(fl::rand({6}), true);
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMean_0, in, 5E-3));
         // Reduce over scalar input
-        auto inScalar = Variable(fl::fromScalar(3.14), true);
+        auto inScalar = Variable(fl::fromScalar(3.14f), true);
         ASSERT_TRUE(fl::detail::jacobianTestImpl(funcMean_0, inScalar, 5E-3));
     }
 
