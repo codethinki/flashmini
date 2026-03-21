@@ -190,18 +190,18 @@ TEST(TensorReductionTest, max) {
 
 TEST(TensorReductionTest, cumsum) {
     int max = 30;
-    auto a = fl::tile(fl::arrange(1, max), {1, 2});
+    auto a = fl::tile(fl::arange(1, max), {1, 2});
 
-    auto ref = fl::arrange(1, max);
+    auto ref = fl::arange(1, max);
     for(int i = 1; i < max - 1; ++i)
-        ref += fl::concatenate({fl::full({i}, 0), fl::arrange(1, max - i)});
+        ref += fl::concatenate({fl::full({i}, 0), fl::arange(1, max - i)});
 
     ASSERT_TRUE(allClose(fl::cumsum(a, 0), fl::tile(ref, {1, 2})));
     ASSERT_TRUE(
         allClose(
             fl::cumsum(a, 1),
             fl::concatenate(
-                {fl::arrange(1, max), 2 * fl::arrange(1, max)}, /* axis = */
+                {fl::arange(1, max), 2 * fl::arange(1, max)}, /* axis = */
                 1
             )
         )

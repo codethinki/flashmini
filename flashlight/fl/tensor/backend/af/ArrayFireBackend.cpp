@@ -38,10 +38,10 @@ namespace {
 
     // Get the stream associated with given device in the given map; if it's not in
     // the map, initialize it (by wrapping or creating) and put it into the map.
-    const Stream& getOrWrapAfDeviceStream(
-        const int afId,
-        const int nativeId,
-        std::unordered_map<int, std::shared_ptr<const Stream>>& afIdToStream
+    Stream const& getOrWrapAfDeviceStream(
+        int const afId,
+        int const nativeId,
+        std::unordered_map<int, std::shared_ptr<Stream const>>& afIdToStream
     ) {
         auto iter = afIdToStream.find(afId);
         if(iter != afIdToStream.end())
@@ -51,7 +51,7 @@ namespace {
         auto resIter = afIdToStream.emplace(afId, ArrayFireCPUStream::create());
         return *resIter.first->second;
 #elif FL_ARRAYFIRE_USE_CUDA
-        const cudaStream_t cudaNativeStream = afcu::getStream(afId);
+        cudaStream_t const cudaNativeStream = afcu::getStream(afId);
         auto resIter = afIdToStream.emplace(
             afId,
             CUDAStream::wrapUnmanaged(nativeId, cudaNativeStream)
@@ -92,10 +92,10 @@ ArrayFireBackend::ArrayFireBackend() {
         idToNativeId_[id] = nativeId;
     }
 
-    const auto& manager = DeviceManager::getInstance();
+    auto const& manager = DeviceManager::getInstance();
     // This callback ensures consistency of AF internal state on active device.
     // Capturing by value to avoid destructor race hazard for static objects.
-    const auto setActiveCallback = [nativeIdToId = nativeIdToId_,
+    auto const setActiveCallback = [nativeIdToId = nativeIdToId_,
             afIdToStream = afIdToStream_](int nativeId) {
         auto afId = nativeIdToId.at(nativeId);
         af::setDevice(afId);
@@ -107,7 +107,7 @@ ArrayFireBackend::ArrayFireBackend() {
     auto& device = manager.getActiveDevice(DeviceType::x64);
     device.addSetActiveCallback(setActiveCallback);
 #elif FL_ARRAYFIRE_USE_CUDA
-    const auto deviceCount = manager.getDeviceCount(DeviceType::CUDA);
+    auto const deviceCount = manager.getDeviceCount(DeviceType::CUDA);
     for(unsigned nativeId = 0; nativeId < deviceCount; nativeId++) {
         auto& device = manager.getDevice(DeviceType::CUDA, nativeId);
         device.addSetActiveCallback(setActiveCallback);
@@ -131,10 +131,10 @@ TensorBackendType ArrayFireBackend::backendType() const { return TensorBackendTy
 
 /* -------------------------- Compute Functions -------------------------- */
 
-void ArrayFireBackend::eval(const Tensor& tensor) { af::eval(toArray(tensor)); }
+void ArrayFireBackend::eval(Tensor const& tensor) { af::eval(toArray(tensor)); }
 
-const Stream& ArrayFireBackend::getStreamOfArray(
-    const af::array& arr
+Stream const& ArrayFireBackend::getStreamOfArray(
+    af::array const& arr
 ) {
     // TODO once we enforce integrate Device::setDevice into fl::setDevice, each
     // array's stream should always be wrapped already (via setDevice callback).
@@ -146,7 +146,7 @@ const Stream& ArrayFireBackend::getStreamOfArray(
     return getOrWrapAfDeviceStream(afId, nativeId, *afIdToStream_);
 }
 
-bool ArrayFireBackend::supportsDataType(const fl::dtype& dtype) const {
+bool ArrayFireBackend::supportsDataType(fl::dtype const& dtype) const {
     switch(dtype) {
         case fl::dtype::f16: return af::isHalfAvailable(af::getDevice())
                 && // f16 isn't [yet] supported with the CPU backend per onednn
@@ -157,8 +157,8 @@ bool ArrayFireBackend::supportsDataType(const fl::dtype& dtype) const {
 }
 
 void ArrayFireBackend::getMemMgrInfo(
-    const char* msg,
-    const int nativeDeviceId,
+    char const* msg,
+    int const nativeDeviceId,
     std::ostream* ostream
 ) {
     int deviceId = nativeIdToId_.at(nativeDeviceId);
@@ -183,14 +183,14 @@ void ArrayFireBackend::setMemMgrLogStream(std::ostream* stream) {
         curMemMgr->setLogStream(stream);
 }
 
-void ArrayFireBackend::setMemMgrLoggingEnabled(const bool enabled) {
+void ArrayFireBackend::setMemMgrLoggingEnabled(bool const enabled) {
     auto* curMemMgr =
         fl::MemoryManagerInstaller::currentlyInstalledMemoryManager();
     if(curMemMgr)
         curMemMgr->setLoggingEnabled(enabled);
 }
 
-void ArrayFireBackend::setMemMgrFlushInterval(const size_t interval) {
+void ArrayFireBackend::setMemMgrFlushInterval(size_t const interval) {
     auto* curMemMgr =
         fl::MemoryManagerInstaller::currentlyInstalledMemoryManager();
     if(curMemMgr)
@@ -199,16 +199,16 @@ void ArrayFireBackend::setMemMgrFlushInterval(const size_t interval) {
 
 /* -------------------------- Rand Functions -------------------------- */
 
-void ArrayFireBackend::setSeed(const int seed) { af::setSeed(seed); }
+void ArrayFireBackend::setSeed(int const seed) { af::setSeed(seed); }
 
-Tensor ArrayFireBackend::randn(const Shape& shape, dtype type) {
+Tensor ArrayFireBackend::randn(Shape const& shape, dtype type) {
     return toTensor<ArrayFireTensor>(
         af::randn(detail::flToAfDims(shape), detail::flToAfType(type)),
         shape.ndim()
     );
 }
 
-Tensor ArrayFireBackend::rand(const Shape& shape, dtype type) {
+Tensor ArrayFireBackend::rand(Shape const& shape, dtype type) {
     return toTensor<ArrayFireTensor>(
         af::randu(detail::flToAfDims(shape), detail::flToAfType(type)),
         shape.ndim()
@@ -253,7 +253,7 @@ AF_BACKEND_CREATE_FUN_LITERAL_DEF(const bool&);
 AF_BACKEND_CREATE_FUN_LITERAL_DEF(const short&);
 AF_BACKEND_CREATE_FUN_LITERAL_DEF(const unsigned short&);
 
-Tensor ArrayFireBackend::identity(const Dim dim, const dtype type) {
+Tensor ArrayFireBackend::identity(Dim const dim, dtype const type) {
     return toTensor<ArrayFireTensor>(
         af::identity({dim, dim}, detail::flToAfType(type)),
         /* numDims = */
@@ -262,20 +262,22 @@ Tensor ArrayFireBackend::identity(const Dim dim, const dtype type) {
 }
 
 Tensor ArrayFireBackend::arange(
-    const Shape& shape,
-    const Dim seqDim,
-    const dtype type
+    Shape const& shape,
+    Dim const seqDim,
+    dtype const type
 ) {
+    auto const afType = detail::flToAfType(type);
+
     return toTensor<ArrayFireTensor>(
-        af::range(detail::flToAfDims(shape), seqDim, detail::flToAfType(type)),
+        af::range(detail::flToAfDims(shape), seqDim, afType),
         shape.ndim()
     );
 }
 
 Tensor ArrayFireBackend::iota(
-    const Shape& dims,
-    const Shape& tileDims,
-    const dtype type
+    Shape const& dims,
+    Shape const& tileDims,
+    dtype const type
 ) {
     return toTensor<ArrayFireTensor>(
         af::iota(
@@ -289,9 +291,9 @@ Tensor ArrayFireBackend::iota(
 }
 
 Tensor ArrayFireBackend::where(
-    const Tensor& condition,
-    const Tensor& x,
-    const Tensor& y
+    Tensor const& condition,
+    Tensor const& x,
+    Tensor const& y
 ) {
     Tensor orig = x;
     af::replace(toArray(orig), toArray(condition), toArray(y));
@@ -301,10 +303,10 @@ Tensor ArrayFireBackend::where(
 void ArrayFireBackend::topk(
     Tensor& values,
     Tensor& indices,
-    const Tensor& input,
-    const unsigned k,
-    const Dim axis,
-    const SortMode sortMode
+    Tensor const& input,
+    unsigned const k,
+    Dim const axis,
+    SortMode const sortMode
 ) {
     if(axis != 0)
         throw std::invalid_argument(
@@ -325,9 +327,9 @@ void ArrayFireBackend::topk(
 }
 
 Tensor ArrayFireBackend::sort(
-    const Tensor& input,
-    const Dim axis,
-    const SortMode sortMode
+    Tensor const& input,
+    Dim const axis,
+    SortMode const sortMode
 ) {
     if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending)
         throw std::invalid_argument(
@@ -349,9 +351,9 @@ Tensor ArrayFireBackend::sort(
 void ArrayFireBackend::sort(
     Tensor& values,
     Tensor& indices,
-    const Tensor& input,
-    const Dim axis,
-    const SortMode sortMode
+    Tensor const& input,
+    Dim const axis,
+    SortMode const sortMode
 ) {
     if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending)
         throw std::invalid_argument(
@@ -372,9 +374,9 @@ void ArrayFireBackend::sort(
 }
 
 Tensor ArrayFireBackend::argsort(
-    const Tensor& input,
-    const Dim axis,
-    const SortMode sortMode
+    Tensor const& input,
+    Dim const axis,
+    SortMode const sortMode
 ) {
     if(sortMode != SortMode::Descending && sortMode != SortMode::Ascending)
         throw std::invalid_argument(
@@ -393,5 +395,5 @@ Tensor ArrayFireBackend::argsort(
     return toTensor<ArrayFireTensor>(std::move(indices), input.ndim());
 }
 
-void ArrayFireBackend::print(const Tensor& tensor) { af::print("ArrayFireTensor", toArray(tensor)); }
+void ArrayFireBackend::print(Tensor const& tensor) { af::print("ArrayFireTensor", toArray(tensor)); }
 } // namespace fl

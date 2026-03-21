@@ -148,7 +148,7 @@ Tensor StubBackend::nonzero(const Tensor& /* tensor */) { FL_STUB_BACKEND_UNIMPL
 
 Tensor StubBackend::pad(
     const Tensor& /* input */,
-    const std::vector<std::pair<int, int>>& /* padWidths */,
+    const std::vector<std::pair<Dim, Dim>>& /* padWidths */,
     const PadType /* type */
 ) { FL_STUB_BACKEND_UNIMPLEMENTED; }
 

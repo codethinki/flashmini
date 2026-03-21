@@ -114,7 +114,7 @@ public:
     Tensor nonzero(Tensor const& tensor) override;
     Tensor pad(
         Tensor const& input,
-        std::vector<std::pair<int, int>> const& padWidths,
+        std::vector<std::pair<Dim, Dim>> const& padWidths,
         PadType type
     ) override;
 

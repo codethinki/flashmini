@@ -139,7 +139,7 @@ TEST(IndexTest, IndexAssignment) {
         )
     );
 
-    x(fl::span, fl::arrange({5}), fl::span, fl::arrange({5})) =
+    x(fl::span, fl::arange({5}), fl::span, fl::arange({5})) =
         fl::full({5, 5, 7, 5}, 2.f);
     ASSERT_TRUE(
         allClose(
@@ -242,7 +242,7 @@ TEST(IndexTest, TensorIndex) {
     ASSERT_TRUE(allClose(a(indices), fl::full({size}, 5.f)));
 
     // Out of range indices
-    auto i = fl::arrange({10}, 0, fl::dtype::u32);
+    auto i = fl::arange({10}, 0, fl::dtype::u32);
     auto b = fl::rand({20, 20});
     auto ref = b;
     ASSERT_EQ(b(i).shape(), b(fl::range(10)).shape());
@@ -257,7 +257,7 @@ TEST(IndexTest, TensorIndex) {
 
     // Tensor index a > 1D tensor
     auto c = fl::rand({10, 10, 10});
-    ASSERT_EQ(c(fl::arrange({5})).shape(), Shape({5, 10, 10}));
+    ASSERT_EQ(c(fl::arange({5})).shape(), Shape({5, 10, 10}));
 }
 
 TEST(IndexTest, ExpressionIndex) {

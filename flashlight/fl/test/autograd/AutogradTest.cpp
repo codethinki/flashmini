@@ -303,20 +303,20 @@ TEST(AutogradTest, Concatenate) {
 
 TEST(AutogradTest, Split) {
     // check output
-    auto x = Variable(fl::arrange({7, 2}), true);
+    auto x = Variable(fl::arange({7, 2}), true);
     auto yVec = split(x, 1, 0);
     ASSERT_EQ(yVec.size(), 7);
     ASSERT_EQ(yVec[0].shape(), Shape({1, 2}));
     ASSERT_EQ(yVec[2].shape(), Shape({1, 2}));
     ASSERT_TRUE(fl::all(yVec[6].tensor() == 6).scalar<char>());
 
-    auto a = Variable(fl::arrange({5, 3}, 1), true);
+    auto a = Variable(fl::arange({5, 3}, 1), true);
     auto bVec = split(a, {2, 1}, 1);
     ASSERT_EQ(bVec.size(), 2);
     ASSERT_EQ(bVec[0].shape(), Shape({5, 2}));
     ASSERT_EQ(bVec[1].shape(), Shape({5, 1}));
     ASSERT_TRUE(
-        fl::all(bVec[0].tensor() == fl::arrange({5, 2}, 1)).scalar<char>()
+        fl::all(bVec[0].tensor() == fl::arange({5, 2}, 1)).scalar<char>()
     );
     ASSERT_TRUE(fl::all(bVec[1].tensor() == 2).scalar<char>());
 

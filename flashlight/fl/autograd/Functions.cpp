@@ -1208,7 +1208,7 @@ Variable categoricalCrossEntropy(
     auto x = fl::reshape(input.tensor(), Shape({C, X}));
     auto y = fl::reshape(targets.tensor(), Shape({1, X}));
 
-    auto A = fl::arrange(Shape({C, X}));
+    auto A = fl::arange(Shape({C, X}));
     auto B = fl::tile(y, Shape({C}));
     auto mask = -(A == B); // [C X]
 
@@ -1293,7 +1293,7 @@ Variable weightedCategoricalCrossEntropy(
     auto x = fl::reshape(input.tensor(), {C, X});
     auto y = fl::reshape(targets.tensor(), {1, X});
 
-    auto A = fl::arrange({C, X});
+    auto A = fl::arange({C, X});
     auto B = fl::tile(y, {C});
     auto mask = -(A == B); // [C X]
 
@@ -1861,10 +1861,10 @@ Variable embedding(Variable const& input, Variable const& embeddings) {
 
         // Sparse Tensor
         auto const sp = Tensor{
-            size,
+            static_cast<Dim>(ip.elements()),
             w.dim(1),
-            fl::full({size}, 1.0, deltas.type()),
-            fl::arrange({size + 1}, 0, fl::dtype::s32),
+            fl::full({size}, 1, deltas.type()),
+            fl::arange({size + 1}, 0, fl::dtype::s32),
             ip.asType(fl::dtype::s32),
             fl::StorageType::CSR
         };

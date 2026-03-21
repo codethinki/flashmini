@@ -41,18 +41,18 @@ class ArrayFireTensor : public TensorAdapterBase {
     // To be visited when this tensor is to be indexed. Indexes the underlying
     // af::array, and returns the proxy to be used as a temporary lvalue.
     struct IndexedArrayComponent {
-        explicit IndexedArrayComponent(const bool _isFlat = false);
-        af::array::array_proxy get(const ArrayFireTensor& inst);
+        explicit IndexedArrayComponent(bool _isFlat = false);
+        af::array::array_proxy get(ArrayFireTensor const& inst);
         bool isFlat;
     };
     // To be visited when this tensor is holding an array without needing
     // indexing. Passthrough - returns the array directly.
     struct ArrayComponent {
-        af::array& get(const ArrayFireTensor& inst);
+        af::array& get(ArrayFireTensor const& inst);
     };
     // An interface to visit when getting an array handle. Indexes lazily
     // because we can't store an af::array::proxy as an lvalue. See getHandle().
-    std::variant<ArrayComponent, IndexedArrayComponent> handle_{ArrayComponent()};
+    std::variant<ArrayComponent, IndexedArrayComponent> handle_{ArrayComponent{}};
 
     /**
      * Constructs an ArrayFireTensor that will be lazily indexed.
@@ -68,7 +68,7 @@ class ArrayFireTensor : public TensorAdapterBase {
      * a full af::array on which operations can be performed.
      *
      * @param[in] handle a pointer to the ArrayFire array
-     * @param[in] indices a vector of ArrayFire indices to lazily index.
+     * @param[in] afIndices a vector of ArrayFire indices to lazily index.
      * @param[in] indexTypes a vector of index types to lazily index. Needed to
      * determine singleton dimension condensation
      * @param[in] isFlat if the indexing op is flat (condense all dims)
@@ -77,8 +77,8 @@ class ArrayFireTensor : public TensorAdapterBase {
         std::shared_ptr<af::array> handle,
         std::vector<af::index>&& afIndices,
         std::vector<detail::IndexType>&& indexTypes,
-        const unsigned numDims,
-        const bool isFlat
+        unsigned numDims,
+        bool isFlat
     );
 
     /**
@@ -126,7 +126,7 @@ public:
      * @param[in] array construct a tensor from an ArrayFire array rvalue
      * reference.
      */
-    explicit ArrayFireTensor(af::array&& array, const unsigned numDims);
+    explicit ArrayFireTensor(af::array&& array, unsigned numDims);
 
     /**
      * Default initialization - empty ArrayFire array and empty shape.
@@ -142,18 +142,18 @@ public:
      * @param[in] memoryLocation the location of the buffer
      */
     ArrayFireTensor(
-        const Shape& shape,
+        Shape const& shape,
         fl::dtype type,
-        const void* ptr,
+        void const* ptr,
         Location memoryLocation
     );
 
     ArrayFireTensor(
-        const Dim nRows,
-        const Dim nCols,
-        const Tensor& values,
-        const Tensor& rowIdx,
-        const Tensor& colIdx,
+        Dim nRows,
+        Dim nCols,
+        Tensor const& values,
+        Tensor const& rowIdx,
+        Tensor const& colIdx,
         StorageType storageType
     );
 
@@ -163,7 +163,7 @@ public:
      * Throws if this tensor represents an array_proxy, since it precludes
      * promotion to an array.
      */
-    const af::array& getHandle() const;
+    af::array const& getHandle() const;
 
     /**
      * Gets an ArrayFire Array from this impl. If the underlying handle is an
@@ -180,7 +180,7 @@ public:
     TensorBackend& backend() const override;
     Tensor copy() override;
     Tensor shallowCopy() override;
-    const Shape& shape() override;
+    Shape const& shape() override;
     dtype type() override;
     bool isSparse() override;
     af::dtype afHandleType(); // for internal use only
@@ -192,11 +192,11 @@ public:
     bool isLocked() override;
     bool isContiguous() override;
     Shape strides() override;
-    const Stream& stream() const override;
-    Tensor astype(const dtype type) override;
-    Tensor index(const std::vector<Index>& indices) override;
+    Stream const& stream() const override;
+    Tensor astype(dtype type) override;
+    Tensor index(std::vector<Index> const& indices) override;
     Tensor flatten() const override;
-    Tensor flat(const Index& idx) const override;
+    Tensor flat(Index const& idx) const override;
     Tensor asContiguousTensor() override;
     void setContext(void* context) override; // noop
     void* getContext() override; // noop
@@ -222,7 +222,7 @@ public:
      * @param[in] operand the tensor operand
      * @param[in] newNumDims the number of dims of the resulting tensor
      */
-    af::array adjustInPlaceOperandDims(const Tensor& operand);
+    af::array adjustInPlaceOperandDims(Tensor const& operand);
 
 #define ASSIGN_OP(OP)                       \
         ASSIGN_OP_TYPE(OP, Tensor);         \
@@ -256,7 +256,7 @@ public:
  * @param[in] tensor the input tensor
  * @return the array underying the Tensor
  */
-const af::array& toArray(const Tensor& tensor);
+af::array const& toArray(Tensor const& tensor);
 af::array& toArray(Tensor& tensor);
 
 } // namespace fl

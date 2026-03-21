@@ -49,14 +49,14 @@ TEST(TensorUnaryOpsTest, roll) {
     ASSERT_TRUE(allClose(t, fl::roll(t, /* shift = */ 3, /* axis = */ 1)));
 
     Shape dims({4, 5});
-    auto r = fl::arrange(dims);
+    auto r = fl::arange(dims);
     auto result = fl::roll(r, /* shift = */ 1, /* axis = */ 0);
     ASSERT_EQ(r.shape(), result.shape());
     ASSERT_TRUE(allClose(result(0), fl::full({dims[1]}, dims[0] - 1, r.type())));
     ASSERT_TRUE(
         allClose(
             result(fl::range(1, fl::end)),
-            fl::arrange({dims[0] - 1, dims[1]}, /* seqDim = */ 0, r.type())
+            fl::arange({dims[0] - 1, dims[1]}, /* seqDim = */ 0, r.type())
         )
     );
 }
@@ -179,15 +179,15 @@ TEST(TensorUnaryOpsTest, sigmoid) {
 
 TEST(TensorUnaryOpsTest, flip) {
     const unsigned high = 10;
-    auto a = fl::arrange({high});
+    auto a = fl::arange({high});
     auto flipped = fl::flip(a, /* dim = */ 0);
     a *= -1;
     a += (high - 1);
     ASSERT_TRUE(allClose(a, flipped));
 
-    auto b = fl::arrange({high, high}, /* seqDim = */ 0);
+    auto b = fl::arange({high, high}, /* seqDim = */ 0);
     ASSERT_TRUE(allClose(fl::flip(b, 1), b));
-    auto c = fl::arrange({high, high}, /* seqDim = */ 1);
+    auto c = fl::arange({high, high}, /* seqDim = */ 1);
     ASSERT_TRUE(allClose(fl::flip(c, 0), c));
 }
 
