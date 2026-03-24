@@ -221,10 +221,10 @@ af_source flToAfLocation(Location location) {
     switch(location) {
         case Location::Host: return afHost;
         case Location::Device: return afDevice;
-        default: throw std::invalid_argument(
+        default: throw std::invalid_argument{
                 "flToAfLocation: no valid ArrayFire location exists "
                 " for given Flashlight location."
-            );
+            };
     }
 }
 
@@ -234,27 +234,26 @@ af::array fromFlData(
     fl::dtype type,
     fl::Location memoryLocation
 ) {
-    af::dim4 dims = detail::flToAfDims(shape);
-    af::dtype afType = detail::flToAfType(type);
+    auto dims = detail::flToAfDims(shape);
+    auto const afType = detail::flToAfType(type);
     af_source loc = detail::flToAfLocation(memoryLocation);
 
     // No or null buffer
     if(!ptr)
-        return af::array(dims, afType);
+        return af::array{dims, afType};
 
 
     using af_fundamental_types = std::tuple<
         float,
         double,
         char,
-        int16_t,
-        int32_t,
-        int64_t,
-        uint8_t,
-        uint16_t,
-        uint32_t,
-        uint64_t
-    >;
+        signed short,
+        int,
+        long long,
+        unsigned char,
+        unsigned short,
+        unsigned int,
+        unsigned long long>;
 
     return dispatch_dtype<af::array, af_fundamental_types>(
         type,

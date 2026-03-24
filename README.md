@@ -22,10 +22,13 @@ Please read the [todo list](TODO.md)
 
 
 ### Quirks
-`FL_USE_CUDNN`:
-- NOT WORKING ATM (v6-7 api from 2017 i gotta fix that first)
-- requires `CUDNN_ROOT` to be set in the environment
-- windows users: **do not** install CUDNN with the default **windows installer**. It will create: `CUDNN_ROOT/<include/bin>/<cuda-version>/`. Since i cannot anticipate the cuda version you use, i can't traverse this. **FIX:** install as **tarball** instead.  
+- `ArrayFire`
+    - Do not install via winget (for now), 3.9 has a critical bug.
+- `FL_USE_CUDNN`:
+    - NOT WORKING ATM (v6-7 api from 2017 i gotta fix that first)
+    - requires `CUDNN_ROOT` to be set in the environment
+    - windows users: **do not** install CUDNN with the default **windows installer**. It will create: `CUDNN_ROOT/<include/bin>/<cuda-version>/`. Since i cannot anticipate the cuda version you use, i can't traverse this. **FIX:** install as **tarball** instead.  
+
 
 ### Functional changes from Flashlight
 - backends removed:

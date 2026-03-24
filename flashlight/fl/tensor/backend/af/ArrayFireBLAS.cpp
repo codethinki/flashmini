@@ -15,8 +15,8 @@
 namespace fl {
 
 Tensor ArrayFireBackend::matmul(
-    const Tensor& lhs,
-    const Tensor& rhs,
+    Tensor const& lhs,
+    Tensor const& rhs,
     MatrixProperty lhsProp,
     MatrixProperty rhsProp
 ) {

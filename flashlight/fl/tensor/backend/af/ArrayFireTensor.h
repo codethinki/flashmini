@@ -77,7 +77,7 @@ class ArrayFireTensor : public TensorAdapterBase {
         std::shared_ptr<af::array> handle,
         std::vector<af::index>&& afIndices,
         std::vector<detail::IndexType>&& indexTypes,
-        unsigned numDims,
+        size_t numDims,
         bool isFlat
     );
 
@@ -85,7 +85,7 @@ class ArrayFireTensor : public TensorAdapterBase {
      * Construct an ArrayFireTensor from an ArrayFire array handle without copying
      * the handle. Used for creating guaranteed-shallow copies.
      */
-    explicit ArrayFireTensor(std::shared_ptr<af::array> arr, unsigned numDims);
+    explicit ArrayFireTensor(std::shared_ptr<af::array> arr, size_t numDims);
 
     /*
      * A Flashlight Shape that mirrors ArrayFire dims.
@@ -108,7 +108,7 @@ class ArrayFireTensor : public TensorAdapterBase {
      * The fl::Tensor default Tensor shape is {0} - the default number of numDims
      * is thus 1. Scalars have numDims == 0;
      */
-    unsigned numDims_{1};
+    size_t numDims_{1};
 
 public:
     constexpr static TensorBackendType tensorBackendType = TensorBackendType::ArrayFire;
@@ -126,7 +126,7 @@ public:
      * @param[in] array construct a tensor from an ArrayFire array rvalue
      * reference.
      */
-    explicit ArrayFireTensor(af::array&& array, unsigned numDims);
+    explicit ArrayFireTensor(af::array&& array, size_t numDims);
 
     /**
      * Default initialization - empty ArrayFire array and empty shape.
@@ -173,7 +173,7 @@ public:
     af::array& getHandle();
 
     ~ArrayFireTensor() override = default;
-    unsigned numDims() const;
+    size_t numDims() const;
     // Used with the fl::Tensor copy constructor
     std::unique_ptr<TensorAdapterBase> clone() const override;
     TensorBackendType backendType() const override;

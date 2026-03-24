@@ -36,7 +36,7 @@ Dim Shape::elements() const {
     return std::accumulate(_dims.begin(), _dims.end(), static_cast<Dim>(1), std::multiplies<Dim>());
 }
 
-Dim Shape::ndim() const { return static_cast<Dim>(_dims.size()); }
+size_t Shape::ndim() const { return _dims.size(); }
 
 Dim Shape::dim(size_t const dim) const {
     checkDimsOrThrow(dim);

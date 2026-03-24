@@ -25,6 +25,8 @@
 #include <af/sparse.h>
 
 namespace fl {
+using af_dim_t = ::dim_t;
+
 
 af::array const& toArray(Tensor const& tensor) {
     if(tensor.backendType() != TensorBackendType::ArrayFire)
@@ -40,7 +42,7 @@ af::array& toArray(Tensor& tensor) {
 
 ArrayFireTensor::ArrayFireTensor(
     af::array&& array,
-    unsigned const numDims
+    size_t const numDims
 ) : arrayHandle_(std::make_shared<af::array>(std::move(array))),
     numDims_(numDims) {}
 
@@ -48,7 +50,7 @@ ArrayFireTensor::ArrayFireTensor(
     std::shared_ptr<af::array> arr,
     std::vector<af::index>&& afIndices,
     std::vector<detail::IndexType>&& indexTypes,
-    unsigned const numDims,
+    size_t const numDims,
     bool const isFlat
 ) : arrayHandle_(arr),
     indices_(std::move(afIndices)),
@@ -58,7 +60,7 @@ ArrayFireTensor::ArrayFireTensor(
 
 ArrayFireTensor::ArrayFireTensor(
     std::shared_ptr<af::array> arr,
-    unsigned numDims
+    size_t numDims
 ) : arrayHandle_(arr),
     numDims_(numDims) {}
 
@@ -101,7 +103,7 @@ ArrayFireTensor::ArrayFireTensor(
     // ArrayFire only supports 2D sparsity
     numDims_(2) {}
 
-unsigned ArrayFireTensor::numDims() const { return numDims_; }
+size_t ArrayFireTensor::numDims() const { return numDims_; }
 
 ArrayFireTensor::IndexedArrayComponent::IndexedArrayComponent(
     bool const _isFlat /* = false */
@@ -447,12 +449,12 @@ af::array ArrayFireTensor::adjustInPlaceOperandDims(Tensor const& operand) {
                 // and literals are pushed to 1.
                 if(i < indexTypes.size()) {
                     if(indexTypes[i] == IndexType::Tensor) {
-                        dim_t size;
+                        af_dim_t size;
                         AF_CHECK(af_get_elements(&size, indices[i].get().idx.arr));
                         postIdxDims[i] = size;
                     }
                     else if(indexTypes[i] == IndexType::Range)
-                        postIdxDims[i] = af::seq(indices[i].get().idx.seq).size;
+                        postIdxDims[i] = static_cast<af_dim_t>(af::seq(indices[i].get().idx.seq).size);
                     else if(indexTypes[i] == IndexType::Literal)
                         postIdxDims[i] = 1;
                 }

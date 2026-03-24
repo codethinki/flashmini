@@ -41,7 +41,7 @@ void DefaultMemoryManager::cleanDeviceMemoryManager(int device) {
     size_t bytesFreed = 0;
     MemoryInfo& current = memory[device];
     {
-        std::lock_guard<std::mutex> lock(this->memoryMutex);
+        std::scoped_lock lock(this->memoryMutex);
         // Return if all buffers are locked
         if(current.totalBuffers == current.lockBuffers)
             return;
@@ -65,7 +65,7 @@ void DefaultMemoryManager::cleanDeviceMemoryManager(int device) {
 
     std::stringstream ss;
     ss << "GC: Clearing " << freePtrs.size() << " buffers |"
-       << std::to_string(bytesFreed) << " bytes";
+        << std::to_string(bytesFreed) << " bytes";
     this->log(ss.str());
 
     // Free memory outside of the lock
@@ -85,13 +85,13 @@ DefaultMemoryManager::DefaultMemoryManager(
     memory(numDevices) {
     // Check for environment variables
     // Debug mode
-    if(const char* c = std::getenv("AF_MEM_DEBUG"))
+    if(char const* c = std::getenv("AF_MEM_DEBUG"))
         this->debugMode = (std::string(c) != "0");
     if(this->debugMode)
         memStepSize = 1;
 
     // Max Buffer count
-    if(const char* c = std::getenv("AF_MAX_BUFFERS"))
+    if(char const* c = std::getenv("AF_MAX_BUFFERS"))
         this->maxBuffers = std::max(1, std::stoi(std::string(c)));
 }
 
@@ -127,16 +127,16 @@ void DefaultMemoryManager::setMaxMemorySize() {
         // memsize returned 0, then use 1GB
         size_t memsize = this->deviceInterface->getMaxMemorySize(n);
         memory[n].maxBytes = memsize == 0
-            ? ONE_GB
-            : std::max(memsize * 0.75, static_cast<double>(memsize - ONE_GB));
+                             ? ONE_GB
+                             : std::max(memsize * 0.75, static_cast<double>(memsize - ONE_GB));
     }
 }
 
 void* DefaultMemoryManager::alloc(
     bool userLock,
-    const unsigned ndims,
-    dim_t* dims,
-    const unsigned elementSize
+    unsigned const ndims,
+    ::dim_t* dims,
+    unsigned const elementSize
 ) {
     size_t bytes = elementSize;
     for(unsigned i = 0; i < ndims; ++i)
@@ -160,7 +160,7 @@ void* DefaultMemoryManager::alloc(
             )
                 this->signalMemoryCleanup();
 
-            std::lock_guard<std::mutex> lock(this->memoryMutex);
+            std::scoped_lock lock(this->memoryMutex);
             free_iter iter = current.freeMap.find(allocBytes);
 
             if(iter != current.freeMap.end() && !iter->second.empty()) {
@@ -176,9 +176,8 @@ void* DefaultMemoryManager::alloc(
         // Only comes here if buffer size not found or in debug mode
         if(ptr == nullptr) {
             // Perform garbage collection if memory can not be allocated
-            try {
-                ptr = this->deviceInterface->nativeAlloc(allocBytes);
-            } catch(std::exception&) {
+            try { ptr = this->deviceInterface->nativeAlloc(allocBytes); }
+            catch(std::exception&) {
                 // FIXME: assume that the exception is due to out of memory, and don't
                 // continue propagating it
                 // If out of memory, run garbage collect and try again
@@ -188,7 +187,7 @@ void* DefaultMemoryManager::alloc(
                 this->signalMemoryCleanup();
                 ptr = this->deviceInterface->nativeAlloc(allocBytes);
             }
-            std::lock_guard<std::mutex> lock(this->memoryMutex);
+            std::scoped_lock lock(this->memoryMutex);
             // Increment these two only when it succeeds to come here.
             current.totalBytes += allocBytes;
             current.totalBuffers += 1;
@@ -204,7 +203,7 @@ size_t DefaultMemoryManager::allocated(void* ptr) {
     if(!ptr)
         return 0;
     MemoryInfo& current = this->getCurrentMemoryInfo();
-    locked_iter iter = current.lockedMap.find((void*) ptr);
+    auto iter = current.lockedMap.find((void*) ptr);
     if(iter == current.lockedMap.end())
         return 0;
     return (iter->second).bytes;
@@ -217,12 +216,14 @@ void DefaultMemoryManager::unlock(void* ptr, bool userUnlock) {
 
     // Frees the pointer outside the lock.
     uptr_t freedPtr(
-        nullptr, [this](void* p) { this->deviceInterface->nativeFree(p); });
+        nullptr,
+        [this](void* p) { this->deviceInterface->nativeFree(p); }
+    );
     {
-        std::lock_guard<std::mutex> lock(this->memoryMutex);
+        std::scoped_lock lock(this->memoryMutex);
         MemoryInfo& current = this->getCurrentMemoryInfo();
 
-        locked_iter iter = current.lockedMap.find((void*) ptr);
+        auto iter = current.lockedMap.find((void*) ptr);
 
         // Pointer not found in locked map
         if(iter == current.lockedMap.end()) {
@@ -251,7 +252,8 @@ void DefaultMemoryManager::unlock(void* ptr, bool userUnlock) {
                 current.totalBuffers--;
                 current.totalBytes -= iter->second.bytes;
             }
-        } else
+        }
+        else
             current.freeMap.at(bytes).emplace_back(ptr);
         current.lockedMap.erase(iter);
     }
@@ -262,8 +264,8 @@ void DefaultMemoryManager::signalMemoryCleanup() {
 }
 
 float DefaultMemoryManager::getMemoryPressure() {
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
-    MemoryInfo& current = this->getCurrentMemoryInfo();
+    std::scoped_lock lock(this->memoryMutex);
+    MemoryInfo const& current = this->getCurrentMemoryInfo();
     if(
         current.lockBytes > current.maxBytes
         || current.lockBuffers > maxBuffers
@@ -274,34 +276,34 @@ float DefaultMemoryManager::getMemoryPressure() {
 }
 
 bool DefaultMemoryManager::jitTreeExceedsMemoryPressure(size_t bytes) {
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
+    std::scoped_lock lock(this->memoryMutex);
     MemoryInfo& current = this->getCurrentMemoryInfo();
     return 2 * bytes > current.lockBytes;
 }
 
 void DefaultMemoryManager::printInfo(
-    const char* msg,
-    const int /* device */,
+    char const* msg,
+    int const /* device */,
     std::ostream* _ostream
 ) {
     std::ostream& ostream = *_ostream;
-    const MemoryInfo& current = this->getCurrentMemoryInfo();
+    MemoryInfo const& current = this->getCurrentMemoryInfo();
 
     ostream << msg << std::endl
-            << "---------------------------------------------------------\n"
-            << "|     POINTER      |    SIZE    |  AF LOCK  | USER LOCK |\n"
-            << "---------------------------------------------------------\n";
+        << "---------------------------------------------------------\n"
+        << "|     POINTER      |    SIZE    |  AF LOCK  | USER LOCK |\n"
+        << "---------------------------------------------------------\n";
 
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
+    std::scoped_lock lock(this->memoryMutex);
     for(auto& kv : current.lockedMap) {
-        const char* statusMngr = "Yes";
-        const char* statusUser = "Unknown";
+        char const* statusMngr = "Yes";
+        char const* statusUser = "Unknown";
         if(kv.second.userLock)
             statusUser = "Yes";
         else
             statusUser = " No";
 
-        const char* unit = "KB";
+        char const* unit = "KB";
         double size = static_cast<double>(kv.second.bytes) / 1024;
         if(size >= 1024) {
             size = size / 1024;
@@ -309,14 +311,14 @@ void DefaultMemoryManager::printInfo(
         }
 
         ostream << "|  " << kv.first << "  |  " << size << " " << unit << " | "
-                << statusMngr << " | " << statusUser << " |\n";
+            << statusMngr << " | " << statusUser << " |\n";
     }
 
     for(auto& kv : current.freeMap) {
-        const char* statusMngr = "No";
-        const char* statusUser = "No";
+        char const* statusMngr = "No";
+        char const* statusUser = "No";
 
-        const char* unit = "KB";
+        char const* unit = "KB";
         double size = static_cast<double>(kv.first) / 1024;
         if(size >= 1024) {
             size = size / 1024;
@@ -325,16 +327,16 @@ void DefaultMemoryManager::printInfo(
 
         for(auto& ptr : kv.second)
             ostream << "|  " << ptr << "  |  " << size << " " << unit << " | "
-                    << statusMngr << " | " << statusUser << " |\n";
+                << statusMngr << " | " << statusUser << " |\n";
     }
 
     ostream << "---------------------------------------------------------\n";
 }
 
-void DefaultMemoryManager::userLock(const void* ptr) {
+void DefaultMemoryManager::userLock(void const* ptr) {
     MemoryInfo& current = this->getCurrentMemoryInfo();
 
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
+    std::scoped_lock lock(this->memoryMutex);
 
     locked_iter iter = current.lockedMap.find(const_cast<void*>(ptr));
     if(iter != current.lockedMap.end())
@@ -346,11 +348,11 @@ void DefaultMemoryManager::userLock(const void* ptr) {
     }
 }
 
-void DefaultMemoryManager::userUnlock(const void* ptr) { this->unlock(const_cast<void*>(ptr), true); }
+void DefaultMemoryManager::userUnlock(void const* ptr) { this->unlock(const_cast<void*>(ptr), true); }
 
-bool DefaultMemoryManager::isUserLocked(const void* ptr) {
+bool DefaultMemoryManager::isUserLocked(void const* ptr) {
     MemoryInfo& current = this->getCurrentMemoryInfo();
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
+    std::scoped_lock lock(this->memoryMutex);
     locked_iter iter = current.lockedMap.find(const_cast<void*>(ptr));
     if(iter != current.lockedMap.end())
         return iter->second.userLock;
@@ -359,26 +361,26 @@ bool DefaultMemoryManager::isUserLocked(const void* ptr) {
 }
 
 size_t DefaultMemoryManager::getMemStepSize() {
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
+    std::scoped_lock lock(this->memoryMutex);
     return this->memStepSize;
 }
 
-void DefaultMemoryManager::setMemStepSize(size_t new_step_size) {
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
-    this->memStepSize = new_step_size;
+void DefaultMemoryManager::setMemStepSize(size_t newStepSize) {
+    std::scoped_lock lock(this->memoryMutex);
+    this->memStepSize = newStepSize;
 }
 
 size_t DefaultMemoryManager::getMaxBytes() {
-    std::lock_guard<std::mutex> lock(this->memoryMutex);
+    std::scoped_lock lock(this->memoryMutex);
     return this->getCurrentMemoryInfo().maxBytes;
 }
 
 unsigned DefaultMemoryManager::getMaxBuffers() { return this->maxBuffers; }
 
 bool DefaultMemoryManager::checkMemoryLimit() {
-    const MemoryInfo& current = this->getCurrentMemoryInfo();
+    MemoryInfo const& current = this->getCurrentMemoryInfo();
     return current.lockBytes >= current.maxBytes
-           || current.totalBuffers >= this->maxBuffers;
+        || current.totalBuffers >= this->maxBuffers;
 }
 
 } // namespace fl

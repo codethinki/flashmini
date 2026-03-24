@@ -14,67 +14,67 @@
 
 namespace fl {
 
-Tensor ArrayFireBackend::exp(const Tensor& tensor) {
+Tensor ArrayFireBackend::exp(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::exp(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::log(const Tensor& tensor) {
+Tensor ArrayFireBackend::log(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::log(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::negative(const Tensor& tensor) {
+Tensor ArrayFireBackend::negative(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(-toArray(tensor), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::logicalNot(const Tensor& tensor) {
+Tensor ArrayFireBackend::logicalNot(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(!toArray(tensor), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::log1p(const Tensor& tensor) {
+Tensor ArrayFireBackend::log1p(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::log1p(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::sin(const Tensor& tensor) {
+Tensor ArrayFireBackend::sin(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::sin(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::cos(const Tensor& tensor) {
+Tensor ArrayFireBackend::cos(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::cos(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::sqrt(const Tensor& tensor) {
+Tensor ArrayFireBackend::sqrt(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::sqrt(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::tanh(const Tensor& tensor) {
+Tensor ArrayFireBackend::tanh(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::tanh(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::floor(const Tensor& tensor) {
+Tensor ArrayFireBackend::floor(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::floor(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::ceil(const Tensor& tensor) {
+Tensor ArrayFireBackend::ceil(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::ceil(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::rint(const Tensor& tensor) {
+Tensor ArrayFireBackend::rint(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::round(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::absolute(const Tensor& tensor) {
+Tensor ArrayFireBackend::absolute(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::abs(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::sigmoid(const Tensor& tensor) {
+Tensor ArrayFireBackend::sigmoid(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::sigmoid(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::erf(const Tensor& tensor) {
+Tensor ArrayFireBackend::erf(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::erf(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::flip(const Tensor& tensor, const unsigned dim) {
+Tensor ArrayFireBackend::flip(Tensor const& tensor, unsigned const dim) {
     return toTensor<ArrayFireTensor>(
         af::flip(toArray(tensor), dim),
         tensor.ndim()
@@ -82,9 +82,9 @@ Tensor ArrayFireBackend::flip(const Tensor& tensor, const unsigned dim) {
 }
 
 Tensor ArrayFireBackend::clip(
-    const Tensor& tensor,
-    const Tensor& low,
-    const Tensor& high
+    Tensor const& tensor,
+    Tensor const& low,
+    Tensor const& high
 ) {
     return toTensor<ArrayFireTensor>(
         af::clamp(toArray(tensor), toArray(low), toArray(high)),
@@ -93,9 +93,9 @@ Tensor ArrayFireBackend::clip(
 }
 
 Tensor ArrayFireBackend::roll(
-    const Tensor& tensor,
-    const int shift,
-    const unsigned axis
+    Tensor const& tensor,
+    int const shift,
+    unsigned const axis
 ) {
     if(axis > AF_MAX_DIMS)
         throw std::invalid_argument(
@@ -109,28 +109,28 @@ Tensor ArrayFireBackend::roll(
     );
 }
 
-Tensor ArrayFireBackend::isnan(const Tensor& tensor) {
+Tensor ArrayFireBackend::isnan(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::isNaN(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::isinf(const Tensor& tensor) {
+Tensor ArrayFireBackend::isinf(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(af::isInf(toArray(tensor)), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::sign(const Tensor& tensor) {
+Tensor ArrayFireBackend::sign(Tensor const& tensor) {
     auto wSigned = 1 - 2 * af::sign(toArray(tensor));
     wSigned(toArray(tensor) == 0) = 0;
     return toTensor<ArrayFireTensor>(std::move(wSigned), tensor.ndim());
 }
 
-Tensor ArrayFireBackend::tril(const Tensor& tensor) {
+Tensor ArrayFireBackend::tril(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(
         af::lower(toArray(tensor), /* is_unit_diag = */ false),
         tensor.ndim()
     );
 }
 
-Tensor ArrayFireBackend::triu(const Tensor& tensor) {
+Tensor ArrayFireBackend::triu(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(
         af::upper(toArray(tensor), /* is_unit_diag = */ false),
         tensor.ndim()

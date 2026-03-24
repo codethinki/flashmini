@@ -84,7 +84,7 @@ public:
     /**
      * @return Number of dimensions in the shape.
      */
-    Dim ndim() const;
+    size_t ndim() const;
 
     /**
      * Get the size of a given dimension in the number of arguments. Throws if the

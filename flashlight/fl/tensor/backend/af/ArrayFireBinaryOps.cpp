@@ -15,7 +15,7 @@
 namespace fl {
 namespace {
 
-    bool canBroadcast(const Shape& lhs, const Shape& rhs) {
+    bool canBroadcast(Shape const& lhs, Shape const& rhs) {
         unsigned nDim = std::max(lhs.ndim(), rhs.ndim());
 
         for(unsigned i = 0; i < nDim; ++i) {
@@ -31,11 +31,11 @@ namespace {
 
 // A binary operation on two ArrayFire arrays
     using binaryOpFunc_t =
-        af::array (*)(const af::array& lhs, const af::array& rhs);
+        af::array (*)(af::array const& lhs, af::array const& rhs);
 
     Tensor doBinaryOpOrBroadcast(
-        const Tensor& lhs,
-        const Tensor& rhs,
+        Tensor const& lhs,
+        Tensor const& rhs,
         binaryOpFunc_t func
     ) {
         // Dims are the same or scalar <> 1-el tensor - no broadcasting
@@ -122,15 +122,15 @@ FL_AF_BINARY_OP_DEF(>>, rShift);
 #undef FL_AF_BINARY_OP_TYPE_DEF
 #undef FL_AF_BINARY_OP_LITERALS_DEF
 
-Tensor ArrayFireBackend::minimum(const Tensor& lhs, const Tensor& rhs) {
+Tensor ArrayFireBackend::minimum(Tensor const& lhs, Tensor const& rhs) {
     return doBinaryOpOrBroadcast(lhs, rhs, af::min);
 }
 
-Tensor ArrayFireBackend::maximum(const Tensor& lhs, const Tensor& rhs) {
+Tensor ArrayFireBackend::maximum(Tensor const& lhs, Tensor const& rhs) {
     return doBinaryOpOrBroadcast(lhs, rhs, af::max);
 }
 
-Tensor ArrayFireBackend::power(const Tensor& lhs, const Tensor& rhs) {
+Tensor ArrayFireBackend::power(Tensor const& lhs, Tensor const& rhs) {
     return doBinaryOpOrBroadcast(lhs, rhs, af::pow);
 }
 } // namespace fl

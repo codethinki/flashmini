@@ -458,10 +458,6 @@ TEST(ArrayFireTensorBaseTest, transpose) {
     );
 }
 
-TEST(ArrayFireTensorBaseTest, concatenate) {
-    std::vector<fl::Tensor> tensors(11);
-    ASSERT_THROW(fl::concatenate(tensors), std::invalid_argument);
-}
 
 TEST(ArrayFireTensorBaseTest, device) {
     auto a = fl::rand({5, 5});

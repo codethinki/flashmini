@@ -125,9 +125,10 @@ Tensor ArrayFireBackend::concatenate(
     std::vector<af::array> arrays{};
     arrays.reserve(tensors.size());
 
-    for(auto const& t : tensors)
-        arrays.push_back(toArray(t));
 
+    for(auto const& t : tensors){
+        arrays.push_back(toArray(t));
+    }
     constexpr size_t maxChunkSize = 10; //https://arrayfire.org/docs/group__manip__func__join.htm
 
     //greedy chunk and join
@@ -187,7 +188,7 @@ Tensor ArrayFireBackend::pad(
         ),
         /* numDims = */
         // TODO: check
-        std::max(input.ndim(), static_cast<Dim>(padWidths.size()))
+        std::max(input.ndim(), padWidths.size())
     );
 }
 } // namespace fl

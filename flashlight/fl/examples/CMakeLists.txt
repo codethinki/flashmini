@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(flashlight-examples LANGUAGES CXX C VERSION 0.4.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # If building in source, we already have the flashlight target
 if (NOT TARGET flashlight)

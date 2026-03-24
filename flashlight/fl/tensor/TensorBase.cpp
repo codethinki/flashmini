@@ -80,7 +80,7 @@ size_t Tensor::elements() const { return impl_->shape().elements(); }
 
 Dim Tensor::dim(size_t const dim) const { return shape().dim(dim); }
 
-Dim Tensor::ndim() const { return shape().ndim(); }
+size_t Tensor::ndim() const { return shape().ndim(); }
 
 bool Tensor::isEmpty() const { return elements() == 0; }
 

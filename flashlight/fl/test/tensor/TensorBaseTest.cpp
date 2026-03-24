@@ -21,59 +21,6 @@
 using namespace ::testing;
 using namespace fl;
 
-namespace {
-void print_2d_tensor(Tensor const& toPrint, std::string_view name) {
-    auto const dims = toPrint.ndim();
-
-    if(dims == 0)
-        std::cout << "[]\n";
-    if(dims > 2)
-        std::cout << std::format("can't print tensor [{}], has more than 2 dimensions\n", name);
-
-    auto adaptive_tensor_print_2d = [&]<class T>() {
-        std::span host{toPrint.host<T>(), toPrint.elements()};
-
-
-        std::cout << std::format("{}:\n", name);
-
-
-        auto const& shape = toPrint.shape();
-
-        auto const height = shape[0];
-        auto const width = dims == 1 ? 1 : shape[1];
-
-
-        std::vector<std::string> rows(height);
-
-        for(size_t x = 0; x < width; x++) {
-            for(size_t y = 0; y < height; y++) {
-                auto& row = rows[y];
-
-                size_t index = x * height + y;
-
-                if(x == width - 1)
-                    row += std::format("{}", host[index]);
-                else
-                    row += std::format("{}, ", host[index]);
-            }
-
-            size_t max = 0;
-            for(auto& row : rows)
-                max = std::max(row.size(), max);
-
-            for(auto& row : rows)
-                row.append(std::string(max - row.size(), ' '));
-        }
-
-        for(auto& row : rows)
-            std::cout << std::format("[{}]\n", row);
-
-        std::cout << '\n';
-    };
-
-    fl::dispatch_dtype(toPrint.type(), adaptive_tensor_print_2d);
-};
-}
 
 TEST(TensorBaseTest, FullTypeMismatch) {
     Shape const shape{2, 2};
@@ -167,15 +114,12 @@ TEST(TensorBaseTest, ConcatenateMany) {
 }
 
 
-TEST(TensorBaseTest, DuplicateTensors) {
+TEST(TensorBaseTest, ConcatenateDuplicateTensors) {
     auto t1 = fl::full({2, 2}, 1.0f, fl::dtype::f32);
     auto t2 = fl::full({2, 2}, 2.0f, fl::dtype::f32);
 
     auto result = fl::concatenate({t1, t2, t1, t2}, /* axis = */ 1);
     auto expected = fl::concatenate({t1.copy(), t2.copy(), t1.copy(), t2.copy()}, /* axis = */ 1);
-
-    print_2d_tensor(result, "result");
-    print_2d_tensor(expected, "expected");
 
     ASSERT_TRUE(allClose(result, expected));
 }
@@ -210,11 +154,6 @@ TEST(TensorBaseTest, ConcatenateViews) {
         {vTiled1.copy(), vTiled0.copy(), vTiled0.copy(), vTiled1.copy(), vTiled1.copy(), vTiled0.copy()},
         1
     );
-
-    print_2d_tensor(vTiled0, "vTiled0");
-    print_2d_tensor(vTiled1, "vTiled1");
-    print_2d_tensor(result, "result (from views)");
-    print_2d_tensor(expectedSymmetricPad, "expected (from copies)");
 
     ASSERT_TRUE(allClose(result, expectedSymmetricPad));
 }

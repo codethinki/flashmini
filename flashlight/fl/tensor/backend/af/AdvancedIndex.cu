@@ -19,7 +19,7 @@
 #define GRID_SIZE 32
 #define BLOCK_SIZE 256
 
-const std::unordered_set<af::dtype> validIndexTypes {
+std::unordered_set<af::dtype> const validIndexTypes {
     af::dtype::s32,
     af::dtype::s64,
     af::dtype::u32,
@@ -29,17 +29,17 @@ const std::unordered_set<af::dtype> validIndexTypes {
 template<class Float, class Index
 >
 __global__ void advancedIndexKernel(
-    const Float* inp,
-    const dim_t* idxStart,
-    const dim_t* idxEnd,
-    const dim_t* outDims,
-    const dim_t* idxArr,
+    Float const* inp,
+    ::dim_t const* idxStart,
+    ::dim_t const* idxEnd,
+    ::dim_t const* outDims,
+    ::dim_t const* idxArr,
     Float* out
 ) {
     // Compute striding information for
     // the input and output tensors
-    dim_t dims[4], strides[4];
-    dim_t outStrides[4];
+    ::dim_t dims[4], strides[4];
+    ::dim_t outStrides[4];
     for(int i = 0; i < 4; i++)
         dims[i] = idxEnd[i] - idxStart[i];
     strides[0] = 1;
@@ -53,20 +53,20 @@ __global__ void advancedIndexKernel(
 
     // Map CUDA thread to an element in the input array
     for(
-        dim_t tid = threadIdx.x + blockIdx.x * BLOCK_SIZE;
+        ::dim_t tid = threadIdx.x + blockIdx.x * BLOCK_SIZE;
         tid < (strides[3] * dims[3]);
         tid += (GRID_SIZE * BLOCK_SIZE)
     ) {
         // Compute input array index for CUDA thread
-        dim_t index[4];
-        dim_t cursor = tid;
+        ::dim_t index[4];
+        ::dim_t cursor = tid;
         for(int i = 3; i >= 0; i--) {
             index[i] = cursor / strides[i];
             cursor = cursor % strides[i];
         }
 
-        dim_t inpIdx = tid;
-        dim_t outIdx = 0;
+        ::dim_t inpIdx = tid;
+        ::dim_t outIdx = 0;
         for(int i = 0; i < 4; i++) {
             // If indexing array specified, use it
             if(idxArr[i]) {
@@ -82,25 +82,27 @@ __global__ void advancedIndexKernel(
 }
 
 namespace fl {
+using af_dim_t = ::dim_t;
+
 namespace detail {
 
     void advancedIndex(
-        const af::array& inp,
-        const af::dim4& idxStart,
-        const af::dim4& idxEnd,
-        const af::dim4& outDims,
-        const std::vector<af::array>& idxArr,
+        af::array const& inp,
+        af::dim4 const& idxStart,
+        af::dim4 const& idxEnd,
+        af::dim4 const& outDims,
+        std::vector<af::array> const& idxArr,
         af::array& out
     ) {
         auto inpType = inp.type();
         auto outType = out.type();
 
         if((inpType != af::dtype::f32) && (inpType != af::dtype::f16))
-            throw std::invalid_argument("Input type must be f16/f32");
+            throw std::invalid_argument{"Input type must be f16/f32"};
         if((outType != af::dtype::f32) && (outType != af::dtype::f16))
-            throw std::invalid_argument("Output type must be f16/f32");
+            throw std::invalid_argument{"Output type must be f16/f32"};
         if(idxArr.size() != 4)
-            throw std::invalid_argument("Index array vector must be length 4");
+            throw std::invalid_argument{"Index array vector must be length 4"};
 
         af::dim4 idxPtr;
         // Extract raw device pointers for dimensions
@@ -114,18 +116,18 @@ namespace detail {
                 continue;
             }
             if(validIndexTypes.find(idxArr[i].type()) == validIndexTypes.end())
-                throw std::invalid_argument(
+                throw std::invalid_argument{
                     "Index type must be one of s32/s64/u32/u64, observed type is "
                     + std::to_string(idxArr[i].type())
-                );
+                };
             idxTypes.push_back(idxArr[i].type());
-            idxPtr[i] = (dim_t) (idxArr[i].device<void>());
+            idxPtr[i] = reinterpret_cast<dim_t>(idxArr[i].device<void>());
         }
         for(int i = 0; i + 1 < idxTypes.size(); i++)
             if(idxTypes[i] != idxTypes[i + 1])
-                throw std::invalid_argument(
+                throw std::invalid_argument{
                     "Index type must be the same across all dimensions"
-                );
+                };
 
         af::array inpCast = inp;
         af::array outCast = out;
@@ -136,10 +138,10 @@ namespace detail {
 
         void* inpRawPtr = inpCast.device<void>();
         void* outRawPtr = outCast.device<void>();
-        af::array arrIdxPtr(4, idxPtr.get());
-        af::array arrIdxEnd(4, idxEnd.get());
-        af::array arrIdxStart(4, idxStart.get());
-        af::array arrOutDims(4, outDims.get());
+        af::array arrIdxPtr{4, idxPtr.get()};
+        af::array arrIdxEnd{4, idxEnd.get()};
+        af::array arrIdxStart{4, idxStart.get()};
+        af::array arrOutDims{4, outDims.get()};
         void* arrIdxStartDev = arrIdxStart.device<void>();
         void* arrIdxEndDev = arrIdxEnd.device<void>();
         void* arrOutDimsDev = arrOutDims.device<void>();
@@ -148,35 +150,35 @@ namespace detail {
         cudaStream_t stream = afcu::getStream(af::getDevice());
         if(idxTypes.size() == 0 || idxTypes[0] == af::dtype::s32)
             advancedIndexKernel<float, int32_t> << < GRID_SIZE, BLOCK_SIZE, 0, stream >> > (
-                static_cast<const float*>(inpRawPtr),
-                static_cast<const dim_t*>(arrIdxStartDev),
-                static_cast<const dim_t*>(arrIdxEndDev),
-                static_cast<const dim_t*>(arrOutDimsDev),
-                static_cast<const dim_t*>(arrIdxPtrDev),
+                static_cast<float const*>(inpRawPtr),
+                static_cast<af_dim_t const*>(arrIdxStartDev),
+                static_cast<af_dim_t const*>(arrIdxEndDev),
+                static_cast<af_dim_t const*>(arrOutDimsDev),
+                static_cast<af_dim_t const*>(arrIdxPtrDev),
                 static_cast<float*>(outRawPtr));
         else if(idxTypes[0] == af::dtype::s64)
             advancedIndexKernel<float, int64_t> << < GRID_SIZE, BLOCK_SIZE, 0, stream >> > (
-                static_cast<const float*>(inpRawPtr),
-                static_cast<const dim_t*>(arrIdxStartDev),
-                static_cast<const dim_t*>(arrIdxEndDev),
-                static_cast<const dim_t*>(arrOutDimsDev),
-                static_cast<const dim_t*>(arrIdxPtrDev),
+                static_cast<float const*>(inpRawPtr),
+                static_cast<af_dim_t const*>(arrIdxStartDev),
+                static_cast<af_dim_t const*>(arrIdxEndDev),
+                static_cast<af_dim_t const*>(arrOutDimsDev),
+                static_cast<af_dim_t const*>(arrIdxPtrDev),
                 static_cast<float*>(outRawPtr));
         else if(idxTypes[0] == af::dtype::u32)
             advancedIndexKernel<float, uint32_t> << < GRID_SIZE, BLOCK_SIZE, 0, stream >> > (
-                static_cast<const float*>(inpRawPtr),
-                static_cast<const dim_t*>(arrIdxStartDev),
-                static_cast<const dim_t*>(arrIdxEndDev),
-                static_cast<const dim_t*>(arrOutDimsDev),
-                static_cast<const dim_t*>(arrIdxPtrDev),
+                static_cast<float const*>(inpRawPtr),
+                static_cast<af_dim_t const*>(arrIdxStartDev),
+                static_cast<af_dim_t const*>(arrIdxEndDev),
+                static_cast<af_dim_t const*>(arrOutDimsDev),
+                static_cast<af_dim_t const*>(arrIdxPtrDev),
                 static_cast<float*>(outRawPtr));
         else if(idxTypes[0] == af::dtype::u64)
             advancedIndexKernel<float, uint64_t> << < GRID_SIZE, BLOCK_SIZE, 0, stream >> > (
-                static_cast<const float*>(inpRawPtr),
-                static_cast<const dim_t*>(arrIdxStartDev),
-                static_cast<const dim_t*>(arrIdxEndDev),
-                static_cast<const dim_t*>(arrOutDimsDev),
-                static_cast<const dim_t*>(arrIdxPtrDev),
+                static_cast<float const*>(inpRawPtr),
+                static_cast<af_dim_t const*>(arrIdxStartDev),
+                static_cast<af_dim_t const*>(arrIdxEndDev),
+                static_cast<af_dim_t const*>(arrOutDimsDev),
+                static_cast<af_dim_t const*>(arrIdxPtrDev),
                 static_cast<float*>(outRawPtr));
         else
             throw std::invalid_argument("Index type must be one of s32/s64/u32/u64");
@@ -191,7 +193,7 @@ namespace detail {
         arrIdxEnd.unlock();
         arrOutDims.unlock();
         arrIdxPtr.unlock();
-        for(const auto& arr : idxArr)
+        for(auto const& arr : idxArr)
             arr.unlock();
 
         out = outCast;

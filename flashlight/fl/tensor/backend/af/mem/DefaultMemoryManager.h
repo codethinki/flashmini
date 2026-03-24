@@ -88,20 +88,20 @@ public:
     void shutdown() override;
     void* alloc(
         bool userLock,
-        const unsigned ndims,
-        dim_t* dims,
-        const unsigned elSize
+        unsigned ndims,
+        ::dim_t* dims,
+        unsigned elSize
     ) override;
     size_t allocated(void* ptr) override;
     void unlock(void* ptr, bool userLock) override;
     void printInfo(
-        const char* msg,
-        const int device,
+        char const* msg,
+        int device,
         std::ostream* ostream = & std::cout
     ) override;
-    void userLock(const void* ptr) override;
-    void userUnlock(const void* ptr) override;
-    bool isUserLocked(const void* ptr) override;
+    void userLock(void const* ptr) override;
+    void userUnlock(void const* ptr) override;
+    bool isUserLocked(void const* ptr) override;
     void signalMemoryCleanup() override;
     float getMemoryPressure() override;
     bool jitTreeExceedsMemoryPressure(size_t bytes) override;
@@ -110,16 +110,16 @@ public:
     // Implementation-specific functions
     void setMaxMemorySize();
     size_t getMemStepSize() override;
-    void setMemStepSize(size_t size) override;
+    void setMemStepSize(size_t newStepSize) override;
     size_t getMaxBytes();
     unsigned getMaxBuffers();
     bool checkMemoryLimit();
 
 protected:
-    DefaultMemoryManager(const DefaultMemoryManager& other) = delete;
-    DefaultMemoryManager(const DefaultMemoryManager&& other) = delete;
-    DefaultMemoryManager& operator=(const DefaultMemoryManager& other) = delete;
-    DefaultMemoryManager& operator=(const DefaultMemoryManager&& other) = delete;
+    DefaultMemoryManager(DefaultMemoryManager const& other) = delete;
+    DefaultMemoryManager(DefaultMemoryManager const&& other) = delete;
+    DefaultMemoryManager& operator=(DefaultMemoryManager const& other) = delete;
+    DefaultMemoryManager& operator=(DefaultMemoryManager const&& other) = delete;
 
     std::mutex memoryMutex;
     // backend-specific
