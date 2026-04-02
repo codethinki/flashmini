@@ -38,9 +38,7 @@ Variable::Variable(
         std::any_of(
             inputs.begin(),
             inputs.end(),
-            [](const Variable& input) {
-                return input.isCalcGrad();
-            }
+            [](const Variable& input) { return input.isCalcGrad(); }
         )
     ) {
         sharedGrad_->calcGrad = true;
@@ -56,15 +54,16 @@ Variable Variable::operator()(const std::vector<Index>& indices) const {
 
     auto gradFunc = [indices, inDims, inType](
         std::vector<Variable>& inputs,
-        const Variable& gradOutput) {
-            if(!inputs[0].isGradAvailable()) {
-                auto grad = fl::full(inDims, 0.0, inType);
-                inputs[0].addGrad(Variable(grad, false));
-            }
+        const Variable& gradOutput
+    ) {
+        if(!inputs[0].isGradAvailable()) {
+            auto grad = fl::full(inDims, 0.0, inType);
+            inputs[0].addGrad(Variable(grad, false));
+        }
 
-            auto& grad = inputs[0].grad().tensor();
-            grad(indices) += gradOutput.tensor();
-        };
+        auto& grad = inputs[0].grad().tensor();
+        grad(indices) += gradOutput.tensor();
+    };
     return Variable(result, {this->withoutData()}, gradFunc);
 }
 
@@ -75,34 +74,33 @@ Variable Variable::flat(const fl::Index& index) const {
 
     auto gradFunc = [index, inDims, inType](
         std::vector<Variable>& inputs,
-        const Variable& gradOutput) {
-            if(!inputs[0].isGradAvailable()) {
-                auto grad = fl::full(inDims, 0.0, inType);
-                inputs[0].addGrad(Variable(grad, false));
-            }
-            auto& grad = inputs[0].grad().tensor();
-            grad.flat(index) += gradOutput.tensor();
-        };
+        const Variable& gradOutput
+    ) {
+        if(!inputs[0].isGradAvailable()) {
+            auto grad = fl::full(inDims, 0.0, inType);
+            inputs[0].addGrad(Variable(grad, false));
+        }
+        auto& grad = inputs[0].grad().tensor();
+        grad.flat(index) += gradOutput.tensor();
+    };
 
     return Variable(result, {this->withoutData()}, gradFunc);
 }
 
-Tensor& Variable::tensor() const {
-    return sharedData_->data;
-}
+Tensor& Variable::tensor() const { return sharedData_->data; }
 
-Variable Variable::copy() const {
-    return Variable(sharedData_->data, sharedGrad_->calcGrad);
-}
+Variable Variable::copy() const { return Variable(sharedData_->data, sharedGrad_->calcGrad); }
 
 Variable Variable::asType(fl::dtype newType) const {
     auto output = tensor().asType(newType);
-    auto gradFunc = [](std::vector<Variable>& inputs,
-        const Variable& gradOutput) {
-            auto& input = inputs[0];
-            // Cast the grad output to match the type of the input's grad
-            input.addGrad(Variable(gradOutput.tensor().asType(input.type()), false));
-        };
+    auto gradFunc = [](
+        std::vector<Variable>& inputs,
+        const Variable& gradOutput
+    ) {
+        auto& input = inputs[0];
+        // Cast the grad output to match the type of the input's grad
+        input.addGrad(Variable(gradOutput.tensor().asType(input.type()), false));
+    };
     return Variable(output, {this->withoutData()}, gradFunc);
 }
 
@@ -116,13 +114,9 @@ Variable& Variable::grad() const {
     return *sharedGrad_->grad;
 }
 
-std::vector<Variable>& Variable::getInputs() const {
-    return sharedGrad_->inputs;
-}
+std::vector<Variable>& Variable::getInputs() const { return sharedGrad_->inputs; }
 
-bool Variable::isCalcGrad() const {
-    return sharedGrad_->calcGrad;
-}
+bool Variable::isCalcGrad() const { return sharedGrad_->calcGrad; }
 
 bool Variable::isGradAvailable() const {
     if(!sharedGrad_->calcGrad)
@@ -130,17 +124,11 @@ bool Variable::isGradAvailable() const {
     return sharedGrad_->grad != nullptr;
 }
 
-Shape Variable::shape() const {
-    return tensor().shape();
-}
+Shape Variable::shape() const { return tensor().shape(); }
 
-bool Variable::isEmpty() const {
-    return tensor().isEmpty();
-}
+bool Variable::isEmpty() const { return tensor().isEmpty(); }
 
-bool Variable::isContiguous() const {
-    return tensor().isContiguous();
-}
+bool Variable::isContiguous() const { return tensor().isContiguous(); }
 
 Variable Variable::asContiguous() const {
     if(!isEmpty() && !isContiguous())
@@ -148,29 +136,17 @@ Variable Variable::asContiguous() const {
     return *this;
 }
 
-fl::dtype Variable::type() const {
-    return tensor().type();
-}
+fl::dtype Variable::type() const { return tensor().type(); }
 
-Dim Variable::elements() const {
-    return tensor().elements();
-}
+Dim Variable::elements() const { return tensor().elements(); }
 
-size_t Variable::bytes() const {
-    return tensor().bytes();
-}
+size_t Variable::bytes() const { return tensor().bytes(); }
 
-unsigned Variable::ndim() const {
-    return tensor().ndim();
-}
+unsigned Variable::ndim() const { return tensor().ndim(); }
 
-Dim Variable::dim(unsigned dim) const {
-    return tensor().dim(dim);
-}
+Dim Variable::dim(unsigned dim) const { return tensor().dim(dim); }
 
-void Variable::eval() const {
-    fl::eval(tensor());
-}
+void Variable::eval() const { fl::eval(tensor()); }
 
 void Variable::zeroGrad() { sharedGrad_->grad.reset(); }
 
@@ -190,8 +166,8 @@ void Variable::addGrad(const Variable& childGrad) {
         if(childGrad.type() != this->type()) {
             std::stringstream ss;
             ss << "Variable::addGrad: attempted to add child gradient of type "
-               << childGrad.type() << " to a Variable of type " << this->type()
-               << ". You might be performing an operation with "
+                << childGrad.type() << " to a Variable of type " << this->type()
+                << ". You might be performing an operation with "
                 "two inputs of different types.";
             throw std::invalid_argument(ss.str());
         }
@@ -199,8 +175,8 @@ void Variable::addGrad(const Variable& childGrad) {
             std::stringstream ss;
             ss << "Variable::addGrad: given gradient has dimensions not equal "
                 "to this Variable's dimensions: this variable has shape "
-               << this->shape() << " whereas the child gradient has dimensions "
-               << childGrad.shape() << std::endl;
+                << this->shape() << " whereas the child gradient has dimensions "
+                << childGrad.shape() << std::endl;
             throw std::invalid_argument(ss.str());
         }
         if(sharedGrad_->grad)
@@ -273,14 +249,14 @@ Variable::DAG Variable::build() const {
 
     // Topological sort
     recurse = [&](const Variable& var) {
-            auto id = var.sharedGrad_.get();
-            if(cache.find(id) != cache.end())
-                return;
-            for(const auto& input : var.getInputs())
-                recurse(input);
-            cache.insert(id);
-            dag.push_back(var);
-        };
+        auto id = var.sharedGrad_.get();
+        if(cache.find(id) != cache.end())
+            return;
+        for(const auto& input : var.getInputs())
+            recurse(input);
+        cache.insert(id);
+        dag.push_back(var);
+    };
 
     recurse(*this);
     return dag;

@@ -72,6 +72,7 @@ namespace detail {
             outD.tensor().flat(i) = 0;
         }
 
+
         return allClose(fwdJacobian, bwdJacobian, precision);
     }
 
