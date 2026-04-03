@@ -20,9 +20,7 @@ BlobDatasetEntryBuffer::BlobDatasetEntryBuffer() = default;
 
 void BlobDatasetEntryBuffer::clear() { data_.clear(); }
 
-int64_t BlobDatasetEntryBuffer::size() const {
-    return data_.size() / nFieldPerEntry_;
-}
+int64_t BlobDatasetEntryBuffer::size() const { return data_.size() / nFieldPerEntry_; }
 
 void BlobDatasetEntryBuffer::resize(int64_t size) { data_.resize(size * nFieldPerEntry_); }
 
@@ -52,15 +50,11 @@ void BlobDatasetEntryBuffer::add(const BlobDatasetEntry& e) {
 
 char* BlobDatasetEntryBuffer::data() { return (char*) data_.data(); }
 
-int64_t BlobDatasetEntryBuffer::bytes() const {
-    return data_.size() * sizeof(int64_t);
-};
+int64_t BlobDatasetEntryBuffer::bytes() const { return data_.size() * sizeof(int64_t); };
 
 BlobDataset::BlobDataset() = default;
 
-int64_t BlobDataset::size() const {
-    return offsets_.size();
-}
+int64_t BlobDataset::size() const { return offsets_.size(); }
 
 std::vector<Tensor> BlobDataset::get(const int64_t idx) const {
     std::vector<Tensor> sample;
@@ -128,12 +122,12 @@ void BlobDataset::add(const BlobDataset& blob, int64_t chunkSize) {
     int64_t remainCopySize = copySize - nChunk * chunkSize;
     std::vector<char> buffer;
     auto copyChunk = [&buffer, &blob, this, &blobOffset](int64_t size) {
-            buffer.resize(size);
-            blob.readData(blobOffset, buffer.data(), size);
-            blobOffset += size;
-            this->writeData(indexOffset_, buffer.data(), size);
-            this->indexOffset_ += size;
-        };
+        buffer.resize(size);
+        blob.readData(blobOffset, buffer.data(), size);
+        blobOffset += size;
+        this->writeData(indexOffset_, buffer.data(), size);
+        this->indexOffset_ += size;
+    };
     for(int64_t i = 0; i < nChunk; i++)
         copyChunk(chunkSize);
     if(remainCopySize > 0)
@@ -168,14 +162,15 @@ Tensor BlobDataset::readArray(const BlobDatasetEntry& e, int i) const {
             );
         else
             return keyval->second(buffer.data(), e.dims, e.type);
-    } else
+    }
+    else
         return Tensor();
 }
 
 void BlobDataset::writeArray(const BlobDatasetEntry& e, const Tensor& array) {
-    std::vector<uint8_t> buffer(array.bytes());
-    array.host(buffer.data());
-    writeData(e.offset, (char*) buffer.data(), buffer.size());
+    auto const tensorData = array.host<char>();
+
+    writeData(e.offset, tensorData.data(), tensorData.size());
 }
 
 void BlobDataset::writeIndex() {

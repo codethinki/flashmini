@@ -116,8 +116,8 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
         categoricalCrossEntropy(
             Variable{fl::rand({7, 10, 4}, fl::dtype::f16), true},
             Variable{
-                (fl::rand({10, 4}, fl::dtype::u32) % 7).asType(fl::dtype::s32),
-                false
+            (fl::rand({10, 4}, fl::dtype::u32) % 7).asType(fl::dtype::s32),
+            false
             }
         );
         }
@@ -522,6 +522,218 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
         ASSERT_TRUE(allClose(grad, res, 1e-3));
     }
 }
+
+
+
+namespace fl {
+
+void print_tensor(Tensor const& toPrint, std::string_view name) {
+    auto const dims = toPrint.ndim();
+
+    if(dims == 0)
+        std::cout << "[]\n";
+    if(dims > 3)
+        std::cout << std::format("can't print tensor [{}], has more than 3 dimensions\n", name);
+
+    auto adaptive_tensor_print = [&]<class T>() {
+        auto host = toPrint.toHostVector<T>();
+
+        std::cout << std::format("{}:\n", name);
+
+        auto const& shape = fl::max({1, 1, 1}, toPrint.shape());
+
+        auto const height = shape[0];
+        auto const width = shape[1];
+        auto const depth = shape[2];
+
+        std::vector<std::string> blocks(depth);
+
+        for(size_t z = 0; z < depth; z++) {
+            std::vector<std::string> rows(height);
+
+            auto const offset = z * height * width;
+
+            for(size_t x = 0; x < width; x++) {
+                for(size_t y = 0; y < height; y++) {
+                    auto& row = rows[y];
+
+                    size_t index = offset + x * height + y;
+
+                    if(x == width - 1)
+                        row += std::format("{}", host[index]);
+                    else
+                        row += std::format("{}, ", host[index]);
+                }
+                size_t max = 0;
+                for(auto& row : rows)
+                    max = std::max(row.size(), max);
+
+                for(auto& row : rows)
+                    row.append(std::string(max - row.size(), ' '));
+            }
+
+
+            for(auto& row : rows)
+                blocks[z].append(std::format("[{}]\n", row));
+            blocks[z] += '\n';
+        }
+
+        for(auto& block : blocks)
+            std::cout << block;
+
+        std::cout << '\n';
+    };
+
+    fl::dispatch_dtype(toPrint.type(), adaptive_tensor_print);
+};
+
+#define PRINT_TENSOR(tensor) print_tensor(tensor, #tensor)
+
+
+Variable embedding2(Variable const& input, Variable const& embeddings) {
+    // TODO{fl::Tensor}{4-dims} - relax this
+    if(input.ndim() >= 4)
+        throw std::invalid_argument{"embedding input must have 3 or fewer dims"};
+
+    auto const idxs = input.tensor().flatten();
+    auto inDims = input.shape();
+    std::vector<Dim> rDims(input.ndim() + 1);
+    rDims[0] = embeddings.dim(0);
+    for(Dim i = 1; i < input.ndim() + 1; i++)
+        rDims[i] = inDims[i - 1];
+
+    Shape const resultDims{rDims};
+    auto const result = fl::reshape(embeddings.tensor()(fl::span, idxs), resultDims);
+
+    auto grad_func = [](
+        std::vector<Variable>& inputs,
+        Variable const& gradOutput
+    ) {
+        auto& w = inputs[1];
+        if(!w.isCalcGrad())
+            return;
+
+        auto const ip = inputs[0].tensor().flatten();
+        auto size = static_cast<Dim>(ip.elements());
+        auto const deltas = fl::reshape(gradOutput.tensor(), {w.dim(0), size});
+
+        auto const e = fl::full({size}, 1.0, deltas.type());
+        auto const iota = fl::arange({size + 1}, 0.0, fl::dtype::s32);
+
+        PRINT_TENSOR(ip);
+        std::cout << std::format("size: {}\n", size);
+        PRINT_TENSOR(deltas);
+
+        PRINT_TENSOR(e);
+        PRINT_TENSOR(iota);
+
+        // Sparse Tensor
+        auto sp = Tensor{
+            static_cast<Dim>(ip.elements()),
+            w.dim(1),
+            e,
+            iota,
+            ip.asType(fl::dtype::s32),
+            fl::StorageType::CSR
+        };
+        //double* x = sp.host<double>();
+        //fl::eval(sp);
+
+        auto deltasT = transpose(deltas);
+        PRINT_TENSOR(deltasT);
+        auto grad = transpose(
+            fl::matmul(
+                sp,
+                deltasT,
+                /* lhsProp = */
+                MatrixProperty::Transpose
+            )
+        );
+        fl::eval(grad);
+        PRINT_TENSOR(grad);
+        w.addGrad(Variable{grad, false});
+
+        PRINT_TENSOR(w.tensor());
+    };
+
+    print_tensor(result, "embedding result");
+
+    return Variable{result, {input, embeddings}, grad_func};
+}
+
+namespace detail {
+
+    using JacobianFunc = std::function<Variable (Variable&)>;
+    inline bool jacobianTestImpl2(
+        JacobianFunc const& func,
+        Variable& input,
+        double precision = 1E-5,
+        float perturbation = 1E-4,
+        std::vector<Variable*> const& zeroGradientVariables = {}
+    ) {
+        auto const outBase = func(input);
+        auto const outElements = outBase.elements();
+        auto const inElements = input.elements();
+
+        auto const fwdJacobian = Tensor({outElements, inElements}, input.type());
+
+        for(int i = 0; i < inElements; ++i) {
+            auto orig = input.tensor().flatten()(i);
+
+            input.tensor().flat(i) = orig - perturbation;
+            auto outA = func(input).tensor();
+
+            input.tensor().flat(i) = orig + perturbation;
+            auto outB = func(input).tensor();
+
+            input.tensor().flat(i) = orig;
+
+            fwdJacobian(fl::span, i) = fl::reshape((outB - outA), {static_cast<Dim>(outA.elements())})
+                * 0.5
+                / perturbation;
+        }
+
+        auto const bwdJacobian = Tensor({outElements, inElements}, input.type());
+        auto const outD = Variable(fl::full(outBase.shape(), 0, outBase.type()), false);
+
+        for(int i = 0; i < outD.elements(); ++i) {
+            outD.tensor().flat(i) = 1; // element in 1D view
+            input.zeroGrad();
+            for(auto* var : zeroGradientVariables)
+                var->zeroGrad();
+
+            auto out = func(input);
+            out.backward(outD);
+
+            bwdJacobian(i) = fl::reshape(input.grad().tensor(), {inElements});
+            outD.tensor().flat(i) = 0;
+        }
+
+        PRINT_TENSOR(fwdJacobian);
+        PRINT_TENSOR(bwdJacobian);
+
+        return allClose(fwdJacobian, bwdJacobian, precision);
+    }
+
+}
+
+TEST(AutogradTest, Embedding2) {
+    int nWords = 10;
+    auto input = Variable{(fl::rand({4, 2}) * nWords).asType(fl::dtype::s32), false};
+    PRINT_TENSOR(input.tensor());
+
+
+    auto weights = Variable{fl::randn({4, nWords}, fl::dtype::f64), true};
+    PRINT_TENSOR(weights.tensor());
+
+    auto func_embed = [&](Variable& w) { return embedding2(input, w); };
+
+    ASSERT_TRUE(detail::jacobianTestImpl2(func_embed, weights, 1E-5));
+}
+
+}
+
+
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

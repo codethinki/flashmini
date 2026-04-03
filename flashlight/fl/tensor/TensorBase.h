@@ -20,6 +20,9 @@
 #include "flashlight/fl/tensor/Shape.h"
 #include "flashlight/fl/tensor/Types.h"
 
+#include <format>
+#include <span>
+
 namespace fl {
 
 class Tensor;
@@ -452,8 +455,8 @@ public:
      *
      * @return a scalar of the first element in the tensor.
      */
-    template<typename T>
-    T scalar() const;
+    template<fundamental_type T>
+    [[nodiscard]] T scalar() const;
 
     /**
      * Return a scalar of the specified type of the tensor. If the specified type
@@ -463,76 +466,62 @@ public:
      * @return a scalar of the first element in the tensor cast to the specified
      * type.
      */
-    template<typename T>
-    T asScalar() const {
-        if(type() == dtype::f16)
-            return fl::dispatch_dtype<T>(dtype::f32, [t = asType(dtype::f32)]<class U> { return t.scalar<U>(); });
-
-
-        return fl::dispatch_dtype<T>(type(), [&t = *this]<class U> { return t.scalar<U>(); });
-    }
+    template<fundamental_type T>
+    [[nodiscard]] T asScalar() const;
 
     /**
      * Return a pointer to the tensor's underlying data per a certain type. This
      * pointer exists on the computation device.
      *
-     * \note The memory allocated here will not be freed until Tensor:unlock() is
+     * @return the requested pointer on the device or `nullptr` if the tensor is empty
+     * 
+     * @attention The memory allocated here will not be freed until Tensor:unlock() is
      * called.
-     *
-     * @return the requested pointer on the device.
      */
-    template<typename T>
-    T* device() const;
+    template<class T>
+    [[nodiscard]] T* device() const;
 
     /**
-     * Populate a pointer value with the address of a Tensor's underlying buffer
-     * on the computation device.
+     * Returns a pointer to the tensor's underlying data on the host. Copies the data
+     * to the host if it's located on the device.
      *
-     * \note The memory allocated here will not be freed until Tensor:unlock() is
-     * called.
-     *
-     * @param[in] ptr the pointer to populate with the Tensor's buffer location on
-     * device.
+     * @return host data pointer or `nullptr` if tensor is empty
+     * @attention memory ownership is transferred to the caller
      */
-    template<typename T>
-    void device(T** ptr) const;
+    [[nodiscard]] void* raw_host() const;
 
     /**
-     * Returns a pointer to the tensor's underlying data, but on the host. If the
-     * tensor is located on a device, makes a copy of device memory and returns a
-     * buffer on the host containing the relevant memory.
+     * Returns the tensor's underlying data on the host, creates a copy.
+     * Users who want to avoid copies may use @ref device()
      *
-     * @return the requested pointer on the host.
+     * @throws std::logic_error if `Tensor::bytes() % sizeof(T) != 0`
+     *
+     * @return vector of data
      */
-    template<typename T>
-    T* host() const;
+    template<class T>
+    [[nodiscard]] std::vector<T> host() const;
+
 
     /**
-     * Populates an existing buffer with the tensor's underlying data, but on the
-     * host. If the tensor is located on a device, makes a copy of device memory
-     * and returns a buffer on the host containing the relevant memory.
-     *
-     * @param[in] ptr a pointer to the region of memory to populate with tensor
-     * values
+     * Populates an existing host buffer with the tensor data.
+     * 
+     * @param[in] dst span to write to
+     * @pre
+     * - span size >= @ref bytes()
+     * - @ref bytes() mod `sizeof(T)` == 0
      */
-    template<typename T>
-    void host(T* ptr) const;
+    template<class T>
+    void host(std::span<T> dst) const;
 
     /**
-     * Returns a vector on the host contaning a flat representation of the tensor.
-     * The resulting vector is a copy of the underlying tensor memory, even if on
-     * the host.
+     * Populates the existing host buffer with the tensor data.
+     * @param[in] dst to write to
      *
-     * @return a vector in host memory containing
+     * @pre buffer size must be >= @ref bytes()
+     * @post bytes 0 - @ref bytes written
      */
-    template<typename T>
-    std::vector<T> toHostVector() const {
-        if(isEmpty())
-            return std::vector<T>();
-        std::vector<T> vec(this->elements());
-        host(vec.data());
-        return vec;
-    }
+    void raw_host(void* dst) const;
+
 
     /**
      * Unlocks any device memory associated with the tensor that was acquired with
@@ -562,7 +551,7 @@ public:
      *
      * @param[in] context a pointer to arbitrary data to pass to a tensor impl.
      */
-    void setContext(void* context);
+    void setContext(void* context) const;
 
     /**
      * Gets arbitrary data stored on a tensor. For internal use/benchmarking only.
@@ -627,6 +616,9 @@ public:
     Tensor& operator=(Tensor&& other) &&;
     Tensor& operator=(Tensor const& other) &;
     Tensor& operator=(Tensor const& other) &&;
+
+private:
+    void scalar_impl(void* out) const;
 };
 
 /**
@@ -1716,7 +1708,10 @@ FL_API std::string tensorBackendTypeToString(TensorBackendType type);
  * @return the output stream.
  */
 FL_API std::ostream& operator<<(std::ostream& os, TensorBackendType type);
+}
 
+
+namespace fl {
 /**
  * Convert a tensor from one type to another. Requires moving the input Tensor
  * - destroys the resulting tensor and creates another tensor of the desired
@@ -1775,3 +1770,67 @@ namespace detail {
         }
 
 } // namespace fl
+
+
+namespace fl {
+
+template<fundamental_type T>
+T Tensor::scalar() const {
+    if(isEmpty())
+        throw std::logic_error{"Tensor::scalar called on empty tensor"};
+
+    if(type() != dtype_traits<T>::fl_type)
+        throw std::logic_error{
+            std::format(
+                "Tensor::scalar: requested type of {} does not match tensor type {}",
+                dtype_traits<T>::name(),
+                to_string(type())
+            )
+        };
+    T out;
+    scalar_impl(&out);
+    return out;
+}
+
+template<fundamental_type T>
+[[nodiscard]] T Tensor::asScalar() const {
+    if(type() == dtype::f16)
+        return fl::dispatch_dtype<T>(dtype::f32, [t = asType(dtype::f32)]<class U> { return t.scalar<U>(); });
+
+
+    return fl::dispatch_dtype<T>(type(), [&t = *this]<class U> { return t.scalar<U>(); });
+}
+
+
+template<class T>
+T* Tensor::device() const { return static_cast<T*>(device<void>()); }
+
+template<class T>
+std::vector<T> Tensor::host() const {
+    if(bytes() % sizeof(T) != 0)
+        throw std::logic_error{"Tensor data can't be mapped to an array of T"};
+
+    std::vector<T> data(bytes() / sizeof(T));
+    this->raw_host(data.data());
+
+    return data;
+}
+
+template<class T>
+void Tensor::host(std::span<T> dst) const {
+    auto const size = bytes();
+    auto const dstSize = dst.size_bytes();
+
+    if(size % sizeof(T) != 0)
+        throw std::logic_error{
+            std::format("Tensor data ({} bytes) can't be mapped to an array of T (size {})", sizeof(T))
+        };
+
+    if(size > dstSize)
+        throw std::logic_error{
+            std::format("Tensor data ({} bytes) doesn't fit span of T with {} bytes", size, dstSize)
+        };
+
+    raw_host(dst.data());
+}
+}

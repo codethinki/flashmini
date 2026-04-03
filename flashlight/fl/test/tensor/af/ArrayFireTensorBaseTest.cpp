@@ -20,6 +20,8 @@
 #include "flashlight/fl/tensor/backend/af/ArrayFireTensor.h"
 #include "flashlight/fl/tensor/backend/af/Utils.h"
 
+#include <format>
+
 using namespace ::testing;
 using namespace fl;
 
@@ -45,6 +47,31 @@ bool allClose(
 } // namespace
 
 namespace fl {
+
+TEST(ArrayFireSparse, HostExtractionCrash) {
+    int size = 8;
+
+    // Create lazy nodes
+    af::array values = af::constant(1.0, size, f64);
+    af::array row_ptr = af::iota(af::dim4(size + 1), af::dim4(1), s32);
+    af::array col_idx = af::constant(0, size, s32);
+
+    // Create sparse array
+
+    af::array sp = af::sparse(size, 4, values, row_ptr, col_idx, AF_STORAGE_CSR);
+
+    try {
+        std::vector<double> data(sp.elements(), 999);
+
+        sp.host(data.data());
+    }
+    catch(af::exception const& e) {
+        SUCCEED();
+        return;
+    }
+
+    FAIL() << "ArrayFire fixed host call on sparse matrices, update Tensor::host accordingly";
+}
 
 TEST(ArrayFireTensorBaseTest, ArrayFireShapeInterop) {
     ASSERT_EQ(detail::afToFlDims(af::dim4(), 0), Shape({})); // scalar

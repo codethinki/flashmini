@@ -74,7 +74,7 @@ target_sources(
   ${CMAKE_CURRENT_LIST_DIR}/TensorBase.cpp
   ${CMAKE_CURRENT_LIST_DIR}/TensorAdapter.cpp
   ${CMAKE_CURRENT_LIST_DIR}/TensorExtension.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/Types.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/DTypes.cpp
 )
 
 # Profiling -- TODO: move this to runtime things

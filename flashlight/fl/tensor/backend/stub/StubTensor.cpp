@@ -74,7 +74,7 @@ const Stream& StubTensor::stream() const {
     FL_STUB_TENSOR_UNIMPLEMENTED;
 }
 
-Tensor StubTensor::astype(const dtype /* type */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
+Tensor StubTensor::asType(const dtype /* type */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 
 Tensor StubTensor::index(const std::vector<Index>& /* indices */) { FL_STUB_TENSOR_UNIMPLEMENTED; }
 

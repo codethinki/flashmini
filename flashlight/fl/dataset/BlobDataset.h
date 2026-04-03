@@ -96,12 +96,15 @@ private:
 protected:
     void readIndex();
 
+    //TODO modernize with std::span
+
     /**
      * Write raw data in the blob.
      * Implementation must be thread-safe.
      * @param[in] offset Offset in the blob in bytes.
      * @param[in] data Raw data bytes.
      * @param[in] size Raw data size in bytes.
+     * @return byte size of written data
      */
     virtual int64_t writeData(int64_t offset, const char* data, int64_t size)
     const = 0;

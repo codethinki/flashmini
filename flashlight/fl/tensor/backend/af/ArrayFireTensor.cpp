@@ -214,7 +214,11 @@ void ArrayFireTensor::scalar(void* out) { AF_CHECK(af_get_scalar(out, getHandle(
 
 void ArrayFireTensor::device(void** out) { AF_CHECK(af_get_device_ptr(out, getHandle().get())); }
 
-void ArrayFireTensor::host(void* out) { AF_CHECK(af_get_data_ptr(out, getHandle().get())); }
+void ArrayFireTensor::host(void* out) {
+    
+
+    AF_CHECK(af_get_data_ptr(out, getHandle().get()));
+}
 
 void ArrayFireTensor::unlock() { AF_CHECK(af_unlock_array(getHandle().get())); }
 
@@ -239,7 +243,7 @@ Stream const& ArrayFireTensor::stream() const {
     return ArrayFireBackend::getInstance().getStreamOfArray(*arrayHandle_);
 }
 
-Tensor ArrayFireTensor::astype(dtype const type) {
+Tensor ArrayFireTensor::asType(dtype const type) {
     auto a = getHandle().as(detail::flToAfType(type));
     return toTensor<ArrayFireTensor>(std::move(a), numDims());
 }

@@ -29,23 +29,27 @@ TEST(TensorBaseTest, FullTypeMismatch) {
     auto const x0 = fl::full<double>(shape, 1.0, fl::dtype::f64);
     ASSERT_EQ(x0.type(), fl::dtype::f64);
     ASSERT_EQ(x0.shape(), shape);
-    ASSERT_EQ(x0.scalar<double>(), 1.0);
 
-    // Explicitly templating int literal while requesting double dtype
+    std::span x0Span(x0.host<double>(), x0.elements());
+    for(double val : x0Span)
+        ASSERT_EQ(val, 1.0);
+
     auto const x1 = fl::full<int>(shape, 0, fl::dtype::f64);
-
     ASSERT_EQ(x1.type(), fl::dtype::f64);
     ASSERT_EQ(x1.shape(), shape);
-    ASSERT_EQ(x1.scalar<double>(), 0);
 
-    // Test that explicitly templating the call to double while requesting an integer dtype
-    // constructs the requested type without relying on implicit literal casting.
+    std::span x1Span(x1.host<double>(), x1.elements());
+    for(double val : x1Span)
+        ASSERT_EQ(val, 0.0);
+
     auto const x2 = fl::full<double>(shape, 1.0, fl::dtype::s32);
     ASSERT_EQ(x2.type(), fl::dtype::s32);
     ASSERT_EQ(x2.shape(), shape);
-    ASSERT_EQ(x2.scalar<int>(), 1);
-}
 
+    std::span const x2Span(x2.host<int>(), x2.elements());
+    for(int val : x2Span)
+        ASSERT_EQ(val, 1);
+}
 TEST(TensorBaseTest, ArangeTypeMismatch) {
     // Case where everything matches
     auto const y0 = fl::arange<double>(0.0, 4.0, 1.0, fl::dtype::f64);
@@ -454,7 +458,7 @@ TEST(TensorBaseTest, tile) {
     ASSERT_EQ(tiled.shape(), Shape({8, 8}));
     ASSERT_TRUE(allClose(tiled, fl::full({8, 8}, 3.f)));
     ASSERT_EQ(fl::tile(a, {}).shape(), a.shape());
-    
+
     auto const s = fl::fromScalar(3.14f);
     ASSERT_EQ(fl::tile(s, {3, 3}).shape(), Shape({3, 3}));
     ASSERT_EQ(fl::tile(s, {}).shape(), s.shape());

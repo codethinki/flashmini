@@ -193,7 +193,7 @@ public:
     bool isContiguous() override;
     Shape strides() override;
     Stream const& stream() const override;
-    Tensor astype(dtype type) override;
+    Tensor asType(dtype type) override;
     Tensor index(std::vector<Index> const& indices) override;
     Tensor flatten() const override;
     Tensor flat(Index const& idx) const override;

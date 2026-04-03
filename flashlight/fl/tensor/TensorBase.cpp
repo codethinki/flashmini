@@ -92,7 +92,7 @@ dtype Tensor::type() const { return impl_->type(); }
 
 bool Tensor::isSparse() const { return impl_->isSparse(); }
 
-Tensor Tensor::asType(dtype const type) const { return impl_->astype(type); }
+Tensor Tensor::asType(dtype const type) const { return impl_->asType(type); }
 
 Tensor Tensor::operator()(std::vector<Index> const& indices) const { return impl_->index(indices); }
 
@@ -106,70 +106,6 @@ TensorBackendType Tensor::backendType() const { return impl_->backendType(); }
 
 TensorBackend& Tensor::backend() const { return impl_->backend(); }
 
-#define FL_CREATE_MEMORY_OPS(TYPE)                                                    \
-        template<> FL_API TYPE Tensor::scalar() const {                               \
-            if(isEmpty()) {                                                           \
-                throw std::invalid_argument("Tensor::scalar called on empty tensor"); \
-            }                                                                         \
-            if(type() != dtype_traits<TYPE>::fl_type) {                               \
-                throw std::invalid_argument(                                          \
-    "Tensor::scalar: requested type of " +                                            \
-    std::string(dtype_traits<TYPE>::name()) +                                         \
-    " doesn't match tensor type, which is " + std::string{to_string(type())}          \
-                );                                                                    \
-            }                                                                         \
-            TYPE out;                                                                 \
-            impl_->scalar(&out);                                                      \
-            return out;                                                               \
-        }                                                                             \
-                                                                                      \
-        template<> FL_API TYPE * Tensor::device() const {                             \
-            if(isEmpty()) {                                                           \
-                return nullptr;                                                       \
-            }                                                                         \
-            TYPE* out;                                                                \
-            void** addr = reinterpret_cast<void**>(&out);                             \
-            impl_->device(addr);                                                      \
-            return out;                                                               \
-        }                                                                             \
-                                                                                      \
-        template<>                                                                    \
-        FL_API void Tensor::device(TYPE * *ptr) const {                               \
-            if(isEmpty()) {                                                           \
-                return;                                                               \
-            }                                                                         \
-            impl_->device(reinterpret_cast<void**>(ptr));                             \
-        }                                                                             \
-                                                                                      \
-        template<> FL_API TYPE * Tensor::host() const {                               \
-            if(isEmpty()) {                                                           \
-                return nullptr;                                                       \
-            }                                                                         \
-            auto* out = reinterpret_cast<TYPE*>(new char[bytes()]);                   \
-            impl_->host(out);                                                         \
-            return out;                                                               \
-        }                                                                             \
-                                                                                      \
-        template<>                                                                    \
-        FL_API void Tensor::host(TYPE * ptr) const {                                  \
-            if(!isEmpty()) {                                                          \
-                impl_->host(ptr);                                                     \
-            }                                                                         \
-        }
-// TODO this should be normal templates
-FL_CREATE_MEMORY_OPS(int);
-FL_CREATE_MEMORY_OPS(unsigned);
-FL_CREATE_MEMORY_OPS(char);
-FL_CREATE_MEMORY_OPS(unsigned char);
-FL_CREATE_MEMORY_OPS(long);
-FL_CREATE_MEMORY_OPS(unsigned long);
-FL_CREATE_MEMORY_OPS(long long);
-FL_CREATE_MEMORY_OPS(unsigned long long);
-FL_CREATE_MEMORY_OPS(double);
-FL_CREATE_MEMORY_OPS(float);
-FL_CREATE_MEMORY_OPS(short);
-FL_CREATE_MEMORY_OPS(unsigned short);
-// void specializations
 template<>
 FL_API void* Tensor::device() const {
     if(isEmpty())
@@ -179,15 +115,7 @@ FL_API void* Tensor::device() const {
     return out;
 }
 
-template<>
-FL_API void Tensor::device(void** ptr) const {
-    if(isEmpty())
-        return;
-    impl_->device(ptr);
-}
-
-template<>
-FL_API void* Tensor::host() const {
+void* Tensor::raw_host() const {
     if(isEmpty())
         return nullptr;
     auto* out = reinterpret_cast<void*>(new char[bytes()]);
@@ -195,9 +123,11 @@ FL_API void* Tensor::host() const {
     return out;
 }
 
-template<>
-FL_API void Tensor::host(void* ptr) const { impl_->host(ptr); }
-#undef FL_CREATE_MEMORY_OPS
+void Tensor::raw_host(void* dst) const {
+    if(!isEmpty())
+        impl_->host(dst);
+}
+
 
 void Tensor::unlock() const { impl_->unlock(); }
 
@@ -209,7 +139,7 @@ Shape Tensor::strides() const { return impl_->strides(); }
 
 Stream const& Tensor::stream() const { return impl_->stream(); }
 
-void Tensor::setContext(void* context) { impl_->setContext(context); }
+void Tensor::setContext(void* context) const { impl_->setContext(context); }
 
 void* Tensor::getContext() const { return impl_->getContext(); }
 
@@ -292,6 +222,14 @@ Tensor& Tensor::operator=(Tensor const& other) && {
     this->impl_->assign(other);
     return *this;
 }
+
+
+void Tensor::scalar_impl(void* out) const { impl_->scalar(&out); }
+
+}
+
+
+namespace fl {
 
 /* --------------------------- Tensor Operators --------------------------- */
 
