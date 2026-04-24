@@ -94,8 +94,8 @@ std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
         );
     }
 
-    auto batchTargetSizeVec = targetSize.toHostVector<int>();
-    auto batchScaleVec = scale.toHostVector<float>();
+    auto batchTargetSizeVec = targetSize.host<int>();
+    auto batchScaleVec = scale.host<float>();
 
     for(int b = 0; b < B; ++b) {
         const int* targetVec = batchTargetVec.data() + b * batchL;

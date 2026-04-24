@@ -30,7 +30,8 @@ TEST(TensorBaseTest, FullTypeMismatch) {
     ASSERT_EQ(x0.type(), fl::dtype::f64);
     ASSERT_EQ(x0.shape(), shape);
 
-    std::span x0Span(x0.host<double>(), x0.elements());
+
+    auto x0Span = x0.host<double>();
     for(double val : x0Span)
         ASSERT_EQ(val, 1.0);
 
@@ -38,7 +39,7 @@ TEST(TensorBaseTest, FullTypeMismatch) {
     ASSERT_EQ(x1.type(), fl::dtype::f64);
     ASSERT_EQ(x1.shape(), shape);
 
-    std::span x1Span(x1.host<double>(), x1.elements());
+    auto x1Span = x1.host<double>();
     for(double val : x1Span)
         ASSERT_EQ(val, 0.0);
 
@@ -46,7 +47,7 @@ TEST(TensorBaseTest, FullTypeMismatch) {
     ASSERT_EQ(x2.type(), fl::dtype::s32);
     ASSERT_EQ(x2.shape(), shape);
 
-    std::span const x2Span(x2.host<int>(), x2.elements());
+    auto const x2Span = x2.host<int>();
     for(int val : x2Span)
         ASSERT_EQ(val, 1);
 }
@@ -657,7 +658,7 @@ void assertScalarBehavior(fl::dtype type) {
     auto one = fl::full({1}, scalar, type);
 
     if(dtype_traits<ScalarArgType>::fl_type != type) {
-        ASSERT_THROW(one.template scalar<ScalarArgType>(), std::invalid_argument)
+        ASSERT_THROW(one.template scalar<ScalarArgType>(), std::logic_error)
             << "dtype: " << type
             << ", ScalarArgType: " << dtype_traits<ScalarArgType>::getName();
         return;
@@ -751,29 +752,30 @@ TEST(TensorBaseTest, asContiguousTensor) {
     ASSERT_EQ(contiguous.strides(), Shape(strides));
 }
 
-TEST(TensorBaseTest, host) {
-    auto const a = fl::rand({10, 10});
+TEST(TensorBaseTest, raw_host) {
+    auto const a = fl::rand({10, 10}, fl::dtype::f32);
 
-    float const* ptr = a.host<float>();
+    std::unique_ptr<float[]> ptr{static_cast<float*>(a.raw_host())};
     for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(ptr[i], a.flatten()(i).scalar<float>());
 
-    float* existingBuffer = new float[100];
-    a.host(existingBuffer);
+
+    std::vector<float> existingBuffer(100);
+    a.raw_host(existingBuffer.data());
     for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(existingBuffer[i], a.flatten()(i).scalar<float>());
 
-    ASSERT_EQ(Tensor().host<void>(), nullptr);
+    ASSERT_EQ(Tensor().raw_host(), nullptr);
 }
 
-TEST(TensorBaseTest, toHostVector) {
+TEST(TensorBaseTest, host) {
     auto const a = fl::rand({10, 10});
-    auto const vec = a.toHostVector<float>();
+    auto const vec = a.host<float>();
 
     for(int i = 0; i < a.elements(); ++i)
         ASSERT_EQ(vec[i], a.flatten()(i).scalar<float>());
 
-    ASSERT_EQ(Tensor().toHostVector<float>().size(), 0);
+    ASSERT_EQ(Tensor().host<float>().size(), 0);
 }
 
 TEST(TensorBaseTest, arange) {

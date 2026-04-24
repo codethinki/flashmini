@@ -422,7 +422,7 @@ std::vector<Seq2SeqCriterion::CandidateHypo> Seq2SeqCriterion::beamSearch(
 
         scoreArr = scoreArr + ox.tensor(); // C x B
         scoreArr = scoreArr.flatten(); // column-first
-        auto scoreVec = scoreArr.toHostVector<float>();
+        auto scoreVec = scoreArr.host<float>();
 
         std::vector<size_t> indices(scoreVec.size());
         std::iota(indices.begin(), indices.end(), 0);
@@ -618,7 +618,7 @@ std::pair<std::vector<std::vector<float>>, std::vector<Seq2SeqStatePtr>> Seq2Seq
 
         Tensor bestpath, maxvalues;
         fl::max(maxvalues, bestpath, alphaBatched.tensor(), 0);
-        std::vector<int> maxIdx = bestpath.toHostVector<int>();
+        std::vector<int> maxIdx = bestpath.host<int>();
         for(int i = 0; i < batchSize; i++) {
             outstates[i]->peakAttnPos = maxIdx[i];
             // TODO: std::abs maybe unnecessary
@@ -637,7 +637,7 @@ std::pair<std::vector<std::vector<float>>, std::vector<Seq2SeqStatePtr>> Seq2Seq
     for(int i = 0; i < batchSize; i++)
         out[i] = outBatched(fl::span, fl::range(i, i + 1))
             .tensor()
-            .toHostVector<float>();
+            .host<float>();
 
     return std::make_pair(out, outstates);
 }

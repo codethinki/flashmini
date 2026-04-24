@@ -534,7 +534,7 @@ TEST(CriterionTest, FCCCost) {
     auto fcc3 = FullConnectionCriterion(N3);
 
     auto l3 = fcc3(in, tgt);
-    auto loss3Host = l3.tensor().toHostVector<float>();
+    auto loss3Host = l3.tensor().host<float>();
     ASSERT_NEAR(loss3Host[0], 0.0, kEpsilon);
     ASSERT_NEAR(loss3Host[1], 0.0, kEpsilon);
     ASSERT_NEAR(loss3Host[2], 0.0, kEpsilon);

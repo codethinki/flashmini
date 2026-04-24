@@ -84,7 +84,7 @@ size_t Tensor::ndim() const { return shape().ndim(); }
 
 bool Tensor::isEmpty() const { return elements() == 0; }
 
-bool Tensor::hasAdapter() const { return impl_.get() != nullptr; }
+bool Tensor::hasAdapter() const { return impl_ != nullptr; }
 
 size_t Tensor::bytes() const { return elements() * getTypeSize(type()); }
 
@@ -107,7 +107,7 @@ TensorBackendType Tensor::backendType() const { return impl_->backendType(); }
 TensorBackend& Tensor::backend() const { return impl_->backend(); }
 
 template<>
-FL_API void* Tensor::device() const {
+void* Tensor::device<void>() const {
     if(isEmpty())
         return nullptr;
     void* out;
@@ -115,15 +115,21 @@ FL_API void* Tensor::device() const {
     return out;
 }
 
+
 void* Tensor::raw_host() const {
     if(isEmpty())
         return nullptr;
+    if(isSparse())
+        throw std::logic_error{"host memory may not be requested from a sparse tensor"};
+
     auto* out = reinterpret_cast<void*>(new char[bytes()]);
     impl_->host(out);
     return out;
 }
 
 void Tensor::raw_host(void* dst) const {
+    if(isSparse())
+        throw std::logic_error{"host memory may not be requested from a sparse tensor"};
     if(!isEmpty())
         impl_->host(dst);
 }
@@ -224,7 +230,7 @@ Tensor& Tensor::operator=(Tensor const& other) && {
 }
 
 
-void Tensor::scalar_impl(void* out) const { impl_->scalar(&out); }
+void Tensor::scalar_impl(void* out) const { impl_->scalar(out); }
 
 }
 

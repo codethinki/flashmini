@@ -149,8 +149,8 @@ void transformerPadMaskFwd(bool isfp16) {
     
     auto noPadMask = fl::full({timesteps, 2}, 1);
 
-    auto output = tr.forward({input, Variable(padMask, false)}).front();
-    auto outputNoPad = tr.forward({input, Variable(noPadMask, false)}).front();
+    auto output = tr.forward({input, Variable{padMask, false}}).front();
+    auto outputNoPad = tr.forward({input, Variable{noPadMask, false}}).front();
 
     ASSERT_EQ(output.dim(0), c);
     ASSERT_EQ(output.dim(1), timesteps);
@@ -177,6 +177,7 @@ void transformerPadMaskFwd(bool isfp16) {
 
     auto output2 = tr.forward({input2, Variable(padMask(fl::span, fl::range(1, 2)), false)})
                      .front();
+
     ASSERT_TRUE(
         allClose(output.tensor()(fl::span, fl::span, fl::range(1, 2)), output2.tensor())
     );

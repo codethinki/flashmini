@@ -29,8 +29,8 @@ namespace pkg {
             else if(trans.type() != fl::dtype::f32)
                 throw std::invalid_argument("viterbiPath: trans must be float32");
 
-            auto inputVec = input.toHostVector<float>();
-            auto transVec = trans.toHostVector<float>();
+            auto inputVec = input.host<float>();
+            auto transVec = trans.host<float>();
             std::vector<int> pathVec(B * T);
             std::vector<uint8_t> workspaceVec(ViterbiPath::getWorkspaceSize(B, T, N));
 
@@ -51,7 +51,7 @@ namespace pkg {
             int B = target.dim(1);
             int L = target.dim(0);
 
-            auto targetVec = target.toHostVector<int>();
+            auto targetVec = target.host<int>();
             std::vector<int> targetSizeVec(B);
 
             CriterionUtils::batchTargetSize(

@@ -73,7 +73,7 @@ Tensor allreduceGet(fl::TopKMeter& mtr) {
 
 void allreduceSet(fl::AverageValueMeter& mtr, Tensor& val) {
     mtr.reset();
-    auto valVec = val.toHostVector<double>();
+    auto valVec = val.host<double>();
     if(valVec[2] != 0)
         valVec[0] /= valVec[2];
     mtr.add(valVec[0], valVec[2]);
@@ -81,7 +81,7 @@ void allreduceSet(fl::AverageValueMeter& mtr, Tensor& val) {
 
 void allreduceSet(fl::EditDistanceMeter& mtr, Tensor& val) {
     mtr.reset();
-    auto valVec = val.toHostVector<int64_t>();
+    auto valVec = val.host<int64_t>();
     mtr.add(
         static_cast<int64_t>(valVec[1]),
         static_cast<int64_t>(valVec[2]),
@@ -92,20 +92,20 @@ void allreduceSet(fl::EditDistanceMeter& mtr, Tensor& val) {
 
 void allreduceSet(fl::CountMeter& mtr, Tensor& val) {
     mtr.reset();
-    auto valVec = val.toHostVector<int64_t>();
+    auto valVec = val.host<int64_t>();
     for(size_t i = 0; i < valVec.size(); ++i)
         mtr.add(i, valVec[i]);
 }
 
 void allreduceSet(fl::TimeMeter& mtr, Tensor& val) {
     auto worldSize = fl::getWorldSize();
-    auto valVec = val.toHostVector<double>();
+    auto valVec = val.host<double>();
     mtr.set(valVec[0] / worldSize);
 }
 
 void allreduceSet(fl::TopKMeter& mtr, Tensor& val) {
     mtr.reset();
-    auto valVec = val.toHostVector<int32_t>();
+    auto valVec = val.host<int32_t>();
     mtr.set(valVec[0], valVec[1]);
 }
 } // namespace fl

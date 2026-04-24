@@ -133,7 +133,7 @@ Tensor join(
     if(isEmpty)
         return Tensor(maxDims, type);
     auto padSeq = fl::full(maxDims, padValue, type);
-    std::vector<fl::Index> sel{std::max(static_cast<Dim>(maxNumDims), static_cast<Dim>(batchDim + 1)), fl::span};
+    std::vector<fl::Index> sel(std::max(static_cast<Dim>(maxNumDims), static_cast<Dim>(batchDim + 1)), fl::span);
 
     for(int i = 0; i < inputs.size(); ++i) {
         for(int d = 0; d < maxNumDims; ++d)

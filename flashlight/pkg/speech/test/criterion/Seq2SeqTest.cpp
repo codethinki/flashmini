@@ -425,7 +425,7 @@ TEST(Seq2SeqTest, BatchedDecoderStep) {
                 input.dim(1)
             );
             ox = logSoftmax(ox, 0);
-            single_scores[i] = ox.tensor().toHostVector<float>();
+            single_scores[i] = ox.tensor().host<float>();
         }
 
         // Batched forward

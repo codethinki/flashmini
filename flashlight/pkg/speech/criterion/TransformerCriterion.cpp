@@ -322,7 +322,7 @@ std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>> Transforme
     outBatched = logSoftmax(outBatched / smoothingTemperature, 0);
     std::vector<std::vector<float>> out(B);
     for(int i = 0; i < B; i++)
-        out[i] = outBatched(fl::span, i).tensor().toHostVector<float>();
+        out[i] = outBatched(fl::span, i).tensor().host<float>();
 
     return std::make_pair(out, outstates);
 }

@@ -198,7 +198,7 @@ std::string PlGenerator::regeneratePl(
 
         std::vector<std::string> words;
         if(useExistingPl_ && seedModelWER_ < currentModelWER_) {
-            auto tokenTarget = sample[kTargetIdx].toHostVector<int>();
+            auto tokenTarget = sample[kTargetIdx].host<int>();
             words = tokenToWord_(tokenTarget, tokenDict_, false);
         } else {
             fl::Variable rawEmission;
@@ -218,7 +218,7 @@ std::string PlGenerator::regeneratePl(
                     sample[kDurationIdx]
                 );
             auto tokenPrediction =
-                criterion->viterbiPath(rawEmission.tensor()).toHostVector<int>();
+                criterion->viterbiPath(rawEmission.tensor()).host<int>();
             words = tokenToWord_(tokenPrediction, tokenDict_, true);
         }
         if(words.size() < minTargetSize_ || words.size() > maxTargetSize_)

@@ -9,6 +9,7 @@
 
 #include <array>
 #include <concepts>
+#include <format>
 #include <optional>
 #include <ostream>
 #include <string>
@@ -48,7 +49,7 @@ enum class dtype_group {
 
 
 
-constexpr std::string_view to_string(dtype e) {
+[[nodiscard]] constexpr std::string_view to_string(dtype e) {
     switch(e) {
         case dtype::f16: return "f16";
         case dtype::f32: return "f32";
@@ -64,6 +65,8 @@ constexpr std::string_view to_string(dtype e) {
         default: return "unknown";
     }
 }
+
+
 
 [[nodiscard]] constexpr auto to_index(dtype d) { return static_cast<std::underlying_type_t<dtype>>(d); }
 
@@ -132,6 +135,8 @@ namespace detail {
     }();
 }
 
+
+
 /**
  * Gets the dtypes size in bytes
  * @param[in] type to get size of
@@ -198,3 +203,11 @@ FL_API inline std::ostream& operator<<(std::ostream& ostream, dtype const& s) {
 }
 
 }
+
+template<>
+struct std::formatter<fl::dtype> {
+    [[nodiscard]] constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+    template<class FormatContext> [[nodiscard]] constexpr auto format(fl::dtype const& obj, FormatContext& ctx) const {
+        return std::format_to(ctx.out(), "fl::dtype[{}]", to_string(obj));
+    }
+};

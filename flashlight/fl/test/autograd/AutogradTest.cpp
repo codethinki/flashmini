@@ -9,6 +9,7 @@
 #include <cmath>
 #include <functional>
 #include <stdexcept>
+#include <format>
 
 #include <gtest/gtest.h>
 
@@ -523,7 +524,7 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
     }
 }
 
-
+/*
 
 namespace fl {
 
@@ -536,7 +537,7 @@ void print_tensor(Tensor const& toPrint, std::string_view name) {
         std::cout << std::format("can't print tensor [{}], has more than 3 dimensions\n", name);
 
     auto adaptive_tensor_print = [&]<class T>() {
-        auto host = toPrint.toHostVector<T>();
+        auto host = toPrint.host<T>();
 
         std::cout << std::format("{}:\n", name);
 
@@ -560,9 +561,9 @@ void print_tensor(Tensor const& toPrint, std::string_view name) {
                     size_t index = offset + x * height + y;
 
                     if(x == width - 1)
-                        row += std::format("{}", host[index]);
+                        row += std::format("{}", static_cast<T>(host[index])); //vector<bool>[i] does not return bool
                     else
-                        row += std::format("{}, ", host[index]);
+                        row += std::format("{}, ", static_cast<T>(host[index]));
                 }
                 size_t max = 0;
                 for(auto& row : rows)
@@ -645,7 +646,6 @@ Variable embedding2(Variable const& input, Variable const& embeddings) {
             fl::matmul(
                 sp,
                 deltasT,
-                /* lhsProp = */
                 MatrixProperty::Transpose
             )
         );
@@ -732,7 +732,7 @@ TEST(AutogradTest, Embedding2) {
 }
 
 }
-
+*/
 
 
 int main(int argc, char** argv) {

@@ -8,3 +8,8 @@
 
 #include "DTypes.h"
 #include "Traits.h"
+
+namespace fl {
+template<class T>
+concept not_void = !std::is_void_v<std::decay_t<T>>;
+}

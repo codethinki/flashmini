@@ -1,0 +1,12 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3073bbe2_002D518f_002D49de_002Da793_002Df400571f70bb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;ProjectFolder&gt;DB94C55F-6B9A-4AAE-80D7-29FD8153E6B5/d:flashlight/d:fl&lt;/ProjectFolder&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;GTest::DB94C55F-6B9A-4AAE-80D7-29FD8153E6B5::::ContribModuleTestF16&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+  &lt;/And&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fcea3d45_002Df2ea_002D4b22_002D9457_002D514f7b761fc3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from fl" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;ProjectFolder&gt;DB94C55F-6B9A-4AAE-80D7-29FD8153E6B5/d:flashlight/d:fl&lt;/ProjectFolder&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

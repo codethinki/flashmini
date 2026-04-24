@@ -34,7 +34,7 @@ std::vector<std::string> tensorMatrixToStrings(
     int L = tensor.dim(0); // padded length of string
     int N = tensor.dim(1); // number of strings
     std::vector<std::string> result;
-    auto values = tensor.toHostVector<T>();
+    auto values = tensor.host<T>();
     for(int i = 0; i < N; ++i) {
         const T* row = &values[i * L];
         int len = 0;

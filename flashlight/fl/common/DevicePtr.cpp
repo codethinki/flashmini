@@ -30,10 +30,9 @@ DevicePtr::~DevicePtr() {
         tensor_->unlock();
 }
 
-DevicePtr::DevicePtr(DevicePtr&& d) noexcept : tensor_(std::move(d.tensor_)),
-                                               ptr_(d.ptr_) {
-    d.ptr_ = nullptr;
-}
+DevicePtr::DevicePtr(DevicePtr&& d) noexcept :
+    tensor_(std::move(d.tensor_)),
+    ptr_(d.ptr_) { d.ptr_ = nullptr; }
 
 DevicePtr& DevicePtr::operator=(DevicePtr&& other) noexcept {
     if(ptr_ != nullptr)
@@ -44,8 +43,6 @@ DevicePtr& DevicePtr::operator=(DevicePtr&& other) noexcept {
     return *this;
 }
 
-void* DevicePtr::get() const {
-    return ptr_;
-}
+void* DevicePtr::get() const { return ptr_; }
 
 } // namespace fl

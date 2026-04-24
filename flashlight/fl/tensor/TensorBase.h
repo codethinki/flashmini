@@ -417,7 +417,7 @@ public:
 
     /**
      * Return a copy (depending on copy-on-write behavior of the underlying
-     * implementation) of this tensor that is contigous in memory.
+     * implementation) of this tensor that is contiguous in memory.
      *
      * @return an identical tensor that is contiguous in memory
      */
@@ -471,7 +471,8 @@ public:
 
     /**
      * Return a pointer to the tensor's underlying data per a certain type. This
-     * pointer exists on the computation device.
+     *  pointer exists on the computation device.
+     * @tparam T may not be void
      *
      * @return the requested pointer on the device or `nullptr` if the tensor is empty
      * 
@@ -484,21 +485,23 @@ public:
     /**
      * Returns a pointer to the tensor's underlying data on the host. Copies the data
      * to the host if it's located on the device.
-     *
+     * 
+     * @pre @ref Tensor::isSparse() is false
      * @return host data pointer or `nullptr` if tensor is empty
+     * @throws std::logic_error if 
      * @attention memory ownership is transferred to the caller
      */
     [[nodiscard]] void* raw_host() const;
 
     /**
      * Returns the tensor's underlying data on the host, creates a copy.
-     * Users who want to avoid copies may use @ref device()
-     *
+     *  Users who want to avoid copies may use @ref device()
+     * @tparam T may not be void
+     * @throws std::logic_error if @ref Tensor::isSparse()
      * @throws std::logic_error if `Tensor::bytes() % sizeof(T) != 0`
-     *
      * @return vector of data
      */
-    template<class T>
+    template<not_void T>
     [[nodiscard]] std::vector<T> host() const;
 
 
@@ -506,11 +509,14 @@ public:
      * Populates an existing host buffer with the tensor data.
      * 
      * @param[in] dst span to write to
+     * @tparam T may not be void
      * @pre
      * - span size >= @ref bytes()
-     * - @ref bytes() mod `sizeof(T)` == 0
+     * - @ref Tensor::bytes() is divisible by `sizeof(T)`
+     * - not @ref Tensor::isSparse()
+     * @throws std::logic_error if @ref Tensor::isSparse()
      */
-    template<class T>
+    template<not_void T>
     void host(std::span<T> dst) const;
 
     /**
@@ -518,6 +524,7 @@ public:
      * @param[in] dst to write to
      *
      * @pre buffer size must be >= @ref bytes()
+     * @throws std::logic_error if @ref Tensor::isSparse()
      * @post bytes 0 - @ref bytes written
      */
     void raw_host(void* dst) const;
@@ -707,7 +714,7 @@ FL_API Tensor arange(Shape const& shape, Dim seqDim = 0, dtype type = dtype::f32
  *
  * @param[in] dims the dimensions of the range
  * @param[in] tileDims the dimensions along which to tile
- * @param[in] type the dtype of the resulting tensoe
+ * @param[in] type the dtype of the resulting tensor
  *
  * @return
  */
@@ -1805,10 +1812,14 @@ template<fundamental_type T>
 template<class T>
 T* Tensor::device() const { return static_cast<T*>(device<void>()); }
 
-template<class T>
+template<>
+void* Tensor::device<void>() const;
+
+template<not_void T>
 std::vector<T> Tensor::host() const {
     if(bytes() % sizeof(T) != 0)
         throw std::logic_error{"Tensor data can't be mapped to an array of T"};
+
 
     std::vector<T> data(bytes() / sizeof(T));
     this->raw_host(data.data());
@@ -1816,7 +1827,19 @@ std::vector<T> Tensor::host() const {
     return data;
 }
 
-template<class T>
+template<>
+inline std::vector<bool> Tensor::host() const {
+    auto data = host<char>();
+
+    std::vector<bool> out(data.size());
+
+    for(size_t i = 0; i < data.size(); i++)
+        out[i] = static_cast<bool>(data[i]);
+
+    return out;
+}
+
+template<not_void T>
 void Tensor::host(std::span<T> dst) const {
     auto const size = bytes();
     auto const dstSize = dst.size_bytes();
