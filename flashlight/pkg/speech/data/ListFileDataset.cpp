@@ -105,12 +105,12 @@ std::vector<Tensor> ListFileDataset::get(const int64_t idx) const {
     }
 
     Tensor sampleIdx = Tensor::fromBuffer(
-        {static_cast<long long>(ids_[idx].length())},
+        {static_cast<int64_t>(ids_[idx].length())},
         const_cast<char*>(ids_[idx].data()), // fix me post C++-17?
         MemoryLocation::Host
     );
     Tensor samplePath = Tensor::fromBuffer(
-        {static_cast<long long>(inputs_[idx].length())},
+        {static_cast<int64_t>(inputs_[idx].length())},
         inputs_[idx].data(),
         MemoryLocation::Host
     );
@@ -150,7 +150,7 @@ int64_t ListFileDataset::getTargetSize(const int64_t idx) const {
     std::vector<char> curTarget(targets_[idx].begin(), targets_[idx].end());
     auto tgtSize = tgtFeatFunc_(
         static_cast<void*>(curTarget.data()),
-        {static_cast<long long>(curTarget.size())},
+        {static_cast<int64_t>(curTarget.size())},
         fl::dtype::b8
     )
         .elements();

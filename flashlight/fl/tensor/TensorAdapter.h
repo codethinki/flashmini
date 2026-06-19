@@ -182,7 +182,7 @@ public:
      * @param[in] the type to which to cast the tensor
      * @return a tensor with element-wise cast to the new type
      */
-    virtual Tensor astype(const dtype type) = 0;
+    virtual Tensor asType(const dtype type) = 0;
 
     /**
      * Index into a tensor with a variable number of indices.

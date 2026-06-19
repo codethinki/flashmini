@@ -18,17 +18,17 @@ TEST(TensorBLASTest, matmul) {
     // TODO: test tensors with order > 2
 
     // Reference impl
-    auto matmulRef = [](const Tensor& lhs, const Tensor& rhs) {
+    auto matmulRef = [](Tensor const& lhs, Tensor const& rhs) {
             // (M x N) x (N x K) --> (M x K)
             int M = lhs.dim(0);
             int N = lhs.dim(1);
             int K = rhs.dim(1);
 
-            auto out = fl::full({M, K}, 0.);
+            auto out = fl::full({M, K}, 0.f);
 
-            for(unsigned i = 0; i < M; ++i)
-                for(unsigned j = 0; j < K; ++j)
-                    for(unsigned k = 0; k < N; ++k)
+            for(int i = 0; i < M; ++i)
+                for(int j = 0; j < K; ++j)
+                    for(int k = 0; k < N; ++k)
                         out(i, j) += lhs(i, k) * rhs(k, j);
             return out;
         };

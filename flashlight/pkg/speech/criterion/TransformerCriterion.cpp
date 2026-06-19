@@ -90,7 +90,7 @@ std::vector<Variable> TransformerCriterion::forward(
         {-1}
     );
     if(train_ && labelSmooth_ > 0) {
-        long long nClass = out.dim(0);
+        auto nClass = out.dim(0);
         auto targetTiled = fl::tile(
             fl::reshape(target.tensor(), {1, target.dim(0), target.dim(1)}),
             {nClass}
@@ -123,11 +123,11 @@ std::pair<Variable, Variable> TransformerCriterion::vectorizedDecoder(
         if(train_) {
             // TODO: other sampling strategies
             auto mask = Variable(
-                (fl::rand(y.shape()) * 100 <= pctTeacherForcing_).astype(y.type()),
+                (fl::rand(y.shape()) * 100 <= pctTeacherForcing_).asType(y.type()),
                 false
             );
             auto samples = Variable(
-                (fl::rand(y.shape()) * (nClass_ - 1)).astype(y.type()),
+                (fl::rand(y.shape()) * (nClass_ - 1)).asType(y.type()),
                 false
             );
 
@@ -322,7 +322,7 @@ std::pair<std::vector<std::vector<float>>, std::vector<TS2SStatePtr>> Transforme
     outBatched = logSoftmax(outBatched / smoothingTemperature, 0);
     std::vector<std::vector<float>> out(B);
     for(int i = 0; i < B; i++)
-        out[i] = outBatched(fl::span, i).tensor().toHostVector<float>();
+        out[i] = outBatched(fl::span, i).tensor().host<float>();
 
     return std::make_pair(out, outstates);
 }

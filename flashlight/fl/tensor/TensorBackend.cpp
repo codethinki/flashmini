@@ -10,11 +10,11 @@
 namespace fl {
 namespace detail {
 
-    bool areBackendsEqual(const Tensor& a, const Tensor& b) { return a.backendType() == b.backendType(); }
+    bool areBackendsEqual(Tensor const& a, Tensor const& b) { return a.backendType() == b.backendType(); }
 
 } // namespace detail
 
-bool TensorBackend::isDataTypeSupported(const fl::dtype& dtype) const {
+bool TensorBackend::isDataTypeSupported(fl::dtype const& dtype) const {
     bool supported = this->supportsDataType(dtype);
     for(auto& p : extensions_)
         supported &= p.second->isDataTypeSupported(dtype);
@@ -22,75 +22,83 @@ bool TensorBackend::isDataTypeSupported(const fl::dtype& dtype) const {
 }
 
 Tensor TensorBackend::clip(
-    const Tensor& tensor,
-    const Tensor& low,
-    const double& high
+    Tensor const& tensor,
+    Tensor const& low,
+    double const& high
 ) {
     return clip(
         tensor,
         low,
-        full(tensor.shape(), high, dtype_traits<double>::ctype)
+        full(tensor.shape(), high, tensor.type())
     );
 }
 
 Tensor TensorBackend::clip(
-    const Tensor& tensor,
-    const double& low,
-    const Tensor& high
+    Tensor const& tensor,
+    double const& low,
+    Tensor const& high
 ) {
     return clip(
         tensor,
-        full(tensor.shape(), low, dtype_traits<double>::ctype),
+        // TODO review, truncated to float in original impl
+        full(tensor.shape(), low, tensor.type()),
         high
     );
 }
 
 Tensor TensorBackend::clip(
-    const Tensor& tensor,
-    const double& low,
-    const double& high
+    Tensor const& tensor,
+    double const& low,
+    double const& high
 ) {
     return clip(
         tensor,
-        full(tensor.shape(), low, dtype_traits<double>::ctype),
-        full(tensor.shape(), high, dtype_traits<double>::ctype)
+        // TODO review, truncated to float in original impl
+        full(tensor.shape(), low, tensor.type()),
+        full(tensor.shape(), high, tensor.type())
     );
 }
 
 Tensor TensorBackend::where(
-    const Tensor& condition,
-    const Tensor& x,
-    const double& y
+    Tensor const& condition,
+    Tensor const& x,
+    double const& y
 ) { return where(condition, x, full(condition.shape(), y, x.type())); }
 
 Tensor TensorBackend::where(
-    const Tensor& condition,
-    const double& x,
-    const Tensor& y
+    Tensor const& condition,
+    double const& x,
+    Tensor const& y
 ) { return where(condition, full(condition.shape(), x, y.type()), y); }
 
-Tensor TensorBackend::minimum(const Tensor& lhs, const double& rhs) {
-    return minimum(lhs, full(lhs.shape(), rhs, dtype_traits<double>::ctype));
+Tensor TensorBackend::minimum(Tensor const& lhs, double const& rhs) {
+        // TODO review, truncated to float in original impl
+    return minimum(lhs, full(lhs.shape(), rhs, lhs.type()));
 }
 
-Tensor TensorBackend::minimum(const double& lhs, const Tensor& rhs) {
-    return minimum(full(rhs.shape(), lhs, dtype_traits<double>::ctype), rhs);
+Tensor TensorBackend::minimum(double const& lhs, Tensor const& rhs) {
+        // TODO review, truncated to float in original impl
+    return minimum(full(rhs.shape(), lhs, rhs.type()), rhs);
 }
 
-Tensor TensorBackend::maximum(const Tensor& lhs, const double& rhs) {
-    return maximum(lhs, full(lhs.shape(), rhs, dtype_traits<double>::ctype));
+Tensor TensorBackend::maximum(Tensor const& lhs, double const& rhs) {
+        // TODO review, truncated to float in original impl
+    return maximum(lhs, full(lhs.shape(), rhs, lhs.type()));
 }
 
-Tensor TensorBackend::maximum(const double& lhs, const Tensor& rhs) {
-    return maximum(full(rhs.shape(), lhs, dtype_traits<double>::ctype), rhs);
+Tensor TensorBackend::maximum(double const& lhs, Tensor const& rhs) {
+        // TODO review, truncated to float in original impl
+    return maximum(full(rhs.shape(), lhs, rhs.type()), rhs);
 }
 
-Tensor TensorBackend::power(const Tensor& lhs, const double& rhs) {
-    return power(lhs, full(lhs.shape(), rhs, dtype_traits<double>::ctype));
+Tensor TensorBackend::power(Tensor const& lhs, double const& rhs) {
+        // TODO review, truncated to float in original impl
+    return power(lhs, full(lhs.shape(), rhs, lhs.type()));
 }
 
-Tensor TensorBackend::power(const double& lhs, const Tensor& rhs) {
-    return power(full(rhs.shape(), lhs, dtype_traits<double>::ctype), rhs);
+Tensor TensorBackend::power(double const& lhs, Tensor const& rhs) {
+        // TODO review, truncated to float in original impl
+    return power(full(rhs.shape(), lhs, rhs.type()), rhs);
 }
 
 } // namespace fl

@@ -128,7 +128,12 @@ public:
      *
      * @return returns the casted variable.
      */
-    Variable astype(fl::dtype type) const;
+    Variable asType(fl::dtype type) const;
+
+    /**
+     * @deprecated use @ref Variable::asType(fl::dtype) const instead
+     */
+    Variable astype(fl::dtype type) const { return asType(type); }
 
     /**
      * @return a reference to the underlying gradient Variable.
@@ -207,25 +212,19 @@ public:
      * Must eventually be freed manually via `free` or a related call.
      */
     template<typename T>
-    T* host() const {
-        return tensor().host<T>();
-    }
+    T* host() const { return tensor().host<T>(); }
 
     /**
      * Copies the array to the existing host pointer `ptr`
      */
     template<typename T>
-    void host(T* ptr) const {
-        tensor().host(ptr);
-    }
+    void host(T* ptr) const { tensor().host(ptr); }
 
     /**
      * Get the first element of the array as a scalar
      */
     template<typename T>
-    T scalar() const {
-        return tensor().scalar<T>();
-    }
+    T scalar() const { return tensor().scalar<T>(); }
 
     /**
      * Remove the gradient stored by the Variable

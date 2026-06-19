@@ -9,6 +9,7 @@
 #include <cmath>
 #include <functional>
 #include <stdexcept>
+#include <format>
 
 #include <gtest/gtest.h>
 
@@ -25,7 +26,7 @@ using namespace fl;
 using fl::detail::AutogradTestF16;
 
 TEST(AutogradTest, OperatorParenthesis) {
-    auto x = Variable(fl::rand({1, 3, 3}, fl::dtype::f64), true);
+    auto x = Variable{fl::rand({1, 3, 3}, fl::dtype::f64), true};
     auto y = x(0, 0) + x(0, 1);
     auto funcOperatorParen = [](Variable& in) { return in(0, 0) + in(0, 1); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcOperatorParen, x));
@@ -35,171 +36,154 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    auto f16 = Variable(fl::rand({2, 2}, fl::dtype::f16), true);
-    auto f32 = Variable(fl::rand({2, 2}, fl::dtype::f32), true);
+    auto f16 = Variable{fl::rand({2, 2}, fl::dtype::f16), true};
+    auto f32 = Variable{fl::rand({2, 2}, fl::dtype::f32), true};
 
     // Binary operators
     EXPECT_THROW(
-        {
-            auto res = f16 + f32;
-        },
+        {auto res = f16 + f32;},
         std::invalid_argument
     ); // +
     EXPECT_THROW(
-        {
-            auto res = f16 - f32;
-        },
+        {auto res = f16 - f32;},
         std::invalid_argument
     ); // -
     EXPECT_THROW(
-        {
-            auto res = f16 * f32;
-        },
+        {auto res = f16 * f32;},
         std::invalid_argument
     ); // *
     EXPECT_THROW(
-        {
-            auto res = f16 / f32;
-        },
+        {auto res = f16 / f32;},
         std::invalid_argument
     ); ///
     EXPECT_THROW(
-        {
-            auto res = f16 > f32;
-        },
+        {auto res = f16 > f32;},
         std::invalid_argument
     ); // >
     EXPECT_THROW(
-        {
-            auto res = f16 < f32;
-        },
+        {auto res = f16 < f32;},
         std::invalid_argument
     ); // <
+    EXPECT_THROW({auto res = f16 >= f32;}, std::invalid_argument); // >=
     EXPECT_THROW(
         {
-            auto res = f16 >= f32;
-        },
-        std::invalid_argument
-    ); // >=
-    EXPECT_THROW(
-        {
-            auto res = f16 <= f32;
+        auto res = f16 <= f32;
         },
         std::invalid_argument
     ); // <=
     EXPECT_THROW(
         {
-            auto res = f16 && f32;
+        auto res = f16 && f32;
         },
         std::invalid_argument
     ); // &&
     EXPECT_THROW(
         {
-            max(f16, f32);
+        max(f16, f32);
         },
         std::invalid_argument
     ); // max
     EXPECT_THROW(
         {
-            min(f16, f32);
+        min(f16, f32);
         },
         std::invalid_argument
     ); // min
     EXPECT_THROW(
         {
-            matmul(f16, f32);
+        matmul(f16, f32);
         },
         std::invalid_argument
     ); // matmul
     EXPECT_THROW(
         {
-            matmulTN(f16, f32);
+        matmulTN(f16, f32);
         },
         std::invalid_argument
     ); // matmulTN
     EXPECT_THROW(
         {
-            matmulNT(f16, f32);
+        matmulNT(f16, f32);
         },
         std::invalid_argument
     ); // matmulNT
     EXPECT_NO_THROW(
         {
-            binaryCrossEntropy(f16, f32);
+        binaryCrossEntropy(f16, f32);
         }
     );
     EXPECT_NO_THROW(
         {
-            categoricalCrossEntropy(
-                Variable(fl::rand({7, 10, 4}, fl::dtype::f16), true),
-                Variable(
-                    (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
-                    false
-                )
-            );
+        categoricalCrossEntropy(
+            Variable{fl::rand({7, 10, 4}, fl::dtype::f16), true},
+            Variable{
+            (fl::rand({10, 4}, fl::dtype::u32) % 7).asType(fl::dtype::s32),
+            false
+            }
+        );
         }
     );
     EXPECT_NO_THROW(
         {
-            pool2d(f16, 1, 1, 1, 1, 1, 1);
+        pool2d(f16, 1, 1, 1, 1, 1, 1);
         }
     );
     EXPECT_NO_THROW(
         {
-            embedding(f16, f32);
+        embedding(f16, f32);
         }
     ); // lookup is of a different type
     // Ternary operators
-    auto f32_2 = Variable(fl::rand({2, 2}, fl::dtype::f32), true);
-    auto f16_2 = Variable(fl::rand({2, 2}, fl::dtype::f16), true);
+    auto f32_2 = Variable{fl::rand({2, 2}, fl::dtype::f32), true};
+    auto f16_2 = Variable{fl::rand({2, 2}, fl::dtype::f16), true};
     EXPECT_THROW(
         {
-            linear(f16, f32, f16_2);
+        linear(f16, f32, f16_2);
         },
         std::invalid_argument
     ); // linear
     EXPECT_THROW(
         {
-            linear(f16, f32, f32_2);
+        linear(f16, f32, f32_2);
         },
         std::invalid_argument
     ); // linear
-    auto w = Variable(fl::rand({1}, fl::dtype::f32), true);
-    auto b = Variable(fl::rand({1}, fl::dtype::f32), true);
+    auto w = Variable{fl::rand({1}, fl::dtype::f32), true};
+    auto b = Variable{fl::rand({1}, fl::dtype::f32), true};
     EXPECT_THROW(
         {
-            batchnorm(f16, f32, f32_2, w, b, {1}, true, 0.01, 0.01);
+        batchnorm(f16, f32, f32_2, w, b, {1}, true, 0.01, 0.01);
         },
         std::invalid_argument
     );
     EXPECT_THROW(
         {
-            batchnorm(f16, f32, f16_2, w, b, {1}, true, 0.01, 0.01);
+        batchnorm(f16, f32, f16_2, w, b, {1}, true, 0.01, 0.01);
         },
         std::invalid_argument
     );
     EXPECT_THROW(
         {
-            conv2d(f16, f32, f16_2, 1, 1, 0, 0, 1, 1);
+        conv2d(f16, f32, f16_2, 1, 1, 0, 0, 1, 1);
         },
         std::invalid_argument
     );
     // Quaternary
-    auto f16_3 = Variable(fl::rand({2, 2, 3}, fl::dtype::f16), false);
-    auto f16_4 = Variable(fl::rand({50}, fl::dtype::f16), false);
+    auto f16_3 = Variable{fl::rand({2, 2, 3}, fl::dtype::f16), false};
+    auto f16_4 = Variable{fl::rand({50}, fl::dtype::f16), false};
     EXPECT_THROW(
         {
-            rnn(
-                f16_3,
-                Variable(Tensor(fl::dtype::f32), false),
-                Variable(Tensor(fl::dtype::f32), false),
-                f16_4,
-                2,
-                2,
-                RnnMode::LSTM,
-                true,
-                0.0
-            );
+        rnn(
+            f16_3,
+            Variable{Tensor{fl::dtype::f32}, false},
+            Variable{Tensor{fl::dtype::f32}, false},
+            f16_4,
+            2,
+            2,
+            RnnMode::LSTM,
+            true,
+            0.0
+        );
         },
         std::invalid_argument
     );
@@ -207,7 +191,7 @@ TEST(AutogradTest, AutogradOperatorTypeCompatibility) {
     std::vector<Variable> concatInputs = {f16, f32, f16_2, f32_2};
     EXPECT_THROW(
         {
-            concatenate(concatInputs, 0);
+        concatenate(concatInputs, 0);
         },
         std::invalid_argument
     );
@@ -217,12 +201,12 @@ TEST(AutogradTest, CastingAsDifferentGradTypes) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    auto f32 = Variable(fl::rand({5, 5}), true);
-    auto f16 = Variable(fl::rand({5, 5}, fl::dtype::f16), true);
+    auto f32 = Variable{fl::rand({5, 5}), true};
+    auto f16 = Variable{fl::rand({5, 5}, fl::dtype::f16), true};
     // Computing gradients with mixed types fails when the op is applied
     ASSERT_THROW(
         {
-            f32 + f16;
+        f32 + f16;
         },
         std::invalid_argument
     );
@@ -232,24 +216,24 @@ TEST(AutogradTest, CastingAs) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    auto var = Variable(fl::rand({5, 5}), true);
-    auto varF16 = var.astype(fl::dtype::f16);
+    auto var = Variable{fl::rand({5, 5}), true};
+    auto varF16 = var.asType(fl::dtype::f16);
     ASSERT_EQ(var.type(), fl::dtype::f32);
     ASSERT_EQ(varF16.type(), fl::dtype::f16);
-    ASSERT_TRUE(allClose(varF16.tensor(), var.astype(fl::dtype::f16).tensor()));
+    ASSERT_TRUE(allClose(varF16.tensor(), var.asType(fl::dtype::f16).tensor()));
 }
 
 TEST(AutogradTest, CastingAsBackward) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    auto a = Variable(fl::rand({4, 4}, fl::dtype::f16), true);
-    auto b = Variable(fl::rand({4, 4}, fl::dtype::f16), false);
+    auto a = Variable{fl::rand({4, 4}, fl::dtype::f16), true};
+    auto b = Variable{fl::rand({4, 4}, fl::dtype::f16), false};
     auto c = b + a;
     c.backward();
     ASSERT_EQ(a.grad().type(), fl::dtype::f16);
     ASSERT_EQ(a.grad().type(), fl::dtype::f16);
-    a = a.astype(fl::dtype::f32);
+    a = a.asType(fl::dtype::f32);
     ASSERT_FALSE(a.isGradAvailable());
 }
 
@@ -258,21 +242,21 @@ TEST(AutogradTest, CastingAsGrad) {
         GTEST_SKIP() << "Half-precision not supported on this device";
 
     // compare to f32 case
-    auto x = Variable(fl::full({5}, 2.0), true);
-    auto y = Variable(fl::full({5}, 3.0), true);
+    auto x = Variable{fl::full({5}, 2.f), true};
+    auto y = Variable{fl::full({5}, 3.f), true};
     auto z = x * x + x * y + y * y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable{fl::full({5}, 1.f), false};
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
 
     // f16 -- cast gradients in both directions
-    auto x32 = Variable(fl::full({5}, 2.0), true);
-    auto y32 = Variable(fl::full({5}, 3.0), true);
-    auto xf16 = x32.astype(fl::dtype::f16);
-    auto yf16 = y32.astype(fl::dtype::f16);
+    auto x32 = Variable{fl::full({5}, 2.f), true};
+    auto y32 = Variable{fl::full({5}, 3.f), true};
+    auto xf16 = x32.asType(fl::dtype::f16);
+    auto yf16 = y32.asType(fl::dtype::f16);
     auto zf16 = xf16 * xf16 + xf16 * yf16 + yf16 * yf16;
-    auto zf32 = zf16.astype(fl::dtype::f32);
+    auto zf32 = zf16.asType(fl::dtype::f32);
     zf32.backward(dz);
 
     ASSERT_EQ(xf16.grad().type(), fl::dtype::f16);
@@ -281,20 +265,20 @@ TEST(AutogradTest, CastingAsGrad) {
     ASSERT_EQ(x32.grad().type(), fl::dtype::f32);
     ASSERT_EQ(y32.grad().type(), fl::dtype::f32);
     ASSERT_TRUE(
-        allClose(dx.tensor(), xf16.grad().tensor().astype(fl::dtype::f32))
+        allClose(dx.tensor(), xf16.grad().tensor().asType(fl::dtype::f32))
     );
     ASSERT_TRUE(
-        allClose(dy.tensor(), y32.grad().tensor().astype(fl::dtype::f32))
+        allClose(dy.tensor(), y32.grad().tensor().asType(fl::dtype::f32))
     );
     ASSERT_TRUE(allClose(dx.tensor(), x32.grad().tensor()));
     ASSERT_TRUE(allClose(dy.tensor(), y32.grad().tensor()));
 }
 
 TEST(AutogradTest, NoCalcGrad) {
-    auto x = Variable(fl::rand({5}), false);
-    auto y = Variable(fl::rand({5}), true);
+    auto x = Variable{fl::rand({5}), false};
+    auto y = Variable{fl::rand({5}), true};
     auto z = x * x + x * y + y * y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable{fl::full({5}, 1.f), false};
     z.backward(dz);
     auto dy = y.grad();
     ASSERT_TRUE(allClose(dy.tensor(), 2 * y.tensor() + x.tensor()));
@@ -302,36 +286,32 @@ TEST(AutogradTest, NoCalcGrad) {
 }
 
 TEST(AutogradTest, Concatenate) {
-    auto x1 = Variable(fl::rand({2, 3, 1, 2}, fl::dtype::f64), true);
-    auto x2 = Variable(fl::rand({2, 3, 3, 2}, fl::dtype::f64), true);
-    auto x3 = Variable(fl::rand({2, 3, 1, 2}, fl::dtype::f64), true);
-    auto x4 = Variable(fl::rand({2, 3, 7, 2}, fl::dtype::f64), true);
+    auto x1 = Variable{fl::rand({2, 3, 1, 2}, fl::dtype::f64), true};
+    auto x2 = Variable{fl::rand({2, 3, 3, 2}, fl::dtype::f64), true};
+    auto x3 = Variable{fl::rand({2, 3, 1, 2}, fl::dtype::f64), true};
+    auto x4 = Variable{fl::rand({2, 3, 7, 2}, fl::dtype::f64), true};
     std::vector<Variable> inputs = {x1, x2, x3, x4};
     auto output = concatenate(inputs, 2);
 
     ASSERT_EQ(output.shape(), Shape({2, 3, 12, 2}));
 
-    auto funcConcatenateT1 = [x2, x3, x4](Variable& in) {
-            return concatenate({in, x2, x3, x4}, 2);
-        };
+    auto funcConcatenateT1 = [x2, x3, x4](Variable& in) { return concatenate({in, x2, x3, x4}, 2); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT1, x1, 1E-5, 1E-4, {&x2, &x3, &x4}));
 
-    auto funcConcatenateT2 = [x1, x2, x4](Variable& in) {
-            return concatenate({x1, x2, in, x4}, 2);
-        };
+    auto funcConcatenateT2 = [x1, x2, x4](Variable& in) { return concatenate({x1, x2, in, x4}, 2); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcConcatenateT2, x3, 1E-5, 1E-4, {&x1, &x2, &x4}));
 }
 
 TEST(AutogradTest, Split) {
     // check output
-    auto x = Variable(fl::arange({7, 2}), true);
+    auto x = Variable{fl::arange({7, 2}), true};
     auto yVec = split(x, 1, 0);
     ASSERT_EQ(yVec.size(), 7);
     ASSERT_EQ(yVec[0].shape(), Shape({1, 2}));
     ASSERT_EQ(yVec[2].shape(), Shape({1, 2}));
     ASSERT_TRUE(fl::all(yVec[6].tensor() == 6).scalar<char>());
 
-    auto a = Variable(fl::arange({5, 3}, 1), true);
+    auto a = Variable{fl::arange({5, 3}, 1), true};
     auto bVec = split(a, {2, 1}, 1);
     ASSERT_EQ(bVec.size(), 2);
     ASSERT_EQ(bVec[0].shape(), Shape({5, 2}));
@@ -346,15 +326,15 @@ TEST(AutogradTest, Split) {
 
     // check gradient
     auto gradFunc = [](Variable& in) { return split(in, 2, 1)[0]; };
-    auto input = Variable(fl::rand({2, 3}, fl::dtype::f64), true);
+    auto input = Variable{fl::rand({2, 3}, fl::dtype::f64), true};
     ASSERT_TRUE(fl::detail::jacobianTestImpl(gradFunc, input));
 }
 
 TEST(AutogradTest, Tile) {
-    auto x = Variable(fl::rand({6}), true);
-    auto y = Variable(fl::rand({6, 3}), true);
+    auto x = Variable{fl::rand({6}), true};
+    auto y = Variable{fl::rand({6, 3}), true};
     auto z = y * tile(x, {1, 3});
-    auto dz = Variable(fl::full({6, 3}, 1.0), false);
+    auto dz = Variable{fl::full({6, 3}, 1.f), false};
     z.backward(dz);
     auto dy = y.grad();
     auto dx = x.grad();
@@ -362,16 +342,16 @@ TEST(AutogradTest, Tile) {
     ASSERT_TRUE(allClose(dx.tensor(), fl::sum(y.tensor(), {1})));
 
     // Jacobian
-    auto input = Variable(fl::rand({10, 1, 5}), true);
+    auto input = Variable{fl::rand({10, 1, 5}), true};
     auto funcTile = [](Variable& in) { return tile(in, {1, 2}); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcTile, input, 1E-4, 1E-3));
 }
 
 TEST(AutogradTest, TileAs) {
-    auto x = Variable(fl::rand({5}), true);
-    auto y = Variable(fl::rand({5, 2}), true);
+    auto x = Variable{fl::rand({5}), true};
+    auto y = Variable{fl::rand({5, 2}), true};
     auto z = y * tileAs(x, y);
-    auto dz = Variable(fl::full({5, 2}, 1.0), false);
+    auto dz = Variable{fl::full({5, 2}, 1.f), false};
     z.backward(dz);
     auto dy = y.grad();
     auto dx = x.grad();
@@ -383,37 +363,37 @@ TEST_F(AutogradTestF16, TileAsF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    auto x = Variable(fl::rand({5}, fl::dtype::f16), true);
-    auto y = Variable(fl::rand({5, 2}, fl::dtype::f16), true);
+    auto x = Variable{fl::rand({5}, fl::dtype::f16), true};
+    auto y = Variable{fl::rand({5, 2}, fl::dtype::f16), true};
     auto z = y * tileAs(x, y);
     ASSERT_EQ(x.type(), z.type());
-    auto dz = Variable(fl::full({5, 2}, 1.0, fl::dtype::f16), false);
+    auto dz = Variable{fl::full({5, 2}, 1.f, fl::dtype::f16), false};
     z.backward(dz);
     auto dy = y.grad();
     auto dx = x.grad();
     ASSERT_TRUE(
         allClose(
             dy.tensor(),
-            fl::tile(x.tensor(), {1, 2}).astype(dx.type()),
+            fl::tile(x.tensor(), {1, 2}).asType(dx.type()),
             1e-2
         )
     );
     ASSERT_TRUE(
-        allClose(dx.tensor(), fl::sum(y.tensor(), {1}).astype(dx.type()), 1e-2)
+        allClose(dx.tensor(), fl::sum(y.tensor(), {1}).asType(dx.type()), 1e-2)
     );
 }
 
 TEST(AutogradTest, TileAs2) {
-    auto x = Variable(fl::rand({10}), true);
+    auto x = Variable{fl::rand({10}), true};
     auto z = tileAs(x, Shape({10, 3}));
-    auto dz = Variable(fl::full({10, 3}, 1.0), false);
+    auto dz = Variable{fl::full({10, 3}, 1.f), false};
     z.backward(dz);
     auto dx = x.grad();
-    ASSERT_TRUE(allClose(dx.tensor(), fl::full(x.shape(), 3.0)));
+    ASSERT_TRUE(allClose(dx.tensor(), fl::full(x.shape(), 3.f)));
 }
 
 TEST(AutogradTest, Indexing) {
-    auto x = Variable(fl::rand({5, 6, 7, 4}, fl::dtype::f64), true);
+    auto x = Variable{fl::rand({5, 6, 7, 4}, fl::dtype::f64), true};
 
     auto funcCol = [](Variable& input) { return input(fl::span, 4); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcCol, x));
@@ -421,39 +401,29 @@ TEST(AutogradTest, Indexing) {
     auto funcRow = [](Variable& input) { return input(4); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRow, x));
 
-    auto funcSlice = [](Variable& input) {
-            return input(fl::span, fl::span, 4);
-        };
+    auto funcSlice = [](Variable& input) { return input(fl::span, fl::span, 4); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcSlice, x));
 
-    auto funcCols = [](Variable& input) {
-            return input(fl::span, fl::range(2, 5));
-        };
+    auto funcCols = [](Variable& input) { return input(fl::span, fl::range(2, 5)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcCols, x));
 
     auto funcRows = [](Variable& input) { return input(fl::range(2, 5)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcRows, x));
 
-    auto funcSlices = [](Variable& input) {
-            return input(fl::span, fl::span, fl::range(2, 5));
-        };
+    auto funcSlices = [](Variable& input) { return input(fl::span, fl::span, fl::range(2, 5)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcSlices, x));
-    auto funcFlat = [](Variable& input) {
-            return input.flat(fl::range(4, 100));
-        };
+    auto funcFlat = [](Variable& input) { return input.flat(fl::range(4, 100)); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcFlat, x));
 }
 
 TEST(AutogradTest, Padding) {
-    auto in = Variable(fl::rand({3, 3}, fl::dtype::f32), true);
-    auto funcPad = [&](Variable& input) {
-            return padding(input, {{1, 2}, {0, 1}}, -1);
-        };
+    auto in = Variable{fl::rand({3, 3}, fl::dtype::f32), true};
+    auto funcPad = [&](Variable& input) { return padding(input, {{1, 2}, {0, 1}}, -1); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPad, in, 1E-3));
 }
 
 TEST(AutogradTest, Pooling) {
-    auto in = Variable(fl::rand({3, 3, 1, 1}, fl::dtype::f32), true);
+    auto in = Variable{fl::rand({3, 3, 1, 1}, fl::dtype::f32), true};
     auto funcPool = [&](Variable& input) { return pool2d(input, 2, 2, 1, 1); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPool, in, 1E-3));
 }
@@ -462,27 +432,26 @@ TEST_F(AutogradTestF16, PoolingF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
 
-    const float inputScale = 2.0; // scale the input to prevent grad underflow
-    auto in = Variable(inputScale * fl::rand({3, 3, 1, 1}, fl::dtype::f16), true);
+    float const inputScale = 2.f; // scale the input to prevent grad underflow
+    auto in = Variable{inputScale * fl::rand({3, 3, 1, 1}, fl::dtype::f16), true};
     auto funcPool = [&](Variable& input) { return pool2d(input, 2, 2, 1, 1); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPool, in, 1e1, 1e-1)); // TODO: investigate
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcPool, in, 1e-2, 1e-1)); // TODO: investigate
 }
 
 TEST(AutogradTest, Reorder) {
-    auto in = Variable(fl::rand({3, 1, 4, 1}, fl::dtype::f32) * 2, true);
-    auto funcReorder = [&](Variable& input) {
-            return reorder(input, {2, 0, 3, 1});
-        };
+    auto in = Variable{fl::rand({3, 1, 4, 1}, fl::dtype::f32) * 2, true};
+    auto funcReorder = [&](Variable& input) { return reorder(input, {2, 0, 3, 1}); };
     ASSERT_TRUE(fl::detail::jacobianTestImpl(funcReorder, in, 1E-3));
 }
 
 TEST(AutogradTest, Embedding) {
     int nWords = 10;
-    auto input =
-        Variable((fl::rand({4, 2}) * nWords).astype(fl::dtype::f32), false);
-    auto weights = Variable(fl::randn({4, nWords}, fl::dtype::f64), true);
-    auto funcEmbed = [&](Variable& w) { return embedding(input, w); };
-    ASSERT_TRUE(fl::detail::jacobianTestImpl(funcEmbed, weights, 1E-5));
+    auto input = Variable{(fl::rand({4, 2}) * nWords).asType(fl::dtype::s32), false};
+
+    auto weights = Variable{fl::randn({4, nWords}, fl::dtype::f64), true};
+    auto func_embed = [&](Variable& w) { return embedding(input, w); };
+
+    ASSERT_TRUE(fl::detail::jacobianTestImpl(func_embed, weights, 1E-5));
 }
 
 TEST(AutogradTest, GetAdvancedIndex) {
@@ -491,18 +460,21 @@ TEST(AutogradTest, GetAdvancedIndex) {
         GTEST_SKIP()
             << "Advanced indexing operator unsupported for non-CUDA backends";
     std::vector<fl::dtype> validIndexTypes = {
-        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64
+        fl::dtype::s32,
+        fl::dtype::s64,
+        fl::dtype::u32,
+        fl::dtype::u64
     };
     for(const auto& dtype : validIndexTypes) {
-        auto x = Variable(fl::rand({20, 50, 40, 30}, fl::dtype::f32), true);
-        Tensor a({6}, dtype);
+        auto x = Variable{fl::rand({20, 50, 40, 30}, fl::dtype::f32), true};
+        Tensor a{{6}, dtype};
         a(0) = 0;
         a(1) = 15;
         a(2) = 6;
         a(3) = 1;
         a(4) = 10;
         a(5) = 6;
-        Tensor b({3}, dtype);
+        Tensor b{{3}, dtype};
         b(0) = 5;
         b(1) = 11;
         b(2) = 19;
@@ -523,18 +495,21 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
     if(!fl::f16Supported())
         GTEST_SKIP() << "Half-precision not supported on this device";
     std::vector<fl::dtype> validIndexTypes = {
-        fl::dtype::s32, fl::dtype::s64, fl::dtype::u32, fl::dtype::u64
+        fl::dtype::s32,
+        fl::dtype::s64,
+        fl::dtype::u32,
+        fl::dtype::u64
     };
     for(const auto& dtype : validIndexTypes) {
-        auto x = Variable(fl::rand({20, 50, 40, 30}, fl::dtype::f16), true);
-        Tensor a({6}, dtype);
+        auto x = Variable{fl::rand({20, 50, 40, 30}, fl::dtype::f16), true};
+        Tensor a{{6}, dtype};
         a(0) = 0;
         a(1) = 15;
         a(2) = 6;
         a(3) = 1;
         a(4) = 10;
         a(5) = 6;
-        Tensor b({3}, dtype);
+        Tensor b{{3}, dtype};
         b(0) = 5;
         b(1) = 11;
         b(2) = 19;
@@ -548,6 +523,217 @@ TEST(AutogradTest, GetAdvancedIndexF16) {
         ASSERT_TRUE(allClose(grad, res, 1e-3));
     }
 }
+
+/*
+
+namespace fl {
+
+void print_tensor(Tensor const& toPrint, std::string_view name) {
+    auto const dims = toPrint.ndim();
+
+    if(dims == 0)
+        std::cout << "[]\n";
+    if(dims > 3)
+        std::cout << std::format("can't print tensor [{}], has more than 3 dimensions\n", name);
+
+    auto adaptive_tensor_print = [&]<class T>() {
+        auto host = toPrint.host<T>();
+
+        std::cout << std::format("{}:\n", name);
+
+        auto const& shape = fl::max({1, 1, 1}, toPrint.shape());
+
+        auto const height = shape[0];
+        auto const width = shape[1];
+        auto const depth = shape[2];
+
+        std::vector<std::string> blocks(depth);
+
+        for(size_t z = 0; z < depth; z++) {
+            std::vector<std::string> rows(height);
+
+            auto const offset = z * height * width;
+
+            for(size_t x = 0; x < width; x++) {
+                for(size_t y = 0; y < height; y++) {
+                    auto& row = rows[y];
+
+                    size_t index = offset + x * height + y;
+
+                    if(x == width - 1)
+                        row += std::format("{}", static_cast<T>(host[index])); //vector<bool>[i] does not return bool
+                    else
+                        row += std::format("{}, ", static_cast<T>(host[index]));
+                }
+                size_t max = 0;
+                for(auto& row : rows)
+                    max = std::max(row.size(), max);
+
+                for(auto& row : rows)
+                    row.append(std::string(max - row.size(), ' '));
+            }
+
+
+            for(auto& row : rows)
+                blocks[z].append(std::format("[{}]\n", row));
+            blocks[z] += '\n';
+        }
+
+        for(auto& block : blocks)
+            std::cout << block;
+
+        std::cout << '\n';
+    };
+
+    fl::dispatch_dtype(toPrint.type(), adaptive_tensor_print);
+};
+
+#define PRINT_TENSOR(tensor) print_tensor(tensor, #tensor)
+
+
+Variable embedding2(Variable const& input, Variable const& embeddings) {
+    // TODO{fl::Tensor}{4-dims} - relax this
+    if(input.ndim() >= 4)
+        throw std::invalid_argument{"embedding input must have 3 or fewer dims"};
+
+    auto const idxs = input.tensor().flatten();
+    auto inDims = input.shape();
+    std::vector<Dim> rDims(input.ndim() + 1);
+    rDims[0] = embeddings.dim(0);
+    for(Dim i = 1; i < input.ndim() + 1; i++)
+        rDims[i] = inDims[i - 1];
+
+    Shape const resultDims{rDims};
+    auto const result = fl::reshape(embeddings.tensor()(fl::span, idxs), resultDims);
+
+    auto grad_func = [](
+        std::vector<Variable>& inputs,
+        Variable const& gradOutput
+    ) {
+        auto& w = inputs[1];
+        if(!w.isCalcGrad())
+            return;
+
+        auto const ip = inputs[0].tensor().flatten();
+        auto size = static_cast<Dim>(ip.elements());
+        auto const deltas = fl::reshape(gradOutput.tensor(), {w.dim(0), size});
+
+        auto const e = fl::full({size}, 1.0, deltas.type());
+        auto const iota = fl::arange({size + 1}, 0.0, fl::dtype::s32);
+
+        PRINT_TENSOR(ip);
+        std::cout << std::format("size: {}\n", size);
+        PRINT_TENSOR(deltas);
+
+        PRINT_TENSOR(e);
+        PRINT_TENSOR(iota);
+
+        // Sparse Tensor
+        auto sp = Tensor{
+            static_cast<Dim>(ip.elements()),
+            w.dim(1),
+            e,
+            iota,
+            ip.asType(fl::dtype::s32),
+            fl::StorageType::CSR
+        };
+        //double* x = sp.host<double>();
+        //fl::eval(sp);
+
+        auto deltasT = transpose(deltas);
+        PRINT_TENSOR(deltasT);
+        auto grad = transpose(
+            fl::matmul(
+                sp,
+                deltasT,
+                MatrixProperty::Transpose
+            )
+        );
+        fl::eval(grad);
+        PRINT_TENSOR(grad);
+        w.addGrad(Variable{grad, false});
+
+        PRINT_TENSOR(w.tensor());
+    };
+
+    print_tensor(result, "embedding result");
+
+    return Variable{result, {input, embeddings}, grad_func};
+}
+
+namespace detail {
+
+    using JacobianFunc = std::function<Variable (Variable&)>;
+    inline bool jacobianTestImpl2(
+        JacobianFunc const& func,
+        Variable& input,
+        double precision = 1E-5,
+        float perturbation = 1E-4,
+        std::vector<Variable*> const& zeroGradientVariables = {}
+    ) {
+        auto const outBase = func(input);
+        auto const outElements = outBase.elements();
+        auto const inElements = input.elements();
+
+        auto const fwdJacobian = Tensor({outElements, inElements}, input.type());
+
+        for(int i = 0; i < inElements; ++i) {
+            auto orig = input.tensor().flatten()(i);
+
+            input.tensor().flat(i) = orig - perturbation;
+            auto outA = func(input).tensor();
+
+            input.tensor().flat(i) = orig + perturbation;
+            auto outB = func(input).tensor();
+
+            input.tensor().flat(i) = orig;
+
+            fwdJacobian(fl::span, i) = fl::reshape((outB - outA), {static_cast<Dim>(outA.elements())})
+                * 0.5
+                / perturbation;
+        }
+
+        auto const bwdJacobian = Tensor({outElements, inElements}, input.type());
+        auto const outD = Variable(fl::full(outBase.shape(), 0, outBase.type()), false);
+
+        for(int i = 0; i < outD.elements(); ++i) {
+            outD.tensor().flat(i) = 1; // element in 1D view
+            input.zeroGrad();
+            for(auto* var : zeroGradientVariables)
+                var->zeroGrad();
+
+            auto out = func(input);
+            out.backward(outD);
+
+            bwdJacobian(i) = fl::reshape(input.grad().tensor(), {inElements});
+            outD.tensor().flat(i) = 0;
+        }
+
+        PRINT_TENSOR(fwdJacobian);
+        PRINT_TENSOR(bwdJacobian);
+
+        return allClose(fwdJacobian, bwdJacobian, precision);
+    }
+
+}
+
+TEST(AutogradTest, Embedding2) {
+    int nWords = 10;
+    auto input = Variable{(fl::rand({4, 2}) * nWords).asType(fl::dtype::s32), false};
+    PRINT_TENSOR(input.tensor());
+
+
+    auto weights = Variable{fl::randn({4, nWords}, fl::dtype::f64), true};
+    PRINT_TENSOR(weights.tensor());
+
+    auto func_embed = [&](Variable& w) { return embedding2(input, w); };
+
+    ASSERT_TRUE(detail::jacobianTestImpl2(func_embed, weights, 1E-5));
+}
+
+}
+*/
+
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

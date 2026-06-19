@@ -36,13 +36,9 @@ void EditDistanceMeter::add(const Tensor& output, const Tensor& target) {
     int len1 = output.dim(0);
     int len2 = target.dim(0);
 
-    int* in1raw = output.host<int>();
-    int* in2raw = target.host<int>();
-    auto err_state = levensteinDistance(in1raw, in2raw, len1, len2);
-    free(in1raw);
-    in1raw = nullptr;
-    free(in2raw);
-    in2raw = nullptr;
+    auto in1raw = output.host<int>();
+    auto in2raw = target.host<int>();
+    auto err_state = levensteinDistance(in1raw.begin(), in2raw.begin(), len1, len2);
     add(err_state, target.dim(0));
 }
 

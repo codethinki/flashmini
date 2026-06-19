@@ -16,13 +16,11 @@ namespace fl {
 std::shared_ptr<fl::DynamicBenchmark> CudnnAutogradExtension::createBenchmarkOptions() {
     return std::make_shared<fl::DynamicBenchmark>(
         std::make_shared<fl::DynamicBenchmarkOptions<KernelMode>>(
-            std::vector<KernelMode>(
-                {
-                    KernelMode::F32,
-                    KernelMode::F32_ALLOW_CONVERSION,
-                    KernelMode::F16
-                }
-            ),
+            std::vector<KernelMode>{
+                KernelMode::F32,
+                KernelMode::F32_ALLOW_CONVERSION,
+                KernelMode::F16
+            },
             fl::kDynamicBenchmarkDefaultCount
         )
     );

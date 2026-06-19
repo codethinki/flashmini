@@ -37,7 +37,7 @@ namespace pkg {
             if(gradVar.type() != fl::dtype::f32)
                 throw std::invalid_argument("FCC: grad must be float32");
 
-            auto gradVec = gradVar.tensor().toHostVector<float>();
+            auto gradVec = gradVar.tensor().host<float>();
             std::vector<float> inputGradVec(B * T * N);
             std::vector<float> transGradVec(N * N);
 
@@ -77,10 +77,10 @@ namespace pkg {
 
             const auto& targetSize = getTargetSizeArray(targetVar.tensor(), T);
             auto ctx = std::make_shared<Context>();
-            auto inputVec = inputVar.tensor().toHostVector<float>();
-            auto targetVec = targetVar.tensor().toHostVector<int>();
-            auto targetSizeVec = targetSize.toHostVector<int>();
-            ctx->transVec = transVar.tensor().toHostVector<float>();
+            auto inputVec = inputVar.tensor().host<float>();
+            auto targetVec = targetVar.tensor().host<int>();
+            auto targetSizeVec = targetSize.host<int>();
+            ctx->transVec = transVar.tensor().host<float>();
             std::vector<float> lossVec(B);
             ctx->workspaceVec.assign(FCC::getWorkspaceSize(B, T, N), 0);
 

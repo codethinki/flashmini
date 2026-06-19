@@ -25,9 +25,7 @@ protected:
         OptimMode::get().setOptimLevel(OptimLevel::O3);
     }
 
-    void TearDown() override {
-        OptimMode::get().setOptimLevel(OptimLevel::DEFAULT);
-    }
+    void TearDown() override { OptimMode::get().setOptimLevel(OptimLevel::DEFAULT); }
 };
 
 } // namespace
@@ -140,18 +138,19 @@ void transformerPadMaskFwd(bool isfp16) {
     int nheads = 2;
     auto dtype = isfp16 ? fl::dtype::f16 : fl::dtype::f32;
 
-    auto tr =
-        Transformer(c, c / nheads, c, nheads, timesteps, 0, 0, false, false);
+    auto tr = Transformer(c, c / nheads, c, nheads, timesteps, 0, 0, false, false);
     auto input1 = Variable(fl::rand({c, timesteps, /* B = */ 1}, dtype), false);
     auto input1NoPad = input1(fl::span, fl::range(0, timesteps / 2));
     auto input2 = Variable(fl::rand({c, timesteps, /* B = */ 1}, dtype), false);
     auto input = fl::concatenate({input1, input2}, 2);
     auto padMask = fl::full({timesteps, 2}, 1);
+
     padMask(fl::iota({timesteps / 2}) + timesteps / 2, 0) = 0;
+    
     auto noPadMask = fl::full({timesteps, 2}, 1);
 
-    auto output = tr.forward({input, Variable(padMask, false)}).front();
-    auto outputNoPad = tr.forward({input, Variable(noPadMask, false)}).front();
+    auto output = tr.forward({input, Variable{padMask, false}}).front();
+    auto outputNoPad = tr.forward({input, Variable{noPadMask, false}}).front();
 
     ASSERT_EQ(output.dim(0), c);
     ASSERT_EQ(output.dim(1), timesteps);
@@ -159,43 +158,45 @@ void transformerPadMaskFwd(bool isfp16) {
 
     if(OptimMode::get().getOptimLevel() == OptimLevel::O3)
         ASSERT_EQ(outputNoPad.type(), input.type());
-    else {
+    else
         ASSERT_EQ(outputNoPad.type(), fl::dtype::f32); // result is upcast
-    }
 
     auto output1 = tr.forward(
-        {
-            input1NoPad,
-            Variable(
-                padMask(fl::range(0, timesteps / 2))(
-                    fl::span,
-                    fl::range(0, 1)
-                ),
-                false
-            )
-        }
-    )
-        .front();
-    auto output2 =
-        tr.forward({input2, Variable(padMask(fl::span, fl::range(1, 2)), false)})
-        .front();
-    ASSERT_TRUE(allClose(
-        output.tensor()(fl::span, fl::span, fl::range(1, 2)), output2.tensor()));
-        ASSERT_TRUE(allClose(
-            outputNoPad.tensor()(fl::span, fl::span, fl::range(1, 2)),
-            output2.tensor()));
-            ASSERT_TRUE(allClose(
-                output.tensor()(fl::span, fl::iota({timesteps / 2}), fl::range(0, 1)),
-                output1.tensor()));
-                ASSERT_FALSE(allClose(
-                    outputNoPad.tensor()(
-                        fl::span, fl::iota({timesteps / 2}), fl::range(0, 1)),
-                    output1.tensor()));
+                         {
+                             input1NoPad,
+                             Variable(
+                                 padMask(fl::range(0, timesteps / 2))(
+                                     fl::span,
+                                     fl::range(0, 1)
+                                 ),
+                                 false
+                             )
+                         }
+                     )
+                     .front();
+
+    auto output2 = tr.forward({input2, Variable(padMask(fl::span, fl::range(1, 2)), false)})
+                     .front();
+
+    ASSERT_TRUE(
+        allClose(output.tensor()(fl::span, fl::span, fl::range(1, 2)), output2.tensor())
+    );
+    ASSERT_TRUE(
+        allClose(outputNoPad.tensor()(fl::span, fl::span, fl::range(1, 2)), output2.tensor())
+    );
+    ASSERT_TRUE(
+        allClose(output.tensor()(fl::span, fl::iota({timesteps / 2}), fl::range(0, 1)), output1.tensor())
+    );
+    ASSERT_FALSE(
+        allClose(
+            outputNoPad.tensor()(
+                fl::span, fl::iota({timesteps / 2}), fl::range(0, 1)),
+            output1.tensor()
+        )
+    );
 }
 
-TEST(ContribModuleTest, TransformerPadMaskFwd) {
-    transformerPadMaskFwd(false);
-}
+TEST(ContribModuleTest, TransformerPadMaskFwd) { transformerPadMaskFwd(false); }
 
 TEST_F(ContribModuleTestF16, TransformerPadMaskFwd16) {
     if(!fl::f16Supported())
@@ -233,9 +234,7 @@ void transformerFwd(bool isfp16) {
     ASSERT_TRUE(allClose(output1, output2, 1E-7));
 }
 
-TEST(ContribModuleTest, TransformerFwd) {
-    transformerFwd(false);
-}
+TEST(ContribModuleTest, TransformerFwd) { transformerFwd(false); }
 
 TEST_F(ContribModuleTestF16, TransformerFwdF16) {
     if(!fl::f16Supported())
@@ -265,9 +264,7 @@ void conformerFwd(bool isfp16) {
     ASSERT_EQ(output[0].dim(2), batchsize);
 }
 
-TEST(ContribModuleTest, ConformerFwd) {
-    conformerFwd(false);
-}
+TEST(ContribModuleTest, ConformerFwd) { conformerFwd(false); }
 
 TEST_F(ContribModuleTestF16, ConformerFwdF16) {
     if(!fl::f16Supported())
@@ -293,9 +290,7 @@ void positionEmbeddingFwd(bool isfp16) {
     ASSERT_FALSE(allClose(output[0], input));
 }
 
-TEST(ContribModuleTest, PositionEmbeddingFwd) {
-    positionEmbeddingFwd(false);
-}
+TEST(ContribModuleTest, PositionEmbeddingFwd) { positionEmbeddingFwd(false); }
 
 TEST_F(ContribModuleTestF16, PositionEmbeddingFwdF16) {
     if(!fl::f16Supported())
@@ -320,14 +315,12 @@ void sinusoidalPositionEmbeddingFwd(bool isfp16) {
     ASSERT_EQ(output[0].dim(2), batchsize);
     auto castOutput = output[0].tensor();
     if(isfp16)
-        castOutput = output[0].astype(fl::dtype::f32).tensor();
+        castOutput = output[0].asType(fl::dtype::f32).tensor();
     ASSERT_TRUE((fl::amax(castOutput, {0})).scalar<float>() <= 2);
     ASSERT_TRUE((fl::amin(castOutput, {0})).scalar<float>() >= -2);
 }
 
-TEST(ContribModuleTest, SinusoidalPositionEmbeddingFwd) {
-    sinusoidalPositionEmbeddingFwd(false);
-}
+TEST(ContribModuleTest, SinusoidalPositionEmbeddingFwd) { sinusoidalPositionEmbeddingFwd(false); }
 
 TEST_F(ContribModuleTestF16, SinusoidalPositionEmbeddingFwdF16) {
     if(!fl::f16Supported())
@@ -366,9 +359,7 @@ void tdsFwd(bool isfp16) {
     ASSERT_EQ(output.type(), input.type());
 }
 
-TEST(ContribModuleTest, TDSFwd) {
-    tdsFwd(false);
-}
+TEST(ContribModuleTest, TDSFwd) { tdsFwd(false); }
 
 TEST_F(ContribModuleTestF16, TDSFwdF16) {
     if(!fl::f16Supported())
@@ -397,9 +388,7 @@ void streamingTDSFwd(bool isfp16) {
     ASSERT_EQ(output.type(), input.type());
 }
 
-TEST(ContribModuleTest, StreamingTDSFwd) {
-    streamingTDSFwd(false);
-}
+TEST(ContribModuleTest, StreamingTDSFwd) { streamingTDSFwd(false); }
 
 TEST_F(ContribModuleTestF16, StreamingTDSFwdF16) {
     if(!fl::f16Supported())
@@ -431,7 +420,7 @@ TEST(ContribModuleTest, SpecAugmentFwd) {
     int tZeros = 0;
     for(int t = 0; t < T; ++t) {
         auto curOutSlice = output.tensor()(t);
-        tZeros = fl::all(curOutSlice == 0).asScalar<bool>() ? tZeros + 1 : tZeros;
+        tZeros = fl::all_of(curOutSlice == 0).asScalar<bool>() ? tZeros + 1 : tZeros;
     }
     ASSERT_GT(tZeros, 0);
 
@@ -439,7 +428,7 @@ TEST(ContribModuleTest, SpecAugmentFwd) {
     int fZeros = 0;
     for(int f = 0; f < F; ++f) {
         auto curOutSlice = output.tensor()(fl::span, f);
-        fZeros = fl::all(curOutSlice == 0).asScalar<bool>() ? fZeros + 1 : fZeros;
+        fZeros = fl::all_of(curOutSlice == 0).asScalar<bool>() ? fZeros + 1 : fZeros;
     }
     ASSERT_GT(fZeros, 0);
 }
@@ -448,7 +437,18 @@ void computeRawWavSpecAug(bool isfp16, float epsilon) {
     // no time, only freq masking
     for(int nmask = 1; nmask < 3; nmask++) {
         RawWavSpecAugment specAug(
-            0, 1, nmask, 0, 0, 0, 1, 2000, 6000, 16000, 20000);
+            0,
+            1,
+            nmask,
+            0,
+            0,
+            0,
+            1,
+            2000,
+            6000,
+            16000,
+            20000
+        );
         specAug.train();
 
         int T = 300, C = 3, B = 4;
@@ -460,8 +460,8 @@ void computeRawWavSpecAug(bool isfp16, float epsilon) {
         inputWav = fl::tile(inputWav, {1, C, B});
         finalWav = fl::tile(finalWav, {1, C, B});
         if(isfp16) {
-            inputWav = inputWav.astype(fl::dtype::f16);
-            finalWav = finalWav.astype(fl::dtype::f16);
+            inputWav = inputWav.asType(fl::dtype::f16);
+            finalWav = finalWav.asType(fl::dtype::f16);
         }
 
         auto filteredWav = specAug(fl::Variable(inputWav, false));
@@ -480,9 +480,7 @@ void computeRawWavSpecAug(bool isfp16, float epsilon) {
     }
 }
 
-TEST(ContribModuleTest, RawWavSpecAugmentFwd) {
-    computeRawWavSpecAug(false, 1e-3);
-}
+TEST(ContribModuleTest, RawWavSpecAugmentFwd) { computeRawWavSpecAug(false, 1e-3); }
 
 TEST_F(ContribModuleTestF16, RawWavSpecAugmentFwdF16) {
     if(!fl::f16Supported())

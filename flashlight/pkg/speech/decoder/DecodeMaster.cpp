@@ -89,8 +89,8 @@ std::pair<std::vector<int64_t>,
                 "computeMetrics: prediction and target do not match"
             );
         // token predictions and target
-        std::vector<int> predictionV = prediction.toHostVector<int>();
-        std::vector<int> targetV = target.toHostVector<int>();
+        std::vector<int> predictionV = prediction.host<int>();
+        std::vector<int> targetV = target.host<int>();
 
         auto predictionS = computeStringPred(predictionV);
         auto targetS = computeStringTarget(targetV);
@@ -98,8 +98,8 @@ std::pair<std::vector<int64_t>,
 
         std::vector<std::string> targetWrdS, predictionWrdS;
         if(isPredictingWrd) {
-            targetWrdS = wrdIdx2Wrd(targetWrd.toHostVector<int>(), wordDict_);
-            predictionWrdS = wrdIdx2Wrd(predictionWrd.toHostVector<int>(), wordDict_);
+            targetWrdS = wrdIdx2Wrd(targetWrd.host<int>(), wordDict_);
+            predictionWrdS = wrdIdx2Wrd(predictionWrd.host<int>(), wordDict_);
         } else {
             targetWrdS = tkn2Wrd(targetS, trainOpt_.wordSep);
             predictionWrdS = tkn2Wrd(predictionS, trainOpt_.wordSep);

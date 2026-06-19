@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
 # ----------------------------- ArrayFire -----------------------------
-find_package(ArrayFire 3.7.3 REQUIRED)
-if (ArrayFire_FOUND AND ArrayFire_VERSION VERSION_LESS 3.7.1)
-  message(FATAL_ERROR "ArrayFire versions < 3.8.1 are no longer supported "
-    "with flashlight. To build flashlight with a version of ArrayFire "
-    "< 3.7.1, use commit <= 5518d91b7f4fd5b400cbc802cfbecc0df57836bd.")
+find_package(ArrayFire 3.10.0 REQUIRED)
+if (ArrayFire_FOUND AND ArrayFire_VERSION VERSION_LESS 3.10.0)
+    message(FATAL_ERROR "ArrayFire < 3.10 is not supported")
 endif()
 
 if (ArrayFire_FOUND)

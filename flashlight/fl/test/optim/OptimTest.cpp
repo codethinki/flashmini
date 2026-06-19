@@ -19,7 +19,7 @@ TEST(OptimTest, GradNorm) {
     std::vector<Variable> parameters;
     for(int i = 0; i < 5; i++) {
         auto v = Variable(fl::randn({10, 10, 10}), true);
-        v = v.astype(fl::dtype::f64);
+        v = v.asType(fl::dtype::f64);
         v.addGrad(Variable(fl::randn({10, 10, 10}, fl::dtype::f64), false));
         parameters.push_back(v);
     }
@@ -42,7 +42,7 @@ TEST(OptimTest, GradNormF16) {
     std::vector<Variable> parameters;
     for(int i = 0; i < 5; i++) {
         auto v = Variable(fl::randn({10, 10, 10}), true);
-        v = v.astype(fl::dtype::f16);
+        v = v.asType(fl::dtype::f16);
         v.addGrad(Variable(fl::randn({10, 10, 10}, fl::dtype::f16), false));
         parameters.push_back(v);
     }

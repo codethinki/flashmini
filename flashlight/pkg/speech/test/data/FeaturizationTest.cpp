@@ -71,10 +71,10 @@ TEST(FeaturizationTest, AfMatmulCompare) {
         Tensor c = fl::transpose(
             fl::matmul(a, b, MatrixProperty::Transpose, MatrixProperty::Transpose)
         );
-        auto aVec = a.toHostVector<float>();
-        auto bVec = b.toHostVector<float>();
+        auto aVec = a.host<float>();
+        auto bVec = b.host<float>();
         auto cVec = cblasGemm(aVec, bVec, n, k);
-        ASSERT_TRUE(compareVec(cVec, c.toHostVector<float>(), 1E-4));
+        ASSERT_TRUE(compareVec(cVec, c.host<float>(), 1E-4));
     }
 }
 
@@ -100,7 +100,7 @@ TEST(FeaturizationTest, Normalize) {
             );
         };
     auto arr = fl::rand({13, 17, 19});
-    auto arrVec = arr.toHostVector<float>();
+    auto arrVec = arr.host<float>();
 
     auto arrVecNrm = normalize(arrVec, 19, threshold);
     auto arrNrm =
@@ -112,7 +112,7 @@ TEST(FeaturizationTest, Normalize) {
 
 TEST(FeaturizationTest, Transpose) {
     auto arr = fl::rand({13, 17, 19, 23});
-    auto arrVec = arr.toHostVector<float>();
+    auto arrVec = arr.host<float>();
     auto arrVecT = transpose2d<float>(arrVec, 17, 13, 19 * 23);
     auto arrT = Tensor::fromVector({17, 13, 19, 23}, arrVecT);
     ASSERT_TRUE(
@@ -139,7 +139,7 @@ TEST(FeaturizationTest, localNormalize) {
             return out;
         };
     auto arr = fl::rand({47, 67, 2, 10}); // FRAMES X FEAT X CHANNELS X BATCHSIZE
-    auto arrVec = arr.toHostVector<float>();
+    auto arrVec = arr.host<float>();
 
     std::vector<std::pair<int, int>> ctx = {
         {0, 0}, {1, 1}, {2, 2}, {4, 4}, {1024, 1024}, {10, 0}, {
@@ -430,7 +430,7 @@ TEST(FeaturizationTest, targetFeaturizer) {
 
     auto tgtArray = targetFeaturizer(
         targets[0].data(),
-        {static_cast<long long>(targets[0].size())},
+        {static_cast<int64_t>(targets[0].size())},
         fl::dtype::b8
     );
     int tgtLen = 5;
@@ -459,7 +459,7 @@ TEST(FeaturizationTest, targetFeaturizer) {
     targetFeaturizer = targetFeatures(tokenDict, lexicon, targetGenConfigEos);
     tgtArray = targetFeaturizer(
         targets[1].data(),
-        {static_cast<long long>(targets[1].size())},
+        {static_cast<int64_t>(targets[1].size())},
         fl::dtype::b8
     );
     tgtLen = 5;

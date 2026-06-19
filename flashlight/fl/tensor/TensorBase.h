@@ -1,8 +1,8 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * SPDX-License-Identifier: MIT
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Original code: Copyright (c) Meta Platforms, Inc. (see FLASHLIGHT_LICENSE)
+ * Modifications: Copyright (c) 2026 Lukas Thomann (see LICENSE)
  */
 
 #pragma once
@@ -20,6 +20,9 @@
 #include "flashlight/fl/tensor/Shape.h"
 #include "flashlight/fl/tensor/Types.h"
 
+#include <format>
+#include <span>
+
 namespace fl {
 
 class Tensor;
@@ -30,7 +33,7 @@ class Tensor;
  */
 
 /// Enum for various tensor backends.
-enum class TensorBackendType {Stub, Tracer, ArrayFire};
+enum class TensorBackendType { Stub, Tracer, ArrayFire };
 
 // See TensorAdapter.h
 class TensorAdapterBase;
@@ -45,12 +48,12 @@ struct Index;
 class Stream;
 
 /// Location of memory or tensors.
-enum class Location {Host, Device};
+enum class Location { Host, Device };
 /// Alias to make it semantically clearer when referring to buffer location
 using MemoryLocation = Location;
 
 /// Tensor storage types.
-enum class StorageType {Dense = 0, CSR = 1, CSC = 2, COO = 3};
+enum class StorageType { Dense = 0, CSR = 1, CSC = 2, COO = 3 };
 
 /* @} */
 
@@ -86,9 +89,9 @@ class FL_API Tensor {
      * compliance with TensorAdapter and is intentionally private.
      */
     Tensor(
-        const Shape& shape,
+        Shape const& shape,
         fl::dtype type,
-        const void* ptr,
+        void const* ptr,
         MemoryLocation memoryLocation
     );
 
@@ -132,13 +135,13 @@ public:
      * Copy constructor - calls the implementation-defined copy constructor for
      * the TensorAdapter.
      */
-    Tensor(const Tensor& tensor);
+    Tensor(Tensor const& tensor);
 
     /**
      * Move constructor - moves the pointer to the TensorAdapter - performs no
      * other operations.
      */
-    Tensor(Tensor&& tensor) noexcept;
+    Tensor(Tensor&& other) noexcept;
 
     /**
      * Construct an empty tensor with the default tensor backend's tensor adapter.
@@ -152,7 +155,7 @@ public:
      * @param[in] shape the shape of the tensor
      * @param[in] type (optional) the type of the tensor
      */
-    explicit Tensor(const Shape& shape, fl::dtype type = fl::dtype::f32);
+    explicit Tensor(Shape const& shape, fl::dtype type = fl::dtype::f32);
 
     /**
      * Construct an empty tensor of a given type.
@@ -174,11 +177,11 @@ public:
      * \todo Expand this API with getters as needed.
      */
     Tensor(
-        const Dim nRows,
-        const Dim nCols,
-        const Tensor& values,
-        const Tensor& rowIdx,
-        const Tensor& colIdx,
+        Dim nRows,
+        Dim nCols,
+        Tensor const& values,
+        Tensor const& rowIdx,
+        Tensor const& colIdx,
         StorageType storageType
     );
 
@@ -212,7 +215,7 @@ public:
     template<typename T>
     static Tensor fromVector(std::vector<T> v) {
         return Tensor(
-            {static_cast<long long>(v.size())},
+            {static_cast<Dim>(v.size())},
             fl::dtype_traits<T>::fl_type,
             v.data(),
             Location::Host
@@ -222,7 +225,7 @@ public:
     template<typename T, std::size_t S>
     static Tensor fromArray(std::array<T, S> a) {
         return Tensor(
-            {static_cast<long long>(a.size())},
+            {static_cast<Dim>(a.size())},
             fl::dtype_traits<T>::fl_type,
             a.data(),
             Location::Host
@@ -239,7 +242,7 @@ public:
      * @return a tensor with values and shape as given.
      */
     template<typename T>
-    static Tensor fromBuffer(Shape s, const T* ptr, Location memoryLocation) {
+    static Tensor fromBuffer(Shape s, T const* ptr, Location memoryLocation) {
         return Tensor(s, fl::dtype_traits<T>::fl_type, ptr, memoryLocation);
     }
 
@@ -256,7 +259,7 @@ public:
     static Tensor fromBuffer(
         Shape s,
         fl::dtype t,
-        const uint8_t* ptr,
+        uint8_t const* ptr,
         Location memoryLocation
     ) { return Tensor(s, t, ptr, memoryLocation); }
 
@@ -270,7 +273,7 @@ public:
      *
      * @return the shape of the tensor
      */
-    const Shape& shape() const;
+    Shape const& shape() const;
 
     /**
      * Get a tensor's location, host or some device.
@@ -293,14 +296,14 @@ public:
      *
      * @return the number of elements at the given dimension
      */
-    Dim dim(const size_t dim) const;
+    Dim dim(size_t dim) const;
 
     /**
      * Get the number of directions of the tensor.
      *
      * @return the number of dimensions
      */
-    int ndim() const;
+    size_t ndim() const;
 
     /**
      * Returns true if the tensor has zero elements, else false.
@@ -354,7 +357,7 @@ public:
      * @return an immutable reference to the stream that contains(ed) the
      * computations which create this tensor.
      */
-    virtual const Stream& stream() const;
+    virtual Stream const& stream() const;
 
     /**
      * Returns a tensor with elements cast as a particular type
@@ -362,7 +365,15 @@ public:
      * @param[in] type the type to which to cast the tensor
      * @return a tensor with element-wise cast to the new type
      */
-    Tensor astype(const dtype type) const;
+    Tensor asType(dtype type) const;
+
+
+    /**
+     * @deprecated use @ref Tensor::asType(dtype) const instead
+     */
+    Tensor astype(dtype type) const { return asType(type); }
+
+
 
     /**
      * Index into a tensor using a vector of fl::Index references.
@@ -370,7 +381,7 @@ public:
      * @param[in] indices a vector of fl::Index references with which to index.
      * @return an indexed tensor
      */
-    Tensor operator()(const std::vector<Index>& indices) const;
+    Tensor operator()(std::vector<Index> const& indices) const;
 
     /**
      * Index into a tensor using a variable number of fl::Index.
@@ -379,12 +390,12 @@ public:
      * @return an indexed tensor
      */
     template<typename... Ts>
-    Tensor operator()(const Ts&... args) const {
-        // TODO: add this back if acceptable with C++ 17 ABIs and a nvcc
-        // static_assert(
-        // std::conjunction<std::is_constructible<Index, Ts>...>::value,
-        // "Tensor index operator can only take Index-compatible types - "
-        // "fl::range, fl::Tensor, fl::span, and integer types.");
+    Tensor operator()(Ts const&... args) const {
+        static_assert(
+            (std::constructible_from<Index, Ts> && ...),
+            "Tensor index operator can only take Index-compatible types - "
+            "fl::range, fl::Tensor, fl::span, and integer types."
+        );
         std::vector<Index> indices{{args...}};
         return this->operator()(indices);
     }
@@ -402,11 +413,11 @@ public:
      *
      * @return an indexed, 1D version of this tensor.
      */
-    Tensor flat(const Index& idx) const;
+    Tensor flat(Index const& idx) const;
 
     /**
      * Return a copy (depending on copy-on-write behavior of the underlying
-     * implementation) of this tensor that is contigous in memory.
+     * implementation) of this tensor that is contiguous in memory.
      *
      * @return an identical tensor that is contiguous in memory
      */
@@ -425,9 +436,7 @@ public:
      * @return the tensor adapter.
      */
     template<typename T>
-    T& getAdapter() const {
-        return *static_cast<T*>(impl_.get());
-    }
+    T& getAdapter() const { return *static_cast<T*>(impl_.get()); }
 
     /**
      * Return the TensorBackend associated with this tensor.
@@ -446,8 +455,8 @@ public:
      *
      * @return a scalar of the first element in the tensor.
      */
-    template<typename T>
-    T scalar() const;
+    template<fundamental_type T>
+    [[nodiscard]] T scalar() const;
 
     /**
      * Return a scalar of the specified type of the tensor. If the specified type
@@ -457,100 +466,69 @@ public:
      * @return a scalar of the first element in the tensor cast to the specified
      * type.
      */
-    template<typename T>
-    T asScalar() const {
-        // Implicitly cast to the requested return type
-        switch(type()) {
-            case dtype::f16:
-                return astype(dtype::f32).scalar<float>();
-            case dtype::f32:
-                return scalar<float>();
-            case dtype::f64:
-                return scalar<double>();
-            case dtype::s32:
-                return scalar<int>();
-            case dtype::u32:
-                return scalar<unsigned int>();
-            case dtype::b8:
-                return scalar<char>();
-            case dtype::u8:
-                return scalar<unsigned char>();
-            case dtype::s64:
-                return scalar<long long>();
-            case dtype::u64:
-                return scalar<unsigned long long>();
-            case dtype::s16:
-                return scalar<short>();
-            case dtype::u16:
-                return scalar<unsigned short>();
-            default:
-                throw std::invalid_argument(
-                    "Tensor::asScaler - no castable type exists."
-                );
-        }
-    }
+    template<fundamental_type T>
+    [[nodiscard]] T asScalar() const;
 
     /**
      * Return a pointer to the tensor's underlying data per a certain type. This
-     * pointer exists on the computation device.
+     *  pointer exists on the computation device.
+     * @tparam T may not be void
      *
-     * \note The memory allocated here will not be freed until Tensor:unlock() is
+     * @return the requested pointer on the device or `nullptr` if the tensor is empty
+     * 
+     * @attention The memory allocated here will not be freed until Tensor:unlock() is
      * called.
-     *
-     * @return the requested pointer on the device.
      */
-    template<typename T>
-    T* device() const;
+    template<class T>
+    [[nodiscard]] T* device() const;
 
     /**
-     * Populate a pointer value with the address of a Tensor's underlying buffer
-     * on the computation device.
-     *
-     * \note The memory allocated here will not be freed until Tensor:unlock() is
-     * called.
-     *
-     * @param[in] ptr the pointer to populate with the Tensor's buffer location on
-     * device.
+     * Returns a pointer to the tensor's underlying data on the host. Copies the data
+     * to the host if it's located on the device.
+     * 
+     * @pre @ref Tensor::isSparse() is false
+     * @return host data pointer or `nullptr` if tensor is empty
+     * @throws std::logic_error if 
+     * @attention memory ownership is transferred to the caller
      */
-    template<typename T>
-    void device(T** ptr) const;
+    [[nodiscard]] void* raw_host() const;
 
     /**
-     * Returns a pointer to the tensor's underlying data, but on the host. If the
-     * tensor is located on a device, makes a copy of device memory and returns a
-     * buffer on the host containing the relevant memory.
-     *
-     * @return the requested pointer on the host.
+     * Returns the tensor's underlying data on the host, creates a copy.
+     *  Users who want to avoid copies may use @ref device()
+     * @tparam T may not be void
+     * @throws std::logic_error if @ref Tensor::isSparse()
+     * @throws std::logic_error if `Tensor::bytes() % sizeof(T) != 0`
+     * @return vector of data
      */
-    template<typename T>
-    T* host() const;
+    template<not_void T>
+    [[nodiscard]] std::vector<T> host() const;
+
 
     /**
-     * Populates an existing buffer with the tensor's underlying data, but on the
-     * host. If the tensor is located on a device, makes a copy of device memory
-     * and returns a buffer on the host containing the relevant memory.
-     *
-     * @param[in] ptr a pointer to the region of memory to populate with tensor
-     * values
+     * Populates an existing host buffer with the tensor data.
+     * 
+     * @param[in] dst span to write to
+     * @tparam T may not be void
+     * @pre
+     * - span size >= @ref bytes()
+     * - @ref Tensor::bytes() is divisible by `sizeof(T)`
+     * - not @ref Tensor::isSparse()
+     * @throws std::logic_error if @ref Tensor::isSparse()
      */
-    template<typename T>
-    void host(T* ptr) const;
+    template<not_void T>
+    void host(std::span<T> dst) const;
 
     /**
-     * Returns a vector on the host contaning a flat representation of the tensor.
-     * The resulting vector is a copy of the underlying tensor memory, even if on
-     * the host.
+     * Populates the existing host buffer with the tensor data.
+     * @param[in] dst to write to
      *
-     * @return a vector in host memory containing
+     * @pre buffer size must be >= @ref bytes()
+     * @throws std::logic_error if @ref Tensor::isSparse()
+     * @post bytes 0 - @ref bytes written
      */
-    template<typename T>
-    std::vector<T> toHostVector() const {
-        if(isEmpty())
-            return std::vector<T>();
-        std::vector<T> vec(this->elements());
-        host(vec.data());
-        return vec;
-    }
+    void raw_host(void* dst) const;
+
 
     /**
      * Unlocks any device memory associated with the tensor that was acquired with
@@ -578,9 +556,9 @@ public:
      * Stores arbitrary data on a tensor. For internal use/benchmarking only. This
      * may be a no-op for some backends.
      *
-     * @param[in] data a pointer to arbitrary data to pass to a tensor impl.
+     * @param[in] context a pointer to arbitrary data to pass to a tensor impl.
      */
-    void setContext(void* data);
+    void setContext(void* context) const;
 
     /**
      * Gets arbitrary data stored on a tensor. For internal use/benchmarking only.
@@ -643,8 +621,11 @@ public:
      */
     Tensor& operator=(Tensor&& other) &;
     Tensor& operator=(Tensor&& other) &&;
-    Tensor& operator=(const Tensor& other) &;
-    Tensor& operator=(const Tensor& other) &&;
+    Tensor& operator=(Tensor const& other) &;
+    Tensor& operator=(Tensor const& other) &&;
+
+private:
+    void scalar_impl(void* out) const;
 };
 
 /**
@@ -664,7 +645,7 @@ public:
  * @return a tensor of the specified shape filled with the specified value
  */
 template<typename T>
-FL_API Tensor fromScalar(const T& val, const dtype type = dtype_traits<T>::ctype);
+FL_API Tensor fromScalar(T const& val, dtype type = dtype_traits<T>::fl_type);
 
 /**
  * Creates a new Tensor with a given Shape and filled with a particular value.
@@ -677,9 +658,9 @@ FL_API Tensor fromScalar(const T& val, const dtype type = dtype_traits<T>::ctype
  */
 template<typename T>
 FL_API Tensor full(
-    const Shape& dims,
-    const T& val,
-    const dtype type = dtype_traits<T>::ctype
+    Shape const& dims,
+    T const& val,
+    dtype type = dtype_traits<T>::fl_type
 );
 
 /**
@@ -688,14 +669,14 @@ FL_API Tensor full(
  * @param[in] dim the size of the dimension of the matrix (dim x dim)
  * @param[in] type the type of the resulting matrix
  */
-FL_API Tensor identity(const Dim dim, const dtype type = dtype::f32);
+FL_API Tensor identity(Dim dim, dtype type = dtype::f32);
 
 /**
  * Return evenly-spaced values in a given interval. Generate values in the
- * interval `[start, stop)` steppping each element by the passed step.
+ * interval `[begin, end)` stepping each element by the passed step.
  *
- * @param[in] start the start of the range
- * @param[in] end the end of the range, inclusive
+ * @param[in] start the start of the range (inclusive)
+ * @param[in] end the end of the range (exclusive)
  * @param[in] step the increment for each consecutive value in the range
  * @param[in] type the dtype of the resulting tensor
  *
@@ -703,10 +684,10 @@ FL_API Tensor identity(const Dim dim, const dtype type = dtype::f32);
  */
 template<typename T>
 FL_API Tensor arange(
-    const T& start,
-    const T& end,
-    const T& step = 1,
-    const dtype type = dtype_traits<T>::ctype
+    T const& start,
+    T const& end,
+    T const& step = 1,
+    dtype type = dtype_traits<T>::fl_type
 );
 
 /**
@@ -721,7 +702,7 @@ FL_API Tensor arange(
  * @return a tensor with the given shape with the sequence along the given
  * dimension, tiled along other dimensions.
  */
-FL_API Tensor arange(const Shape& shape, const Dim seqDim = 0, const dtype type = dtype::f32);
+FL_API Tensor arange(Shape const& shape, Dim seqDim = 0, dtype type = dtype::f32);
 
 /**
  * Creates a sequence with the range `[0, dims.elements())` sequentially in the
@@ -733,14 +714,14 @@ FL_API Tensor arange(const Shape& shape, const Dim seqDim = 0, const dtype type 
  *
  * @param[in] dims the dimensions of the range
  * @param[in] tileDims the dimensions along which to tile
- * @param[in] type the dtype of the resulting tensoe
+ * @param[in] type the dtype of the resulting tensor
  *
  * @return
  */
 FL_API Tensor iota(
-    const Shape& dims,
-    const Shape& tileDims = { 1 },
-    const dtype type = dtype::f32
+    Shape const& dims,
+    Shape const& tileDims = {1},
+    dtype type = dtype::f32
 );
 
 /************************ Shaping and Indexing *************************/
@@ -752,7 +733,7 @@ FL_API Tensor iota(
  * @param[in] shape the new shape for the tensor
  * @return the reshaped tensor
  */
-FL_API Tensor reshape(const Tensor& tensor, const Shape& shape);
+FL_API Tensor reshape(Tensor const& tensor, Shape const& shape);
 
 /**
  * Permute the axes of a tensor. If no arguments are given, reverses the axes of
@@ -764,7 +745,7 @@ FL_API Tensor reshape(const Tensor& tensor, const Shape& shape);
  * argument is not passed, the axes of the input tensor will be reversed.
  * @return the permuted tensor
  */
-FL_API Tensor transpose(const Tensor& tensor, const Shape& axes = {});
+FL_API Tensor transpose(Tensor const& tensor, Shape const& axes = {});
 
 /**
  * Repeat the contents of a tensor a given number of times along specified
@@ -775,7 +756,7 @@ FL_API Tensor transpose(const Tensor& tensor, const Shape& axes = {});
  * tensor
  * @return the tiled tensor
  */
-FL_API Tensor tile(const Tensor& tensor, const Shape& shape);
+FL_API Tensor tile(Tensor const& tensor, Shape const& shape);
 
 /**
  * Join or concatenate tensors together along a particular axis.
@@ -784,7 +765,7 @@ FL_API Tensor tile(const Tensor& tensor, const Shape& shape);
  * @param[in] axis the axis along which to concatenate tensors
  * @return a concatenated tensor
  */
-FL_API Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis = 0);
+FL_API Tensor concatenate(std::vector<Tensor> const& tensors, unsigned axis = 0);
 
 /**
  * Join or concatenate tensors together along a particular axis.
@@ -794,7 +775,7 @@ FL_API Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axi
  * @return a concatenated tensor
  */
 template<typename... Ts>
-Tensor concatenate(unsigned axis, const Ts&... args) {
+Tensor concatenate(unsigned axis, Ts const&... args) {
     std::vector<Tensor> tensors{{args...}};
     return concatenate(tensors, axis);
 }
@@ -806,7 +787,7 @@ Tensor concatenate(unsigned axis, const Ts&... args) {
  * @param[in] tensor input tensor
  * @return a tensor containing the indices of the nonzero elements
  */
-FL_API Tensor nonzero(const Tensor& tensor);
+FL_API Tensor nonzero(Tensor const& tensor);
 
 /// Padding types for the pad operator.
 enum class PadType {
@@ -822,16 +803,15 @@ enum class PadType {
  * Pad a tensor with zeros.
  *
  * @param[in] input the input tensor to pad
- * @param[in] padWidths a vector of tuples representing padding (before, after)
- * tuples for each axis
- * @param[in] type the padding mode with which to pad the tensor - see `PadType`
+ * @param[in] padWidths padding sizes for each axis with (prepended, appended) respectively
+ * @param[in] type the padding mode with which to pad the tensor - @ref PadType
  *
  * @return the padded tensor
  */
 FL_API Tensor pad(
-    const Tensor& input,
-    const std::vector<std::pair<int, int>>& padWidths,
-    const PadType type = PadType::Constant
+    Tensor const& input,
+    std::vector<std::pair<Dim, Dim>> const& padWidths,
+    PadType type = PadType::Constant
 );
 
 /************************** Unary Operators ***************************/
@@ -841,8 +821,8 @@ FL_API Tensor pad(
  * @param[in] tensor the input tensor to negate.
  * @return a tensor with elements negated.
  */
-FL_API Tensor negative(const Tensor& tensor);
-inline Tensor operator-(const Tensor& tensor) { return negative(tensor); }
+FL_API Tensor negative(Tensor const& tensor);
+inline Tensor operator-(Tensor const& tensor) { return negative(tensor); }
 
 /**
  * Performs element-wise logical-not on the elements of a tensor
@@ -850,8 +830,8 @@ inline Tensor operator-(const Tensor& tensor) { return negative(tensor); }
  * @param[in] tensor the tensor on which to perform logical not
  * @return a tensor with element-wise logical not of the input
  */
-FL_API Tensor logicalNot(const Tensor& tensor);
-inline Tensor operator!(const Tensor& tensor) { return logicalNot(tensor); }
+FL_API Tensor logicalNot(Tensor const& tensor);
+inline Tensor operator!(Tensor const& tensor) { return logicalNot(tensor); }
 
 /**
  * Compute the element-wise exponential of a tensor
@@ -859,7 +839,7 @@ inline Tensor operator!(const Tensor& tensor) { return logicalNot(tensor); }
  * @param[in] tensor the tensor to exponentiate
  * @return the exponentiated tensor
  */
-FL_API Tensor exp(const Tensor& tensor);
+FL_API Tensor exp(Tensor const& tensor);
 
 /**
  * Compute the element-wise natural logarithm of a tensor
@@ -867,7 +847,7 @@ FL_API Tensor exp(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor log(const Tensor& tensor);
+FL_API Tensor log(Tensor const& tensor);
 
 /**
  * Returns the natural logarithm of one plus the input, element-wise.
@@ -875,7 +855,7 @@ FL_API Tensor log(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor log1p(const Tensor& tensor);
+FL_API Tensor log1p(Tensor const& tensor);
 
 /**
  * Returns the element-wise sine of the input.
@@ -883,7 +863,7 @@ FL_API Tensor log1p(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor sin(const Tensor& tensor);
+FL_API Tensor sin(Tensor const& tensor);
 
 /**
  * Returns the element-wise cosine of the input.
@@ -891,7 +871,7 @@ FL_API Tensor sin(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor cos(const Tensor& tensor);
+FL_API Tensor cos(Tensor const& tensor);
 
 /**
  * Returns the element-wise non-negative square root of the input.
@@ -899,7 +879,7 @@ FL_API Tensor cos(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor sqrt(const Tensor& tensor);
+FL_API Tensor sqrt(Tensor const& tensor);
 
 /**
  * Returns the element-wise hyperbolic tangent of the input.
@@ -907,7 +887,7 @@ FL_API Tensor sqrt(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor tanh(const Tensor& tensor);
+FL_API Tensor tanh(Tensor const& tensor);
 
 /**
  * Returns the element-wise floor of the input.
@@ -915,7 +895,7 @@ FL_API Tensor tanh(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute the floor
  * @return the resulting tensor
  */
-FL_API Tensor floor(const Tensor& tensor);
+FL_API Tensor floor(Tensor const& tensor);
 
 /**
  * Returns the element-wise ceiling of the input.
@@ -923,7 +903,7 @@ FL_API Tensor floor(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute the ceiling
  * @return the resulting tensor
  */
-FL_API Tensor ceil(const Tensor& tensor);
+FL_API Tensor ceil(Tensor const& tensor);
 
 /**
  * Returns the tensor with element-wise rounding to the nearest integer.
@@ -931,7 +911,7 @@ FL_API Tensor ceil(const Tensor& tensor);
  * @param[in] tensor the input tensor
  * @return the resulting tensor
  */
-FL_API Tensor rint(const Tensor& tensor);
+FL_API Tensor rint(Tensor const& tensor);
 
 /**
  * Returns the element-wise absolute value of the input.
@@ -939,10 +919,10 @@ FL_API Tensor rint(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor absolute(const Tensor& tensor);
+FL_API Tensor absolute(Tensor const& tensor);
 
 // \copydoc absolute
-inline Tensor abs(const Tensor& tensor) { return absolute(tensor); }
+inline Tensor abs(Tensor const& tensor) { return absolute(tensor); }
 
 /**
  * Returns the element-wise sigmoid the input:
@@ -951,7 +931,7 @@ inline Tensor abs(const Tensor& tensor) { return absolute(tensor); }
  * @param[in] tensor the tensor on which to compute
  * @return the resulting tensor
  */
-FL_API Tensor sigmoid(const Tensor& tensor);
+FL_API Tensor sigmoid(Tensor const& tensor);
 
 /**
  * Computes the element-wise error function the input: see
@@ -960,7 +940,7 @@ FL_API Tensor sigmoid(const Tensor& tensor);
  * @param[in] tensor the tensor on which to compute
  * @return ther resulting tensor
  */
-FL_API Tensor erf(const Tensor& tensor);
+FL_API Tensor erf(Tensor const& tensor);
 
 /**
  * Flip a Tensor along a specified dimension.
@@ -970,7 +950,7 @@ FL_API Tensor erf(const Tensor& tensor);
  *
  * @return the resulting flipped tensor
  */
-FL_API Tensor flip(const Tensor& tensor, const unsigned dim);
+FL_API Tensor flip(Tensor const& tensor, unsigned dim);
 
 /**
  * Clip (limit) the values of a tensor. Given some interval of values, set
@@ -988,7 +968,7 @@ FL_API Tensor flip(const Tensor& tensor, const unsigned dim);
  * clipping
  * @return a tensor with all values clipped between high and low
  */
-FL_API Tensor clip(const Tensor& tensor, const Tensor& low, const Tensor& high);
+FL_API Tensor clip(Tensor const& tensor, Tensor const& low, Tensor const& high);
 
 /**
  * Clip (limit) the values of a tensor. Given some interval of values, set
@@ -1003,7 +983,7 @@ FL_API Tensor clip(const Tensor& tensor, const Tensor& low, const Tensor& high);
  * @param[in] high a scalar to use as the maximum value in clipping
  * @return a tensor with all values clipped between high and low
  */
-FL_API Tensor clip(const Tensor& tensor, const Tensor& low, const double& high);
+FL_API Tensor clip(Tensor const& tensor, Tensor const& low, double const& high);
 
 /**
  * Clip (limit) the values of a tensor. Given some interval of values, set
@@ -1018,7 +998,7 @@ FL_API Tensor clip(const Tensor& tensor, const Tensor& low, const double& high);
  * clipping
  * @return a tensor with all values clipped between high and low
  */
-FL_API Tensor clip(const Tensor& tensor, const double& low, const Tensor& high);
+FL_API Tensor clip(Tensor const& tensor, double const& low, Tensor const& high);
 
 /**
  * Clip (limit) the values of a tensor. Given some interval of values, set
@@ -1031,7 +1011,7 @@ FL_API Tensor clip(const Tensor& tensor, const double& low, const Tensor& high);
  * @param[in] high a scalar to use as the maximum value in clipping
  * @return a tensor with all values clipped between high and low
  */
-FL_API Tensor clip(const Tensor& tensor, const double& low, const double& high);
+FL_API Tensor clip(Tensor const& tensor, double const& low, double const& high);
 
 /**
  * Rolls (or shifts) a tensor by a certain amount along a given axis, moving
@@ -1044,7 +1024,7 @@ FL_API Tensor clip(const Tensor& tensor, const double& low, const double& high);
  * @return a tensor with values shifted by the given amount in a circular
  * fashion
  */
-FL_API Tensor roll(const Tensor& tensor, const int shift, const unsigned axis);
+FL_API Tensor roll(Tensor const& tensor, int shift, unsigned axis);
 
 /**
  * Returns a boolean tensor which is true where the input tensor was NaN, and
@@ -1054,7 +1034,7 @@ FL_API Tensor roll(const Tensor& tensor, const int shift, const unsigned axis);
  * @return a boolean tensor with true in positions that contained NaN in the
  * input tensor
  */
-FL_API Tensor isnan(const Tensor& tensor);
+FL_API Tensor isnan(Tensor const& tensor);
 
 /**
  * Returns a boolean tensor which is true where the input tensor was infinity,
@@ -1064,7 +1044,7 @@ FL_API Tensor isnan(const Tensor& tensor);
  * @return a boolean tensor with true in positions that contained Inf in the
  * input tensor
  */
-FL_API Tensor isinf(const Tensor& tensor);
+FL_API Tensor isinf(Tensor const& tensor);
 
 /**
  * Returns a tensor that contains -1 if an element is less than 0, 0 if an
@@ -1074,7 +1054,7 @@ FL_API Tensor isinf(const Tensor& tensor);
  * @param[in] tensor the input tensor
  * @return a tensor containing element-wise sign values.
  */
-FL_API Tensor sign(const Tensor& tensor);
+FL_API Tensor sign(Tensor const& tensor);
 
 /**
  * Returns an upper triangular version of the tensor.
@@ -1087,7 +1067,7 @@ FL_API Tensor sign(const Tensor& tensor);
  * @return a copy of the input tensor with elements above the diagonal zeroed
  * out
  */
-FL_API Tensor tril(const Tensor& tensor);
+FL_API Tensor tril(Tensor const& tensor);
 
 /**
  * Returns an upper triangular version of the tensor.
@@ -1100,7 +1080,7 @@ FL_API Tensor tril(const Tensor& tensor);
  * @return a copy of the input tensor with elements below the diagonal zeroed
  * out
  */
-FL_API Tensor triu(const Tensor& tensor);
+FL_API Tensor triu(Tensor const& tensor);
 
 /**
  * Conditionally return elements from one of two tensors based on a condition.
@@ -1116,7 +1096,7 @@ FL_API Tensor triu(const Tensor& tensor);
  * @return the resulting tensor that contains elements of x where condition is
  * true and elements of y where condition is false.
  */
-FL_API Tensor where(const Tensor& condition, const Tensor& x, const Tensor& y);
+FL_API Tensor where(Tensor const& condition, Tensor const& x, Tensor const& y);
 
 /**
  * Conditionally return elements from a tensor or passed scalar based on a
@@ -1132,7 +1112,7 @@ FL_API Tensor where(const Tensor& condition, const Tensor& x, const Tensor& y);
  * @return the resulting tensor that contains elements of x where condition is
  * true and the scalar value y where the condition is false.
  */
-FL_API Tensor where(const Tensor& condition, const Tensor& x, const double& y);
+FL_API Tensor where(Tensor const& condition, Tensor const& x, double const& y);
 
 /**
  * Conditionally return elements from a scalar or passed tensor based on a
@@ -1148,12 +1128,12 @@ FL_API Tensor where(const Tensor& condition, const Tensor& x, const double& y);
  * @return the resulting tensor that contains elements of x where condition is
  * true and the scalar value y where the condition is false.
  */
-FL_API Tensor where(const Tensor& condition, const double& x, const Tensor& y);
+FL_API Tensor where(Tensor const& condition, double const& x, Tensor const& y);
 
 /*!
  * Sorting mode for sorting-related functions.
  */
-enum class SortMode {Descending = 0, Ascending = 1};
+enum class SortMode { Descending = 0, Ascending = 1 };
 
 /**
  * Get the top-k values and indices from a Tensor.
@@ -1170,10 +1150,10 @@ enum class SortMode {Descending = 0, Ascending = 1};
 FL_API void topk(
     Tensor& values,
     Tensor& indices,
-    const Tensor& input,
-    const unsigned k,
-    const Dim axis,
-    const SortMode sortMode = SortMode::Descending
+    Tensor const& input,
+    unsigned k,
+    Dim axis,
+    SortMode sortMode = SortMode::Descending
 );
 
 /**
@@ -1184,9 +1164,9 @@ FL_API void topk(
  * @param[in] sortMode the ordering with which to sort. Defaults to ascending
  */
 FL_API Tensor sort(
-    const Tensor& input,
-    const Dim axis,
-    const SortMode sortMode = SortMode::Ascending
+    Tensor const& input,
+    Dim axis,
+    SortMode sortMode = SortMode::Ascending
 );
 
 /**
@@ -1201,9 +1181,9 @@ FL_API Tensor sort(
 FL_API void sort(
     Tensor& values,
     Tensor& indices,
-    const Tensor& input,
-    const Dim axis,
-    const SortMode sortMode = SortMode::Ascending
+    Tensor const& input,
+    Dim axis,
+    SortMode sortMode = SortMode::Ascending
 );
 
 /**
@@ -1214,9 +1194,9 @@ FL_API void sort(
  * @param[in] sortMode the ordering with which to sort. Defaults to ascending
  */
 FL_API Tensor argsort(
-    const Tensor& input,
-    const Dim axis,
-    const SortMode sortMode = SortMode::Ascending
+    Tensor const& input,
+    Dim axis,
+    SortMode sortMode = SortMode::Ascending
 );
 
 /************************** Binary Operators ***************************/
@@ -1280,7 +1260,7 @@ FL_BINARY_OP_DECL(>>, rShift);
  * @param[in] rhs right hand side tensor for the minimum
  * @return a tensor containing the minimum values in each tensor
  */
-FL_API Tensor minimum(const Tensor& lhs, const Tensor& rhs);
+FL_API Tensor minimum(Tensor const& lhs, Tensor const& rhs);
 
 /**
  * Returns the element-wise minimum of tensor elements with some scalar.
@@ -1290,7 +1270,7 @@ FL_API Tensor minimum(const Tensor& lhs, const Tensor& rhs);
  * @return a tensor containing the minimum values element-wise with the tensor
  * and a scalar.
  */
-FL_API Tensor minimum(const Tensor& lhs, const double& rhs);
+FL_API Tensor minimum(Tensor const& lhs, double const& rhs);
 
 /**
  * Returns the element-wise minimum of tensor elements with some scalar.
@@ -1300,7 +1280,7 @@ FL_API Tensor minimum(const Tensor& lhs, const double& rhs);
  * @return a tensor containing the minimum values element-wise with the tensor
  * and a scalar.
  */
-FL_API Tensor minimum(const double& lhs, const Tensor& rhs);
+FL_API Tensor minimum(double const& lhs, Tensor const& rhs);
 
 /**
  * Returns the element-wise maximum of tensor elements.
@@ -1311,7 +1291,7 @@ FL_API Tensor minimum(const double& lhs, const Tensor& rhs);
  * @param[in] rhs right hand side tensor for the minimum
  * @return a tensor containing the maximum values in each tensor
  */
-FL_API Tensor maximum(const Tensor& lhs, const Tensor& rhs);
+FL_API Tensor maximum(Tensor const& lhs, Tensor const& rhs);
 
 /**
  * Returns the element-wise maximum of tensor elements with some scalar.
@@ -1321,7 +1301,7 @@ FL_API Tensor maximum(const Tensor& lhs, const Tensor& rhs);
  * @return a tensor containing the maximum values element-wise with the tensor
  * and a scalar.
  */
-FL_API Tensor maximum(const Tensor& lhs, const double& rhs);
+FL_API Tensor maximum(Tensor const& lhs, double const& rhs);
 
 /**
  * Returns the element-wise maximum of tensor elements with some scalar.
@@ -1331,7 +1311,7 @@ FL_API Tensor maximum(const Tensor& lhs, const double& rhs);
  * @return a tensor containing the maximum values element-wise with the tensor
  * and a scalar.
  */
-FL_API Tensor maximum(const double& lhs, const Tensor& rhs);
+FL_API Tensor maximum(double const& lhs, Tensor const& rhs);
 
 /**
  * Returns the element-wise exponentiation of tensors; the left hand tensor is
@@ -1341,7 +1321,7 @@ FL_API Tensor maximum(const double& lhs, const Tensor& rhs);
  * @param[in] rhs the exponent tensor
  * @return a tensor containing the exponentiated values
  */
-FL_API Tensor power(const Tensor& lhs, const Tensor& rhs);
+FL_API Tensor power(Tensor const& lhs, Tensor const& rhs);
 
 /**
  * Returns the element-wise exponentiation of tensors raised to some scalar
@@ -1351,7 +1331,7 @@ FL_API Tensor power(const Tensor& lhs, const Tensor& rhs);
  * @param[in] rhs a scalar exponent
  * @return a tensor containing the exponentiated values
  */
-FL_API Tensor power(const Tensor& lhs, const double& rhs);
+FL_API Tensor power(Tensor const& lhs, double const& rhs);
 
 /**
  * Returns the element-wise exponentiation of a scalar raised element-wise to
@@ -1361,7 +1341,7 @@ FL_API Tensor power(const Tensor& lhs, const double& rhs);
  * @param[in] rhs the tensor containing exponent values
  * @return a tensor containing the exponentiated values
  */
-FL_API Tensor power(const double& lhs, const Tensor& rhs);
+FL_API Tensor power(double const& lhs, Tensor const& rhs);
 
 /******************************* BLAS ********************************/
 
@@ -1369,7 +1349,7 @@ FL_API Tensor power(const double& lhs, const Tensor& rhs);
  * Transformations to apply to Tensors (i.e. matrices) before applying certain
  * operations (i.e. matmul).
  */
-enum class MatrixProperty {None = 0, Transpose = 1};
+enum class MatrixProperty { None = 0, Transpose = 1 };
 
 /**
  * Perform matrix multiplication between two tensors.
@@ -1384,8 +1364,8 @@ enum class MatrixProperty {None = 0, Transpose = 1};
  * @return an output tensor containing the matrix product.
  */
 FL_API Tensor matmul(
-    const Tensor& lhs,
-    const Tensor& rhs,
+    Tensor const& lhs,
+    Tensor const& rhs,
     MatrixProperty lhsProp = MatrixProperty::None,
     MatrixProperty rhsProp = MatrixProperty::None
 );
@@ -1404,9 +1384,9 @@ FL_API Tensor matmul(
  * @return a tensor containing the max(es)
  */
 FL_API Tensor amin(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1421,9 +1401,9 @@ FL_API Tensor amin(
  * @return a tensor containing the max(es)
  */
 FL_API Tensor amax(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1442,9 +1422,9 @@ FL_API Tensor amax(
 FL_API void min(
     Tensor& values,
     Tensor& indices,
-    const Tensor& input,
-    const unsigned axis,
-    const bool keepDims = false
+    Tensor const& input,
+    unsigned axis,
+    bool keepDims = false
 );
 
 /**
@@ -1463,9 +1443,9 @@ FL_API void min(
 FL_API void max(
     Tensor& values,
     Tensor& indices,
-    const Tensor& input,
-    const unsigned axis,
-    const bool keepDims = false
+    Tensor const& input,
+    unsigned axis,
+    bool keepDims = false
 );
 
 /**
@@ -1477,7 +1457,7 @@ FL_API void max(
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the indices of the max values along each axis
  */
-FL_API Tensor argmax(const Tensor& input, const unsigned axis, const bool keepDims = false);
+FL_API Tensor argmax(Tensor const& input, unsigned axis, bool keepDims = false);
 
 /**
  * Return the indices of the minimum values along an axis.
@@ -1488,7 +1468,7 @@ FL_API Tensor argmax(const Tensor& input, const unsigned axis, const bool keepDi
  * as singleton dimensions rather than collapsing them
  * @return a tensor containing the indices of the max values along each axis
  */
-FL_API Tensor argmin(const Tensor& input, const unsigned axis, const bool keepDims = false);
+FL_API Tensor argmin(Tensor const& input, unsigned axis, bool keepDims = false);
 
 /**
  * Sum of tensor over given axes. If axes is left empty, computes the sum along
@@ -1502,9 +1482,9 @@ FL_API Tensor argmin(const Tensor& input, const unsigned axis, const bool keepDi
  * @return a tensor containing the sum(s)
  */
 FL_API Tensor sum(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1515,7 +1495,7 @@ FL_API Tensor sum(
  * @param[in] axis the axis along which to accumulate
  * @return a tensor of the same shape containing the accumulated sum
  */
-FL_API Tensor cumsum(const Tensor& input, const unsigned axis);
+FL_API Tensor cumsum(Tensor const& input, unsigned axis);
 
 /**
  * Mean of tensor over given axes. If axes is left empty, computes the mean
@@ -1529,9 +1509,9 @@ FL_API Tensor cumsum(const Tensor& input, const unsigned axis);
  * @return a tensor containing the mean(s)
  */
 FL_API Tensor mean(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1546,9 +1526,9 @@ FL_API Tensor mean(
  * @return a tensor containing the median(s)
  */
 FL_API Tensor median(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1564,10 +1544,10 @@ FL_API Tensor median(
  * @return a tensor containing the variance(s)
  */
 FL_API Tensor var(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool bias = false,
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool bias = false,
+    bool keepDims = false
 );
 
 /**
@@ -1582,9 +1562,9 @@ FL_API Tensor var(
  * @return a tensor containing the standard deviation(s)
  */
 FL_API Tensor std(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1599,10 +1579,10 @@ FL_API Tensor std(
  * @return a tensor containing the norm(s)
  */
 FL_API Tensor norm(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
+    Tensor const& input,
+    std::vector<int> const& axes = {},
     double p = 2,
-    const bool keepDims = false
+    bool keepDims = false
 );
 
 /**
@@ -1619,9 +1599,9 @@ FL_API Tensor norm(
  * over the entire tensor.
  */
 FL_API Tensor countNonzero(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
 
 /**
@@ -1638,11 +1618,20 @@ FL_API Tensor countNonzero(
  * @return a bool tensor containing axis-wise values denoting truthy values
  * along that axis in the input tensor.
  */
-FL_API Tensor any(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+FL_API Tensor any_of(
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
+
+/**
+ * @deprecated use @ref fl::any_of(Tensor const&, std::vector<int> const&, bool)
+ */
+FL_API inline Tensor any(
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
+) { return any_of(input, axes, keepDims); }
 
 /**
  * Checks if all values are true in a tensor along one or more axes; returns
@@ -1658,25 +1647,34 @@ FL_API Tensor any(
  * @return a bool tensor containing axis-wise values with true along
  * axes that contain only true values.
  */
-FL_API Tensor all(
-    const Tensor& input,
-    const std::vector<int>& axes = {},
-    const bool keepDims = false
+FL_API Tensor all_of(
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
 );
+
+/**
+ * @deprecated use @ref fl::all_of(Tensor const&, std::vector<int> const&, bool)
+ */
+FL_API inline Tensor all(
+    Tensor const& input,
+    std::vector<int> const& axes = {},
+    bool keepDims = false
+) { return all_of(input, axes, keepDims); }
 
 /************************** Utilities ***************************/
 
 /**
  * Write a string representation of a tensor to an output stream.
  */
-FL_API std::ostream& operator<<(std::ostream& ostr, const Tensor& t);
+FL_API std::ostream& operator<<(std::ostream& ostr, Tensor const& t);
 
 /**
  * Print a string representation of a tensor to standard out.
  *
  * @param[in] tensor the tensor to print
  */
-FL_API void print(const Tensor& tensor);
+FL_API void print(Tensor const& tensor);
 
 /**
  * Returns of two tensors are close. Checks:
@@ -1691,15 +1689,15 @@ FL_API void print(const Tensor& tensor);
  * tensors
  */
 FL_API bool allClose(
-    const fl::Tensor& a,
-    const fl::Tensor& b,
-    const double absTolerance = 1e-5
+    fl::Tensor const& a,
+    fl::Tensor const& b,
+    double absTolerance = 1e-5
 );
 
 /**
  * @return if a Tensor contains any NaN or Inf values.
  */
-FL_API bool isInvalidArray(const Tensor& tensor);
+FL_API bool isInvalidArray(Tensor const& tensor);
 
 /**
  * Get a string representation of a tensor backend type.
@@ -1707,7 +1705,7 @@ FL_API bool isInvalidArray(const Tensor& tensor);
  * @param[in] type the tensor backend type.
  * @return a string representing the given tensor backend type.
  */
-FL_API std::string tensorBackendTypeToString(const TensorBackendType type);
+FL_API std::string tensorBackendTypeToString(TensorBackendType type);
 
 /**
  * Write a string representation of a tensor backend type to an output stream.
@@ -1716,8 +1714,11 @@ FL_API std::string tensorBackendTypeToString(const TensorBackendType type);
  * @param[in] type the tensor backend type.
  * @return the output stream.
  */
-FL_API std::ostream& operator<<(std::ostream& os, const TensorBackendType type);
+FL_API std::ostream& operator<<(std::ostream& os, TensorBackendType type);
+}
 
+
+namespace fl {
 /**
  * Convert a tensor from one type to another. Requires moving the input Tensor
  * - destroys the resulting tensor and creates another tensor of the desired
@@ -1754,13 +1755,13 @@ Tensor to(Tensor&& t) {
 
 namespace detail {
 
-    bool areTensorTypesEqual(const Tensor& a, const Tensor& b);
+    bool areTensorTypesEqual(Tensor const& a, Tensor const& b);
 
     template<typename... Args>
     bool areTensorTypesEqual(
-        const Tensor& a,
-        const Tensor& b,
-        const Args&... args
+        Tensor const& a,
+        Tensor const& b,
+        Args const&... args
     ) { return areTensorTypesEqual(a, b) && areTensorTypesEqual(a, args...); }
 
 } // namespace detail
@@ -1776,3 +1777,83 @@ namespace detail {
         }
 
 } // namespace fl
+
+
+namespace fl {
+
+template<fundamental_type T>
+T Tensor::scalar() const {
+    if(isEmpty())
+        throw std::logic_error{"Tensor::scalar called on empty tensor"};
+
+    if(type() != dtype_traits<T>::fl_type)
+        throw std::logic_error{
+            std::format(
+                "Tensor::scalar: requested type of {} does not match tensor type {}",
+                dtype_traits<T>::name(),
+                to_string(type())
+            )
+        };
+    T out;
+    scalar_impl(&out);
+    return out;
+}
+
+template<fundamental_type T>
+[[nodiscard]] T Tensor::asScalar() const {
+    if(type() == dtype::f16)
+        return fl::dispatch_dtype<T>(dtype::f32, [t = asType(dtype::f32)]<class U> { return t.scalar<U>(); });
+
+
+    return fl::dispatch_dtype<T>(type(), [&t = *this]<class U> { return t.scalar<U>(); });
+}
+
+
+template<class T>
+T* Tensor::device() const { return static_cast<T*>(device<void>()); }
+
+template<>
+void* Tensor::device<void>() const;
+
+template<not_void T>
+std::vector<T> Tensor::host() const {
+    if(bytes() % sizeof(T) != 0)
+        throw std::logic_error{"Tensor data can't be mapped to an array of T"};
+
+
+    std::vector<T> data(bytes() / sizeof(T));
+    this->raw_host(data.data());
+
+    return data;
+}
+
+template<>
+inline std::vector<bool> Tensor::host() const {
+    auto data = host<char>();
+
+    std::vector<bool> out(data.size());
+
+    for(size_t i = 0; i < data.size(); i++)
+        out[i] = static_cast<bool>(data[i]);
+
+    return out;
+}
+
+template<not_void T>
+void Tensor::host(std::span<T> dst) const {
+    auto const size = bytes();
+    auto const dstSize = dst.size_bytes();
+
+    if(size % sizeof(T) != 0)
+        throw std::logic_error{
+            std::format("Tensor data ({} bytes) can't be mapped to an array of T (size {})", sizeof(T))
+        };
+
+    if(size > dstSize)
+        throw std::logic_error{
+            std::format("Tensor data ({} bytes) doesn't fit span of T with {} bytes", size, dstSize)
+        };
+
+    raw_host(dst.data());
+}
+}

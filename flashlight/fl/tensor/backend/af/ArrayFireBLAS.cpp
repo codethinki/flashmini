@@ -15,12 +15,18 @@
 namespace fl {
 
 Tensor ArrayFireBackend::matmul(
-    const Tensor& lhs,
-    const Tensor& rhs,
+    Tensor const& lhs,
+    Tensor const& rhs,
     MatrixProperty lhsProp,
     MatrixProperty rhsProp
 ) {
-    unsigned numDims = std::max(lhs.ndim(), rhs.ndim());
+    //TEMP until arrayfire fixes their sparse tensor bug we have to do this
+    if(lhs.isSparse())
+        eval(lhs);
+    if(rhs.isSparse())
+        eval(rhs);
+
+    auto numDims = std::max(lhs.ndim(), rhs.ndim());
     if((lhs.ndim() == 1 || rhs.ndim() == 1) && numDims > 1)
         numDims -= 1;
 
@@ -36,7 +42,8 @@ Tensor ArrayFireBackend::matmul(
         lhsProp = MatrixProperty::Transpose;
         rhsProp = MatrixProperty::None;
         numDims = 1;
-    } else {
+    }
+    else {
         if(rhs.ndim() == 1)
             rhsArray = af::moddims(toArray(rhs), {rhs.dim(0), 1});
         if(lhs.ndim() == 1)

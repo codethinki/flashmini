@@ -209,9 +209,7 @@ void save(
         throw cereal::Exception(
             "Serialzation of sparse Tensor is not supported yet!"
         );
-    std::vector<uint8_t> vec(tensor.bytes());
-    tensor.host(vec.data());
-    ar(tensor.shape(), tensor.type(), vec);
+    ar(tensor.shape(), tensor.type(), tensor.host<uint8_t>());
 }
 
 template<class Archive>

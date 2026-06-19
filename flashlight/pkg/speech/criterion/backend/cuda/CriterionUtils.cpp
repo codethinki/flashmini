@@ -44,7 +44,7 @@ Tensor viterbiPath(const Tensor& input, const Tensor& trans) {
 
     Tensor path({T, B}, fl::dtype::s32);
     Tensor workspace(
-        {static_cast<long long>(ViterbiPath::getWorkspaceSize(B, T, N))},
+        {static_cast<int64_t>(ViterbiPath::getWorkspaceSize(B, T, N))},
         fl::dtype::u8);
 
     {

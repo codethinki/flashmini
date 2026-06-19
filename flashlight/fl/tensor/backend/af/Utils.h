@@ -65,34 +65,34 @@ namespace detail {
 /**
  * Convert an fl::Shape into an ArrayFire af::dim4
  */
-    af::dim4 flToAfDims(const Shape& shape);
+    af::dim4 flToAfDims(Shape const& shape);
 
 /**
  * Convert an ArrayFire af::dim4 into an fl::Shape
  */
-    Shape afToFlDims(const af::dim4& d, const unsigned numDims);
+    Shape afToFlDims(af::dim4 const& d, unsigned const numDims);
 
 /**
  * Convert an ArrayFire af::dim4 into an fl::Shape, in-place
  */
-    void afToFlDims(const af::dim4& d, const unsigned numDims, Shape& s);
+    void afToFlDims(af::dim4 const& d, unsigned const numDims, Shape& s);
 
 /**
  * Convert an fl::range into an af::seq.
  */
-    af::seq flRangeToAfSeq(const fl::range& range);
+    af::seq flRangeToAfSeq(fl::range const& range);
 
 /**
  * Convert an fl::Index into an af::index.
  */
-    af::index flToAfIndex(const fl::Index& idx);
+    af::index flToAfIndex(fl::Index const& idx);
 
-    std::vector<af::index> flToAfIndices(const std::vector<fl::Index>& flIndices);
+    std::vector<af::index> flToAfIndices(std::vector<fl::Index> const& flIndices);
 
 /**
  * Strip leading 1 indices from an ArrayFire dim4.
  */
-    af::dim4 condenseDims(const af::dim4& dims);
+    af::dim4 condenseDims(af::dim4 const& dims);
 
 /**
  * Modify the dimensions (in place via af::moddims) or an Array to have no 1
@@ -104,10 +104,10 @@ namespace detail {
  * If keepDims is true, this is a noop, and the array is returned as is.
  */
     af::array condenseIndices(
-        const af::array& arr,
-        const bool keepDims = false,
-        const std::optional<std::vector<detail::IndexType>>& indexTypes = {},
-        const bool isFlat = false
+        af::array const& arr,
+        bool const keepDims = false,
+        std::optional<std::vector<detail::IndexType>> const& indexTypes = {},
+        bool const isFlat = false
     );
 
 /**
@@ -119,8 +119,8 @@ namespace detail {
  * Construct an ArrayFire array from a buffer and Flashlight details.
  */
     af::array fromFlData(
-        const Shape& shape,
-        const void* ptr,
+        Shape const& shape,
+        void const* ptr,
         fl::dtype type,
         fl::Location memoryLocation
     );

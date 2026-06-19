@@ -39,20 +39,20 @@ public:
     void shutdown() override;
     void* alloc(
         bool userLock,
-        const unsigned ndims,
-        dim_t* dims,
-        const unsigned elSize
+        unsigned ndims,
+        ::dim_t* dims,
+        unsigned elSize
     ) override;
     size_t allocated(void* ptr) override;
     void unlock(void* ptr, bool userLock) override;
     void printInfo(
-        const char* msg,
-        const int device,
+        char const* msg,
+        int device,
         std::ostream* ostream = & std::cout
     ) override;
-    void userLock(const void* ptr) override;
-    void userUnlock(const void* ptr) override;
-    bool isUserLocked(const void* ptr) override;
+    void userLock(void const* ptr) override;
+    void userUnlock(void const* ptr) override;
+    bool isUserLocked(void const* ptr) override;
     void signalMemoryCleanup() override;
     float getMemoryPressure() override;
     bool jitTreeExceedsMemoryPressure(size_t bytes) override;
@@ -89,7 +89,7 @@ public:
               next_(nullptr) {}
     };
 
-    typedef bool (*Comparison)(const Block*, const Block*);
+    typedef bool (*Comparison)(Block const*, Block const*);
     typedef std::set<Block*, Comparison> BlockSet;
 
     // A structure to store allocation stats per device.
@@ -131,9 +131,9 @@ public:
 protected:
     std::unordered_map<int, std::unique_ptr<DeviceMemoryInfo>> deviceMemInfos_;
 
-    CachingMemoryManager(const CachingMemoryManager& other) = delete;
+    CachingMemoryManager(CachingMemoryManager const& other) = delete;
     CachingMemoryManager(CachingMemoryManager&& other) = delete;
-    CachingMemoryManager& operator=(const CachingMemoryManager& other) = delete;
+    CachingMemoryManager& operator=(CachingMemoryManager const& other) = delete;
     CachingMemoryManager& operator=(CachingMemoryManager&& other) = delete;
 
     // Returns the memory info of the caching allocator for the given device.

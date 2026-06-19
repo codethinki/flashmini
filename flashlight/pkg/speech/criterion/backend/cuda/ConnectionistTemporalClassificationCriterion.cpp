@@ -94,8 +94,8 @@ std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
         );
     }
 
-    auto batchTargetSizeVec = targetSize.toHostVector<int>();
-    auto batchScaleVec = scale.toHostVector<float>();
+    auto batchTargetSizeVec = targetSize.host<int>();
+    auto batchScaleVec = scale.host<float>();
 
     for(int b = 0; b < B; ++b) {
         const int* targetVec = batchTargetVec.data() + b * batchL;
@@ -125,7 +125,7 @@ std::vector<Variable> ConnectionistTemporalClassificationCriterion::forward(
         "Error: get_workspace_size"
     );
 
-    Tensor workspace({static_cast<long long>(workspace_size)}, fl::dtype::b8);
+    Tensor workspace({static_cast<int64_t>(workspace_size)}, fl::dtype::b8);
 
     std::vector<float> costs(B, 0.0);
     {

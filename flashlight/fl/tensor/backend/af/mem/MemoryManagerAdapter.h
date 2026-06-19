@@ -23,7 +23,7 @@ namespace fl {
 
 namespace {
 
-    const size_t kDefaultLogFlushInterval = 50;
+    size_t const kDefaultLogFlushInterval = 50;
 
 } // namespace
 
@@ -74,21 +74,21 @@ public:
     virtual void shutdown() = 0;
     virtual void* alloc(
         bool userLock,
-        const unsigned ndims,
-        dim_t* dims,
-        const unsigned elSize
+        unsigned ndims,
+        ::dim_t* dims,
+        unsigned elSize
     ) = 0;
     virtual size_t allocated(void* ptr) = 0;
     virtual void unlock(void* ptr, bool userLock) = 0;
     virtual void signalMemoryCleanup() = 0;
     virtual void printInfo(
-        const char* msg,
-        const int device,
-        std::ostream* ostream = & std::cout
+        char const* msg,
+        int device,
+        std::ostream* ostream = &std::cout
     ) = 0;
-    virtual void userLock(const void* ptr) = 0;
-    virtual void userUnlock(const void* ptr) = 0;
-    virtual bool isUserLocked(const void* ptr) = 0;
+    virtual void userLock(void const* ptr) = 0;
+    virtual void userUnlock(void const* ptr) = 0;
+    virtual bool isUserLocked(void const* ptr) = 0;
     virtual float getMemoryPressure() = 0;
     virtual bool jitTreeExceedsMemoryPressure(size_t bytes) = 0;
     virtual void addMemoryManagement(int device) = 0;
@@ -148,7 +148,7 @@ public:
     af_memory_manager getHandle() const;
 
     // Native and device memory management functions
-    const std::shared_ptr<MemoryManagerDeviceInterface> deviceInterface;
+    std::shared_ptr<MemoryManagerDeviceInterface> const deviceInterface;
 
 protected:
     // AF memory manager entity containing relevant function pointers

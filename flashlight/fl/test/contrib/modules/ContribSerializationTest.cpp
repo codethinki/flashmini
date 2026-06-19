@@ -43,7 +43,7 @@ TEST(SerializationTest, Residual) {
 
 TEST(SerializationTest, AsymmetricConv1D) {
     int c = 32;
-    auto model = std::make_shared<AsymmetricConv1D>(c, c, 5, 1, -1, 0, 1);
+    auto model = std::make_shared<AsymmetricConv1D>(c, c, 5, 1, -1, 0.f, 1);
 
     const fs::path path = fs::temp_directory_path() / "AsymmetricConv1D.mdl";
     save(path, model);
@@ -71,8 +71,8 @@ TEST(SerializationTest, Transformer) {
         c,
         nheads,
         timesteps,
-        0.2,
-        0.1,
+        0.2f,
+        0.1f,
         false,
         false
     );
@@ -107,8 +107,8 @@ TEST(SerializationTest, ConformerSerialization) {
         nheads,
         timesteps,
         33,
-        0.2,
-        0.1
+        0.2f,
+        0.1f
     );
     model->eval();
 
@@ -193,7 +193,7 @@ TEST(SerializationTest, RawWavSpecAugment) {
         1,
         1,
         0,
-        0,
+        0.f,
         0,
         1,
         2000,

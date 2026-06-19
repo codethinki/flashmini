@@ -31,11 +31,11 @@ namespace detail {
  * operator
  */
     void advancedIndex(
-        const af::array& inp,
-        const af::dim4& idxStart,
-        const af::dim4& idxEnd,
-        const af::dim4& outDims,
-        const std::vector<af::array>& idxArr,
+        af::array const& inp,
+        af::dim4 const& idxStart,
+        af::dim4 const& idxEnd,
+        af::dim4 const& outDims,
+        std::vector<af::array> const& idxArr,
         af::array& out
     );
 

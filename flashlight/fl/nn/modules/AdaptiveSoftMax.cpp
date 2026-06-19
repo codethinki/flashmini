@@ -66,7 +66,7 @@ Variable AdaptiveSoftMax::getFullLogProb(
     Tensor output({outputSize, batchSize}, inputs.type());
 
     output(
-        fl::range(0, cutoff_[0] + static_cast<long long>(cutoff_.size()) - 1)
+        fl::range(0, cutoff_[0] + static_cast<Dim>(cutoff_.size()) - 1)
     ) =
         headOutput.tensor();
 
@@ -115,7 +115,7 @@ Variable AdaptiveSoftMax::predict(const Variable& inputs) const {
 
     auto notInShortlist = (prediction >= cutoff_[0]);
     Variable ret = Variable(prediction, false);
-    if(fl::any(notInShortlist).asScalar<bool>()) {
+    if(fl::any_of(notInShortlist).asScalar<bool>()) {
         headOutput = logSoftmax(headOutput, 0);
         auto logProbTailPositions = getFullLogProb(
             inputsFlattened(fl::span, notInShortlist),

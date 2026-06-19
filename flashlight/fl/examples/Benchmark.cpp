@@ -70,7 +70,7 @@ double embedding() {
 
     int num_elems = 400;
     Variable input(
-        (fl::rand({num_elems}) * vocab_size).astype(fl::dtype::s32), false);
+        (fl::rand({num_elems}) * vocab_size).asType(fl::dtype::s32), false);
     Variable grad_output(
         fl::randn({embed_dim, num_elems}, fl::dtype::f32), false);
 

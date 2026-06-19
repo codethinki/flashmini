@@ -33,9 +33,9 @@ namespace {
         10485760; // allocations between 1 and 10 MiB may use kLargeBuffer
     constexpr size_t kRoundLarge = 2097152; // round up large allocs to 2 MiB
 
-// Environment variables names, specifying number of mega bytes as floats.
-    constexpr const char* kMemRecyclingSize = "FL_MEM_RECYCLING_SIZE_MB";
-    constexpr const char* kMemSplitSize = "FL_MEM_SPLIT_SIZE_MB";
+    // Environment variables names, specifying number of mega bytes as floats.
+    constexpr auto kMemRecyclingSize = "FL_MEM_RECYCLING_SIZE_MB";
+    constexpr auto kMemSplitSize = "FL_MEM_SPLIT_SIZE_MB";
     constexpr double kMB = static_cast<double>(1UL << 20);
 
     size_t roundSize(size_t size) {
@@ -55,16 +55,16 @@ namespace {
     }
 
     static bool BlockComparator(
-        const CachingMemoryManager::Block* a,
-        const CachingMemoryManager::Block* b
+        CachingMemoryManager::Block const* a,
+        CachingMemoryManager::Block const* b
     ) {
         if(a->size_ != b->size_)
             return a->size_ < b->size_;
-        return (uintptr_t) a->ptr_ < (uintptr_t) b->ptr_;
+        return reinterpret_cast<uintptr_t>(a->ptr_) < reinterpret_cast<uintptr_t>(b->ptr_);
     }
 
     std::string formatMemory(size_t bytes) {
-        const std::vector<std::string> units = {"B", "KiB", "MiB", "GiB", "TiB"};
+        std::vector<std::string> const units = {"B", "KiB", "MiB", "GiB", "TiB"};
         size_t unitId =
             bytes == 0 ? 0 : std::floor(std::log(bytes) / std::log(1024.0));
         unitId = std::min(unitId, units.size() - 1);
@@ -73,20 +73,21 @@ namespace {
         return bytesStr + " " + units[unitId];
     }
 
-/**
- * Returns number of bytes as represented by the named environment variable. The
- * variable is interperested as a float string specifying value in MBs. Returns
- * defaultVal on failure to read the variable or parse its value.
- */
-    size_t getEnvAsBytesFromFloatMb(const char* name, size_t defaultVal) {
-        const char* env = std::getenv(name);
+    /**
+     * Returns number of bytes as represented by the named environment variable. The
+     * variable is interperested as a float string specifying value in MBs. Returns
+     * defaultVal on failure to read the variable or parse its value.
+     */
+    size_t getEnvAsBytesFromFloatMb(char const* name, size_t defaultVal) {
+        char const* env = std::getenv(name);
         if(env) {
             try {
-                const double mb = std::stod(env);
+                double const mb = std::stod(env);
                 return std::round(mb * kMB);
-            } catch(std::exception& ex) {
+            }
+            catch(std::exception& ex) {
                 std::cerr << "getEnvAsBytesFromFloatMb: Invalid environment "
-                          << "variable value: name=" << name << " value=" << env;
+                    << "variable value: name=" << name << " value=" << env;
                 throw ex;
             }
         }
@@ -96,8 +97,8 @@ namespace {
 } // namespace
 
 CachingMemoryManager::DeviceMemoryInfo::DeviceMemoryInfo(int id) : deviceId_(id),
-                                                                   largeBlocks_(BlockComparator),
-                                                                   smallBlocks_(BlockComparator) {}
+    largeBlocks_(BlockComparator),
+    smallBlocks_(BlockComparator) {}
 
 CachingMemoryManager::CachingMemoryManager(
     int numDevices,
@@ -139,19 +140,19 @@ void CachingMemoryManager::removeMemoryManagement(int device) {
 
 void* CachingMemoryManager::alloc(
     bool userLock,
-    const unsigned ndims,
-    dim_t* dims,
-    const unsigned elementSize
+    unsigned const ndims,
+    ::dim_t* dims,
+    unsigned const elementSize
 ) {
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock lock(memoryInfo.mutexAll_);
     size_t size = elementSize;
     for(unsigned i = 0; i < ndims; ++i)
         size *= dims[i];
     if(size == 0)
         return nullptr;
     size = roundSize(size);
-    const bool isSmallAlloc = (size <= kSmallSize);
+    bool const isSmallAlloc = (size <= kSmallSize);
     CachingMemoryManager::Block searchKey(size);
     CachingMemoryManager::BlockSet& pool =
         isSmallAlloc ? memoryInfo.smallBlocks_ : memoryInfo.largeBlocks_;
@@ -167,7 +168,8 @@ void* CachingMemoryManager::alloc(
         block = *it;
         pool.erase(it);
         memoryInfo.stats_.cachedBytes_ -= block->size_;
-    } else {
+    }
+    else {
         void* ptr = nullptr;
         size_t allocSize = getAllocationSize(size);
         mallocWithRetry(allocSize, &ptr); // could throw
@@ -184,7 +186,7 @@ void* CachingMemoryManager::alloc(
     if(
         (diff >= (isSmallAlloc ? kMinBlockSize : kSmallSize))
         && (block->size_ < splitSizeLimit_) // possibly dont split large buffers to
-                                            // minimize risk of fragmentation
+        // minimize risk of fragmentation
     ) {
         remaining = block;
         block = new Block(size, block->ptr_);
@@ -210,7 +212,7 @@ size_t CachingMemoryManager::allocated(void* ptr) {
     if(!ptr)
         return 0;
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock _(memoryInfo.mutexAll_);
     auto it = memoryInfo.allocatedBlocks_.find(ptr);
     if(it == memoryInfo.allocatedBlocks_.end())
         return 0;
@@ -221,7 +223,7 @@ void CachingMemoryManager::unlock(void* ptr, bool userUnlock) {
     if(!ptr)
         return;
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock lock(memoryInfo.mutexAll_);
     auto it = memoryInfo.allocatedBlocks_.find(ptr);
     if(it == memoryInfo.allocatedBlocks_.end()) {
         // Probably came from user, just free it
@@ -247,9 +249,9 @@ void CachingMemoryManager::freeBlock(CachingMemoryManager::Block* block) {
     if(block->inUse())
         throw std::runtime_error("trying to free a block which is in use");
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock lock(memoryInfo.mutexAll_);
 
-    const bool isSmallAlloc = (block->size_ <= kSmallSize);
+    bool const isSmallAlloc = (block->size_ <= kSmallSize);
     CachingMemoryManager::BlockSet& pool =
         isSmallAlloc ? memoryInfo.smallBlocks_ : memoryInfo.largeBlocks_;
     tryMergeBlocks(block, block->prev_, pool);
@@ -272,7 +274,8 @@ void CachingMemoryManager::tryMergeBlocks(
         dst->prev_ = src->prev_;
         if(dst->prev_)
             dst->prev_->next_ = dst;
-    } else {
+    }
+    else {
         dst->next_ = src->next_;
         if(dst->next_)
             dst->next_->prev_ = dst;
@@ -290,24 +293,26 @@ void CachingMemoryManager::mallocWithRetry(size_t size, void** ptr) {
     try {
         ++memInfo.stats_.totalNativeMallocs_;
         *ptr = this->deviceInterface->nativeAlloc(size);
-    } catch(std::exception&) {
+    }
+    catch(std::exception&) {
         try {
             signalMemoryCleanup();
             ++memInfo.stats_.totalNativeMallocs_;
             *ptr = this->deviceInterface->nativeAlloc(size);
-        } catch(std::exception& ex) {
+        }
+        catch(std::exception& ex) {
             // note: af exception inherits from std exception
             std::cerr << "Failed to allocate memory of size " << formatMemory(size)
-                      << " (Device: " << memInfo.deviceId_ << ", Capacity: "
-                      << formatMemory(
-                this->deviceInterface->getMaxMemorySize(
-                    memInfo.deviceId_
+                << " (Device: " << memInfo.deviceId_ << ", Capacity: "
+                << formatMemory(
+                    this->deviceInterface->getMaxMemorySize(
+                        memInfo.deviceId_
+                    )
                 )
-                )
-                      << ", Allocated: "
-                      << formatMemory(memInfo.stats_.allocatedBytes_)
-                      << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
-                      << ") with error '" << ex.what() << "'" << std::endl;
+                << ", Allocated: "
+                << formatMemory(memInfo.stats_.allocatedBytes_)
+                << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
+                << ") with error '" << ex.what() << "'" << std::endl;
             // note: converting here an af exception to std exception prevents to
             // catch the af error code at the user level. Rethrowing.
             throw;
@@ -333,7 +338,8 @@ void CachingMemoryManager::freeBlocks(
             ++it;
             blocks.erase(cur);
             delete block;
-        } else
+        }
+        else
             ++it;
     }
 }
@@ -341,7 +347,7 @@ void CachingMemoryManager::freeBlocks(
 void CachingMemoryManager::signalMemoryCleanup() {
     // Free all non-split cached blocks on device
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock lock(memoryInfo.mutexAll_);
 
     freeBlocks(
         memoryInfo.largeBlocks_,
@@ -365,32 +371,32 @@ bool CachingMemoryManager::jitTreeExceedsMemoryPressure(size_t /* unused */) {
 }
 
 void CachingMemoryManager::printInfo(
-    const char* msg,
-    const int /* unused */,
+    char const* msg,
+    int const /* unused */,
     std::ostream* _ostream
 ) {
     std::ostream& ostream = *_ostream;
     auto& memInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memInfo.mutexAll_);
+    std::scoped_lock lock(memInfo.mutexAll_);
 
     ostream << msg << "\nType: CachingMemoryManager" << std::endl
-            << "\nDevice: " << memInfo.deviceId_ << ", Capacity: "
-            << formatMemory(
-        this->deviceInterface->getMaxMemorySize(memInfo.deviceId_)
+        << "\nDevice: " << memInfo.deviceId_ << ", Capacity: "
+        << formatMemory(
+            this->deviceInterface->getMaxMemorySize(memInfo.deviceId_)
         )
-            << ", Allocated: " << formatMemory(memInfo.stats_.allocatedBytes_)
-            << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
-            << std::endl
-            << "\nTotal native calls: " << memInfo.stats_.totalNativeMallocs_
-            << "(mallocs), " << memInfo.stats_.totalNativeFrees_ << "(frees)"
-            << std::endl;
+        << ", Allocated: " << formatMemory(memInfo.stats_.allocatedBytes_)
+        << ", Cached: " << formatMemory(memInfo.stats_.cachedBytes_)
+        << std::endl
+        << "\nTotal native calls: " << memInfo.stats_.totalNativeMallocs_
+        << "(mallocs), " << memInfo.stats_.totalNativeFrees_ << "(frees)"
+        << std::endl;
 }
 
-void CachingMemoryManager::userLock(const void* ptr) {
+void CachingMemoryManager::userLock(void const* ptr) {
     if(!ptr)
         return;
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock lock(memoryInfo.mutexAll_);
 
     auto it = memoryInfo.allocatedBlocks_.find(const_cast<void*>(ptr));
     if(it == memoryInfo.allocatedBlocks_.end()) {
@@ -399,17 +405,18 @@ void CachingMemoryManager::userLock(const void* ptr) {
         block->managerLock_ = false;
         block->userLock_ = true;
         memoryInfo.allocatedBlocks_[block->ptr_] = block;
-    } else
+    }
+    else
         it->second->userLock_ = true;
 }
 
-void CachingMemoryManager::userUnlock(const void* ptr) { this->unlock(const_cast<void*>(ptr), true); }
+void CachingMemoryManager::userUnlock(void const* ptr) { this->unlock(const_cast<void*>(ptr), true); }
 
-bool CachingMemoryManager::isUserLocked(const void* ptr) {
+bool CachingMemoryManager::isUserLocked(void const* ptr) {
     if(!ptr)
         return false;
     auto& memoryInfo = getDeviceMemoryInfo();
-    std::lock_guard<std::recursive_mutex> lock(memoryInfo.mutexAll_);
+    std::scoped_lock lock(memoryInfo.mutexAll_);
     auto it = memoryInfo.allocatedBlocks_.find(const_cast<void*>(ptr));
     if(it == memoryInfo.allocatedBlocks_.end())
         return false;

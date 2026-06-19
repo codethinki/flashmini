@@ -91,9 +91,9 @@ Tensor ConnectionistTemporalClassificationCriterion::viterbiPathWithTarget(
     const Tensor targetSize = getTargetSizeArray(target, T);
     std::shared_ptr<CTCContext> ctx = std::make_shared<CTCContext>();
     Tensor softmax = ::logSoftmax(input, 0);
-    std::vector<float> inputVec = softmax.toHostVector<float>();
-    ctx->targetVec = target.toHostVector<int>();
-    ctx->targetSizeVec = targetSize.toHostVector<int>();
+    std::vector<float> inputVec = softmax.host<float>();
+    ctx->targetVec = target.host<int>();
+    ctx->targetSizeVec = targetSize.host<int>();
     ctx->workspaceVec.assign(CTC::getWorkspaceSize(B, T, N, L), 0);
     std::vector<int> bestPaths(B * T);
     CTC::viterbi(

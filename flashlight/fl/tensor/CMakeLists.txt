@@ -74,7 +74,7 @@ target_sources(
   ${CMAKE_CURRENT_LIST_DIR}/TensorBase.cpp
   ${CMAKE_CURRENT_LIST_DIR}/TensorAdapter.cpp
   ${CMAKE_CURRENT_LIST_DIR}/TensorExtension.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/Types.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/DTypes.cpp
 )
 
 # Profiling -- TODO: move this to runtime things
@@ -95,14 +95,9 @@ if(FL_USE_CUDA)
   endif()
 
   # Link CUDA components
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.17)
-    find_package(CUDAToolkit REQUIRED cublas)
-    target_link_libraries(flashlight PRIVATE CUDA::cublas)
-  else()
-    # Remove old branch when requiring CMake >= 3.17
-    target_link_libraries(flashlight PRIVATE ${CUDA_LIBRARIES})
-    target_include_directories(flashlight PRIVATE ${CUDA_INCLUDE_DIRS})
-  endif()
+  find_package(CUDAToolkit REQUIRED cublas)
+  target_link_libraries(flashlight PRIVATE CUDA::cublas)
+
 
   if(FL_BUILD_PROFILING)
     # Try to find NVTX

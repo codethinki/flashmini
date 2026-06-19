@@ -97,7 +97,7 @@ namespace {
             }
         }
 
-        auto weightsFlat = weights.flatten().astype(weights.type());
+        auto weightsFlat = weights.flatten().asType(weights.type());
         // cuDNN RNN weights, for each layer, are arranged with a chunk of
         // input-hidden weights for each layer followed by a chunk of hidden-hidden
         // weights for each layer:

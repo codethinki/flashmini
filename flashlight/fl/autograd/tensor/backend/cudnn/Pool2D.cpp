@@ -25,10 +25,10 @@ Tensor CudnnAutogradExtension::pool2d(
     const PoolingMode mode,
     std::shared_ptr<detail::AutogradPayload>
 ) {
-    auto inDesc = TensorDescriptor(input);
+    auto inDesc = TensorDescriptor{input};
 
     // init pooling descriptor
-    auto poolDesc = PoolingDescriptor(wx, wy, sx, sy, px, py, mode);
+    auto poolDesc = PoolingDescriptor{wx, wy, sx, sy, px, py, mode};
 
     // init output descriptor
     auto ix = input.dim(0);
@@ -36,7 +36,7 @@ Tensor CudnnAutogradExtension::pool2d(
     auto ox = 1 + (ix + 2 * px - wx) / sx;
     auto oy = 1 + (iy + 2 * py - wy) / sy;
 
-    auto output = Tensor(
+    auto output = Tensor{
         {
             ox,
             oy,
@@ -44,8 +44,8 @@ Tensor CudnnAutogradExtension::pool2d(
             input.ndim() < 4 ? 1 : input.dim(3)
         },
         input.type()
-    );
-    auto outDesc = TensorDescriptor(output);
+    };
+    auto outDesc = TensorDescriptor{output};
     {
         DevicePtr inputraw(input);
         DevicePtr resultraw(output);
@@ -60,12 +60,12 @@ Tensor CudnnAutogradExtension::pool2d(
         CUDNN_CHECK_ERR(
             cudnnPoolingForward(
                 handle,
-                poolDesc.descriptor,
+                poolDesc.get(),
                 one,
-                inDesc.descriptor,
+                inDesc.get(),
                 inputraw.get(),
                 zero,
-                outDesc.descriptor,
+                outDesc.get(),
                 resultraw.get()
             )
         );
@@ -90,11 +90,11 @@ Tensor CudnnAutogradExtension::pool2dBackward(
     const PoolingMode mode,
     std::shared_ptr<detail::AutogradPayload>
 ) {
-    auto i_desc = TensorDescriptor(input);
-    auto o_desc = TensorDescriptor(poolOutput);
-    auto p_desc = PoolingDescriptor(wx, wy, sx, sy, px, py, mode);
+    auto i_desc = TensorDescriptor{input};
+    auto o_desc = TensorDescriptor{poolOutput};
+    auto p_desc = PoolingDescriptor{wx, wy, sx, sy, px, py, mode};
 
-    auto gradInput = Tensor(input.shape(), input.type());
+    auto gradInput = Tensor{input.shape(), input.type()};
 
     auto hndl = getCudnnHandle();
     const auto& cudnnStream = getCudnnStream();
@@ -112,16 +112,16 @@ Tensor CudnnAutogradExtension::pool2dBackward(
         CUDNN_CHECK_ERR(
             cudnnPoolingBackward(
                 hndl,
-                p_desc.descriptor,
+                p_desc.get(),
                 oneg,
-                o_desc.descriptor,
+                o_desc.get(),
                 outraw.get(),
-                o_desc.descriptor,
+                o_desc.get(),
                 gradresultraw.get(),
-                i_desc.descriptor,
+                i_desc.get(),
                 inraw.get(),
                 zerog,
-                i_desc.descriptor,
+                i_desc.get(),
                 gradinputraw.get()
             )
         );

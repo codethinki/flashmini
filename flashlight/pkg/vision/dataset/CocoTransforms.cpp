@@ -157,7 +157,7 @@ std::vector<Tensor> randomResize(std::vector<Tensor> inputs, int size, int maxsi
         boxes = boxes * resizedArray;
     }
 
-    std::vector<long> imageSizeArray = {resizedImage.dim(1), resizedImage.dim(0)};
+    std::vector<Dim> imageSizeArray = {resizedImage.dim(1), resizedImage.dim(0)};
     Tensor sizeArray = Tensor::fromVector(imageSizeArray);
     return {
         resizedImage,
@@ -190,7 +190,7 @@ TransformAllFunction Normalize(
                    boxes = boxes / ratioArray;
                }
                // Normalize Image
-               Tensor image = in[ImageIdx].astype(fl::dtype::f32) / 255.f;
+               Tensor image = in[ImageIdx].asType(fl::dtype::f32) / 255.f;
                image = image - mean;
                image = image / std;
                std::vector<Tensor> outputs = {

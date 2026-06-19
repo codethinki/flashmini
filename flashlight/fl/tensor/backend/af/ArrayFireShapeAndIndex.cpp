@@ -13,10 +13,11 @@
 
 #include "flashlight/fl/tensor/backend/af/ArrayFireTensor.h"
 #include "flashlight/fl/tensor/backend/af/Utils.h"
+#include <span>
 
 namespace fl {
 
-Tensor ArrayFireBackend::reshape(const Tensor& tensor, const Shape& shape) {
+Tensor ArrayFireBackend::reshape(Tensor const& tensor, Shape const& shape) {
     return toTensor<ArrayFireTensor>(
         af::moddims(toArray(tensor), detail::flToAfDims(shape)),
         shape.ndim()
@@ -24,8 +25,8 @@ Tensor ArrayFireBackend::reshape(const Tensor& tensor, const Shape& shape) {
 }
 
 Tensor ArrayFireBackend::transpose(
-    const Tensor& tensor,
-    const Shape& axes /* = {} */
+    Tensor const& tensor,
+    Shape const& axes /* = {} */
 ) {
     if(tensor.ndim() == 1)
         return tensor;
@@ -48,7 +49,8 @@ Tensor ArrayFireBackend::transpose(
             af::reorder(toArray(tensor), dims[0], dims[1], dims[2], dims[3]),
             tensor.ndim()
         );
-    } else {
+    }
+    else {
         if(axes.ndim() > AF_MAX_DIMS)
             throw std::invalid_argument(
                 "ArrayFire tensor transpose was given "
@@ -79,7 +81,7 @@ Tensor ArrayFireBackend::transpose(
     }
 }
 
-Tensor ArrayFireBackend::tile(const Tensor& tensor, const Shape& shape) {
+Tensor ArrayFireBackend::tile(Tensor const& tensor, Shape const& shape) {
     return toTensor<ArrayFireTensor>(
         af::tile(toArray(tensor), detail::flToAfDims(shape)),
         // TODO: check
@@ -87,62 +89,81 @@ Tensor ArrayFireBackend::tile(const Tensor& tensor, const Shape& shape) {
     );
 }
 
+
+namespace {
+
+    af::array join_chunk(std::span<af::array const> chunk, unsigned const axis) {
+        switch(chunk.size()) {
+            case 0: throw std::invalid_argument{"Cannot concatenate empty chunk"};
+            case 1: return chunk[0];
+            case 2: return af::join(axis, chunk[0], chunk[1]);
+            case 3: return af::join(axis, chunk[0], chunk[1], chunk[2]);
+            case 4: return af::join(axis, chunk[0], chunk[1], chunk[2], chunk[3]);
+            default: {
+                std::vector<af_array> handles{};
+                handles.reserve(chunk.size());
+                for(auto const& arr : chunk)
+                    handles.push_back(arr.get());
+
+                af_array outHandle = nullptr;
+                AF_CHECK(af_join_many(&outHandle, axis, chunk.size(), handles.data()));
+                return af::array{outHandle};
+            }
+        }
+    }
+
+} // namespace
+
 Tensor ArrayFireBackend::concatenate(
-    const std::vector<Tensor>& tensors,
-    const unsigned axis
+    std::vector<Tensor> const& tensors,
+    unsigned axis
 ) {
-    af::array out;
-    switch(tensors.size()) {
-        case 0:
-            return toTensor<ArrayFireTensor>(ArrayFireTensor()); // empty tensor
-        case 1:
-            return tensors.front();
-        case 2:
-            out = af::join(axis, toArray(tensors[0]), toArray(tensors[1]));
-            break;
-        case 3:
-            out = af::join(
-                axis,
-                toArray(tensors[0]),
-                toArray(tensors[1]),
-                toArray(tensors[2])
-            );
-            break;
-        case 4:
-            out = af::join(
-                axis,
-                toArray(tensors[0]),
-                toArray(tensors[1]),
-                toArray(tensors[2]),
-                toArray(tensors[3])
-            );
-            break;
-        default:
-            // TODO: iteratively concat to remove this limitation
-            throw std::invalid_argument(
-                "ArrayFire concatenate doesn't support > 4 tensors"
-            );
+    if(tensors.empty())
+        return toTensor<ArrayFireTensor>(); // empty tensor
+
+    //TODO use std::from_range and views::transform once c++23
+    std::vector<af::array> arrays{};
+    arrays.reserve(tensors.size());
+
+
+    for(auto const& t : tensors){
+        arrays.push_back(toArray(t));
+    }
+    constexpr size_t maxChunkSize = 10; //https://arrayfire.org/docs/group__manip__func__join.htm
+
+    //greedy chunk and join
+    while(arrays.size() > 1) {
+        size_t const chunks = (arrays.size() + maxChunkSize - 1) / maxChunkSize;
+
+        for(size_t i = 0; i < chunks; i++) {
+            auto const begin = i * maxChunkSize;
+            auto const size = std::min<size_t>(maxChunkSize, arrays.size() - begin);
+
+            arrays[i] = join_chunk({&arrays[begin], size}, axis);
+        }
+        arrays.resize(chunks);
     }
 
     unsigned numDims = tensors[0].ndim();
-    if(axis > std::max(numDims - 1, 0u))
+    if(axis >= numDims)
         numDims = axis + 1;
 
     // All tensors have the same numdims else AF would throw
-    return toTensor<ArrayFireTensor>(std::move(out), numDims);
+    return toTensor<ArrayFireTensor>(std::move(arrays[0]), numDims);
 }
 
-Tensor ArrayFireBackend::nonzero(const Tensor& tensor) {
+Tensor ArrayFireBackend::nonzero(Tensor const& tensor) {
     return toTensor<ArrayFireTensor>(
-        af::where(toArray(tensor)), /* numDims = */
+        af::where(toArray(tensor)),
+        /* numDims = */
         1
     );
 }
 
 Tensor ArrayFireBackend::pad(
-    const Tensor& input,
-    const std::vector<std::pair<int, int>>& padWidths,
-    const PadType type
+    Tensor const& input,
+    std::vector<std::pair<Dim, Dim>> const& padWidths,
+    PadType const type
 ) {
     if(padWidths.size() > AF_MAX_DIMS)
         throw std::invalid_argument(
@@ -165,8 +186,9 @@ Tensor ArrayFireBackend::pad(
             endPadding,
             detail::flToAfPadType(type)
         ),
-        /* numDims = */ // TODO: check
-        std::max(input.ndim(), static_cast<int>(padWidths.size()))
+        /* numDims = */
+        // TODO: check
+        std::max(input.ndim(), padWidths.size())
     );
 }
 } // namespace fl

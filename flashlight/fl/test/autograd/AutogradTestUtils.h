@@ -10,10 +10,11 @@
 #include "gtest/gtest.h"
 
 #include "flashlight/fl/autograd/Functions.h"
+#include "flashlight/fl/autograd/Variable.h"
+#include "flashlight/fl/tensor/Compute.h"
 #include "flashlight/fl/tensor/Index.h"
 #include "flashlight/fl/tensor/Init.h"
 #include "flashlight/fl/tensor/Random.h"
-#include "flashlight/fl/autograd/Variable.h"
 
 namespace fl {
 namespace detail {
@@ -24,51 +25,54 @@ namespace detail {
             OptimMode::get().setOptimLevel(OptimLevel::O3);
         }
 
-        void TearDown() override {
-            OptimMode::get().setOptimLevel(OptimLevel::DEFAULT);
-        }
+        void TearDown() override { OptimMode::get().setOptimLevel(OptimLevel::DEFAULT); }
     };
 
     using JacobianFunc = std::function<Variable (Variable&)>;
     inline bool jacobianTestImpl(
-        const JacobianFunc& func,
+        JacobianFunc const& func,
         Variable& input,
-        float precision = 1E-5,
+        double precision = 1E-5,
         float perturbation = 1E-4,
-        const std::vector<Variable*>& zeroGradientVariables = {}) {
-        auto fwdJacobian =
-            Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
+        std::vector<Variable*> const& zeroGradientVariables = {}
+    ) {
+        auto const outBase = func(input);
+        auto const outElements = outBase.elements();
+        auto const inElements = input.elements();
 
-        for(int i = 0; i < input.elements(); ++i) {
-            Tensor orig = input.tensor().flatten()(i);
+        auto const fwdJacobian = Tensor({outElements, inElements}, input.type());
+
+        for(int i = 0; i < inElements; ++i) {
+            auto orig = input.tensor().flatten()(i);
             input.tensor().flat(i) = orig - perturbation;
-            auto outa = func(input).tensor();
+            auto outA = func(input).tensor();
 
             input.tensor().flat(i) = orig + perturbation;
-            auto outb = func(input).tensor();
+            auto outB = func(input).tensor();
+
             input.tensor().flat(i) = orig;
 
-            fwdJacobian(fl::span, i) =
-                fl::reshape((outb - outa), {static_cast<Dim>(outa.elements())}) * 0.5
-                / perturbation;
+
+            fwdJacobian(fl::span, i) = fl::reshape((outB - outA), {static_cast<Dim>(outA.elements())}) * 0.5 /
+                perturbation;
         }
 
-        auto bwdJacobian =
-            Tensor({func(input).elements(), input.elements()}, fl::dtype::f32);
-        auto dout =
-            Variable(fl::full(func(input).shape(), 0, func(input).type()), false);
+        auto const bwdJacobian = Tensor({outElements, inElements}, input.type());
+        auto const outD = Variable(fl::full(outBase.shape(), 0, outBase.type()), false);
 
-        for(int i = 0; i < dout.elements(); ++i) {
-            dout.tensor().flat(i) = 1; // element in 1D view
+        for(int i = 0; i < outD.elements(); ++i) {
+            outD.tensor().flat(i) = 1; // element in 1D view
             input.zeroGrad();
             for(auto* var : zeroGradientVariables)
                 var->zeroGrad();
             auto out = func(input);
-            out.backward(dout);
+            out.backward(outD);
 
-            bwdJacobian(i) = fl::reshape(input.grad().tensor(), {input.elements()});
-            dout.tensor().flat(i) = 0;
+            bwdJacobian(i) = fl::reshape(input.grad().tensor(), {inElements});
+            outD.tensor().flat(i) = 0;
         }
+
+
         return allClose(fwdJacobian, bwdJacobian, precision);
     }
 

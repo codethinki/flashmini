@@ -26,7 +26,7 @@ std::unique_ptr<Module> Dropout::clone() const {
 }
 
 std::string Dropout::prettyString() const {
-    return "Dropout (" + std::to_string(ratio_) + ")";
+    return std::format("Dropout ({0})", ratio_);
 }
 
 } // namespace fl

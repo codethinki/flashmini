@@ -289,7 +289,7 @@ FL_API Variable constant(
  * \ingroup nn_init_utils
  */
 template<typename T>
-Variable scalar(T val, fl::dtype type = dtype_traits<T>::ctype, bool calcGrad = true) {
+Variable scalar(T val, fl::dtype type = dtype_traits<T>::fl_type, bool calcGrad = true) {
     return Variable(fromScalar(val, type), calcGrad);
 }
 

@@ -28,7 +28,7 @@ void assertTensorScalarBinop(
     const Tensor& expectOut
 ) {
     auto result = op(in, scalar);
-    auto expect = expectOut.astype(result.type());
+    auto expect = expectOut.asType(result.type());
     ASSERT_TRUE(allClose(result, expect))
         << "in.type(): " << in.type()
         << ", ScalarType: " << dtype_traits<ScalarType>::getName();
@@ -42,7 +42,7 @@ void assertScalarTensorBinop(
     const Tensor& expectOut
 ) {
     auto result = op(scalar, in);
-    auto expect = expectOut.astype(result.type());
+    auto expect = expectOut.asType(result.type());
     ASSERT_TRUE(allClose(result, expect))
         << "ScalarType: " << dtype_traits<ScalarType>::getName()
         << ", in.type(): " << in.type();
@@ -98,12 +98,12 @@ void applyToAllDtypes(std::function<void(fl::dtype)> func) {
 
 TEST(TensorBinaryOpsTest, ArithmeticBinaryOperators) {
     auto testArithmeticBinops = [](dtype type) {
-            auto a = Tensor::fromVector<float>({2, 2}, {0, 1, 2, 3}).astype(type);
-            auto b = Tensor::fromVector<float>({2, 2}, {1, 2, 3, 4}).astype(type);
-            auto c = Tensor::fromVector<float>({2, 2}, {1, 3, 5, 7}).astype(type);
-            auto d = Tensor::fromVector<float>({2, 2}, {1, 6, 15, 28}).astype(type);
-            auto e = Tensor::fromVector<float>({2, 2}, {3, 2, 1, 0}).astype(type);
-            auto f = Tensor::fromVector<float>({2, 2}, {2, 4, 6, 8}).astype(type);
+            auto a = Tensor::fromVector<float>({2, 2}, {0, 1, 2, 3}).asType(type);
+            auto b = Tensor::fromVector<float>({2, 2}, {1, 2, 3, 4}).asType(type);
+            auto c = Tensor::fromVector<float>({2, 2}, {1, 3, 5, 7}).asType(type);
+            auto d = Tensor::fromVector<float>({2, 2}, {1, 6, 15, 28}).asType(type);
+            auto e = Tensor::fromVector<float>({2, 2}, {3, 2, 1, 0}).asType(type);
+            auto f = Tensor::fromVector<float>({2, 2}, {2, 4, 6, 8}).asType(type);
             auto z = fl::full({2, 2}, 0, type);
 
             assertCommutativeBinop(a, z, std::plus<>(), a);
@@ -140,16 +140,16 @@ TEST(TensorBinaryOpsTest, ComparisonBinaryOperators) {
     auto falses = fl::full({2, 2}, 0, dtype::b8);
     auto trues = fl::full({2, 2}, 1, dtype::b8);
     auto falseTrues =
-        Tensor::fromVector<float>({2, 2}, {0, 1, 0, 1}).astype(fl::dtype::b8);
+        Tensor::fromVector<float>({2, 2}, {0, 1, 0, 1}).asType(fl::dtype::b8);
     auto trueFalses =
-        Tensor::fromVector<float>({2, 2}, {1, 0, 1, 0}).astype(fl::dtype::b8);
+        Tensor::fromVector<float>({2, 2}, {1, 0, 1, 0}).asType(fl::dtype::b8);
 
     auto testComparisonBinops = [&](dtype type) {
-            auto a = Tensor::fromVector<float>({2, 2}, {0, 1, 2, 3}).astype(type);
-            auto b = Tensor::fromVector<float>({2, 2}, {0, 0, 2, 0}).astype(type);
-            auto c = Tensor::fromVector<float>({2, 2}, {2, 3, 4, 5}).astype(type);
-            auto d = Tensor::fromVector<float>({2, 2}, {0, 4, 2, 6}).astype(type);
-            auto e = Tensor::fromVector<float>({2, 2}, {0, 1, 0, 1}).astype(type);
+            auto a = Tensor::fromVector<float>({2, 2}, {0, 1, 2, 3}).asType(type);
+            auto b = Tensor::fromVector<float>({2, 2}, {0, 0, 2, 0}).asType(type);
+            auto c = Tensor::fromVector<float>({2, 2}, {2, 3, 4, 5}).asType(type);
+            auto d = Tensor::fromVector<float>({2, 2}, {0, 4, 2, 6}).asType(type);
+            auto e = Tensor::fromVector<float>({2, 2}, {0, 1, 0, 1}).asType(type);
 
             ASSERT_TRUE(allClose((a == a), trues)) << "dtype: " << type;
             assertCommutativeBinop(a, b, std::equal_to<>(), trueFalses);
@@ -207,11 +207,11 @@ TEST(TensorBinaryOpsTest, LogicalBinaryOperators) {
     auto falses = fl::full({2, 2}, 0, dtype::b8);
     auto trues = fl::full({2, 2}, 1, dtype::b8);
     auto falseTrues =
-        Tensor::fromVector<float>({2, 2}, {0, 1, 0, 1}).astype(fl::dtype::b8);
+        Tensor::fromVector<float>({2, 2}, {0, 1, 0, 1}).asType(fl::dtype::b8);
 
     auto testLogicalBinops = [&](dtype type) {
-            auto a = Tensor::fromVector<float>({2, 2}, {0, 1, 0, 3}).astype(type);
-            auto b = Tensor::fromVector<float>({2, 2}, {2, 3, 4, 5}).astype(type);
+            auto a = Tensor::fromVector<float>({2, 2}, {0, 1, 0, 3}).asType(type);
+            auto b = Tensor::fromVector<float>({2, 2}, {2, 3, 4, 5}).asType(type);
             auto z = fl::full({2, 2}, 0, type);
 
             ASSERT_TRUE(allClose((z || z), falses)) << "dtype: " << type;
@@ -234,9 +234,9 @@ TEST(TensorBinaryOpsTest, LogicalBinaryOperators) {
 
 TEST(TensorBinaryOpsTest, ModuloBinaryOperators) {
     auto testModuloBinop = [](dtype type) {
-            auto a = Tensor::fromVector<float>({2, 2}, {1, 2, 3, 4}).astype(type);
-            auto b = Tensor::fromVector<float>({2, 2}, {2, 3, 5, 7}).astype(type);
-            auto c = Tensor::fromVector<float>({2, 2}, {0, 1, 2, 3}).astype(type);
+            auto a = Tensor::fromVector<float>({2, 2}, {1, 2, 3, 4}).asType(type);
+            auto b = Tensor::fromVector<float>({2, 2}, {2, 3, 5, 7}).asType(type);
+            auto c = Tensor::fromVector<float>({2, 2}, {0, 1, 2, 3}).asType(type);
             auto z = fl::full({2, 2}, 0, type);
 
             ASSERT_TRUE(allClose((z % b), z)) << "dtype: " << type;
@@ -260,14 +260,14 @@ TEST(TensorBinaryOpsTest, ModuloBinaryOperators) {
 
 TEST(TensorBinaryOpsTest, BitBinaryOperators) {
     auto testBitBinops = [](dtype type) {
-            auto a = Tensor::fromVector<float>({2, 1}, {0b0001, 0b1000}).astype(type);
-            auto b = Tensor::fromVector<float>({2, 1}, {0b0010, 0b0100}).astype(type);
-            auto c = Tensor::fromVector<float>({2, 1}, {0b0011, 0b1100}).astype(type);
-            auto d = Tensor::fromVector<float>({2, 1}, {0b0110, 0b0110}).astype(type);
-            auto e = Tensor::fromVector<float>({2, 1}, {0b1000, 0b0001}).astype(type);
-            auto g = Tensor::fromVector<float>({2, 1}, {2, 1}).astype(type);
-            auto h = Tensor::fromVector<float>({2, 1}, {0b1000, 0b1000}).astype(type);
-            auto z = Tensor::fromVector<float>({2, 1}, {0b0000, 0b0000}).astype(type);
+            auto a = Tensor::fromVector<float>({2, 1}, {0b0001, 0b1000}).asType(type);
+            auto b = Tensor::fromVector<float>({2, 1}, {0b0010, 0b0100}).asType(type);
+            auto c = Tensor::fromVector<float>({2, 1}, {0b0011, 0b1100}).asType(type);
+            auto d = Tensor::fromVector<float>({2, 1}, {0b0110, 0b0110}).asType(type);
+            auto e = Tensor::fromVector<float>({2, 1}, {0b1000, 0b0001}).asType(type);
+            auto g = Tensor::fromVector<float>({2, 1}, {2, 1}).asType(type);
+            auto h = Tensor::fromVector<float>({2, 1}, {0b1000, 0b1000}).asType(type);
+            auto z = Tensor::fromVector<float>({2, 1}, {0b0000, 0b0000}).asType(type);
 
             ASSERT_TRUE(allClose((z & z), z)) << "dtype: " << type;
             assertCommutativeBinop(a, b, std::bit_and<>(), z);
@@ -366,8 +366,8 @@ TEST(TensorBinaryOpsTest, minimum) {
     auto c = fl::minimum(a, b);
     ASSERT_EQ(a.type(), c.type());
     ASSERT_TRUE(allClose(a, c));
-    ASSERT_TRUE(allClose(fl::minimum(1, b).astype(a.type()), a));
-    ASSERT_TRUE(allClose(fl::minimum(b, 1).astype(a.type()), a));
+    ASSERT_TRUE(allClose(fl::minimum(1, b).asType(a.type()), a));
+    ASSERT_TRUE(allClose(fl::minimum(b, 1).asType(a.type()), a));
 }
 
 TEST(TensorBinaryOpsTest, maximum) {
@@ -376,8 +376,8 @@ TEST(TensorBinaryOpsTest, maximum) {
     auto c = fl::maximum(a, b);
     ASSERT_EQ(b.type(), c.type());
     ASSERT_TRUE(allClose(b, c));
-    ASSERT_TRUE(allClose(fl::maximum(1, b).astype(a.type()), b));
-    ASSERT_TRUE(allClose(fl::maximum(b, 1).astype(a.type()), b));
+    ASSERT_TRUE(allClose(fl::maximum(1, b).asType(a.type()), b));
+    ASSERT_TRUE(allClose(fl::maximum(b, 1).asType(a.type()), b));
 }
 
 using binaryOpFunc_t = Tensor (*)(const Tensor& lhs, const Tensor& rhs);
@@ -473,8 +473,8 @@ TEST(TensorBinaryOpsTest, broadcasting) {
 
     for(const auto& funcp : functions) {
         for(auto& shapeData : shapes) {
-            auto lhs = ((fl::rand(shapeData.lhs) + 1) * 10).astype(fl::dtype::s32);
-            auto rhs = ((fl::rand(shapeData.rhs) + 1) * 10).astype(fl::dtype::s32);
+            auto lhs = ((fl::rand(shapeData.lhs) + 1) * 10).asType(fl::dtype::s32);
+            auto rhs = ((fl::rand(shapeData.rhs) + 1) * 10).asType(fl::dtype::s32);
 
             auto [actualOut, expectedOut] = doBinaryOp(
                 lhs,
@@ -498,7 +498,7 @@ TEST(TensorBinaryOpsTest, broadcasting) {
         // Scalar broadcasting
         const double scalarVal = 4;
         const Shape inShape = {2, 3, 4};
-        const auto lhs = fl::rand(inShape).astype(fl::dtype::s32);
+        const auto lhs = fl::rand(inShape).asType(fl::dtype::s32);
         const auto rhs = fl::fromScalar(scalarVal, fl::dtype::s32);
         const auto rhsTiled = fl::full(inShape, scalarVal, fl::dtype::s32);
         ASSERT_TRUE(allClose(funcp.first(lhs, rhs), funcp.first(lhs, rhsTiled)));
@@ -517,7 +517,7 @@ TEST(TensorBinaryOpsTest, powerDouble) {
 
     auto b = fl::full({3, 3}, 2.);
     ASSERT_TRUE(
-        allClose(fl::power(3, a), fl::full(b.shape(), 3 * 3, fl::dtype::f32))
+        allClose(fl::power(3, a), fl::full(b.shape(), 3 * 3, fl::dtype::f64))
     );
 }
 

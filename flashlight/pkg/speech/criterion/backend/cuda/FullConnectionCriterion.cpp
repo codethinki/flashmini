@@ -96,7 +96,7 @@ Variable FullConnectionCriterion::forward(
     const auto& trans = transVar.tensor();
     Tensor loss({B}, fl::dtype::f32);
     Tensor workspace(
-        {static_cast<long long>(FCC::getWorkspaceSize(B, T, N))}, fl::dtype::u8);
+        {static_cast<int64_t>(FCC::getWorkspaceSize(B, T, N))}, fl::dtype::u8);
 
     {
         fl::DevicePtr inputRaw(input);

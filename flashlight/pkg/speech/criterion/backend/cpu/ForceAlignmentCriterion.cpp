@@ -38,7 +38,7 @@ namespace pkg {
             if(gradVar.type() != fl::dtype::f32)
                 throw std::invalid_argument("FAC: grad must be float32");
 
-            auto gradVec = gradVar.tensor().toHostVector<float>();
+            auto gradVec = gradVar.tensor().host<float>();
             std::vector<float> inputGradVec(B * T * N);
             std::vector<float> transGradVec(N * N);
 
@@ -87,10 +87,10 @@ namespace pkg {
 
             const auto& targetSize = getTargetSizeArray(targetVar.tensor(), T);
             auto ctx = std::make_shared<Context>();
-            auto inputVec = inputVar.tensor().toHostVector<float>();
-            ctx->targetVec = targetVar.tensor().toHostVector<int>();
-            ctx->targetSizeVec = targetSize.toHostVector<int>();
-            auto transVec = transVar.tensor().toHostVector<float>();
+            auto inputVec = inputVar.tensor().host<float>();
+            ctx->targetVec = targetVar.tensor().host<int>();
+            ctx->targetSizeVec = targetSize.host<int>();
+            auto transVec = transVar.tensor().host<float>();
             std::vector<float> lossVec(B);
             ctx->workspaceVec.assign(FAC::getWorkspaceSize(B, T, N, L), 0);
 
@@ -135,10 +135,10 @@ namespace pkg {
                 throw std::invalid_argument("FAC: target must be int32");
             const Tensor targetSize = getTargetSizeArray(target, T);
             std::shared_ptr<Context> ctx = std::make_shared<Context>();
-            std::vector<float> inputVec = input.toHostVector<float>();
-            ctx->targetVec = target.toHostVector<int>();
-            ctx->targetSizeVec = targetSize.toHostVector<int>();
-            std::vector<float> transVec = trans.toHostVector<float>();
+            std::vector<float> inputVec = input.host<float>();
+            ctx->targetVec = target.host<int>();
+            ctx->targetSizeVec = targetSize.host<int>();
+            std::vector<float> transVec = trans.host<float>();
             std::vector<float> lossVec(B);
             ctx->workspaceVec.assign(FAC::getWorkspaceSize(B, T, N, L), 0);
             std::vector<int> bestPaths(B * T);

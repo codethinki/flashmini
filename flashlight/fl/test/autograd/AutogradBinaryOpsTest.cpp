@@ -71,13 +71,13 @@ TEST(AutogradBinaryOpsTest, BinaryCrossEntropy) {
     auto loss = binaryCrossEntropy(x, y);
 
     // bce loss should be positive
-    ASSERT_TRUE(fl::all(loss.tensor() > 0).scalar<char>());
+    ASSERT_TRUE(fl::all_of(loss.tensor() > 0).scalar<char>());
 }
 
 TEST(AutogradBinaryOpsTest, CrossEntropy) {
     auto x = Variable(fl::rand({7, 10, 4}, fl::dtype::f64), true);
     auto y = Variable(
-        (fl::rand({10, 4}, fl::dtype::u32) % 7).astype(fl::dtype::s32),
+        (fl::rand({10, 4}, fl::dtype::u32) % 7).asType(fl::dtype::s32),
         false
     );
     auto ignoreIdx = y(0, 0).scalar<int>();
@@ -165,7 +165,7 @@ TEST_F(AutogradTestF16, LinearF16) {
 TEST(AutogradBinaryOpsTest, Multiply) {
     auto x = Variable(fl::rand({5}), true);
     auto y = x * x;
-    auto dy = Variable(fl::full({5}, 1.0), false);
+    auto dy = Variable(fl::full({5}, 1.f), false);
     y.backward(dy);
     auto dx = x.grad();
     ASSERT_TRUE(allClose(dx.tensor(), 2 * x.tensor()));
@@ -175,7 +175,7 @@ TEST(AutogradBinaryOpsTest, MultiplyAdd) {
     auto x = Variable(fl::rand({5}), true);
     auto y = Variable(fl::rand({5}), true);
     auto z = x * x + x * y + y * y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable(fl::full({5}, 1.f), false);
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
@@ -187,19 +187,19 @@ TEST(AutogradBinaryOpsTest, MultiplyAddScalar) {
     auto x = Variable(fl::rand({5}), true);
     auto y = Variable(fl::rand({5}), true);
     auto z = 2 * x + x * y + y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable(fl::full({5}, 1.f), false);
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
-    ASSERT_TRUE(allClose(dx.tensor(), (2.0 + y.tensor())));
-    ASSERT_TRUE(allClose(dy.tensor(), (1.0 + x.tensor())));
+    ASSERT_TRUE(allClose(dx.tensor(), (2.f + y.tensor())));
+    ASSERT_TRUE(allClose(dy.tensor(), (1.f + x.tensor())));
 }
 
 TEST(AutogradBinaryOpsTest, MultiplySub) {
     auto x = Variable(fl::rand({5}), true);
     auto y = Variable(fl::rand({5}), true);
     auto z = x * x - x * y;
-    auto dz = Variable(fl::full({5}, 1.0), false);
+    auto dz = Variable(fl::full({5}, 1.f), false);
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
@@ -211,14 +211,14 @@ TEST(AutogradBinaryOpsTest, DivideAdd) {
     auto x = Variable(fl::rand({5}, fl::dtype::f64), true);
     auto y = Variable(fl::rand({5}, fl::dtype::f64), true);
     auto z = x + x / y + y;
-    auto dz = Variable(fl::full({5}, 1.0, fl::dtype::f64), false);
+    auto dz = Variable(fl::full({5}, 1.f, fl::dtype::f64), false);
     z.backward(dz);
     auto dx = x.grad();
     auto dy = y.grad();
     ASSERT_EQ(z.type(), fl::dtype::f64);
-    ASSERT_TRUE(allClose(dx.tensor(), (1.0 + 1.0 / y.tensor())));
+    ASSERT_TRUE(allClose(dx.tensor(), (1.f + 1.f / y.tensor())));
     ASSERT_TRUE(
-        allClose(dy.tensor(), (1.0 - x.tensor() / (y.tensor() * y.tensor())))
+        allClose(dy.tensor(), (1.f - x.tensor() / (y.tensor() * y.tensor())))
     );
 }
 

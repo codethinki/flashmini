@@ -189,7 +189,7 @@ Variable Conformer::mhsa(const Variable& input, const Variable& inputPadMask) {
 
     Variable mask, posEmb;
     if(posEmbContextSize_ > 0)
-        posEmb = tile(params_[0].astype(input.type()), {1, 1, nHeads_ * bsz});
+        posEmb = tile(params_[0].asType(input.type()), {1, 1, nHeads_ * bsz});
 
     fl::Variable padMask;
     // TODO{fl::Tensor}{resize} - emulate the ArrayFire resize operation for
@@ -222,7 +222,7 @@ Variable Conformer::conv(const Variable& _input) {
     // input C x T x B x 1
     // apply first pointwise conv
     auto result = gatedlinearunit(
-        (*conv1_)(((*normConv1_)(input)).astype(input.type())),
+        (*conv1_)(((*normConv1_)(input)).asType(input.type())),
         0
     );
     result = reorder(result, {1, 3, 0, 2});
@@ -231,7 +231,7 @@ Variable Conformer::conv(const Variable& _input) {
     result = (*convDepthWise_)(result);
     result = reorder(result, {2, 0, 3, 1});
     // C x T x B x 1
-    result = fl::swish(((*normConv2_)(result)).astype(input.type()), 1.);
+    result = fl::swish(((*normConv2_)(result)).asType(input.type()), 1.);
     // apply second pointwise conv
     result = dropout((*conv2_)(result), pDropout);
     return moddims(result, _input.shape());
@@ -260,7 +260,7 @@ std::vector<Variable> Conformer::forward(const std::vector<Variable>& input) {
     auto ffn1 = dropout(
         (*w12_)(
             dropout(
-                fl::swish((*w11_)(((*norm1_)(x)).astype(x.type())), 1.),
+                fl::swish((*w11_)(((*norm1_)(x)).asType(x.type())), 1.),
                 pDropout
             )
         ),
@@ -275,14 +275,14 @@ std::vector<Variable> Conformer::forward(const std::vector<Variable>& input) {
     auto ffn2 = dropout(
         (*w22_)(
             dropout(
-                fl::swish((*w21_)(((*norm2_)(x)).astype(x.type())), 1.),
+                fl::swish((*w21_)(((*norm2_)(x)).asType(x.type())), 1.),
                 pDropout
             )
         ),
         pDropout
     );
     x = x + f * 0.5 * ffn2;
-    x = ((*norm3_)(x)).astype(x.type());
+    x = ((*norm3_)(x)).asType(x.type());
     return {x};
 }
 

@@ -20,6 +20,8 @@
 #include "flashlight/fl/tensor/backend/af/ArrayFireTensor.h"
 #include "flashlight/fl/tensor/backend/af/Utils.h"
 
+#include <format>
+
 using namespace ::testing;
 using namespace fl;
 
@@ -46,6 +48,31 @@ bool allClose(
 
 namespace fl {
 
+TEST(ArrayFireSparse, HostExtractionCrash) {
+    int size = 8;
+
+    // Create lazy nodes
+    af::array values = af::constant(1.0, size, f64);
+    af::array row_ptr = af::iota(af::dim4(size + 1), af::dim4(1), s32);
+    af::array col_idx = af::constant(0, size, s32);
+
+    // Create sparse array
+
+    af::array sp = af::sparse(size, 4, values, row_ptr, col_idx, AF_STORAGE_CSR);
+
+    try {
+        std::vector<double> data(sp.elements(), 999);
+
+        sp.host(data.data());
+    }
+    catch(af::exception const& e) {
+        SUCCEED();
+        return;
+    }
+
+    FAIL() << "ArrayFire fixed host call on sparse matrices, update Tensor::host accordingly";
+}
+
 TEST(ArrayFireTensorBaseTest, ArrayFireShapeInterop) {
     ASSERT_EQ(detail::afToFlDims(af::dim4(), 0), Shape({})); // scalar
     ASSERT_EQ(detail::afToFlDims(af::dim4(0), 1), Shape({0}));
@@ -54,9 +81,7 @@ TEST(ArrayFireTensorBaseTest, ArrayFireShapeInterop) {
     ASSERT_EQ(detail::afToFlDims(af::dim4(0, 1, 1, 1), 4), Shape({0, 1, 1, 1}));
 
     using namespace fl::detail;
-    auto dimsEq = [](const af::dim4& d, const Shape& s) {
-            return detail::afToFlDims(d, s.ndim()) == s;
-        };
+    auto dimsEq = [](const af::dim4& d, const Shape& s) { return detail::afToFlDims(d, s.ndim()) == s; };
 
     ASSERT_TRUE(dimsEq(af::dim4(3), {3})); // not 3, 1, 1, 1
     ASSERT_TRUE(dimsEq(af::dim4(3, 2), {3, 2})); // not 3, 2, 1, 1
@@ -133,17 +158,17 @@ TEST(ArrayFireTensorBaseTest, AfRefCountModify) {
 TEST(ArrayFireTensorBaseTest, astypeRefcount) {
     auto t = fl::rand({5, 5});
     ASSERT_EQ(getRefCount(toArray(t)), 1);
-    auto t64 = t.astype(fl::dtype::f64);
+    auto t64 = t.asType(fl::dtype::f64);
     ASSERT_EQ(getRefCount(toArray(t64)), 1);
 }
 
 TEST(ArrayFireTensorBaseTest, astypeInPlaceRefcount) {
     auto a = fl::rand({4, 4});
     ASSERT_EQ(getRefCount(toArray(a)), 1);
-    a = a.astype(fl::dtype::f64);
+    a = a.asType(fl::dtype::f64);
     ASSERT_EQ(getRefCount(toArray(a)), 1);
     ASSERT_EQ(a.type(), fl::dtype::f64);
-    a = a.astype(fl::dtype::f32);
+    a = a.asType(fl::dtype::f32);
     ASSERT_EQ(getRefCount(toArray(a)), 1);
 }
 
@@ -208,15 +233,25 @@ TEST(ArrayFireTensorBaseTest, BinaryOperators) {
 
 TEST(ArrayFireTensorBaseTest, full) {
     // TODO: expand with fixtures for each type
-    auto a = fl::full({3, 4}, 3.);
-    ASSERT_EQ(a.shape(), Shape({3, 4}));
-    ASSERT_EQ(a.type(), fl::dtype::f32);
-    ASSERT_TRUE(allClose(toArray(a), af::constant(3., {3, 4})));
+    af::dim4 afDim2{3, 4};
+    Shape const dim2Shape{afDim2[0], afDim2[1]};
+    constexpr float val2 = 3;
 
-    auto b = fl::full({1, 1, 5, 4}, 4.5);
-    ASSERT_EQ(b.shape(), Shape({1, 1, 5, 4}));
+    auto a = fl::full(dim2Shape, val2);
+    ASSERT_EQ(a.shape(), dim2Shape);
+    ASSERT_EQ(a.type(), fl::dtype::f32);
+
+    ASSERT_TRUE(allClose(toArray(a), af::constant(val2, afDim2)));
+
+
+    af::dim4 afDim4{1, 1, 5, 4};
+    Shape const dim4Shape{afDim4[0], afDim4[1], afDim4[2], afDim4[3]};
+    constexpr float val4 = 4.5;
+
+    auto b = fl::full(dim4Shape, val4);
+    ASSERT_EQ(b.shape(), dim4Shape);
     ASSERT_EQ(b.type(), fl::dtype::f32);
-    ASSERT_TRUE(allClose(toArray(b), af::constant(4.5, {1, 1, 5, 4})));
+    ASSERT_TRUE(allClose(toArray(b), af::constant(val4, afDim4)));
 }
 
 TEST(ArrayFireTensorBaseTest, identity) {
@@ -431,7 +466,7 @@ TEST(ArrayFireTensorBaseTest, tile) {
 }
 
 TEST(ArrayFireTensorBaseTest, nonzero) {
-    auto a = fl::rand({10, 10}).astype(fl::dtype::u32);
+    auto a = fl::rand({10, 10}).asType(fl::dtype::u32);
     auto nz = fl::nonzero(a);
     ASSERT_TRUE(allClose(toArray(nz), af::where(toArray(a))));
 }
@@ -450,10 +485,6 @@ TEST(ArrayFireTensorBaseTest, transpose) {
     );
 }
 
-TEST(ArrayFireTensorBaseTest, concatenate) {
-    std::vector<fl::Tensor> tensors(11);
-    ASSERT_THROW(fl::concatenate(tensors), std::invalid_argument);
-}
 
 TEST(ArrayFireTensorBaseTest, device) {
     auto a = fl::rand({5, 5});

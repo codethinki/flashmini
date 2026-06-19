@@ -36,10 +36,10 @@ class ArrayFireBackend : public TensorBackend {
     // keep track of the individual active stream on each ArrayFire device
     // NOTE using a `shared_ptr` to allow its capture in setActive callback;
     // see constructor for details.
-    std::shared_ptr<std::unordered_map<int, std::shared_ptr<const Stream>>>
+    std::shared_ptr<std::unordered_map<int, std::shared_ptr<Stream const>>>
     afIdToStream_{
         std::make_shared<
-            std::unordered_map<int, std::shared_ptr<const Stream>>>()
+            std::unordered_map<int, std::shared_ptr<Stream const>>>()
     };
 
     // Intentionally private. Only one instance should exist/it should be accessed
@@ -53,31 +53,31 @@ public:
 
     // No copy or move construction or assignment
     ArrayFireBackend(ArrayFireBackend&&) = delete;
-    ArrayFireBackend(const ArrayFireBackend&) = delete;
+    ArrayFireBackend(ArrayFireBackend const&) = delete;
     ArrayFireBackend& operator=(ArrayFireBackend&&) = delete;
-    ArrayFireBackend& operator=(const ArrayFireBackend&) = delete;
+    ArrayFireBackend& operator=(ArrayFireBackend const&) = delete;
 
     /* -------------------------- Compute Functions -------------------------- */
-    void eval(const Tensor& tensor) override;
+    void eval(Tensor const& tensor) override;
 
     /**
      * Return the stream from which the given array was created.
      *
      * @return an immutable reference to the stream from which `arr` was created.
      */
-    const Stream& getStreamOfArray(const af::array& arr);
-    bool supportsDataType(const fl::dtype& dtype) const override;
+    Stream const& getStreamOfArray(af::array const& arr);
+    bool supportsDataType(fl::dtype const& dtype) const override;
     // Memory management
-    void getMemMgrInfo(const char* msg, const int nativeDeviceId, std::ostream* ostream)
+    void getMemMgrInfo(char const* msg, int nativeDeviceId, std::ostream* ostream)
     override;
     void setMemMgrLogStream(std::ostream* stream) override;
-    void setMemMgrLoggingEnabled(const bool enabled) override;
-    void setMemMgrFlushInterval(const size_t interval) override;
+    void setMemMgrLoggingEnabled(bool enabled) override;
+    void setMemMgrFlushInterval(size_t interval) override;
 
     /* -------------------------- Rand Functions -------------------------- */
-    void setSeed(const int seed) override;
-    Tensor randn(const Shape& shape, dtype type) override;
-    Tensor rand(const Shape& shape, dtype type) override;
+    void setSeed(int seed) override;
+    Tensor randn(Shape const& shape, dtype type) override;
+    Tensor rand(Shape const& shape, dtype type) override;
 
     /* --------------------------- Tensor Operators --------------------------- */
     /******************** Tensor Creation Functions ********************/
@@ -99,71 +99,71 @@ public:
     AF_BACKEND_CREATE_FUN_LITERAL_DECL(const unsigned short&);
 #undef AF_BACKEND_CREATE_FUN_LITERAL_DECL
 
-    Tensor identity(const Dim dim, const dtype type) override;
-    Tensor arange(const Shape& shape, const Dim seqDim, const dtype type)
+    Tensor identity(Dim dim, dtype type) override;
+    Tensor arange(Shape const& shape, Dim seqDim, dtype type)
     override;
-    Tensor iota(const Shape& dims, const Shape& tileDims, const dtype type)
+    Tensor iota(Shape const& dims, Shape const& tileDims, dtype type)
     override;
 
     /************************ Shaping and Indexing *************************/
-    Tensor reshape(const Tensor& tensor, const Shape& shape) override;
-    Tensor transpose(const Tensor& tensor, const Shape& axes /* = {} */) override;
-    Tensor tile(const Tensor& tensor, const Shape& shape) override;
-    Tensor concatenate(const std::vector<Tensor>& tensors, const unsigned axis)
+    Tensor reshape(Tensor const& tensor, Shape const& shape) override;
+    Tensor transpose(Tensor const& tensor, Shape const& axes /* = {} */) override;
+    Tensor tile(Tensor const& tensor, Shape const& shape) override;
+    Tensor concatenate(std::vector<Tensor> const& tensors, unsigned axis)
     override;
-    Tensor nonzero(const Tensor& tensor) override;
+    Tensor nonzero(Tensor const& tensor) override;
     Tensor pad(
-        const Tensor& input,
-        const std::vector<std::pair<int, int>>& padWidths,
-        const PadType type
+        Tensor const& input,
+        std::vector<std::pair<Dim, Dim>> const& padWidths,
+        PadType type
     ) override;
 
     /************************** Unary Operators ***************************/
-    Tensor exp(const Tensor& tensor) override;
-    Tensor log(const Tensor& tensor) override;
-    Tensor negative(const Tensor& tensor) override;
-    Tensor logicalNot(const Tensor& tensor) override;
-    Tensor log1p(const Tensor& tensor) override;
-    Tensor sin(const Tensor& tensor) override;
-    Tensor cos(const Tensor& tensor) override;
-    Tensor sqrt(const Tensor& tensor) override;
-    Tensor tanh(const Tensor& tensor) override;
-    Tensor floor(const Tensor& tensor) override;
-    Tensor ceil(const Tensor& tensor) override;
-    Tensor rint(const Tensor& tensor) override;
-    Tensor absolute(const Tensor& tensor) override;
-    Tensor sigmoid(const Tensor& tensor) override;
-    Tensor erf(const Tensor& tensor) override;
-    Tensor flip(const Tensor& tensor, const unsigned dim) override;
-    Tensor clip(const Tensor& tensor, const Tensor& low, const Tensor& high)
+    Tensor exp(Tensor const& tensor) override;
+    Tensor log(Tensor const& tensor) override;
+    Tensor negative(Tensor const& tensor) override;
+    Tensor logicalNot(Tensor const& tensor) override;
+    Tensor log1p(Tensor const& tensor) override;
+    Tensor sin(Tensor const& tensor) override;
+    Tensor cos(Tensor const& tensor) override;
+    Tensor sqrt(Tensor const& tensor) override;
+    Tensor tanh(Tensor const& tensor) override;
+    Tensor floor(Tensor const& tensor) override;
+    Tensor ceil(Tensor const& tensor) override;
+    Tensor rint(Tensor const& tensor) override;
+    Tensor absolute(Tensor const& tensor) override;
+    Tensor sigmoid(Tensor const& tensor) override;
+    Tensor erf(Tensor const& tensor) override;
+    Tensor flip(Tensor const& tensor, unsigned dim) override;
+    Tensor clip(Tensor const& tensor, Tensor const& low, Tensor const& high)
     override;
-    Tensor roll(const Tensor& tensor, const int shift, const unsigned axis)
+    Tensor roll(Tensor const& tensor, int shift, unsigned axis)
     override;
-    Tensor isnan(const Tensor& tensor) override;
-    Tensor isinf(const Tensor& tensor) override;
-    Tensor sign(const Tensor& tensor) override;
-    Tensor tril(const Tensor& tensor) override;
-    Tensor triu(const Tensor& tensor) override;
-    Tensor where(const Tensor& condition, const Tensor& x, const Tensor& y)
+    Tensor isnan(Tensor const& tensor) override;
+    Tensor isinf(Tensor const& tensor) override;
+    Tensor sign(Tensor const& tensor) override;
+    Tensor tril(Tensor const& tensor) override;
+    Tensor triu(Tensor const& tensor) override;
+    Tensor where(Tensor const& condition, Tensor const& x, Tensor const& y)
     override;
     void topk(
         Tensor& values,
         Tensor& indices,
-        const Tensor& input,
-        const unsigned k,
-        const Dim axis,
-        const SortMode sortMode
+        Tensor const& input,
+        unsigned k,
+        Dim axis,
+        SortMode sortMode
     ) override;
-    Tensor sort(const Tensor& input, const Dim axis, const SortMode sortMode)
+    Tensor sort(Tensor const& input, Dim axis, SortMode sortMode)
     override;
     void sort(
         Tensor& values,
         Tensor& indices,
-        const Tensor& input,
-        const Dim axis,
-        const SortMode sortMode
+        Tensor const& input,
+        Dim axis,
+        SortMode sortMode
     ) override;
-    Tensor argsort(const Tensor& input, const Dim axis, const SortMode sortMode)
+    Tensor argsort(Tensor const& input, Dim axis, SortMode sortMode)
     override;
 
     /************************** Binary Operators ***************************/
@@ -212,77 +212,77 @@ public:
 #undef FL_AF_BINARY_OP_TYPE_DECL
 #undef FL_AF_BINARY_OP_LITERALS_DECL
 
-    Tensor minimum(const Tensor& lhs, const Tensor& rhs) override;
-    Tensor maximum(const Tensor& lhs, const Tensor& rhs) override;
-    Tensor power(const Tensor& lhs, const Tensor& rhs) override;
+    Tensor minimum(Tensor const& lhs, Tensor const& rhs) override;
+    Tensor maximum(Tensor const& lhs, Tensor const& rhs) override;
+    Tensor power(Tensor const& lhs, Tensor const& rhs) override;
 
     /******************************* BLAS ********************************/
     Tensor matmul(
-        const Tensor& lhs,
-        const Tensor& rhs,
+        Tensor const& lhs,
+        Tensor const& rhs,
         MatrixProperty lhsProp,
         MatrixProperty rhsProp
     ) override;
 
     /************************** Reductions ***************************/
-    Tensor amin(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor amin(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
-    Tensor amax(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor amax(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
     void min(
         Tensor& values,
         Tensor& indices,
-        const Tensor& input,
-        const unsigned axis,
-        const bool keepDims
+        Tensor const& input,
+        unsigned axis,
+        bool keepDims
     ) override;
     void max(
         Tensor& values,
         Tensor& indices,
-        const Tensor& input,
-        const unsigned axis,
-        const bool keepDims
+        Tensor const& input,
+        unsigned axis,
+        bool keepDims
     ) override;
-    Tensor sum(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor sum(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
-    Tensor cumsum(const Tensor& input, const unsigned axis) override;
-    Tensor argmax(const Tensor& input, const unsigned axis, const bool keepDims)
+    Tensor cumsum(Tensor const& input, unsigned axis) override;
+    Tensor argmax(Tensor const& input, unsigned axis, bool keepDims)
     override;
-    Tensor argmin(const Tensor& input, const unsigned axis, const bool keepDims)
+    Tensor argmin(Tensor const& input, unsigned axis, bool keepDims)
     override;
-    Tensor mean(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor mean(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
     Tensor median(
-        const Tensor& input,
-        const std::vector<int>& axes,
-        const bool keepDims
+        Tensor const& input,
+        std::vector<int> const& axes,
+        bool keepDims
     ) override;
     Tensor var(
-        const Tensor& input,
-        const std::vector<int>& axes,
-        const bool bias,
-        const bool keepDims
+        Tensor const& input,
+        std::vector<int> const& axes,
+        bool bias,
+        bool keepDims
     ) override;
-    Tensor std(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor std(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
     Tensor norm(
-        const Tensor& input,
-        const std::vector<int>& axes,
+        Tensor const& input,
+        std::vector<int> const& axes,
         double p,
-        const bool keepDims
+        bool keepDims
     ) override;
     Tensor countNonzero(
-        const Tensor& input,
-        const std::vector<int>& axes,
-        const bool keepDims
+        Tensor const& input,
+        std::vector<int> const& axes,
+        bool keepDims
     ) override;
-    Tensor any(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor any(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
-    Tensor all(const Tensor& input, const std::vector<int>& axes, const bool keepDims)
+    Tensor all(Tensor const& input, std::vector<int> const& axes, bool keepDims)
     override;
 
     /************************** Utils ***************************/
-    void print(const Tensor& tensor) override;
+    void print(Tensor const& tensor) override;
 };
 
 } // namespace fl

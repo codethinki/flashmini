@@ -147,8 +147,8 @@ Variable Conv2D::forward(const Variable& input) {
     if(bias_)
         return conv2d(
             input,
-            params_[0].astype(input.type()),
-            params_[1].astype(input.type()),
+            params_[0].asType(input.type()),
+            params_[1].asType(input.type()),
             xStride_,
             yStride_,
             px,
@@ -161,7 +161,7 @@ Variable Conv2D::forward(const Variable& input) {
     else
         return conv2d(
             input,
-            params_[0].astype(input.type()),
+            params_[0].asType(input.type()),
             xStride_,
             yStride_,
             px,

@@ -71,7 +71,7 @@ namespace detail {
     }
 
     Tensor erfinv(const Tensor& y) {
-        if(fl::any(fl::abs(y) >= 1.).scalar<char>())
+        if(fl::any_of(fl::abs(y) >= 1.).scalar<char>())
             throw std::runtime_error("[erfinv] input is out of range (-1, 1)");
         double a[4] = {0.886226899, -1.645349621, 0.914624893, -0.140543331};
         double b[4] = {-2.118377725, 1.442710462, -0.329097515, 0.012229801};
@@ -90,7 +90,7 @@ namespace detail {
         num = ((c[3] * z + c[2]) * z + c[1]) * z + c[0];
         dem = (d[1] * z + d[0]) * z + 1.0;
         // TODO{fl::Tensor}{operator} - check af::sign - zero case?
-        z = fl::sign(y).astype(fl::dtype::f32); // -1 for negative, 1 for positive
+        z = fl::sign(y).asType(fl::dtype::f32); // -1 for negative, 1 for positive
         z = z * num / dem;
         x = x + z * !centralMask;
 
@@ -98,8 +98,8 @@ namespace detail {
         x = x - (fl::erf(x) - y) / ((2.0 / std::sqrt(M_PI)) * fl::exp(-x * x));
         x = x - (fl::erf(x) - y) / ((2.0 / std::sqrt(M_PI)) * fl::exp(-x * x));
         if(
-            fl::any(fl::isnan(x)).asScalar<bool>()
-            || fl::any(fl::isinf(x)).asScalar<bool>()
+            fl::any_of(fl::isnan(x)).asScalar<bool>()
+            || fl::any_of(fl::isinf(x)).asScalar<bool>()
         )
             throw std::runtime_error("[erfinv] invalid result");
         return x;

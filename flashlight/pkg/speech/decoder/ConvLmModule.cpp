@@ -58,7 +58,7 @@ GetConvLmScoreFunc buildGetConvLmScoreFunction(
             Tensor preds =
                 fl::reshape(output.tensor().flatten()(globalIndices.flatten()), {C, B});
                     // vector of B X C predictions
-                    return preds.toHostVector<float>();
+                    return preds.host<float>();
         };
 
     return getConvLmScoreFunc;

@@ -120,7 +120,7 @@ void appendToLog(std::ofstream& logfile, const std::string& logstr) {
 
 Tensor allreduceGet(SpeechStatMeter& mtr) {
     auto mtrValRaw = mtr.value();
-    std::vector<long long> mtrVal(mtrValRaw.begin(), mtrValRaw.end());
+    std::vector<int64_t> mtrVal(mtrValRaw.begin(), mtrValRaw.end());
     // Caveat: maxInputSz_, maxTargetSz_ would be approximate
     mtrVal[2] *= mtrVal[4];
     mtrVal[3] *= mtrVal[4];
@@ -130,7 +130,7 @@ Tensor allreduceGet(SpeechStatMeter& mtr) {
 void allreduceSet(SpeechStatMeter& mtr, Tensor& val) {
     mtr.reset();
     // Caveat: maxInputSz_, maxTargetSz_ would be approximate
-    auto valVec = val.toHostVector<int64_t>();
+    auto valVec = val.host<int64_t>();
     SpeechStats stats;
     auto denom = (valVec[4] == 0) ? 1 : valVec[4];
     stats.totalInputSz_ = valVec[0];

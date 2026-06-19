@@ -50,14 +50,14 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
     }
 
     auto w =
-        Variable(fl::rand({static_cast<long long>(nParams)}, precision), true);
+        Variable(fl::rand({static_cast<Dim>(nParams)}, precision), true);
 
     auto funcRnnIn = [&](Variable& input) -> Variable {
             return std::get<0>(
                 rnn(
                     input,
-                    Variable().astype(precision),
-                    Variable().astype(precision),
+                    Variable().asType(precision),
+                    Variable().asType(precision),
                     w,
                     hiddenSize,
                     numLayers,
@@ -73,8 +73,8 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
             return std::get<0>(
                 rnn(
                     in,
-                    Variable().astype(precision),
-                    Variable().astype(precision),
+                    Variable().asType(precision),
+                    Variable().asType(precision),
                     weights,
                     hiddenSize,
                     numLayers,
@@ -98,8 +98,8 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
             return std::get<0>(
                 rnn(
                     in,
-                    hiddenState.astype(precision),
-                    Variable().astype(precision),
+                    hiddenState.asType(precision),
+                    Variable().asType(precision),
                     w,
                     hiddenSize,
                     numLayers,
@@ -116,8 +116,8 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
             return std::get<1>(
                 rnn(
                     input,
-                    Variable().astype(precision),
-                    Variable().astype(precision),
+                    Variable().asType(precision),
+                    Variable().asType(precision),
                     w,
                     hiddenSize,
                     numLayers,
@@ -144,8 +144,8 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 return std::get<0>(
                     rnn(
                         in,
-                        Variable().astype(precision),
-                        cellState.astype(precision),
+                        Variable().asType(precision),
+                        cellState.asType(precision),
                         w,
                         hiddenSize,
                         numLayers,
@@ -164,8 +164,8 @@ void testRnnImpl(RnnMode mode, fl::dtype precision = fl::dtype::f64) {
                 return std::get<2>(
                     rnn(
                         input,
-                        Variable().astype(precision),
-                        Variable().astype(precision),
+                        Variable().asType(precision),
+                        Variable().asType(precision),
                         w,
                         hiddenSize,
                         numLayers,
