@@ -1,5 +1,5 @@
 ### this is a **fork** from [**FLASHLIGHT**](https://github.com/flashlight/flashlight)
-
+## DEV STOPPED; REPO INACTIVE
 ### State
 [![Build & Test](https://github.com/codethinki/flashmini/actions/workflows/build-test.yml/badge.svg)](https://github.com/codethinki/flashmini/actions/workflows/build-test.yml)\
 Badge indicates:
